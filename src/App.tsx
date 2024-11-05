@@ -1,3 +1,8 @@
-const App = () => <>Sysmetic</>;
+import { RouterProvider } from 'react-router-dom';
+import router from '@/routes/Router';
 
-export default App;
+export const App = () => (
+  <>
+    <RouterProvider router={router} />
+  </>
+);
