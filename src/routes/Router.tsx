@@ -45,6 +45,14 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       {
+        path: PATH.SIGN_IN,
+        element: <SignIn />,
+      },
+      {
+        path: PATH.SIGN_UP,
+        element: <SignUp />,
+      },
+      {
         index: true,
         element: <Home />,
       },
@@ -177,14 +185,6 @@ const router = createBrowserRouter([
         element: <Faq />,
       },
     ],
-  },
-  {
-    path: PATH.SIGN_IN,
-    element: <SignIn />,
-  },
-  {
-    path: PATH.SIGN_UP,
-    element: <SignUp />,
   },
   {
     path: PATH.TEMP,
