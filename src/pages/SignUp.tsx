@@ -17,6 +17,9 @@ const SignUp = () => (
       <button>투자자 가입</button>
       <button>트레이더 가입</button>
     </div>
+    <div css={AlertDivStyle}>
+      <p>* 일반회원은 투자자로 가입하시면 됩니다.</p>
+    </div>
   </div>
 );
 
@@ -79,6 +82,17 @@ const ButtonDivStyle = css`
     // background-color: #0B3C79;
     cursor: pointer;
   }
+`;
+
+const AlertDivStyle = css`
+  width: 258px;
+  height: 26px;
+  color: #c84a31;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 160%;
+  letter-spacing: -0.32px;
+  margin: 7px 0 0 321px;
 `;
 
 export default SignUp;
