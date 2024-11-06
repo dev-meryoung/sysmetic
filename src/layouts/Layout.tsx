@@ -15,9 +15,10 @@ const Layout = () => (
 
 const containerStyle = css`
   width: 100%;
-  max-width: 1180px;
+  max-width: 1200px;
   height: 100vh;
-  margin: 0 10px;
+  padding: 0 10px;
+  margin: 0 auto;
 `;
 
 export default Layout;
