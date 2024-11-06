@@ -1,13 +1,23 @@
+import { css } from '@emotion/react';
 import { Outlet } from 'react-router-dom';
 import Footer from '@/layouts/Footer';
 import Header from '@/layouts/Header';
 
 const Layout = () => (
-  <main>
+  <div css={containerStyle}>
     <Header />
-    <Outlet />
+    <main>
+      <Outlet />
+    </main>
     <Footer />
-  </main>
+  </div>
 );
+
+const containerStyle = css`
+  width: 100%;
+  max-width: 1180px;
+  height: 100vh;
+  margin: 0 10px;
+`;
 
 export default Layout;
