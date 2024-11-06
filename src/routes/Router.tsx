@@ -184,11 +184,11 @@ const router = createBrowserRouter([
         path: PATH.FAQ,
         element: <Faq />,
       },
+      {
+        path: PATH.TEMP,
+        element: <Temp />,
+      },
     ],
-  },
-  {
-    path: PATH.TEMP,
-    element: <Temp />,
   },
   {
     path: PATH.NOT_FOUND,

@@ -138,10 +138,9 @@ const GlobalStyles = () => (
       }
       body,
       #root {
-        display: flex;
-        justify-content: center;
         width: 100%;
         height: 100%;
+        font-size: 1.6rem;
         font-family: 'Pretendard Variable', Pretendard, 'Malgun Gothic',
           Helvetica, 'Apple SD Gothic Neo', Sans-serif;
       }
