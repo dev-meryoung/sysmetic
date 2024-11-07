@@ -15,9 +15,7 @@ const Layout = () => (
 
 const containerStyle = css`
   width: 100%;
-  max-width: 1200px;
-  height: 100vh;
-  padding: 0 10px;
+  height: 100%;
   margin: 0 auto;
 `;
 
