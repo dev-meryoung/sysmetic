@@ -57,6 +57,7 @@ const wrapperStyle = css`
 const footerTopStyle = css`
   background-color: #333333;
   width: 100%;
+  height: 224px;
 
   button {
     border: 1px solid #cccccc;
@@ -72,6 +73,7 @@ const footerBottomStyle = css`
   background-color: #111111;
   padding: 14px 0;
   width: 100%;
+  height: 80px;
 
   div {
     color: #ffffff;
@@ -86,6 +88,7 @@ const footerBottomStyle = css`
 
 const layoutStyle = css`
   max-width: 1200px;
+  height: 100%;
   padding: 43px 10px;
   display: flex;
   justify-content: space-between;
