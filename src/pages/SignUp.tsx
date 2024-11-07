@@ -25,15 +25,12 @@ const SignUp = () => (
 
 const AWrapperStyle = css`
   width: 100%;
-  height: calc(100vh - calc(144px + 309px));
+  height: 100%;
   max-width: 1200px;
   padding: 0 10px;
   margin: 0 auto;
   color: #000;
   letter-spacing: -0.4px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 `;
 
 const TitleStyle = css`
@@ -42,7 +39,7 @@ const TitleStyle = css`
   font-weight: 700;
   font-size: 24px;
   line-height: 24px;
-  margin-bottom: 38px;
+  margin: 92px 0 38px;
 `;
 
 const ContentsDivStyle = css`
@@ -92,7 +89,7 @@ const AlertDivStyle = css`
   font-weight: 400;
   line-height: 160%;
   letter-spacing: -0.32px;
-  margin: 7px 0 0 321px;
+  margin: 7px 0 105px 321px;
 `;
 
 export default SignUp;
