@@ -93,9 +93,7 @@ const SignIn = () => {
 export default SignIn;
 
 const wrapperStyle = css`
-  margin: 0 auto;
-  margin-top: 120px;
-  margin-bottom: 174px;
+  margin: 150px auto 150px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -123,7 +121,7 @@ const staySignInContainer = css`
 const containerInputStyle = css`
   display: flex;
   flex-direction: column;
-  margin-top: 39px;
+  margin-top: 40px;
   gap: 16px;
   align-items: center;
 `;
@@ -137,7 +135,7 @@ const inputWrapperStyle = css`
 
 const inputStyle = css`
   width: 100%;
-  height: 48px;
+  height: 45px;
   border-radius: 4px;
   border: 1px solid gray;
   padding: 8px 12px;
