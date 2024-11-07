@@ -156,10 +156,11 @@ const ContentsDivStyle = css`
         align-items: center;
       }
 
-      input {
+      input[type='radio'] {
         width: 24px;
         height: 24px;
         margin: 12px;
+        accent-color: #1261c4;
       }
     }
   }
@@ -192,27 +193,5 @@ const ButtonDivWrapper = css`
     color: #fff;
   }
 `;
-
-// const ContentDivStyle = css`
-//   border: 1px solid #1261c44d;
-//   padding: 30px 26px;
-//   height: 250px;
-
-//   h2 {
-//     font-size: 20px;
-//     margin-bottom: 11px;
-//   }
-
-//   h2 > span {
-//     color: #1261c4;
-//     font-weight: 700;
-//   }
-
-//   p {
-//     height: 186px;
-//     overflow: auto;
-//     line-height: 160%;
-//   }
-// `;
 
 export default SignUpType;
