@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { PATH } from '@/constants/path';
 import Layout from '@/layouts/Layout';
+import SignupStepLayout from '@/layouts/SignupStepLayout';
 import Admin from '@/pages/admin/Admin';
 import AdminMethods from '@/pages/admin/AdminMethods';
 import AdminNoticeAdd from '@/pages/admin/AdminNoticeAdd';
@@ -27,8 +28,13 @@ import NotFound from '@/pages/NotFound';
 import Notices from '@/pages/Notices';
 import NoticesDetail from '@/pages/NoticesDetail';
 import QnaAdd from '@/pages/QnaAdd';
+import SignFindId from '@/pages/SignFindId';
+import SignFindPw from '@/pages/SignFindPw';
 import SignIn from '@/pages/SignIn';
 import SignUp from '@/pages/SignUp';
+import SignUpDone from '@/pages/SignUpDone';
+import SignUpForm from '@/pages/SignUpForm';
+import SignUpType from '@/pages/SignUpType';
 import StrategyAdd from '@/pages/StrategyAdd';
 import StrategyDetail from '@/pages/StrategyDetail';
 import StrategyList from '@/pages/StrategyList';
@@ -37,7 +43,6 @@ import Temp from '@/pages/Temp';
 import TraderList from '@/pages/TraderList';
 import TraderStrategyInfo from '@/pages/TraderStrategyInfo';
 import TraderStrategyList from '@/pages/TraderStrategyList';
-import UserStrategyInfo from '@/pages/UserStrategyInfo';
 
 const router = createBrowserRouter([
   {
@@ -49,16 +54,38 @@ const router = createBrowserRouter([
         element: <SignIn />,
       },
       {
+        path: PATH.SIGN_FIND_PW,
+        element: <SignFindPw />,
+      },
+      {
+        path: PATH.SIGN_FIND_ID,
+        element: <SignFindId />,
+      },
+      {
         path: PATH.SIGN_UP,
         element: <SignUp />,
       },
       {
-        index: true,
-        element: <Home />,
+        path: PATH.SIGN_UP_TYPE(),
+        element: <SignupStepLayout />,
+        children: [
+          {
+            index: true,
+            element: <SignUpType />,
+          },
+          {
+            path: PATH.SIGN_UP_FORM(),
+            element: <SignUpForm />,
+          },
+          {
+            path: PATH.SIGN_UP_DONE(),
+            element: <SignUpDone />,
+          },
+        ],
       },
       {
-        path: PATH.STRATEGIES_INFO_USER,
-        element: <UserStrategyInfo />,
+        index: true,
+        element: <Home />,
       },
       {
         path: PATH.STRATEGIES_LIST,

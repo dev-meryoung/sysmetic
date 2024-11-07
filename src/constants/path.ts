@@ -1,8 +1,12 @@
 export const PATH = {
   ROOT: '/',
   SIGN_IN: '/signin',
+  SIGN_FIND_ID: '/signin/find/id',
+  SIGN_FIND_PW: '/signin/find/pw',
   SIGN_UP: '/signup',
-  STRATEGIES_INFO_USER: '/strategies/info/user',
+  SIGN_UP_TYPE: (type = ':type') => `/signup/step/${type}`,
+  SIGN_UP_FORM: (type = ':type') => `/signup/step/${type}/form`,
+  SIGN_UP_DONE: (type = ':type') => `/signup/step/${type}/done`,
   STRATEGIES_LIST: '/strategies',
   STRATEGIES_DETAIL: (strategyId = ':strategyId') =>
     `/strategies/${strategyId}`,
