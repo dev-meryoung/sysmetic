@@ -43,7 +43,8 @@ const headerTopBgStyle = css`
 `;
 
 const headerTopStyle = css`
-  width: 1200px;
+  width: 100%;
+  max-width: 1200px;
   display: flex;
   justify-content: flex-end;
   padding: 0 10px;
