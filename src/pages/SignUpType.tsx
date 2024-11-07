@@ -189,6 +189,7 @@ const ButtonDivWrapper = css`
   }
 
   .next-btn {
+    border: none;
     background-color: #1261c4;
     color: #fff;
   }
