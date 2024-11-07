@@ -2,9 +2,13 @@ const Temp = () => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
     라우팅 테스트 페이지
     <a href='/signin'>로그인</a>
+    <a href='/signin/find/id'>아이디 찾기</a>
+    <a href='/signin/find/pw'>비밀번호 찾기</a>
     <a href='/signup'>회원가입</a>
+    <a href='/signup/step/:type'>회원가입(1.약관동의)</a>
+    <a href='/signup/step/:type/form'>회원가입(2.정보입력)</a>
+    <a href='/signup/step/:type/done'>회원가입(3.가입완료)</a>
     <a href='/'>메인</a>
-    <a href='/strategies/info/user'>전략탐색(안내)</a>
     <a href='/strategies'>전략 목록</a>
     <a href='/strategies/1 '>전략상세</a>
     <a href='/strategies/1/qna/add'>문의 질문 등록</a>
