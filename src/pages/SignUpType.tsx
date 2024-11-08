@@ -168,9 +168,8 @@ const ContentsDivStyle = css`
 
 const ButtonDivStyle = css`
   display: flex;
-  margin: 0 auto;
+  margin: 0 auto 95px;
   gap: 16px;
-  margin-bottom: 95px;
 
   button {
     width: 120px;
