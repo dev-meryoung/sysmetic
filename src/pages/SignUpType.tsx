@@ -82,7 +82,7 @@ const SignUpType = () => {
           </React.Fragment>
         ))}
       </div>
-      <div css={ButtonDivWrapper}>
+      <div css={ButtonDivStyle}>
         <button className='back-btn'>이전</button>
         <button className='next-btn'>다음</button>
       </div>
@@ -166,7 +166,7 @@ const ContentsDivStyle = css`
   }
 `;
 
-const ButtonDivWrapper = css`
+const ButtonDivStyle = css`
   display: flex;
   margin: 0 auto;
   gap: 16px;
