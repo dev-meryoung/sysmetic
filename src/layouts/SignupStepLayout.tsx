@@ -26,7 +26,6 @@ const SignupStepLayout = () => (
 
 const SignupStepLayoutWrapperStyle = css`
   width: 100%;
-  padding: 0 10px;
   margin: 0 auto;
   color: #000;
   letter-spacing: -0.4px;
@@ -47,6 +46,7 @@ const SignupStepLayoutWrapperStyle = css`
     font-size: 24px;
     line-height: 24px;
     margin: 90px auto 38px;
+    padding: 0 10px;
   }
 `;
 
@@ -54,6 +54,7 @@ const SignUpBreadCrumStyle = css`
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
+  padding: 0 10px;
 
   .step {
     width: 160px;
