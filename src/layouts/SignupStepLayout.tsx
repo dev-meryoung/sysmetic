@@ -45,7 +45,7 @@ const SignupStepLayoutWrapperStyle = css`
     font-weight: 700;
     font-size: 24px;
     line-height: 24px;
-    margin: 90px auto 38px;
+    margin: 96px auto 40px;
     padding: 0 10px;
   }
 `;
