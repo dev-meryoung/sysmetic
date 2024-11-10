@@ -104,14 +104,14 @@ const WrapperStyle = css`
 
 const ContentsDivStyle = css`
   height: auto;
-  margin-top: 79px;
+  margin-top: 80px;
   h2 {
     width: 140px;
     height: 20px;
     font-size: 20px;
     font-weight: 700;
     letter-spacing: -0.4px;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
   }
 
   h3 {
@@ -123,7 +123,7 @@ const ContentsDivStyle = css`
 
   .content-box {
     // padding-bottom: 119px;
-    margin-bottom: 71px;
+    margin-bottom: 64px;
   }
 
   .content-div {
@@ -147,7 +147,7 @@ const ContentsDivStyle = css`
       width: 300px;
       height: 48px;
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
       align-items: center;
       gap: 12px;
 
@@ -168,7 +168,7 @@ const ContentsDivStyle = css`
 
 const ButtonDivStyle = css`
   display: flex;
-  margin: 0 auto 95px;
+  margin: 0 auto 96px;
   gap: 16px;
 
   button {
