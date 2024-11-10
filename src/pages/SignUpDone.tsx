@@ -39,7 +39,7 @@ const WrapperStyle = css`
 const ProfileDivStyle = css`
   width: 300px;
   height: 300px;
-  margin: 95px auto 0;
+  margin: 96px auto 0;
   border-radius: 300px;
   background-color: #f9f9f9;
   font-size: 36px;
@@ -72,7 +72,7 @@ const ContentsDivStyle = css`
 
 const ButtonDivStyle = css`
   display: flex;
-  margin: 60px auto 98px;
+  margin: 64px auto 96px;
   gap: 16px;
 
   button {
