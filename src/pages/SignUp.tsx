@@ -39,7 +39,7 @@ const TitleStyle = css`
   font-weight: 700;
   font-size: 24px;
   line-height: 24px;
-  margin: 92px 0 38px;
+  margin: 96px 0 40px;
 `;
 
 const ContentsDivStyle = css`
@@ -65,7 +65,7 @@ const ButtonDivStyle = css`
   margin-top: 40px;
   display: flex;
   justify-content: space-between;
-  gap: 20px;
+  gap: 22px;
 
   button {
     width: 578px;
