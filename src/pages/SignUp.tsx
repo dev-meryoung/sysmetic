@@ -1,9 +1,9 @@
 import { css } from '@emotion/react';
 
 const SignUp = () => (
-  <div css={AWrapperStyle}>
-    <h1 css={TitleStyle}>회원가입</h1>
-    <div css={ContentsDivStyle}>
+  <div css={wrapperStyle}>
+    <h1 css={titleStyle}>회원가입</h1>
+    <div css={contentsDivStyle}>
       <h2>
         <span>시스메틱</span>에 오신 것을 환영합니다.
       </h2>
@@ -13,17 +13,17 @@ const SignUp = () => (
       </p>
       <p>투자자 가입으로 가입 시, 관심있는 전략만 별도로 관리할 수 있습니다.</p>
     </div>
-    <div css={ButtonDivStyle}>
+    <div css={buttonDivStyle}>
       <button>투자자 가입</button>
       <button>트레이더 가입</button>
     </div>
-    <div css={AlertDivStyle}>
+    <div css={alertDivStyle}>
       <p>* 일반회원은 투자자로 가입하시면 됩니다.</p>
     </div>
   </div>
 );
 
-const AWrapperStyle = css`
+const wrapperStyle = css`
   width: 100%;
   height: 100%;
   max-width: 1200px;
@@ -33,7 +33,7 @@ const AWrapperStyle = css`
   letter-spacing: -0.4px;
 `;
 
-const TitleStyle = css`
+const titleStyle = css`
   width: 82px;
   height: 24px;
   font-weight: 700;
@@ -42,7 +42,7 @@ const TitleStyle = css`
   margin: 96px 0 40px;
 `;
 
-const ContentsDivStyle = css`
+const contentsDivStyle = css`
   border: 1px solid #1261c44d;
   padding: 30px 26px;
 
@@ -61,7 +61,7 @@ const ContentsDivStyle = css`
   }
 `;
 
-const ButtonDivStyle = css`
+const buttonDivStyle = css`
   margin-top: 40px;
   display: flex;
   justify-content: space-between;
@@ -82,7 +82,7 @@ const ButtonDivStyle = css`
   }
 `;
 
-const AlertDivStyle = css`
+const alertDivStyle = css`
   width: 258px;
   height: 26px;
   color: #c84a31;

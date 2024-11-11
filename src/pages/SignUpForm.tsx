@@ -1,9 +1,9 @@
 import { css } from '@emotion/react';
 
 const SignUpForm = () => (
-  <div css={WrapperStyle}>
-    <div css={SubTitleStyle}>정보입력</div>
-    <div css={FormDivStyle}>
+  <div css={wrapperStyle}>
+    <div css={subTitleStyle}>정보입력</div>
+    <div css={formDivStyle}>
       <div className='email-form'>
         <h2>이메일</h2>
         <div>
@@ -55,11 +55,11 @@ const SignUpForm = () => (
         />
       </div>
     </div>
-    <div css={SubTitleStyle}>
+    <div css={subTitleStyle}>
       정보수신 동의
       <p>모든 정보수신에 동의를 하셔야 회원가입이 이루어집니다.</p>
     </div>
-    <div css={AgreementDivStyle}>
+    <div css={agreementDivStyle}>
       <div>
         <label>
           <input type='radio' name='agree1' />
@@ -81,14 +81,14 @@ const SignUpForm = () => (
         </label>
       </div>
     </div>
-    <div css={ButtonDivStyle}>
+    <div css={buttonDivStyle}>
       <button className='back-btn'>이전</button>
       <button className='next-btn'>다음</button>
     </div>
   </div>
 );
 
-const WrapperStyle = css`
+const wrapperStyle = css`
   width: 100%;
   height: 100%;
   max-width: 1200px;
@@ -102,7 +102,7 @@ const WrapperStyle = css`
   flex-direction: column;
 `;
 
-const SubTitleStyle = css`
+const subTitleStyle = css`
   margin-top: 80px;
   padding-bottom: 40px;
   font-size: 20px;
@@ -118,7 +118,7 @@ const SubTitleStyle = css`
   }
 `;
 
-const FormDivStyle = css`
+const formDivStyle = css`
   margin-top: 40px;
   letter-spacing: -0.28px;
 
@@ -217,7 +217,7 @@ const FormDivStyle = css`
   }
 `;
 
-const AgreementDivStyle = css`
+const agreementDivStyle = css`
   font-size: 20px;
   margin-top: 40px;
   font-size: 16px;
@@ -242,7 +242,7 @@ const AgreementDivStyle = css`
   }
 `;
 
-const ButtonDivStyle = css`
+const buttonDivStyle = css`
   display: flex;
   margin: 80px auto 96px;
   gap: 16px;

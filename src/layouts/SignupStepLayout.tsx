@@ -2,10 +2,10 @@ import { css } from '@emotion/react';
 import { Outlet } from 'react-router-dom';
 
 const SignupStepLayout = () => (
-  <div css={SignupStepLayoutWrapperStyle}>
+  <div css={signUpStepLayoutWrapperStyle}>
     <h1 className='title'>회원가입</h1>
     <div className='step-inner-layout'>
-      <div css={SignUpStepStyle}>
+      <div css={signUpStepStyle}>
         <div className='step'>
           <h2>STEP 1</h2>
           <h3>약관동의</h3>
@@ -24,7 +24,7 @@ const SignupStepLayout = () => (
   </div>
 );
 
-const SignupStepLayoutWrapperStyle = css`
+const signUpStepLayoutWrapperStyle = css`
   width: 100%;
   margin: 0 auto;
   color: #000;
@@ -50,7 +50,7 @@ const SignupStepLayoutWrapperStyle = css`
   }
 `;
 
-const SignUpStepStyle = css`
+const signUpStepStyle = css`
   max-width: 1200px;
   margin: 0 auto;
   display: flex;

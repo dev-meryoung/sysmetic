@@ -18,7 +18,7 @@ const SignUpType = () => {
     setIsRadioToggled(updatedToggled);
   };
 
-  const ContentLists: ContentProps[] = [
+  const contentLists: ContentProps[] = [
     {
       id: 1,
       name: 'termsAgree1',
@@ -46,22 +46,22 @@ const SignUpType = () => {
   ];
 
   return (
-    <div css={WrapperStyle}>
-      <div css={ContentsDivStyle}>
-        {ContentLists.map((ContentList, i) => (
-          <React.Fragment key={ContentList.id}>
+    <div css={wrapperStyle}>
+      <div css={contentsDivStyle}>
+        {contentLists.map((contentList, i) => (
+          <React.Fragment key={contentList.id}>
             <div className='content-box'>
-              <h2>{ContentList.title}</h2>
+              <h2>{contentList.title}</h2>
               <div className='content-div'>
-                <p>{ContentList.license}</p>
+                <p>{contentList.license}</p>
               </div>
               <div className='bottom'>
-                <h3>{ContentList.agree}</h3>
+                <h3>{contentList.agree}</h3>
                 <div className='radio-div'>
                   <label>
                     <input
                       type='radio'
-                      name={ContentList.name}
+                      name={contentList.name}
                       checked={isRadioToggled[i] === true}
                       onChange={() => handleRadioToggle(i, true)}
                     />
@@ -70,7 +70,7 @@ const SignUpType = () => {
                   <label>
                     <input
                       type='radio'
-                      name={ContentList.name}
+                      name={contentList.name}
                       checked={isRadioToggled[i] === false}
                       onChange={() => handleRadioToggle(i, false)}
                     />
@@ -82,7 +82,7 @@ const SignUpType = () => {
           </React.Fragment>
         ))}
       </div>
-      <div css={ButtonDivStyle}>
+      <div css={buttonDivStyle}>
         <button className='back-btn'>이전</button>
         <button className='next-btn'>다음</button>
       </div>
@@ -90,7 +90,7 @@ const SignUpType = () => {
   );
 };
 
-const WrapperStyle = css`
+const wrapperStyle = css`
   width: 100%;
   height: 100%;
   max-width: 1200px;
@@ -102,7 +102,7 @@ const WrapperStyle = css`
   flex-direction: column;
 `;
 
-const ContentsDivStyle = css`
+const contentsDivStyle = css`
   height: auto;
   margin-top: 80px;
   h2 {
@@ -166,7 +166,7 @@ const ContentsDivStyle = css`
   }
 `;
 
-const ButtonDivStyle = css`
+const buttonDivStyle = css`
   display: flex;
   margin: 0 auto 96px;
   gap: 16px;

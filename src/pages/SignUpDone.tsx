@@ -1,14 +1,14 @@
 import { css } from '@emotion/react';
 
 const SignUpDone = () => (
-  <div css={WrapperStyle}>
-    <div css={ProfileDivStyle}>
+  <div css={wrapperStyle}>
+    <div css={profileDivStyle}>
       <img
         src='https://img.animalplanet.co.kr/news/2020/08/06/700/yaj83kp9p731j819tcda.jpg'
         alt='my-profile'
       />
     </div>
-    <div css={ContentsDivStyle}>
+    <div css={contentsDivStyle}>
       <h2>축하합니다. Sysmetic 회원가입이 완료되었습니다!</h2>
       <p>
         Sysmetic과 함께 투자하는 전략들을 만나보세요. <br />
@@ -16,14 +16,14 @@ const SignUpDone = () => (
         있습니다.
       </p>
     </div>
-    <div css={ButtonDivStyle}>
+    <div css={buttonDivStyle}>
       <button className='main-btn'>메인가기</button>
       <button className='login-btn'>로그인</button>
     </div>
   </div>
 );
 
-const WrapperStyle = css`
+const wrapperStyle = css`
   width: 100%;
   height: 100%;
   max-width: 1200px;
@@ -36,7 +36,7 @@ const WrapperStyle = css`
   flex-direction: column;
 `;
 
-const ProfileDivStyle = css`
+const profileDivStyle = css`
   width: 300px;
   height: 300px;
   margin: 96px auto 0;
@@ -51,7 +51,7 @@ const ProfileDivStyle = css`
   overflow: hidden;
 `;
 
-const ContentsDivStyle = css`
+const contentsDivStyle = css`
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -70,7 +70,7 @@ const ContentsDivStyle = css`
   }
 `;
 
-const ButtonDivStyle = css`
+const buttonDivStyle = css`
   display: flex;
   margin: 64px auto 96px;
   gap: 16px;
