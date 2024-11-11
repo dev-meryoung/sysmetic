@@ -5,7 +5,7 @@ const SignupStepLayout = () => (
   <div css={SignupStepLayoutWrapperStyle}>
     <h1 className='title'>회원가입</h1>
     <div className='step-inner-layout'>
-      <div css={SignUpBreadCrumStyle}>
+      <div css={SignUpStepStyle}>
         <div className='step'>
           <h2>STEP 1</h2>
           <h3>약관동의</h3>
@@ -50,7 +50,7 @@ const SignupStepLayoutWrapperStyle = css`
   }
 `;
 
-const SignUpBreadCrumStyle = css`
+const SignUpStepStyle = css`
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
