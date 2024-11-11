@@ -70,6 +70,7 @@ const ButtonDivStyle = css`
   button {
     width: 578px;
     height: 136px;
+    font-family: inherit;
     font-size: 32px;
     color: #fff;
     font-weight: 700;

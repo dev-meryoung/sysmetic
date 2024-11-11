@@ -174,6 +174,7 @@ const ButtonDivStyle = css`
   button {
     width: 120px;
     height: 48px;
+    font-family: inherit;
     font-size: 14px;
     font-weight: 400;
     letter-spacing: -0.28px;
