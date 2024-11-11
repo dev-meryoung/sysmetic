@@ -5,6 +5,7 @@ import VisibilityOffOutlined from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlined from '@mui/icons-material/VisibilityOutlined';
 import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { PATH } from '@/constants/path';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -24,7 +25,7 @@ const SignIn = () => {
   };
 
   const handleSignin = () => {
-    navigate('/');
+    navigate(PATH.ROOT);
   };
 
   return (
