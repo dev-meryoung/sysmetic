@@ -4,11 +4,13 @@ import CancelOutlined from '@mui/icons-material/CancelOutlined';
 import VisibilityOffOutlined from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlined from '@mui/icons-material/VisibilityOutlined';
 import { Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const handlePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -19,6 +21,10 @@ const SignIn = () => {
   };
   const handleClearPassword = () => {
     setPassword('');
+  };
+
+  const handleSignin = () => {
+    navigate('/');
   };
 
   return (
@@ -74,19 +80,22 @@ const SignIn = () => {
         </div>
       </div>
 
-      <div css={staySignInContainer}>
+      <div css={staySignInContainerStyle}>
         <input type='checkbox' css={staySignInStyle} /> 로그인 유지
       </div>
 
       <div>
-        <button css={accessBtnStyle}>로그인</button>
+        <button onClick={handleSignin} css={accessBtnStyle}>
+          로그인
+        </button>
       </div>
 
       <div css={linksStyle}>
-        <a href='#' css={accountStyle}>
+        <a href='/signup' css={accountStyle}>
           회원가입
         </a>
-        <a href='#'>계정(이메일) 찾기</a> | <a href='#'>비밀번호 재설정</a>
+        <a href='/signin/find/id'>계정(이메일) 찾기</a> |{' '}
+        <a href='/signin/find/pw'>비밀번호 재설정</a>
       </div>
     </div>
   );
@@ -95,14 +104,16 @@ const SignIn = () => {
 export default SignIn;
 
 const wrapperStyle = css`
-  margin: 150px auto 150px;
+  padding-top: 124px;
+  padding-bottom: 124px;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
+  margin: 0 auto;
   max-width: 1200px;
-  padding: 0 10px;
-  height: auto;
+  box-sizing: border-box;
+  height: 627px;
 `;
 
 const signInTextStyle = css`
@@ -111,12 +122,12 @@ const signInTextStyle = css`
   align-self: center;
 `;
 
-const staySignInContainer = css`
+const staySignInContainerStyle = css`
   display: flex;
   align-items: center;
   width: 360px;
   margin-top: 16px;
-  margin-bottom: 26px;
+  margin-bottom: 24px;
   font-size: 14px;
 `;
 
@@ -130,23 +141,29 @@ const containerInputStyle = css`
 
 const inputWrapperStyle = css`
   position: relative;
-  width: 360px;
   display: flex;
   align-items: center;
 `;
 
 const inputStyle = css`
-  width: 100%;
-  height: 45px;
-  border-radius: 4px;
-  border: 1px solid gray;
+  width: 360px;
+  height: 48px;
   padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
   outline: none;
+  box-sizing: border-box; /* box-sizing 추가 */
 
-  :focus {
-    border: 2px solid #1261c4;
+  &:focus {
+    border: 1px solid #1261c4;
+  }
+
+  &::placeholder {
+    font-size: 16px;
+    color: rgba(0, 0, 0, 0.3);
   }
 `;
+
 const showIconBtnStyle = css`
   position: absolute;
   right: 40px;
