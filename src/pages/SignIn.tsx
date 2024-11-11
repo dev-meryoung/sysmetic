@@ -16,10 +16,10 @@ const SignIn = () => {
 
   const handleClearEmail = () => {
     setEmail('');
-  }
+  };
   const handleClearPassword = () => {
     setPassword('');
-  }
+  };
 
   return (
     <div css={wrapperStyle}>
@@ -28,14 +28,14 @@ const SignIn = () => {
       <div css={containerInputStyle}>
         <div css={inputWrapperStyle}>
           <input
-            type="text"
-            placeholder="이메일 주소 (abc@abc.com)"
+            type='text'
+            placeholder='이메일 주소 (abc@abc.com)'
             css={inputStyle}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
           <Button
-            variant="text"
+            variant='text'
             onClick={handleClearEmail}
             css={deleteIconBtnStyle}
             disableRipple
@@ -46,13 +46,13 @@ const SignIn = () => {
         <div css={inputWrapperStyle}>
           <input
             type={showPassword ? 'text' : 'password'}
-            placeholder="비밀번호"
+            placeholder='비밀번호'
             css={inputStyle}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
           <Button
-            variant="text"
+            variant='text'
             onClick={handlePasswordVisibility}
             css={showIconBtnStyle}
             disableRipple
@@ -64,7 +64,7 @@ const SignIn = () => {
             )}
           </Button>
           <Button
-            variant="text"
+            variant='text'
             onClick={handleClearPassword}
             css={deleteIconBtnStyle}
             disableRipple
@@ -75,7 +75,7 @@ const SignIn = () => {
       </div>
 
       <div css={staySignInContainer}>
-        <input type="checkbox" css={staySignInStyle} /> 로그인 유지
+        <input type='checkbox' css={staySignInStyle} /> 로그인 유지
       </div>
 
       <div>
@@ -83,8 +83,10 @@ const SignIn = () => {
       </div>
 
       <div css={linksStyle}>
-        <a href="#" css={accountStyle}>회원가입</a>
-        <a href="#">계정(이메일) 찾기</a> | <a href="#">비밀번호 재설정</a>
+        <a href='#' css={accountStyle}>
+          회원가입
+        </a>
+        <a href='#'>계정(이메일) 찾기</a> | <a href='#'>비밀번호 재설정</a>
       </div>
     </div>
   );
@@ -142,12 +144,12 @@ const inputStyle = css`
   outline: none;
 
   :focus {
-    border: 2px solid #1261C4;
+    border: 2px solid #1261c4;
   }
 `;
 const showIconBtnStyle = css`
   position: absolute;
-  right: 40px; 
+  right: 40px;
   top: 50%;
   transform: translateY(-50%);
   padding: 0;
@@ -156,7 +158,7 @@ const showIconBtnStyle = css`
 
 const deleteIconBtnStyle = css`
   position: absolute;
-  right: 8px; 
+  right: 8px;
   top: 50%;
   transform: translateY(-50%);
   padding: 0;
@@ -166,7 +168,7 @@ const deleteIconBtnStyle = css`
 const accessBtnStyle = css`
   border: none;
   cursor: pointer;
-  background-color: #1261C4;
+  background-color: #1261c4;
   color: white;
   width: 360px;
   height: 56px;
