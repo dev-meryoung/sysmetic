@@ -8,7 +8,7 @@ const SignUpForm = () => (
         <h2>이메일</h2>
         <div>
           <input type='text' />
-          <span style={{ margin: '0 6px' }}>@</span>
+          <span style={{ margin: '0 8px' }}>@</span>
           <select name='email' id='email'>
             <option value='naver'>naver.com</option>
             <option value='daum'>daum.com</option>
@@ -236,7 +236,7 @@ const AgreementDivStyle = css`
 
   div {
     display: flex;
-    gap: 24px;
+    gap: 16px;
   }
 
   input[type='radio'] {
