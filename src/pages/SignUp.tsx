@@ -79,6 +79,8 @@ const buttonDivStyle = css`
     background-color: #1261c4;
     // background-color: #0B3C79;
     cursor: pointer;
+    border: none;
+    border-radius: 4px;
   }
 `;
 
