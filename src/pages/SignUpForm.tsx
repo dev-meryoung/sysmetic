@@ -154,10 +154,10 @@ const FormDivStyle = css`
       border: none;
       border-radius: 4px;
       color: #fff;
-      font-family: Pretendard;
-      font-size: 12px;
+      font-family: 'Pretendard Variable', Pretendard, 'Malgun Gothic', Helvetica,
+        'Apple SD Gothic Neo', Sans-serif;
+      font-size: 14px;
       font-weight: 400;
-      border-radius: 4px;
       cursor: pointer;
     }
 
@@ -195,8 +195,9 @@ const FormDivStyle = css`
       border-radius: 4px;
       background-color: #1261c4;
       color: #fff;
-      font-family: Pretendard;
-      font-size: 12px;
+      font-family: 'Pretendard Variable', Pretendard, 'Malgun Gothic', Helvetica,
+        'Apple SD Gothic Neo', Sans-serif;
+      font-size: 14px;
       font-weight: 400;
       border-radius: 4px;
       cursor: pointer;
@@ -220,13 +221,9 @@ const FormDivStyle = css`
 
 const AgreementDivStyle = css`
   font-size: 20px;
-  font-weight: 700;
   margin-top: 40px;
-
-  p {
-    font-size: 16px;
-    font-weight: 400;
-  }
+  font-size: 16px;
+  font-weight: 400;
 
   label {
     display: flex;
@@ -255,6 +252,8 @@ const ButtonDivStyle = css`
   button {
     width: 120px;
     height: 48px;
+    font-family: 'Pretendard Variable', Pretendard, 'Malgun Gothic', Helvetica,
+      'Apple SD Gothic Neo', Sans-serif;
     font-size: 14px;
     font-weight: 400;
     letter-spacing: -0.28px;
