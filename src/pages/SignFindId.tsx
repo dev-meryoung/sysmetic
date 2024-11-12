@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import { css } from '@emotion/react';
+import { useNavigate } from 'react-router-dom';
+import Button from '@/components/Button';
+import { PATH } from '@/constants/path';
 
 const SignFindId = () => {
   const [email, setEmail] = useState('');
   const [showEmail, setShowEmail] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
+  const navigate = useNavigate();
 
   const handleFindBtn = () => {
     if (email.trim() === '') {
@@ -14,6 +18,10 @@ const SignFindId = () => {
       setShowMessage(false);
       setShowEmail(true);
     }
+  };
+
+  const handleMainBtn = () => {
+    navigate(PATH.ROOT);
   };
 
   return (
@@ -38,7 +46,15 @@ const SignFindId = () => {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="' - ' 를 제외하고 입력해주세요."
           />
-          <button onClick={handleFindBtn}>아이디 찾기</button>
+            <Button
+              label='아이디 찾기'
+              onClick={handleFindBtn}
+              color="PRIMARY_NORMAL"
+              size="xxs"
+              shape="block"
+              fontSize="14px"
+            >
+          </Button>
           <br />
           {showMessage && (
             <span>해당 휴대번호로 가입한 이메일이 존재하지않습니다.</span>
@@ -57,12 +73,22 @@ const SignFindId = () => {
             </div>
           </div>
           <div css={linkStyle}>
-            <a href='/' css={goMainStyle}>
-              메인가기
-            </a>
-            <a href='/signin' css={signinStyle}>
-              로그인
-            </a>
+              <Button
+                label='메인가기'
+                onClick={handleMainBtn}
+                color="PRIMARY_NORMAL"
+                size="xs"
+                shape="block"
+                >
+              </Button>
+              <Button
+                label='로그인'
+                onClick={handleMainBtn}
+                color="PRIMARY_NORMAL"
+                size="xs"
+                shape="line"
+                >
+              </Button>
           </div>
         </>
       )}
@@ -187,38 +213,7 @@ const linkStyle = css`
   text-align: center;
   margin-top: 80px;
   margin-bottom: 96px;
-`;
-
-const goMainStyle = css`
-  display: inline-block;
-  font-size: 14px;
-  font-weight: 400;
-  width: 120px;
-  height: 48px;
-  border-radius: 4px;
-  text-align: center;
-  line-height: 48px;
-  background-color: white;
-  border: 1px solid #1261c4;
-  color: #1261c4;
-  cursor: pointer;
-  text-decoration: none;
-  margin-left: 16px;
-`;
-
-const signinStyle = css`
-  display: inline-block;
-  font-size: 14px;
-  font-weight: 400;
-  width: 120px;
-  height: 48px;
-  border-radius: 4px;
-  text-align: center;
-  line-height: 48px;
-  background-color: #1261c4;
-  color: white;
-  border: none;
-  cursor: pointer;
-  text-decoration: none;
-  margin-left: 16px;
+  display: flex;      
+  justify-content: center; 
+  gap: 16px;          
 `;

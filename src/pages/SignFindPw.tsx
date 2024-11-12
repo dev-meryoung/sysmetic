@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
 import CancelOutlined from '@mui/icons-material/CancelOutlined';
 import { useNavigate } from 'react-router-dom';
+import Button from '@/components/Button';
 import { PATH } from '@/constants/path';
+
 
 const SignFindPw = () => {
   const [email, setEmail] = useState('');
@@ -21,9 +23,10 @@ const SignFindPw = () => {
   const correctCode = '1'; // 임시 인증번호
 
   const handleClearEmail = () => {
-    setEmail('');
+    setEmail(''); 
     setPassword('');
     setCheckPassword('');
+    setVerificationCode('');
     setShowPasswordError(false);
     setShowCheckPasswordError(false);
   };
@@ -79,6 +82,10 @@ const SignFindPw = () => {
     navigate(PATH.SIGN_IN);
   };
 
+  const handleMainBtn = () => {
+    navigate(PATH.ROOT);
+  };
+
   return (
     <div css={wrapperStyle}>
       <div css={pageInfoStyle}>
@@ -108,9 +115,17 @@ const SignFindPw = () => {
                 <CancelOutlined style={{ color: '#C84A31', fontSize: 24 }} />
               </button>
             </div>
-            <button className='send-btn' onClick={handleSendEmailBtn}>
-              요청하기
-            </button>
+            <div css={buttonStyle}>
+              <Button
+                label='요청하기'
+                onClick={handleSendEmailBtn}
+                color="PRIMARY_NORMAL"
+                size="xxs"
+                shape="block"
+                fontSize="14px"
+                >
+              </Button>
+            </div>
           </div>
           {showMessage && (
             <span className='message'>
@@ -129,13 +144,18 @@ const SignFindPw = () => {
                 placeholder='6자리'
               />
             </div>
-            <button
-              css={numberCheckBtnStyle(showCheckBtn)}
-              onClick={handleVerificationCodeBtn}
-              disabled={!showCheckBtn}
-            >
-              인증 확인
-            </button>
+            <div css={buttonStyle}>
+              <Button
+                label='인증확인'
+                onClick={handleVerificationCodeBtn}
+                color="PRIMARY_NORMAL"
+                size="xxs"
+                shape="block"
+                disabled={!showCheckBtn}
+                fontSize="14px"
+                >
+              </Button>
+            </div>
           </div>
           {checkNumber && (
             <span className='message'>잘못된 인증번호입니다.</span>
@@ -179,12 +199,24 @@ const SignFindPw = () => {
               </div>
             </div>
             <div css={linkStyle}>
-              <a href='/' css={goMainStyle}>
-                메인가기
-              </a>
-              <button onClick={handleComplete} css={signinStyle}>
-                설정완료
-              </button>
+              <Button
+                label='메인가기'
+                onClick={handleMainBtn}
+                color="PRIMARY_NORMAL"
+                size="xs"
+                shape="line"
+                fontSize="14px"
+                >
+              </Button>
+              <Button
+                label='설정 완료'
+                onClick={handleComplete}
+                color="PRIMARY_NORMAL"
+                size="xs"
+                shape="block"
+                fontSize="14px"
+                >
+              </Button>
             </div>
           </>
         )}
@@ -325,57 +357,16 @@ const inputSectionStyle = css`
   }
 `;
 
-const numberCheckBtnStyle = (isActive: boolean) => css`
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 14px;
-  width: 96px;
-  height: 48px;
-  border: none;
-  margin-left: 16px;
-  border-radius: 4px;
-  background-color: ${isActive ? '#1261C4' : '#ccc'};
-  color: white;
-  cursor: ${isActive ? 'pointer' : 'not-allowed'};
-`;
-
 const linkStyle = css`
   width: 100%;
   text-align: center;
   margin-top: 80px;
   margin-bottom: 96px;
+  display: flex;      
+  justify-content: center; 
+  gap: 16px;   
 `;
 
-const goMainStyle = css`
-  display: inline-block;
-  font-size: 14px;
-  font-weight: 400;
-  width: 120px;
-  height: 48px;
-  border-radius: 4px;
-  text-align: center;
-  line-height: 48px;
-  background-color: white;
-  border: 1px solid #1261c4;
-  color: #1261c4;
-  cursor: pointer;
-  text-decoration: none;
+const buttonStyle = css`
   margin-left: 16px;
-`;
-
-const signinStyle = css`
-  display: inline-block;
-  font-size: 14px;
-  font-weight: 400;
-  width: 120px;
-  height: 48px;
-  border-radius: 4px;
-  text-align: center;
-  line-height: 48px;
-  background-color: #1261c4;
-  color: white;
-  border: none;
-  cursor: pointer;
-  text-decoration: none;
-  margin-left: 16px;
-`;
+`

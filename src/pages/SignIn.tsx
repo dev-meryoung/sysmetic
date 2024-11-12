@@ -3,9 +3,11 @@ import { css } from '@emotion/react';
 import CancelOutlined from '@mui/icons-material/CancelOutlined';
 import VisibilityOffOutlined from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlined from '@mui/icons-material/VisibilityOutlined';
-import { Button } from '@mui/material';
+import { Button as MuiButton} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import Button from '@/components/Button';
 import { PATH } from '@/constants/path';
+
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -41,14 +43,14 @@ const SignIn = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <Button
+          <MuiButton
             variant='text'
             onClick={handleClearEmail}
             css={deleteIconBtnStyle}
             disableRipple
           >
             <CancelOutlined style={{ color: '#C84A31', fontSize: 24 }} />
-          </Button>
+          </MuiButton>
         </div>
         <div css={inputWrapperStyle}>
           <input
@@ -58,7 +60,7 @@ const SignIn = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <Button
+          <MuiButton
             variant='text'
             onClick={handlePasswordVisibility}
             css={showIconBtnStyle}
@@ -69,15 +71,15 @@ const SignIn = () => {
             ) : (
               <VisibilityOutlined style={{ color: '#333', fontSize: 24 }} />
             )}
-          </Button>
-          <Button
+          </MuiButton>
+          <MuiButton
             variant='text'
             onClick={handleClearPassword}
             css={deleteIconBtnStyle}
             disableRipple
           >
             <CancelOutlined style={{ color: '#C84A31', fontSize: 24 }} />
-          </Button>
+          </MuiButton>
         </div>
       </div>
 
@@ -86,16 +88,21 @@ const SignIn = () => {
       </div>
 
       <div>
-        <button onClick={handleSignin} css={accessBtnStyle}>
-          로그인
-        </button>
+        <Button
+          label='로그인'
+          onClick={handleSignin}
+          color="PRIMARY_NORMAL"
+          size="lg"
+          shape="block"
+          >
+        </Button>
       </div>
 
       <div css={linksStyle}>
         <a href='/signup' css={accountStyle}>
           회원가입
         </a>
-        <a href='/signin/find/id'>계정(이메일) 찾기</a> |{' '}
+        <a href='/signin/find/id'>계정(이메일) 찾기</a> 
         <a href='/signin/find/pw'>비밀번호 재설정</a>
       </div>
     </div>
@@ -181,18 +188,6 @@ const deleteIconBtnStyle = css`
   transform: translateY(-50%);
   padding: 0;
   min-width: auto;
-`;
-
-const accessBtnStyle = css`
-  border: none;
-  cursor: pointer;
-  background-color: #1261c4;
-  color: white;
-  width: 360px;
-  height: 56px;
-  border-radius: 4px;
-  font-size: 16px;
-  font-weight: 700;
 `;
 
 const staySignInStyle = css`
