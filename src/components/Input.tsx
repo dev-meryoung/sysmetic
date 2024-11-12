@@ -1,27 +1,38 @@
+import { useState } from 'react';
 import { css } from '@emotion/react';
 import { SvgIconComponent } from '@mui/icons-material';
 import SvgIcon from '@mui/icons-material/CancelOutlined';
 
-export interface InputProps {
+interface InputProps {
   type?: string;
   placeholder?: string;
   color?: string;
   firstIcon?: SvgIconComponent;
   secondIcon?: SvgIconComponent;
 }
+
 const Input: React.FC<InputProps> = ({
   type,
   placeholder,
   color,
   firstIcon,
   secondIcon,
-}) => (
-  <div css={inputWrapperStyle(color)}>
-    <input css={inputStyle} type={type} placeholder={placeholder} />
-    {firstIcon && <SvgIcon css={iconStyle} />}
-    {secondIcon && <SvgIcon css={iconStyle} />}
-  </div>
-);
+}) => {
+  const [input, setInput] = useState('');
+  return (
+    <div css={inputWrapperStyle(color)}>
+      <input
+        css={inputStyle}
+        type={type}
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        placeholder={placeholder}
+      />
+      {firstIcon && <SvgIcon css={iconStyle} />}
+      {secondIcon && <SvgIcon css={iconStyle} />}
+    </div>
+  );
+};
 
 const inputWrapperStyle = (color: string | undefined) => css`
   display: flex;
