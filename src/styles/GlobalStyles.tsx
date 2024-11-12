@@ -1,4 +1,5 @@
 import { Global, css } from '@emotion/react';
+import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 
 const GlobalStyles = () => (
   <Global
@@ -133,16 +134,43 @@ const GlobalStyles = () => (
       html {
         width: 100%;
         height: 100%;
-        font-size: 10px;
+        font-size: ${FONT_SIZE.TEXT_XXS};
         overflow-y: auto;
       }
       body,
       #root {
         width: 100%;
         height: 100%;
-        font-size: 1.6rem;
+        font-size: ${FONT_SIZE.TEXT_MD};
         font-family: 'Pretendard Variable', Pretendard, 'Malgun Gothic',
           Helvetica, 'Apple SD Gothic Neo', Sans-serif;
+      }
+      h1 {
+        font-size: ${FONT_SIZE.TITLE_XXL};
+        font-weight: ${FONT_WEIGHT.BOLD};
+      }
+      h2 {
+        font-size: ${FONT_SIZE.TITLE_XL};
+        font-weight: ${FONT_WEIGHT.BOLD};
+      }
+      h3 {
+        font-size: ${FONT_SIZE.TITLE_LG};
+        font-weight: ${FONT_WEIGHT.BOLD};
+      }
+      h4 {
+        font-size: ${FONT_SIZE.TITLE_MD};
+        font-weight: ${FONT_WEIGHT.BOLD};
+      }
+      h5 {
+        font-size: ${FONT_SIZE.TITLE_SM};
+        font-weight: ${FONT_WEIGHT.BOLD};
+      }
+      h6 {
+        font-size: ${FONT_SIZE.TITLE_XS};
+        font-weight: ${FONT_WEIGHT.BOLD};
+      }
+      button {
+        font-size: ${FONT_SIZE.TEXT_SM};
       }
     `}
   />
