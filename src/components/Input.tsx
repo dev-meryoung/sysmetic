@@ -21,6 +21,7 @@ const Input: React.FC<InputProps> = ({
   secondIcon,
 }) => {
   const [input, setInput] = useState('');
+
   return (
     <div css={inputWrapperStyle(color)}>
       <input
@@ -54,6 +55,10 @@ const inputStyle = css`
   font-size: 16px;
   font-weight: 400;
   letter-spacing: -0.32px;
+
+  &::placeholder {
+    color: rgba(0, 0, 0, 0.3);
+  }
 `;
 
 const iconStyle = css`
