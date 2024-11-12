@@ -46,14 +46,14 @@ const SignFindId = () => {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="' - ' 를 제외하고 입력해주세요."
           />
-            <Button
-              label='아이디 찾기'
-              onClick={handleFindBtn}
-              color="PRIMARY_NORMAL"
-              size="xxs"
-              shape="block"
-              fontSize="14px"
-            >
+          <Button
+            label='아이디 찾기'
+            onClick={handleFindBtn}
+            color="PRIMARY_NORMAL"
+            size="xxs"
+            shape="block"
+            fontSize="14px"
+          >
           </Button>
           <br />
           {showMessage && (
@@ -73,22 +73,22 @@ const SignFindId = () => {
             </div>
           </div>
           <div css={linkStyle}>
-              <Button
-                label='메인가기'
-                onClick={handleMainBtn}
-                color="PRIMARY_NORMAL"
-                size="xs"
-                shape="block"
-                >
-              </Button>
-              <Button
-                label='로그인'
-                onClick={handleMainBtn}
-                color="PRIMARY_NORMAL"
-                size="xs"
-                shape="line"
-                >
-              </Button>
+            <Button
+              label='메인가기'
+              onClick={handleMainBtn}
+              color="PRIMARY_NORMAL"
+              size="xs"
+              shape="block"
+              >
+            </Button>
+            <Button
+              label='로그인'
+              onClick={handleMainBtn}
+              color="PRIMARY_NORMAL"
+              size="xs"
+              shape="line"
+              >
+            </Button>
           </div>
         </>
       )}
