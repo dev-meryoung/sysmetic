@@ -2,6 +2,14 @@ import { useState } from 'react';
 import { css } from '@emotion/react';
 import { SvgIconComponent } from '@mui/icons-material';
 import SvgIcon from '@mui/icons-material/CancelOutlined';
+import COLOR from '@/constants/color';
+import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
+
+const INPUT_COLOR = {
+  FADED_GRAY_100: '#0000001A',
+  FADED_GRAY_300: '#0000004D',
+  OFF_BLACK: '#1c1b1f',
+};
 
 type InputTypes = 'text' | 'password' | 'email' | 'tel';
 
@@ -40,7 +48,7 @@ const Input: React.FC<InputProps> = ({
 const inputWrapperStyle = (color: string | undefined) => css`
   display: flex;
   width: 100%;
-  border: 1px solid ${color ? color : 'rgba(0, 0, 0, 0.1)'};
+  border: 1px solid ${color ? color : INPUT_COLOR.FADED_GRAY_100};
   border-radius: 4px;
 `;
 
@@ -52,12 +60,12 @@ const inputStyle = css`
   border-radius: 4px;
   padding: 16px 0 16px 16px;
 
-  font-size: 16px;
-  font-weight: 400;
+  font-size: ${FONT_SIZE.TEXT_MD};
+  font-weight: ${FONT_WEIGHT.REGULAR};
   letter-spacing: -0.32px;
 
   &::placeholder {
-    color: rgba(0, 0, 0, 0.3);
+    color: ${INPUT_COLOR.FADED_GRAY_300};
   }
 `;
 
@@ -65,7 +73,7 @@ const iconStyle = css`
   width: 48px;
   height: 48px;
   padding: 12px;
-  color: #1c1b1f;
+  color: ${INPUT_COLOR.OFF_BLACK};
   cursor: pointer;
 `;
 

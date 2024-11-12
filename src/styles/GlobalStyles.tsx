@@ -134,7 +134,7 @@ const GlobalStyles = () => (
       html {
         width: 100%;
         height: 100%;
-        font-size: ${FONT_SIZE.TEXT_XXS};
+        font-size: 10px;
         overflow-y: auto;
       }
       body,
