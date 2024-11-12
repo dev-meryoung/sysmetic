@@ -3,8 +3,10 @@ import { css } from '@emotion/react';
 import { SvgIconComponent } from '@mui/icons-material';
 import SvgIcon from '@mui/icons-material/CancelOutlined';
 
+type InputTypes = 'text' | 'password' | 'email' | 'tel';
+
 interface InputProps {
-  type?: string;
+  type?: InputTypes;
   placeholder?: string;
   color?: string;
   firstIcon?: SvgIconComponent;
