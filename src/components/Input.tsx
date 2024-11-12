@@ -8,7 +8,6 @@ import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 const INPUT_COLOR = {
   FADED_GRAY_100: '#0000001A',
   FADED_GRAY_300: '#0000004D',
-  OFF_BLACK: '#1c1b1f',
 };
 
 type InputTypes = 'text' | 'password' | 'email' | 'tel';
@@ -48,7 +47,7 @@ const Input: React.FC<InputProps> = ({
 const inputWrapperStyle = (color: string | undefined) => css`
   display: flex;
   width: 100%;
-  border: 1px solid ${color ? color : INPUT_COLOR.FADED_GRAY_100};
+  border: 1px solid ${color || INPUT_COLOR.FADED_GRAY_100};
   border-radius: 4px;
 `;
 
@@ -73,7 +72,7 @@ const iconStyle = css`
   width: 48px;
   height: 48px;
   padding: 12px;
-  color: ${INPUT_COLOR.OFF_BLACK};
+  color: ${COLOR.BLACK};
   cursor: pointer;
 `;
 

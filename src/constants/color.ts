@@ -6,7 +6,7 @@ const COLOR = {
   ERROR_RED: '#b41c11',
   INFO_BLUE: '#0082d3',
   WHITE: '#fff',
-  BLACK: '#000',
+  BLACK: '#111',
   GRAY_100: '#f9f9f9',
   GRAY_200: '#eee',
   GRAY_300: '#eaeaea',
