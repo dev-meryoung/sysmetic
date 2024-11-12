@@ -8,24 +8,30 @@ import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 const INPUT_COLOR = {
   FADED_GRAY_100: '#0000001A',
   FADED_GRAY_300: '#0000004D',
+  LIGHT_SKY_BLUE: '#AECAED',
 };
 
 type InputTypes = 'text' | 'password' | 'email' | 'tel';
+type InputColorTypes = 'lightgray' | 'skyblue';
 
 interface InputProps {
   type?: InputTypes;
   placeholder?: string;
-  color?: string;
+  color?: InputColorTypes;
   firstIcon?: SvgIconComponent;
   secondIcon?: SvgIconComponent;
+  onFIconClick?: () => void;
+  onSIconClick?: () => void;
 }
 
 const Input: React.FC<InputProps> = ({
   type,
   placeholder,
-  color,
+  color = 'lightgray',
   firstIcon,
   secondIcon,
+  onFIconClick,
+  onSIconClick,
 }) => {
   const [input, setInput] = useState('');
 
@@ -38,8 +44,8 @@ const Input: React.FC<InputProps> = ({
         onChange={(e) => setInput(e.target.value)}
         placeholder={placeholder}
       />
-      {firstIcon && <SvgIcon css={iconStyle} />}
-      {secondIcon && <SvgIcon css={iconStyle} />}
+      {firstIcon && <SvgIcon css={iconStyle} onClick={onFIconClick} />}
+      {secondIcon && <SvgIcon css={iconStyle} onClick={onSIconClick} />}
     </div>
   );
 };
@@ -47,7 +53,10 @@ const Input: React.FC<InputProps> = ({
 const inputWrapperStyle = (color: string | undefined) => css`
   display: flex;
   width: 100%;
-  border: 1px solid ${color || INPUT_COLOR.FADED_GRAY_100};
+  border: 1px solid
+    ${color === 'skyblue'
+      ? INPUT_COLOR.LIGHT_SKY_BLUE
+      : INPUT_COLOR.FADED_GRAY_100};
   border-radius: 4px;
 `;
 
