@@ -9,7 +9,7 @@ export const COLOR = {
   PRIMARY700: '#082a54',
   PRIMARY800: '#04172f',
   POINT: '#c84a31',
-  POINT100: '#FAF4F2',
+  POINT100: '#faf4f2',
   POINT200: '#e9Cac2',
   POINT300: '#d9a192',
   POINT400: '#c97862',
