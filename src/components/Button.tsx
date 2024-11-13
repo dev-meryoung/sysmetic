@@ -4,7 +4,7 @@ import { COLOR, COLOR_OPACITY } from '@/constants/color';
 
 type ButtonShapeTypes = 'block' | 'line' | 'round' | 'text';
 type ButtonSizeTypes = 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
-type ButtonColorTypes = 'PRIMARY_NORMAL' | 'POINT_NORMAL' | 'SIGN_UP_TRADER' | 'EMAIL_AUTHENTICATION' | 'GO_MAIN' | 'INTEREST' |'CHECK_GREEN' | 'WARN_YELLOW' | 'ERROR_RED'| 'INFO_BLUE';
+type ButtonColorTypes = 'primary' | 'point' | 'primary600' | 'black' | 'primaryOpacity10' | 'pointOpacity10' |'checkGreen' | 'warnYellow' | 'errorRed'| 'infoBlue';
 type ButtonActionTypes = 'submit' | 'button';
 
 interface ButtonProps {
@@ -28,16 +28,16 @@ type ButtonColors = {
 };
 
 const buttonColors: Record<ButtonColorTypes, ButtonColors> = {
-  PRIMARY_NORMAL: { color: COLOR.PRIMARY, hoverColor: COLOR.PRIMARY500, disabledColor: COLOR.GRAY600},
-  POINT_NORMAL: { color: COLOR.PRIMARY, hoverColor: COLOR.POINT500, disabledColor: COLOR.POINT200},
-  SIGN_UP_TRADER: { color: COLOR.PRIMARY600, hoverColor: COLOR.PRIMARY700},
-  EMAIL_AUTHENTICATION: { color: COLOR.BLACK, hoverColor: COLOR.GRAY800},
-  GO_MAIN: { color: COLOR.PRIMARY, hoverColor: COLOR_OPACITY.PRIMARY_OPACITY10},
-  INTEREST: { color: COLOR.POINT, hoverColor: COLOR_OPACITY.POINT_OPACITY10},
-  CHECK_GREEN: { color: COLOR.CHECK_GREEN},
-  WARN_YELLOW: { color: COLOR.WARN_YELLOW},
-  ERROR_RED: { color: COLOR.ERROR_RED},
-  INFO_BLUE: { color: COLOR.INFO_BLUE}
+  primary: { color: COLOR.PRIMARY, hoverColor: COLOR.PRIMARY500, disabledColor: COLOR.GRAY500},
+  point: { color: COLOR.PRIMARY, hoverColor: COLOR.POINT500, disabledColor: COLOR.POINT200},
+  primary600: { color: COLOR.PRIMARY600, hoverColor: COLOR.PRIMARY700},
+  black: { color: COLOR.BLACK, hoverColor: COLOR.GRAY800},
+  primaryOpacity10: { color: COLOR.PRIMARY, hoverColor: COLOR_OPACITY.PRIMARY_OPACITY10},
+  pointOpacity10: { color: COLOR.POINT, hoverColor: COLOR_OPACITY.POINT_OPACITY10},
+  checkGreen: { color: COLOR.CHECK_GREEN},
+  warnYellow: { color: COLOR.WARN_YELLOW},
+  errorRed: { color: COLOR.ERROR_RED},
+  infoBlue: { color: COLOR.INFO_BLUE}
 };
 
 const buttonSizes: Record<ButtonSizeTypes, ReturnType<typeof css>> = {
@@ -76,7 +76,7 @@ const Button: React.FC<ButtonProps> = ({
   handleClick,
   shape = 'block',
   size = 'md',
-  color = 'PRIMARY_NORMAL',
+  color = 'primary',
   type = 'button',
   fullWidth = false,
   disabled = false,

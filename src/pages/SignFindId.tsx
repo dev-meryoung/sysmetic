@@ -24,6 +24,9 @@ const SignFindId = () => {
   const handleMainBtn = () => {
     navigate(PATH.ROOT);
   };
+  const handleSignInBtn = () => {
+    navigate(PATH.SIGN_IN);
+  };
 
   return (
     <div css={wrapperStyle}>
@@ -50,7 +53,7 @@ const SignFindId = () => {
             <Button
               label='아이디 찾기'
               handleClick={handleFindBtn}
-              color="PRIMARY_NORMAL"
+              color="primary"
               size="xxl"
               shape="block"
               fontSize="14px"
@@ -77,17 +80,17 @@ const SignFindId = () => {
             <Button
               label='메인가기'
               handleClick={handleMainBtn}
-              color="PRIMARY_NORMAL"
+              color="primaryOpacity10"
               size="xs"
-              shape="block"
+              shape="line"
               >
             </Button>
             <Button
               label='로그인'
-              handleClick={handleMainBtn}
-              color="PRIMARY_NORMAL"
+              handleClick={handleSignInBtn}
+              color="primary"
               size="xs"
-              shape="line"
+              shape="block"
               >
             </Button>
           </div>

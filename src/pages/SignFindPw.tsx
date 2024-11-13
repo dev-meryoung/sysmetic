@@ -120,7 +120,7 @@ const SignFindPw = () => {
               <Button
                 label='요청하기'
                 handleClick={handleSendEmailBtn}
-                color="PRIMARY_NORMAL"
+                color="primary"
                 size="xxl"
                 shape="block"
                 fontSize="14px"
@@ -149,7 +149,7 @@ const SignFindPw = () => {
               <Button
                 label='인증확인'
                 handleClick={handleVerificationCodeBtn}
-                color="PRIMARY_NORMAL"
+                color="primary"
                 size="xxl"
                 shape="block"
                 disabled={!showCheckBtn}
@@ -203,7 +203,7 @@ const SignFindPw = () => {
               <Button
                 label='메인가기'
                 handleClick={handleMainBtn}
-                color="GO_MAIN"
+                color="primaryOpacity10"
                 size="xs"
                 shape="line"
                 fontSize="14px"
@@ -212,7 +212,7 @@ const SignFindPw = () => {
               <Button
                 label='설정 완료'
                 handleClick={handleComplete}
-                color="PRIMARY_NORMAL"
+                color="primary"
                 size="xs"
                 shape="block"
                 fontSize="14px"

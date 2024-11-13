@@ -6,7 +6,7 @@ import VisibilityOutlined from '@mui/icons-material/VisibilityOutlined';
 import { Button as MuiButton} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
-import COLOR from '@/constants/color';
+import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { PATH } from '@/constants/path';
 
 
@@ -50,7 +50,7 @@ const SignIn = () => {
             css={deleteIconBtnStyle}
             disableRipple
           >
-            <CancelOutlined style={{ color: COLOR.POINT_NORMAL, fontSize: '2.4rem' }} />
+            <CancelOutlined style={{ color: COLOR.POINT, fontSize: '2.4rem' }} />
           </MuiButton>
         </div>
         <div css={inputWrapperStyle}>
@@ -68,9 +68,9 @@ const SignIn = () => {
             disableRipple
           >
             {showPassword ? (
-              <VisibilityOffOutlined style={{ color: COLOR.WHITE, fontSize: '2.4rem' }} />
+              <VisibilityOffOutlined style={{ color: COLOR.BLACK, fontSize: '2.4rem' }} />
             ) : (
-              <VisibilityOutlined style={{ color: COLOR.WHITE, fontSize: '2.4rem' }} />
+              <VisibilityOutlined style={{ color: COLOR.BLACK, fontSize: '2.4rem' }} />
             )}
           </MuiButton>
           <MuiButton
@@ -79,7 +79,7 @@ const SignIn = () => {
             css={deleteIconBtnStyle}
             disableRipple
           >
-            <CancelOutlined style={{ color: COLOR.POINT_NORMAL, fontSize: '2.4rem' }} />
+            <CancelOutlined style={{ color: COLOR.POINT, fontSize: '2.4rem' }} />
           </MuiButton>
         </div>
       </div>
@@ -92,7 +92,7 @@ const SignIn = () => {
         <Button
           label='로그인'
           handleClick={handleSignin}
-          color="PRIMARY_NORMAL"
+          color="primary"
           size="lg"
           shape="block"
           >
@@ -159,17 +159,17 @@ const inputStyle = css`
   height: 48px;
   padding: 8px 12px;
   border-radius: 4px;
-  border: 1px solid rgba(0, 0, 0, 0.3);
+  border: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
   outline: none;
   box-sizing: border-box; 
 
   &:focus {
-    border: 1px solid ${COLOR.PRIMARY_NORMAL};
+    border: 1px solid ${COLOR.PRIMARY};
   }
 
   &::placeholder {
     font-size: 16px;
-    color: rgba(0, 0, 0, 0.3);
+    color: ${COLOR_OPACITY.BLACK_OPACITY30};
   }
 `;
 
@@ -204,7 +204,7 @@ const linksStyle = css`
   font-weight: 400;
 
   a {
-    color: ${COLOR.WHITE};
+    color: ${COLOR.BLACK};
     text-decoration: none;
   }
 `;
