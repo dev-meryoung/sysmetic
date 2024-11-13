@@ -1,10 +1,10 @@
 import React from 'react';
 import { css } from '@emotion/react';
-import COLOR from '@/constants/color';
+import { COLOR, COLOR_OPACITY } from '@/constants/color';
 
 type ButtonShapeTypes = 'block' | 'line' | 'round' | 'text';
-type ButtonSizeTypes = 'xxxs' | 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
-type ButtonColorTypes = 'PRIMARY_NORMAL' | 'POINT_NORMAL' | 'SIGN_UP_TRADER' | 'EMAIL_AUTHENTICATION' |'CHECK_GREEN' | 'WARN_YELLOW' | 'ERROR_RED'| 'INFO_BLUE';
+type ButtonSizeTypes = 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+type ButtonColorTypes = 'PRIMARY_NORMAL' | 'POINT_NORMAL' | 'SIGN_UP_TRADER' | 'EMAIL_AUTHENTICATION' | 'GO_MAIN' | 'INTEREST' |'CHECK_GREEN' | 'WARN_YELLOW' | 'ERROR_RED'| 'INFO_BLUE';
 type ButtonActionTypes = 'submit' | 'button';
 
 interface ButtonProps {
@@ -28,10 +28,12 @@ type ButtonColors = {
 };
 
 const buttonColors: Record<ButtonColorTypes, ButtonColors> = {
-  PRIMARY_NORMAL: { color: COLOR.PRIMARY_NORMAL, hoverColor: COLOR.PRIMARY_500, disabledColor: COLOR.GRAY_600},
-  POINT_NORMAL: { color: COLOR.POINT_NORMAL, hoverColor: COLOR.POINT_500, disabledColor: COLOR.POINT_200},
-  SIGN_UP_TRADER: { color: COLOR.PRIMARY_600, hoverColor: COLOR.PRIMARY_700},
-  EMAIL_AUTHENTICATION: { color: COLOR.BLACK, hoverColor: COLOR.GRAY_800},
+  PRIMARY_NORMAL: { color: COLOR.PRIMARY, hoverColor: COLOR.PRIMARY500, disabledColor: COLOR.GRAY600},
+  POINT_NORMAL: { color: COLOR.PRIMARY, hoverColor: COLOR.POINT500, disabledColor: COLOR.POINT200},
+  SIGN_UP_TRADER: { color: COLOR.PRIMARY600, hoverColor: COLOR.PRIMARY700},
+  EMAIL_AUTHENTICATION: { color: COLOR.BLACK, hoverColor: COLOR.GRAY800},
+  GO_MAIN: { color: COLOR.PRIMARY, hoverColor: COLOR_OPACITY.PRIMARY_OPACITY10},
+  INTEREST: { color: COLOR.POINT, hoverColor: COLOR_OPACITY.POINT_OPACITY10},
   CHECK_GREEN: { color: COLOR.CHECK_GREEN},
   WARN_YELLOW: { color: COLOR.WARN_YELLOW},
   ERROR_RED: { color: COLOR.ERROR_RED},
@@ -39,13 +41,9 @@ const buttonColors: Record<ButtonColorTypes, ButtonColors> = {
 };
 
 const buttonSizes: Record<ButtonSizeTypes, ReturnType<typeof css>> = {
-  xxxs: css`
+  xxs: css`
     width: 80px;
     height: 32px;
-  `,
-  xxs: css`
-    width: 96px;
-    height: 48px;
   `,
   xs: css`
     width: 120px;
@@ -67,11 +65,10 @@ const buttonSizes: Record<ButtonSizeTypes, ReturnType<typeof css>> = {
     width: 580px;
     height: 136px;
   `,
-  /* 인풋, 표스퀘어 버튼용 (넓이유동적)  */
+  /* 인풋, 표스퀘어, 아이디찾기, 요청하기, 인증확인 버튼용 (넓이유동적) */
   xxl: css`
-  padding: 16px 17px;
-  height: 48px;
-`
+    padding: 16px 17px;
+  `
 };
 
 const Button: React.FC<ButtonProps> = ({
@@ -117,7 +114,7 @@ const buttonStyle = (
       : selectColors.color;
 
   const textColor =
-    disabled || selectColors.color === COLOR.GRAY_500
+    disabled || selectColors.color === COLOR.GRAY500
       ? COLOR.WHITE
       : shape === 'text' || shape === 'line'
         ? selectColors.color
@@ -127,13 +124,11 @@ const buttonStyle = (
   const hoverStyles =
     !disabled &&
     css`
-      background-color: ${shape === 'text' || shape === 'line'
-        ? 'transparent'
-        : selectColors.hoverColor};
+      background-color: ${selectColors.hoverColor};
       color: ${shape === 'text' || shape === 'line'
-      ? selectColors.hoverColor
+      ? selectColors.color
       : COLOR.WHITE};
-      ${shape === 'line' && `border-color: ${selectColors.hoverColor}`};
+      ${shape === 'line' && `border-color: ${selectColors.color}`};
     `;
 
   return css`

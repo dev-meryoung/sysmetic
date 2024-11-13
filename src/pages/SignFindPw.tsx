@@ -3,7 +3,7 @@ import { css } from '@emotion/react';
 import CancelOutlined from '@mui/icons-material/CancelOutlined';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
-import COLOR from '@/constants/color';
+import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { PATH } from '@/constants/path';
 
 
@@ -113,7 +113,7 @@ const SignFindPw = () => {
                 placeholder='이메일 주소(abc@abc.com)'
               />
               <button className='clear-btn' onClick={handleClearEmail}>
-              <CancelOutlined style={{ color: COLOR.POINT_NORMAL, fontSize: '2.4rem' }} />
+                <CancelOutlined style={{ color: COLOR.POINT, fontSize: '2.4rem' }} />
               </button>
             </div>
             <div css={buttonStyle}>
@@ -121,7 +121,7 @@ const SignFindPw = () => {
                 label='요청하기'
                 handleClick={handleSendEmailBtn}
                 color="PRIMARY_NORMAL"
-                size="xxs"
+                size="xxl"
                 shape="block"
                 fontSize="14px"
                 >
@@ -150,7 +150,7 @@ const SignFindPw = () => {
                 label='인증확인'
                 handleClick={handleVerificationCodeBtn}
                 color="PRIMARY_NORMAL"
-                size="xxs"
+                size="xxl"
                 shape="block"
                 disabled={!showCheckBtn}
                 fontSize="14px"
@@ -203,7 +203,7 @@ const SignFindPw = () => {
               <Button
                 label='메인가기'
                 handleClick={handleMainBtn}
-                color="PRIMARY_NORMAL"
+                color="GO_MAIN"
                 size="xs"
                 shape="line"
                 fontSize="14px"
@@ -313,14 +313,12 @@ const inputSectionStyle = css`
       height: 48px;
       padding-left: 12px;
       border-radius: 4px;
-      border: 1px solid rgba(0, 0, 0, 0.3);
+      border: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
       outline: none;
-      &:focus {
-        border: 1px solid ${COLOR.PRIMARY_NORMAL};
-      }
+
       &::placeholder {
         font-size: 16px;
-        color: rgba(0, 0, 0, 0.3);
+        color: ${COLOR_OPACITY.BLACK_OPACITY30};
       }
     }
 
@@ -344,13 +342,13 @@ const inputSectionStyle = css`
     margin-left: 16px;
     border: none;
     border-radius: 4px;
-    background-color: ${COLOR.PRIMARY_NORMAL};
+    background-color: ${COLOR.PRIMARY};
     color: white;
     cursor: pointer;
   }
 
   .message {
-    color: ${COLOR.POINT_NORMAL};
+    color: ${COLOR.POINT};
     font-size: 14px;
     font-weight: 400;
     margin-top: 4px;

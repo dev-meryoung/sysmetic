@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { css } from '@emotion/react';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
-import COLOR from '@/constants/color';
+import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { PATH } from '@/constants/path';
 
 const SignFindId = () => {
@@ -47,15 +47,15 @@ const SignFindId = () => {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="' - ' 를 제외하고 입력해주세요."
           />
-          <Button
-            label='아이디 찾기'
-            handleClick={handleFindBtn}
-            color="PRIMARY_NORMAL"
-            size="xxs"
-            shape="block"
-            fontSize="14px"
-          >
-          </Button>
+            <Button
+              label='아이디 찾기'
+              handleClick={handleFindBtn}
+              color="PRIMARY_NORMAL"
+              size="xxl"
+              shape="block"
+              fontSize="14px"
+            >
+            </Button>
           <br />
           {showMessage && (
             <span>해당 휴대번호로 가입한 이메일이 존재하지않습니다.</span>
@@ -113,7 +113,7 @@ const wrapperStyle = css`
 
 const pageInfoStyle = css`
   width: 100%;
-  border-bottom: 1px solid #000;
+  border-bottom: 1px solid ${COLOR.BLACK};
 
   .info {
     div {
@@ -147,38 +147,28 @@ const findFormStyle = css`
       width: 360px;
       height: 48px;
       padding: 8px 12px;
-      border: 1px solid rgba(0, 0, 0, 0.3);
+      border: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
       border-radius: 4px;
       outline: none;
 
       &:focus {
-        border: 1px solid ${COLOR.PRIMARY_NORMAL};
+        border: 1px solid ${COLOR.PRIMARY};
       }
 
       &::placeholder {
         font-size: 16px;
-        color: rgba(0, 0, 0, 0.3);
+        color: ${COLOR_OPACITY.BLACK_OPACITY30};
       }
     }
 
     button {
-      font-size: 14px;
-      font-weight: 400;
-      line-height: 14px;
       margin-left: 12px;
-      width: 96px;
-      height: 48px;
-      border: none;
-      border-radius: 4px;
-      background-color: ${COLOR.PRIMARY_NORMAL};
-      color: white;
-      cursor: pointer;
     }
 
     span {
       position: absolute;
       margin-top: 8px;
-      color: ${COLOR.POINT_NORMAL};
+      color: ${COLOR.POINT};
       font-size: 14px;
       font-weight: 400;
     }
@@ -190,7 +180,7 @@ const showEmailStyle = css`
   height: 120px;
   margin-top: 80px;
   padding: 20px;
-  background-color: ${COLOR.GRAY_100};
+  background-color: ${COLOR.GRAY100};
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -204,7 +194,7 @@ const showEmailStyle = css`
       line-height: 26px;
     }
     span {
-      color: red;
+      color: ${COLOR.ERROR_RED};
     }
   }
 `;
