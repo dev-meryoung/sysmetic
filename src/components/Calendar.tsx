@@ -24,7 +24,7 @@ const Calendar: React.FC<CalendarProps> = ({
   dateProps,
   periodProps,
 }) => {
-  const handleChangeDate = (value: string) => {
+  const handleDateChange = (value: string) => {
     if (dateProps && dateProps.setDate) {
       dateProps.setDate(value);
     }
@@ -68,7 +68,7 @@ const Calendar: React.FC<CalendarProps> = ({
         css={calendarStyle}
         type={inputType}
         value={dateProps?.date || ''}
-        onChange={(e) => handleChangeDate(e.target.value)}
+        onChange={(e) => handleDateChange(e.target.value)}
       />
       <CalendarTodayOutlined css={calendarIconStyle} />
     </div>
