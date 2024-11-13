@@ -1,19 +1,24 @@
-import React from 'react';
 import { css } from '@emotion/react';
 
-type ProfileImageProps = {
+interface ProfileImageProps {
   src: string;
   alt: string;
-  size?: 'sm' | 'md' | 'lg';
-};
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+}
 
-const sizes = {
+const sizes: Record<'sm' | 'md' | 'lg' | 'xl' | 'xxl', number> = {
   sm: 32,
   md: 48,
-  lg: 96
+  lg: 56,
+  xl: 96,
+  xxl: 120,
 };
 
-const ProfileImage: React.FC<ProfileImageProps> = ({ src, alt, size = 'md' }) => (
+const ProfileImage: React.FC<ProfileImageProps> = ({
+  src,
+  alt,
+  size = 'md',
+}) => (
   <div
     css={css`
       width: ${sizes[size]}px;

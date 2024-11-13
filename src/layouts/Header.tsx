@@ -1,6 +1,8 @@
 import { css } from '@emotion/react';
 import { Link } from 'react-router-dom';
 import logo from '@/assets/images/logo.png';
+import COLOR from '@/constants/color';
+import { FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 
 const Header = () => (
@@ -18,7 +20,7 @@ const Header = () => (
         <img className='bottom-logo' src={logo} />
       </Link>
       <div className='bottom-links'>
-        <Link to={PATH.STRATEGIES_INFO_USER}>전략탐색</Link>
+        <Link to={PATH.STRATEGIES_LIST}>전략탐색</Link>
         <Link to={PATH.STRATEGIES_INFO_TRADER}>전략등록</Link>
         <Link to={PATH.NOTICES}>공지사항</Link>
         <a>회사소개</a>
@@ -39,7 +41,7 @@ const headerTopBgStyle = css`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #1261c4;
+  background-color: ${COLOR.PRIMARY_NORMAL};
 `;
 
 const headerTopStyle = css`
@@ -54,8 +56,7 @@ const headerTopStyle = css`
     gap: 24px;
 
     a {
-      color: #fff;
-      font-weight: 400;
+      color: ${COLOR.WHITE};
       text-decoration: none;
     }
   }
@@ -80,8 +81,8 @@ const headerBottomStyle = css`
     gap: 32px;
 
     a {
-      color: #000;
-      font-weight: 700;
+      color: ${COLOR.BLACK};
+      font-weight: ${FONT_WEIGHT.BOLD};
       text-decoration: none;
     }
   }

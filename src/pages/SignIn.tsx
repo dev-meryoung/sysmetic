@@ -3,8 +3,10 @@ import { css } from '@emotion/react';
 import CancelOutlined from '@mui/icons-material/CancelOutlined';
 import VisibilityOffOutlined from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlined from '@mui/icons-material/VisibilityOutlined';
-import { Button } from '@mui/material';
+import { Button as MuiButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import Button from '@/components/Button';
+import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { PATH } from '@/constants/path';
 
 const SignIn = () => {
@@ -41,14 +43,16 @@ const SignIn = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <Button
+          <MuiButton
             variant='text'
             onClick={handleClearEmail}
             css={deleteIconBtnStyle}
             disableRipple
           >
-            <CancelOutlined style={{ color: '#C84A31', fontSize: 24 }} />
-          </Button>
+            <CancelOutlined
+              style={{ color: COLOR.POINT, fontSize: '2.4rem' }}
+            />
+          </MuiButton>
         </div>
         <div css={inputWrapperStyle}>
           <input
@@ -58,26 +62,32 @@ const SignIn = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <Button
+          <MuiButton
             variant='text'
             onClick={handlePasswordVisibility}
             css={showIconBtnStyle}
             disableRipple
           >
             {showPassword ? (
-              <VisibilityOffOutlined style={{ color: '#333', fontSize: 24 }} />
+              <VisibilityOffOutlined
+                style={{ color: COLOR.BLACK, fontSize: '2.4rem' }}
+              />
             ) : (
-              <VisibilityOutlined style={{ color: '#333', fontSize: 24 }} />
+              <VisibilityOutlined
+                style={{ color: COLOR.BLACK, fontSize: '2.4rem' }}
+              />
             )}
-          </Button>
-          <Button
+          </MuiButton>
+          <MuiButton
             variant='text'
             onClick={handleClearPassword}
             css={deleteIconBtnStyle}
             disableRipple
           >
-            <CancelOutlined style={{ color: '#C84A31', fontSize: 24 }} />
-          </Button>
+            <CancelOutlined
+              style={{ color: COLOR.POINT, fontSize: '2.4rem' }}
+            />
+          </MuiButton>
         </div>
       </div>
 
@@ -86,16 +96,20 @@ const SignIn = () => {
       </div>
 
       <div>
-        <button onClick={handleSignin} css={accessBtnStyle}>
-          로그인
-        </button>
+        <Button
+          label='로그인'
+          handleClick={handleSignin}
+          color='primary'
+          size='lg'
+          shape='block'
+        ></Button>
       </div>
 
       <div css={linksStyle}>
         <a href='/signup' css={accountStyle}>
           회원가입
         </a>
-        <a href='/signin/find/id'>계정(이메일) 찾기</a> |{' '}
+        <a href='/signin/find/id'>계정(이메일) 찾기</a>
         <a href='/signin/find/pw'>비밀번호 재설정</a>
       </div>
     </div>
@@ -151,17 +165,17 @@ const inputStyle = css`
   height: 48px;
   padding: 8px 12px;
   border-radius: 4px;
-  border: 1px solid rgba(0, 0, 0, 0.3);
+  border: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
   outline: none;
-  box-sizing: border-box; /* box-sizing 추가 */
+  box-sizing: border-box;
 
   &:focus {
-    border: 1px solid #1261c4;
+    border: 1px solid ${COLOR.PRIMARY};
   }
 
   &::placeholder {
     font-size: 16px;
-    color: rgba(0, 0, 0, 0.3);
+    color: ${COLOR_OPACITY.BLACK_OPACITY30};
   }
 `;
 
@@ -183,18 +197,6 @@ const deleteIconBtnStyle = css`
   min-width: auto;
 `;
 
-const accessBtnStyle = css`
-  border: none;
-  cursor: pointer;
-  background-color: #1261c4;
-  color: white;
-  width: 360px;
-  height: 56px;
-  border-radius: 4px;
-  font-size: 16px;
-  font-weight: 700;
-`;
-
 const staySignInStyle = css`
   margin-right: 8px;
   cursor: pointer;
@@ -208,7 +210,7 @@ const linksStyle = css`
   font-weight: 400;
 
   a {
-    color: #333;
+    color: ${COLOR.BLACK};
     text-decoration: none;
   }
 `;

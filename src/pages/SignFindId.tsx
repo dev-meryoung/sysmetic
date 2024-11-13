@@ -1,10 +1,15 @@
 import { useState } from 'react';
 import { css } from '@emotion/react';
+import { useNavigate } from 'react-router-dom';
+import Button from '@/components/Button';
+import { COLOR, COLOR_OPACITY } from '@/constants/color';
+import { PATH } from '@/constants/path';
 
 const SignFindId = () => {
   const [email, setEmail] = useState('');
   const [showEmail, setShowEmail] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
+  const navigate = useNavigate();
 
   const handleFindBtn = () => {
     if (email.trim() === '') {
@@ -14,6 +19,13 @@ const SignFindId = () => {
       setShowMessage(false);
       setShowEmail(true);
     }
+  };
+
+  const handleMainBtn = () => {
+    navigate(PATH.ROOT);
+  };
+  const handleSignInBtn = () => {
+    navigate(PATH.SIGN_IN);
   };
 
   return (
@@ -38,7 +50,14 @@ const SignFindId = () => {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="' - ' 를 제외하고 입력해주세요."
           />
-          <button onClick={handleFindBtn}>아이디 찾기</button>
+          <Button
+            label='아이디 찾기'
+            handleClick={handleFindBtn}
+            color='primary'
+            size='xxl'
+            shape='block'
+            fontSize='14px'
+          ></Button>
           <br />
           {showMessage && (
             <span>해당 휴대번호로 가입한 이메일이 존재하지않습니다.</span>
@@ -57,12 +76,20 @@ const SignFindId = () => {
             </div>
           </div>
           <div css={linkStyle}>
-            <a href='/' css={goMainStyle}>
-              메인가기
-            </a>
-            <a href='/signin' css={signinStyle}>
-              로그인
-            </a>
+            <Button
+              label='메인가기'
+              handleClick={handleMainBtn}
+              color='primaryOpacity10'
+              size='xs'
+              shape='line'
+            ></Button>
+            <Button
+              label='로그인'
+              handleClick={handleSignInBtn}
+              color='primary'
+              size='xs'
+              shape='block'
+            ></Button>
           </div>
         </>
       )}
@@ -86,7 +113,7 @@ const wrapperStyle = css`
 
 const pageInfoStyle = css`
   width: 100%;
-  border-bottom: 1px solid #000;
+  border-bottom: 1px solid ${COLOR.BLACK};
 
   .info {
     div {
@@ -120,38 +147,28 @@ const findFormStyle = css`
       width: 360px;
       height: 48px;
       padding: 8px 12px;
-      border: 1px solid rgba(0, 0, 0, 0.3);
+      border: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
       border-radius: 4px;
       outline: none;
 
       &:focus {
-        border: 1px solid #1261c4;
+        border: 1px solid ${COLOR.PRIMARY};
       }
 
       &::placeholder {
         font-size: 16px;
-        color: rgba(0, 0, 0, 0.3);
+        color: ${COLOR_OPACITY.BLACK_OPACITY30};
       }
     }
 
     button {
-      font-size: 14px;
-      font-weight: 400;
-      line-height: 14px;
       margin-left: 12px;
-      width: 96px;
-      height: 48px;
-      border: none;
-      border-radius: 4px;
-      background-color: #1261c4;
-      color: white;
-      cursor: pointer;
     }
 
     span {
       position: absolute;
       margin-top: 8px;
-      color: #c84a31;
+      color: ${COLOR.POINT};
       font-size: 14px;
       font-weight: 400;
     }
@@ -163,7 +180,7 @@ const showEmailStyle = css`
   height: 120px;
   margin-top: 80px;
   padding: 20px;
-  background-color: #f9f9f9;
+  background-color: ${COLOR.GRAY100};
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -177,7 +194,7 @@ const showEmailStyle = css`
       line-height: 26px;
     }
     span {
-      color: red;
+      color: ${COLOR.ERROR_RED};
     }
   }
 `;
@@ -187,38 +204,7 @@ const linkStyle = css`
   text-align: center;
   margin-top: 80px;
   margin-bottom: 96px;
-`;
-
-const goMainStyle = css`
-  display: inline-block;
-  font-size: 14px;
-  font-weight: 400;
-  width: 120px;
-  height: 48px;
-  border-radius: 4px;
-  text-align: center;
-  line-height: 48px;
-  background-color: white;
-  border: 1px solid #1261c4;
-  color: #1261c4;
-  cursor: pointer;
-  text-decoration: none;
-  margin-left: 16px;
-`;
-
-const signinStyle = css`
-  display: inline-block;
-  font-size: 14px;
-  font-weight: 400;
-  width: 120px;
-  height: 48px;
-  border-radius: 4px;
-  text-align: center;
-  line-height: 48px;
-  background-color: #1261c4;
-  color: white;
-  border: none;
-  cursor: pointer;
-  text-decoration: none;
-  margin-left: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
 `;

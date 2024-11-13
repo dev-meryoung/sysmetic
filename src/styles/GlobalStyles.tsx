@@ -1,4 +1,5 @@
 import { Global, css } from '@emotion/react';
+import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 
 const GlobalStyles = () => (
@@ -144,6 +145,7 @@ const GlobalStyles = () => (
         font-size: ${FONT_SIZE.TEXT_MD};
         font-family: 'Pretendard Variable', Pretendard, 'Malgun Gothic',
           Helvetica, 'Apple SD Gothic Neo', Sans-serif;
+        color: ${COLOR.TEXT_BLACK};
       }
       h1 {
         font-size: ${FONT_SIZE.TITLE_XXL};
@@ -171,6 +173,9 @@ const GlobalStyles = () => (
       }
       button {
         font-size: ${FONT_SIZE.TEXT_SM};
+      }
+      svg {
+        color: ${COLOR.BLACK};
       }
     `}
   />

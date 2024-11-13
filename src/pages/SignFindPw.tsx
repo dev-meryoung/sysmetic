@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
 import CancelOutlined from '@mui/icons-material/CancelOutlined';
 import { useNavigate } from 'react-router-dom';
+import Button from '@/components/Button';
+import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { PATH } from '@/constants/path';
 
 const SignFindPw = () => {
@@ -11,7 +13,7 @@ const SignFindPw = () => {
   const [showPasswordError, setShowPasswordError] = useState(false);
   const [showCheckPasswordError, setShowCheckPasswordError] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
-// sendEmail 나중에 추가 예정
+  // sendEmail 나중에 추가 예정
   const [showMessage, setShowMessage] = useState(false);
   const [checkNumber, setCheckNumber] = useState(false);
   const [showCheckBtn, setShowCheckBtn] = useState(false);
@@ -24,6 +26,7 @@ const SignFindPw = () => {
     setEmail('');
     setPassword('');
     setCheckPassword('');
+    setVerificationCode('');
     setShowPasswordError(false);
     setShowCheckPasswordError(false);
   };
@@ -79,6 +82,10 @@ const SignFindPw = () => {
     navigate(PATH.SIGN_IN);
   };
 
+  const handleMainBtn = () => {
+    navigate(PATH.ROOT);
+  };
+
   return (
     <div css={wrapperStyle}>
       <div css={pageInfoStyle}>
@@ -105,12 +112,21 @@ const SignFindPw = () => {
                 placeholder='이메일 주소(abc@abc.com)'
               />
               <button className='clear-btn' onClick={handleClearEmail}>
-                <CancelOutlined style={{ color: '#C84A31', fontSize: 24 }} />
+                <CancelOutlined
+                  style={{ color: COLOR.POINT, fontSize: '2.4rem' }}
+                />
               </button>
             </div>
-            <button className='send-btn' onClick={handleSendEmailBtn}>
-              요청하기
-            </button>
+            <div css={buttonStyle}>
+              <Button
+                label='요청하기'
+                handleClick={handleSendEmailBtn}
+                color='primary'
+                size='xxl'
+                shape='block'
+                fontSize='14px'
+              ></Button>
+            </div>
           </div>
           {showMessage && (
             <span className='message'>
@@ -129,13 +145,17 @@ const SignFindPw = () => {
                 placeholder='6자리'
               />
             </div>
-            <button
-              css={numberCheckBtnStyle(showCheckBtn)}
-              onClick={handleVerificationCodeBtn}
-              disabled={!showCheckBtn}
-            >
-              인증 확인
-            </button>
+            <div css={buttonStyle}>
+              <Button
+                label='인증확인'
+                handleClick={handleVerificationCodeBtn}
+                color='primary'
+                size='xxl'
+                shape='block'
+                disabled={!showCheckBtn}
+                fontSize='14px'
+              ></Button>
+            </div>
           </div>
           {checkNumber && (
             <span className='message'>잘못된 인증번호입니다.</span>
@@ -179,12 +199,22 @@ const SignFindPw = () => {
               </div>
             </div>
             <div css={linkStyle}>
-              <a href='/' css={goMainStyle}>
-                메인가기
-              </a>
-              <button onClick={handleComplete} css={signinStyle}>
-                설정완료
-              </button>
+              <Button
+                label='메인가기'
+                handleClick={handleMainBtn}
+                color='primaryOpacity10'
+                size='xs'
+                shape='line'
+                fontSize='14px'
+              ></Button>
+              <Button
+                label='설정 완료'
+                handleClick={handleComplete}
+                color='primary'
+                size='xs'
+                shape='block'
+                fontSize='14px'
+              ></Button>
             </div>
           </>
         )}
@@ -211,7 +241,7 @@ const wrapperStyle = css`
 
 const pageInfoStyle = css`
   width: 100%;
-  border-bottom: 1px solid #000;
+  border-bottom: 1px solid ${COLOR.BLACK};
 
   .info {
     div {
@@ -280,14 +310,12 @@ const inputSectionStyle = css`
       height: 48px;
       padding-left: 12px;
       border-radius: 4px;
-      border: 1px solid rgba(0, 0, 0, 0.3);
+      border: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
       outline: none;
-      &:focus {
-        border: 1px solid #1261c4;
-      }
+
       &::placeholder {
         font-size: 16px;
-        color: rgba(0, 0, 0, 0.3);
+        color: ${COLOR_OPACITY.BLACK_OPACITY30};
       }
     }
 
@@ -311,13 +339,13 @@ const inputSectionStyle = css`
     margin-left: 16px;
     border: none;
     border-radius: 4px;
-    background-color: #1261c4;
+    background-color: ${COLOR.PRIMARY};
     color: white;
     cursor: pointer;
   }
 
   .message {
-    color: #c84a31;
+    color: ${COLOR.POINT};
     font-size: 14px;
     font-weight: 400;
     margin-top: 4px;
@@ -325,57 +353,16 @@ const inputSectionStyle = css`
   }
 `;
 
-const numberCheckBtnStyle = (isActive: boolean) => css`
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 14px;
-  width: 96px;
-  height: 48px;
-  border: none;
-  margin-left: 16px;
-  border-radius: 4px;
-  background-color: ${isActive ? '#1261C4' : '#ccc'};
-  color: white;
-  cursor: ${isActive ? 'pointer' : 'not-allowed'};
-`;
-
 const linkStyle = css`
   width: 100%;
   text-align: center;
   margin-top: 80px;
   margin-bottom: 96px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
 `;
 
-const goMainStyle = css`
-  display: inline-block;
-  font-size: 14px;
-  font-weight: 400;
-  width: 120px;
-  height: 48px;
-  border-radius: 4px;
-  text-align: center;
-  line-height: 48px;
-  background-color: white;
-  border: 1px solid #1261c4;
-  color: #1261c4;
-  cursor: pointer;
-  text-decoration: none;
-  margin-left: 16px;
-`;
-
-const signinStyle = css`
-  display: inline-block;
-  font-size: 14px;
-  font-weight: 400;
-  width: 120px;
-  height: 48px;
-  border-radius: 4px;
-  text-align: center;
-  line-height: 48px;
-  background-color: #1261c4;
-  color: white;
-  border: none;
-  cursor: pointer;
-  text-decoration: none;
+const buttonStyle = css`
   margin-left: 16px;
 `;
