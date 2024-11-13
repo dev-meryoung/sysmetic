@@ -1,22 +1,22 @@
 import { css } from '@emotion/react';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
-import COLOR from '@/constants/color';
+import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE } from '@/constants/font';
 
 interface CheckboxProps {
   label?: string;
   checked: boolean;
-  onChange: (checked: boolean) => void;
+  handleChange: (checked: boolean) => void;
 }
 
 const Checkbox: React.FC<CheckboxProps> = ({
   label = '',
   checked = false,
-  onChange,
+  handleChange,
 }) => {
   const handleClick = () => {
-    onChange(!checked);
+    handleChange(!checked);
   };
 
   return (
@@ -26,13 +26,13 @@ const Checkbox: React.FC<CheckboxProps> = ({
           <CheckBoxIcon
             sx={{
               color: COLOR.WHITE,
-              fill: COLOR.PRIMARY_NORMAL,
+              fill: COLOR.PRIMARY,
             }}
           />
         ) : (
           <CheckBoxOutlineBlankIcon
             sx={{
-              color: COLOR.GRAY_800,
+              color: COLOR.GRAY800,
             }}
           />
         )}
@@ -66,7 +66,7 @@ const checkboxStyle = css`
   }
 
   :hover {
-    background-color: ${COLOR.GRAY_300};
+    background-color: ${COLOR_OPACITY.PRIMARY_OPACITY10};
     transition: 0.3s;
   }
 `;
