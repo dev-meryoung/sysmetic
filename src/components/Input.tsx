@@ -2,12 +2,10 @@ import { useState } from 'react';
 import { css } from '@emotion/react';
 import { SvgIconComponent } from '@mui/icons-material';
 import SvgIcon from '@mui/icons-material/CancelOutlined';
-import COLOR from '@/constants/color';
+import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 
 const INPUT_COLOR = {
-  FADED_GRAY_100: '#0000001A',
-  FADED_GRAY_300: '#0000004D',
   LIGHT_SKY_BLUE: '#AECAED',
 };
 
@@ -56,7 +54,7 @@ const inputWrapperStyle = (color: string | undefined) => css`
   border: 1px solid
     ${color === 'skyblue'
       ? INPUT_COLOR.LIGHT_SKY_BLUE
-      : INPUT_COLOR.FADED_GRAY_100};
+      : COLOR_OPACITY.BLACK_OPACITY30};
   border-radius: 4px;
 `;
 
@@ -73,7 +71,7 @@ const inputStyle = css`
   letter-spacing: -0.32px;
 
   &::placeholder {
-    color: ${INPUT_COLOR.FADED_GRAY_300};
+    color: ${COLOR_OPACITY.BLACK_OPACITY30};
   }
 `;
 
@@ -81,7 +79,7 @@ const iconStyle = css`
   width: 48px;
   height: 48px;
   padding: 12px;
-  color: ${COLOR.BLACK};
+  color: ${COLOR.TEXT_BLACK};
   cursor: pointer;
 `;
 
