@@ -6,7 +6,7 @@ import {
   KeyboardDoubleArrowRight,
   KeyboardArrowRight,
 } from '@mui/icons-material';
-import COLOR from '@/constants/color';
+import { COLOR } from '@/constants/color';
 import { FONT_SIZE } from '@/constants/font';
 
 interface PaginationProps {
@@ -104,7 +104,7 @@ const paginationStyle = css`
 
     :hover {
       cursor: pointer;
-      color: ${COLOR.PRIMARY_NORMAL};
+      color: ${COLOR.PRIMARY};
     }
 
     svg {
@@ -113,8 +113,8 @@ const paginationStyle = css`
   }
 
   .active {
-    color: ${COLOR.PRIMARY_NORMAL};
-    border: 1px solid ${COLOR.PRIMARY_NORMAL};
+    color: ${COLOR.PRIMARY};
+    border: 1px solid ${COLOR.PRIMARY};
     border-radius: 4px;
   }
 `;
