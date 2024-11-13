@@ -2,19 +2,19 @@ import React from 'react';
 import { css } from '@emotion/react';
 import COLOR from '@/constants/color';
 
-type ButtonShapeType = 'block' | 'line' | 'round' | 'text';
-type ButtonSizeType = 'xxxs' | 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
-type ButtonColorType = 'PRIMARY_NORMAL' | 'POINT_NORMAL' | 'SIGN_UP_TRADER' | 'EMAIL_AUTHENTICATION' |'CHECK_GREEN' | 'WARN_YELLOW' | 'ERROR_RED'| 'INFO_BLUE';
-type ButtonActionType = 'submit' | 'button';
+type ButtonShapeTypes = 'block' | 'line' | 'round' | 'text';
+type ButtonSizeTypes = 'xxxs' | 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+type ButtonColorTypes = 'PRIMARY_NORMAL' | 'POINT_NORMAL' | 'SIGN_UP_TRADER' | 'EMAIL_AUTHENTICATION' |'CHECK_GREEN' | 'WARN_YELLOW' | 'ERROR_RED'| 'INFO_BLUE';
+type ButtonActionTypes = 'submit' | 'button';
 
 interface ButtonProps {
   label: string;
-  onClick: React.MouseEventHandler<HTMLButtonElement>;
-  shape?: ButtonShapeType;
-  size?: ButtonSizeType;
-  color?: ButtonColorType;
+  handleClick: React.MouseEventHandler<HTMLButtonElement>;
+  shape?: ButtonShapeTypes;
+  size?: ButtonSizeTypes;
+  color?: ButtonColorTypes;
   fullWidth?: boolean;
-  type?: ButtonActionType;
+  type?: ButtonActionTypes;
   disabled?: boolean;
   fontWeight?: number;
   fontSize?: string;
@@ -27,7 +27,7 @@ type ButtonColors = {
   opacity?: number;
 };
 
-const buttonColors: Record<ButtonColorType, ButtonColors> = {
+const buttonColors: Record<ButtonColorTypes, ButtonColors> = {
   PRIMARY_NORMAL: { color: COLOR.PRIMARY_NORMAL, hoverColor: COLOR.PRIMARY_500, disabledColor: COLOR.GRAY_600},
   POINT_NORMAL: { color: COLOR.POINT_NORMAL, hoverColor: COLOR.POINT_500, disabledColor: COLOR.POINT_200},
   SIGN_UP_TRADER: { color: COLOR.PRIMARY_600, hoverColor: COLOR.PRIMARY_700},
@@ -38,7 +38,7 @@ const buttonColors: Record<ButtonColorType, ButtonColors> = {
   INFO_BLUE: { color: COLOR.INFO_BLUE}
 };
 
-const buttonSizes: Record<ButtonSizeType, ReturnType<typeof css>> = {
+const buttonSizes: Record<ButtonSizeTypes, ReturnType<typeof css>> = {
   xxxs: css`
     width: 80px;
     height: 32px;
@@ -76,7 +76,7 @@ const buttonSizes: Record<ButtonSizeType, ReturnType<typeof css>> = {
 
 const Button: React.FC<ButtonProps> = ({
   label,
-  onClick,
+  handleClick,
   shape = 'block',
   size = 'md',
   color = 'PRIMARY_NORMAL',
@@ -93,7 +93,7 @@ const Button: React.FC<ButtonProps> = ({
     <button
       css={buttonStyle(shape, selectSizes, selectColors, fullWidth, disabled, fontWeight, fontSize)}
       type={type}
-      onClick={onClick}
+      onClick={handleClick}
       disabled={disabled}
     >
       {label}
@@ -102,7 +102,7 @@ const Button: React.FC<ButtonProps> = ({
 };
 
 const buttonStyle = (
-  shape: ButtonShapeType,
+  shape: ButtonShapeTypes,
   selectSizes: ReturnType<typeof css>,
   selectColors: ButtonColors,
   fullWidth: boolean,

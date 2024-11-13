@@ -6,6 +6,7 @@ import VisibilityOutlined from '@mui/icons-material/VisibilityOutlined';
 import { Button as MuiButton} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
+import COLOR from '@/constants/color';
 import { PATH } from '@/constants/path';
 
 
@@ -49,7 +50,7 @@ const SignIn = () => {
             css={deleteIconBtnStyle}
             disableRipple
           >
-            <CancelOutlined style={{ color: '#C84A31', fontSize: 24 }} />
+            <CancelOutlined style={{ color: COLOR.POINT_NORMAL, fontSize: '2.4rem' }} />
           </MuiButton>
         </div>
         <div css={inputWrapperStyle}>
@@ -67,9 +68,9 @@ const SignIn = () => {
             disableRipple
           >
             {showPassword ? (
-              <VisibilityOffOutlined style={{ color: '#333', fontSize: 24 }} />
+              <VisibilityOffOutlined style={{ color: COLOR.WHITE, fontSize: '2.4rem' }} />
             ) : (
-              <VisibilityOutlined style={{ color: '#333', fontSize: 24 }} />
+              <VisibilityOutlined style={{ color: COLOR.WHITE, fontSize: '2.4rem' }} />
             )}
           </MuiButton>
           <MuiButton
@@ -78,7 +79,7 @@ const SignIn = () => {
             css={deleteIconBtnStyle}
             disableRipple
           >
-            <CancelOutlined style={{ color: '#C84A31', fontSize: 24 }} />
+            <CancelOutlined style={{ color: COLOR.POINT_NORMAL, fontSize: '2.4rem' }} />
           </MuiButton>
         </div>
       </div>
@@ -90,7 +91,7 @@ const SignIn = () => {
       <div>
         <Button
           label='로그인'
-          onClick={handleSignin}
+          handleClick={handleSignin}
           color="PRIMARY_NORMAL"
           size="lg"
           shape="block"
@@ -160,10 +161,10 @@ const inputStyle = css`
   border-radius: 4px;
   border: 1px solid rgba(0, 0, 0, 0.3);
   outline: none;
-  box-sizing: border-box; /* box-sizing 추가 */
+  box-sizing: border-box; 
 
   &:focus {
-    border: 1px solid #1261c4;
+    border: 1px solid ${COLOR.PRIMARY_NORMAL};
   }
 
   &::placeholder {
@@ -203,7 +204,7 @@ const linksStyle = css`
   font-weight: 400;
 
   a {
-    color: #333;
+    color: ${COLOR.WHITE};
     text-decoration: none;
   }
 `;

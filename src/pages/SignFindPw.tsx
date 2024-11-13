@@ -3,6 +3,7 @@ import { css } from '@emotion/react';
 import CancelOutlined from '@mui/icons-material/CancelOutlined';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
+import COLOR from '@/constants/color';
 import { PATH } from '@/constants/path';
 
 
@@ -112,13 +113,13 @@ const SignFindPw = () => {
                 placeholder='이메일 주소(abc@abc.com)'
               />
               <button className='clear-btn' onClick={handleClearEmail}>
-                <CancelOutlined style={{ color: '#C84A31', fontSize: 24 }} />
+              <CancelOutlined style={{ color: COLOR.POINT_NORMAL, fontSize: '2.4rem' }} />
               </button>
             </div>
             <div css={buttonStyle}>
               <Button
                 label='요청하기'
-                onClick={handleSendEmailBtn}
+                handleClick={handleSendEmailBtn}
                 color="PRIMARY_NORMAL"
                 size="xxs"
                 shape="block"
@@ -147,7 +148,7 @@ const SignFindPw = () => {
             <div css={buttonStyle}>
               <Button
                 label='인증확인'
-                onClick={handleVerificationCodeBtn}
+                handleClick={handleVerificationCodeBtn}
                 color="PRIMARY_NORMAL"
                 size="xxs"
                 shape="block"
@@ -201,7 +202,7 @@ const SignFindPw = () => {
             <div css={linkStyle}>
               <Button
                 label='메인가기'
-                onClick={handleMainBtn}
+                handleClick={handleMainBtn}
                 color="PRIMARY_NORMAL"
                 size="xs"
                 shape="line"
@@ -210,7 +211,7 @@ const SignFindPw = () => {
               </Button>
               <Button
                 label='설정 완료'
-                onClick={handleComplete}
+                handleClick={handleComplete}
                 color="PRIMARY_NORMAL"
                 size="xs"
                 shape="block"
@@ -243,7 +244,7 @@ const wrapperStyle = css`
 
 const pageInfoStyle = css`
   width: 100%;
-  border-bottom: 1px solid #000;
+  border-bottom: 1px solid ${COLOR.BLACK};
 
   .info {
     div {
@@ -315,7 +316,7 @@ const inputSectionStyle = css`
       border: 1px solid rgba(0, 0, 0, 0.3);
       outline: none;
       &:focus {
-        border: 1px solid #1261c4;
+        border: 1px solid ${COLOR.PRIMARY_NORMAL};
       }
       &::placeholder {
         font-size: 16px;
@@ -343,13 +344,13 @@ const inputSectionStyle = css`
     margin-left: 16px;
     border: none;
     border-radius: 4px;
-    background-color: #1261c4;
+    background-color: ${COLOR.PRIMARY_NORMAL};
     color: white;
     cursor: pointer;
   }
 
   .message {
-    color: #c84a31;
+    color: ${COLOR.POINT_NORMAL};
     font-size: 14px;
     font-weight: 400;
     margin-top: 4px;

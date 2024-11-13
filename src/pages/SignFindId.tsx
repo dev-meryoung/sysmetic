@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { css } from '@emotion/react';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
+import COLOR from '@/constants/color';
 import { PATH } from '@/constants/path';
 
 const SignFindId = () => {
@@ -48,7 +49,7 @@ const SignFindId = () => {
           />
           <Button
             label='아이디 찾기'
-            onClick={handleFindBtn}
+            handleClick={handleFindBtn}
             color="PRIMARY_NORMAL"
             size="xxs"
             shape="block"
@@ -75,7 +76,7 @@ const SignFindId = () => {
           <div css={linkStyle}>
             <Button
               label='메인가기'
-              onClick={handleMainBtn}
+              handleClick={handleMainBtn}
               color="PRIMARY_NORMAL"
               size="xs"
               shape="block"
@@ -83,7 +84,7 @@ const SignFindId = () => {
             </Button>
             <Button
               label='로그인'
-              onClick={handleMainBtn}
+              handleClick={handleMainBtn}
               color="PRIMARY_NORMAL"
               size="xs"
               shape="line"
@@ -151,7 +152,7 @@ const findFormStyle = css`
       outline: none;
 
       &:focus {
-        border: 1px solid #1261c4;
+        border: 1px solid ${COLOR.PRIMARY_NORMAL};
       }
 
       &::placeholder {
@@ -169,7 +170,7 @@ const findFormStyle = css`
       height: 48px;
       border: none;
       border-radius: 4px;
-      background-color: #1261c4;
+      background-color: ${COLOR.PRIMARY_NORMAL};
       color: white;
       cursor: pointer;
     }
@@ -177,7 +178,7 @@ const findFormStyle = css`
     span {
       position: absolute;
       margin-top: 8px;
-      color: #c84a31;
+      color: ${COLOR.POINT_NORMAL};
       font-size: 14px;
       font-weight: 400;
     }
@@ -189,7 +190,7 @@ const showEmailStyle = css`
   height: 120px;
   margin-top: 80px;
   padding: 20px;
-  background-color: #f9f9f9;
+  background-color: ${COLOR.GRAY_100};
   display: flex;
   flex-direction: column;
   justify-content: center;

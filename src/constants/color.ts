@@ -9,7 +9,7 @@ const COLOR = {
   PRIMARY_700: '#082a54',
   PRIMARY_800: '#04172f',
   POINT_NORMAL: '#c84a31',
-  POINT_100: '#FAF4F2',
+  POINT_100: '#faf4f2',
   POINT_200: '#e9Cac2',
   POINT_300: '#d9a192',
   POINT_400: '#c97862',
