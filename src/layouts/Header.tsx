@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import { Link } from 'react-router-dom';
 import logo from '@/assets/images/logo.png';
-import COLOR from '@/constants/color';
+import { COLOR } from '@/constants/color';
 import { FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 
@@ -41,7 +41,7 @@ const headerTopBgStyle = css`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: ${COLOR.PRIMARY_NORMAL};
+  background-color: ${COLOR.PRIMARY};
 `;
 
 const headerTopStyle = css`
