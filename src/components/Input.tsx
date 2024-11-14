@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { css } from '@emotion/react';
 import { SvgIconComponent } from '@mui/icons-material';
 import SvgIcon from '@mui/icons-material/CancelOutlined';
@@ -10,7 +9,8 @@ const INPUT_COLOR = {
 };
 
 type InputTypes = 'text' | 'password' | 'email' | 'tel';
-type InputColorTypes = 'lightgray' | 'skyblue';
+type InputColorTypes = 'default' | 'skyblue';
+export type InputStateTypes = 'normal' | 'warn' | 'success';
 
 interface InputProps {
   type?: InputTypes;
@@ -18,6 +18,9 @@ interface InputProps {
   color?: InputColorTypes;
   firstIcon?: SvgIconComponent;
   secondIcon?: SvgIconComponent;
+  status: InputStateTypes;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onFIconClick?: () => void;
   onSIconClick?: () => void;
 }
@@ -25,36 +28,42 @@ interface InputProps {
 const Input: React.FC<InputProps> = ({
   type,
   placeholder,
-  color = 'lightgray',
+  color = 'default',
   firstIcon,
   secondIcon,
+  status,
+  value,
   onFIconClick,
   onSIconClick,
-}) => {
-  const [input, setInput] = useState('');
+  onChange,
+}) => (
+  <div css={inputWrapperStyle(color, status)}>
+    <input
+      css={inputStyle}
+      type={type}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+    />
+    {firstIcon && <SvgIcon css={iconStyle} onClick={onFIconClick} />}
+    {secondIcon && <SvgIcon css={iconStyle} onClick={onSIconClick} />}
+  </div>
+);
 
-  return (
-    <div css={inputWrapperStyle(color)}>
-      <input
-        css={inputStyle}
-        type={type}
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder={placeholder}
-      />
-      {firstIcon && <SvgIcon css={iconStyle} onClick={onFIconClick} />}
-      {secondIcon && <SvgIcon css={iconStyle} onClick={onSIconClick} />}
-    </div>
-  );
-};
-
-const inputWrapperStyle = (color: string | undefined) => css`
+const inputWrapperStyle = (
+  color: string | undefined,
+  status: InputStateTypes | undefined
+) => css`
   display: flex;
   width: 100%;
   border: 1px solid
-    ${color === 'skyblue'
-      ? INPUT_COLOR.LIGHT_SKY_BLUE
-      : COLOR_OPACITY.BLACK_OPACITY30};
+    ${status === 'warn'
+      ? COLOR.ERROR_RED
+      : status === 'success'
+        ? COLOR.CHECK_GREEN
+        : color === 'skyblue'
+          ? INPUT_COLOR.LIGHT_SKY_BLUE
+          : COLOR_OPACITY.BLACK_OPACITY30};
   border-radius: 4px;
 `;
 
