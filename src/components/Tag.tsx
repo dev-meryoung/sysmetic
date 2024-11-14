@@ -12,7 +12,6 @@ const Tag: React.FC<TagProps> = ({ src, alt }) => (
 const tagStyle = css`
   display: inline-block;
   height: 16px;
-  margin: 0 2px;
 `;
 
 export default Tag;
