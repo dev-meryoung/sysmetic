@@ -20,7 +20,14 @@ const TabButton: React.FC<TabButtonProps> = ({ tabsData, shape = 'block' }) => {
 
   const [activeTab, setActiveTab] = useState(() => {
     const tabParam = searchParams.get('tab');
-    return tabParam ? parseInt(tabParam) : 0;
+
+    // tabParam 값이 없거나 유효하지 않으면 첫 번째 탭(id: 0)을 자동으로 선택하도록 처리
+    const tabId =
+      tabParam && !isNaN(Number(tabParam)) && Number(tabParam) >= 0
+        ? parseInt(tabParam)
+        : 0;
+
+    return tabId;
   });
 
   const handleTabClick = (tabId: number) => {
