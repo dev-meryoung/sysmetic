@@ -18,7 +18,7 @@ interface InputProps {
   color?: InputColorTypes;
   firstIcon?: SvgIconComponent;
   secondIcon?: SvgIconComponent;
-  status: InputStateTypes;
+  status?: InputStateTypes;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onFIconClick?: () => void;
@@ -31,7 +31,7 @@ const Input: React.FC<InputProps> = ({
   color = 'default',
   firstIcon,
   secondIcon,
-  status,
+  status = 'normal',
   value,
   onFIconClick,
   onSIconClick,
@@ -50,10 +50,7 @@ const Input: React.FC<InputProps> = ({
   </div>
 );
 
-const inputWrapperStyle = (
-  color: string | undefined,
-  status: InputStateTypes | undefined
-) => css`
+const inputWrapperStyle = (color: string, status: InputStateTypes) => css`
   display: flex;
   width: 100%;
   border: 1px solid
