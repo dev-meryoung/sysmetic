@@ -3,8 +3,8 @@ import { css } from '@emotion/react';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 
 type ButtonShapeTypes = 'block' | 'line' | 'round' | 'text';
-type ButtonSizeTypes = 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
-type ButtonColorTypes = 'primary' | 'point' | 'primary600' | 'black' | 'primaryOpacity10' | 'pointOpacity10' |'checkGreen' | 'warnYellow' | 'errorRed'| 'infoBlue';
+type ButtonSizeTypes = 'xxxs' | 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+type ButtonColorTypes = 'primary' | 'point' | 'primary600' | 'black' | 'white' | 'primaryOpacity10' | 'pointOpacity10' |'checkGreen' | 'warnYellow' | 'errorRed'| 'infoBlue';
 type ButtonActionTypes = 'submit' | 'button';
 
 interface ButtonProps {
@@ -24,14 +24,14 @@ type ButtonColors = {
   color: string;
   hoverColor?: string;
   disabledColor?: string;
-  opacity?: number;
 };
 
 const buttonColors: Record<ButtonColorTypes, ButtonColors> = {
-  primary: { color: COLOR.PRIMARY, hoverColor: COLOR.PRIMARY500, disabledColor: COLOR.GRAY500},
-  point: { color: COLOR.PRIMARY, hoverColor: COLOR.POINT500, disabledColor: COLOR.POINT200},
+  primary: { color: COLOR.PRIMARY, hoverColor: COLOR.PRIMARY600, disabledColor: COLOR.GRAY600},
+  point: { color: COLOR.PRIMARY, hoverColor: COLOR.POINT600, disabledColor: COLOR.POINT200},
   primary600: { color: COLOR.PRIMARY600, hoverColor: COLOR.PRIMARY700},
   black: { color: COLOR.BLACK, hoverColor: COLOR.GRAY800},
+  white: { color: COLOR.WHITE, hoverColor: COLOR.GRAY100},
   primaryOpacity10: { color: COLOR.PRIMARY, hoverColor: COLOR_OPACITY.PRIMARY_OPACITY10},
   pointOpacity10: { color: COLOR.POINT, hoverColor: COLOR_OPACITY.POINT_OPACITY10},
   checkGreen: { color: COLOR.CHECK_GREEN},
@@ -41,9 +41,13 @@ const buttonColors: Record<ButtonColorTypes, ButtonColors> = {
 };
 
 const buttonSizes: Record<ButtonSizeTypes, ReturnType<typeof css>> = {
-  xxs: css`
+  xxxs: css`
     width: 80px;
     height: 32px;
+  `,
+  xxs: css`
+    width: 80px;
+    height: 44px;
   `,
   xs: css`
     width: 120px;
@@ -114,7 +118,7 @@ const buttonStyle = (
       : selectColors.color;
 
   const textColor =
-    disabled || selectColors.color === COLOR.GRAY500
+    disabled || selectColors.color === COLOR.GRAY600
       ? COLOR.WHITE
       : shape === 'text' || shape === 'line'
         ? selectColors.color

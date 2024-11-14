@@ -50,15 +50,15 @@ const SignFindId = () => {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="' - ' 를 제외하고 입력해주세요."
           />
-            <Button
-              label='아이디 찾기'
-              handleClick={handleFindBtn}
-              color="primary"
-              size="xxl"
-              shape="block"
-              fontSize="14px"
-            >
-            </Button>
+          <Button
+            label='아이디 찾기'
+            handleClick={handleFindBtn}
+            color="primary"
+            size="xxl"
+            shape="block"
+            fontSize="14px"
+          >
+          </Button>
           <br />
           {showMessage && (
             <span>해당 휴대번호로 가입한 이메일이 존재하지않습니다.</span>
