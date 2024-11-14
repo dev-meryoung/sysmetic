@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import IconButton from '@/components/IconButton';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
+import { FONT_SIZE } from '@/constants/font';
 import { PATH } from '@/constants/path';
 
 
@@ -49,6 +50,7 @@ const SignIn = () => {
               handleClick={handleClearEmail}
               color="point"
               size="sm"
+              shape="line"
               css={deleteIconBtnStyle} 
             />         
         </div>
@@ -65,6 +67,7 @@ const SignIn = () => {
             handleClick={handlePasswordVisibility}
             color="black"
             size="sm" 
+            shape="line"
             css={showIconBtnStyle}
           />
           <IconButton
@@ -72,6 +75,7 @@ const SignIn = () => {
             handleClick={handleClearPassword}
             color="point"
             size="sm"
+            shape="line"
             css={deleteIconBtnStyle} 
           />  
         </div>
@@ -86,6 +90,7 @@ const SignIn = () => {
           color="primary"
           size="lg"
           shape="block"
+          width={360}
           >
         </Button>
       </div>
@@ -155,7 +160,7 @@ const inputStyle = css`
 
 const showIconBtnStyle = css`
   position: absolute;
-  right: 4rem;
+  right: 3.5rem;
   top: 50%;
   transform: translateY(-50%);
   padding: 0;
@@ -164,7 +169,6 @@ const showIconBtnStyle = css`
 const deleteIconBtnStyle = css`
   position: absolute;
   right: 0;
-  padding: 16px;
   top: 50%;
   transform: translateY(-50%);
 `;
@@ -175,7 +179,7 @@ const staySignInContainerStyle = css`
   width: 360px;
   margin-top: 16px;
   margin-bottom: 24px;
-  font-size: 14px;
+  font-size: ${FONT_SIZE.TEXT_SM};
 `;
 
 const staySignInStyle = css`
@@ -187,7 +191,7 @@ const linksStyle = css`
   margin-top: 16px;
   display: flex;
   gap: 8px;
-  font-size: 14px;
+  font-size: ${FONT_SIZE.TEXT_SM};
   font-weight: 400;
 
   a {

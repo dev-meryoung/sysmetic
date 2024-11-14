@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import IconButton from '@/components/IconButton';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
+import { FONT_SIZE } from '@/constants/font';
 import { PATH } from '@/constants/path';
 
 const SignFindPw = () => {
@@ -114,7 +115,6 @@ const SignFindPw = () => {
                 IconComponent={CancelOutlined}
                 handleClick={handleClearEmail}
                 color="point"
-                hoverColor="primary"
                 size="sm"
                 css={clearIconStyle}
               />
@@ -124,7 +124,8 @@ const SignFindPw = () => {
                 label='요청하기'
                 handleClick={handleSendEmailBtn}
                 color="primary"
-                size="xxl"
+                size="md"
+                width= {80}
                 shape="block"
                 fontSize="14px"
               />
@@ -152,7 +153,8 @@ const SignFindPw = () => {
                 label='인증확인'
                 handleClick={handleVerificationCodeBtn}
                 color="primary"
-                size="xxl"
+                size="md"
+                width= {80}
                 shape="block"
                 disabled={!showCheckBtn}
                 fontSize="14px"
@@ -205,7 +207,8 @@ const SignFindPw = () => {
                 label='메인가기'
                 handleClick={handleMainBtn}
                 color="primaryOpacity10"
-                size="xs"
+                size= "md"
+                width= {120}
                 shape="line"
                 fontSize="14px"
               />
@@ -213,7 +216,8 @@ const SignFindPw = () => {
                 label='설정 완료'
                 handleClick={handleComplete}
                 color="primary"
-                size="xs"
+                size= "md"
+                width= {120}
                 shape="block"
                 fontSize="14px"
               />
@@ -245,12 +249,12 @@ const pageInfoStyle = css`
   border-bottom: 1px solid ${COLOR.BLACK};
   .info {
     div {
-      font-size: 24px;
+      font-size: ${FONT_SIZE.TITLE_SM};
       font-weight: 700;
       margin-bottom: 16px;
     }
     span {
-      font-size: 16px;
+      font-size: ${FONT_SIZE.TEXT_MD};
       font-weight: 400;
       line-height: 24px;
       margin-bottom: 40px;
@@ -274,7 +278,7 @@ const inputSectionStyle = css`
   }
 
   div {
-    font-size: 14px;
+    font-size: ${FONT_SIZE.TEXT_SM};
     font-weight: 400;
     line-height: 14px;
   }
@@ -300,7 +304,7 @@ const inputSectionStyle = css`
       outline: none;
 
       &::placeholder {
-        font-size: 16px;
+        font-size: ${FONT_SIZE.TEXT_MD};
         color: ${COLOR_OPACITY.BLACK_OPACITY30};
       }
     }
@@ -308,7 +312,7 @@ const inputSectionStyle = css`
 
   .message {
     color: ${COLOR.POINT};
-    font-size: 14px;
+    font-size: ${FONT_SIZE.TEXT_SM};
     font-weight: 400;
     margin-top: 4px;
     display: block;
