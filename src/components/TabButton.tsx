@@ -99,6 +99,7 @@ const tabBtnStyle = css`
       border-top: 1px solid ${COLOR.PRIMARY100};
       border-left: 1px solid ${COLOR.PRIMARY100};
       border-right: 1px solid ${COLOR.PRIMARY100};
+      color: ${COLOR.PRIMARY};
 
       &::after {
         content: '';
