@@ -44,17 +44,13 @@ const SignIn = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-
-
             <IconButton
               IconComponent={CancelOutlined}
               handleClick={handleClearEmail}
               color="point"
               size="sm"
               css={deleteIconBtnStyle} 
-            />
-
-          
+            />         
         </div>
         <div css={inputWrapperStyle}>
           <input
