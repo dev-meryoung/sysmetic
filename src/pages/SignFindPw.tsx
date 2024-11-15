@@ -3,7 +3,9 @@ import { css } from '@emotion/react';
 import CancelOutlined from '@mui/icons-material/CancelOutlined';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
+import IconButton from '@/components/IconButton';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
+import { FONT_SIZE } from '@/constants/font';
 import { PATH } from '@/constants/path';
 
 const SignFindPw = () => {
@@ -13,7 +15,6 @@ const SignFindPw = () => {
   const [showPasswordError, setShowPasswordError] = useState(false);
   const [showCheckPasswordError, setShowCheckPasswordError] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
-  // sendEmail 나중에 추가 예정
   const [showMessage, setShowMessage] = useState(false);
   const [checkNumber, setCheckNumber] = useState(false);
   const [showCheckBtn, setShowCheckBtn] = useState(false);
@@ -111,21 +112,24 @@ const SignFindPw = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder='이메일 주소(abc@abc.com)'
               />
-              <button className='clear-btn' onClick={handleClearEmail}>
-                <CancelOutlined
-                  style={{ color: COLOR.POINT, fontSize: '2.4rem' }}
-                />
-              </button>
+              <IconButton
+                IconComponent={CancelOutlined}
+                handleClick={handleClearEmail}
+                color='point'
+                size='sm'
+                css={clearIconStyle}
+              />
             </div>
             <div css={buttonStyle}>
               <Button
                 label='요청하기'
                 handleClick={handleSendEmailBtn}
                 color='primary'
-                size='xxl'
+                size='md'
+                width={80}
                 shape='block'
                 fontSize='14px'
-              ></Button>
+              />
             </div>
           </div>
           {showMessage && (
@@ -150,11 +154,12 @@ const SignFindPw = () => {
                 label='인증확인'
                 handleClick={handleVerificationCodeBtn}
                 color='primary'
-                size='xxl'
+                size='md'
+                width={80}
                 shape='block'
                 disabled={!showCheckBtn}
                 fontSize='14px'
-              ></Button>
+              />
             </div>
           </div>
           {checkNumber && (
@@ -203,18 +208,20 @@ const SignFindPw = () => {
                 label='메인가기'
                 handleClick={handleMainBtn}
                 color='primaryOpacity10'
-                size='xs'
+                size='md'
+                width={120}
                 shape='line'
                 fontSize='14px'
-              ></Button>
+              />
               <Button
                 label='설정 완료'
                 handleClick={handleComplete}
                 color='primary'
-                size='xs'
+                size='md'
+                width={120}
                 shape='block'
                 fontSize='14px'
-              ></Button>
+              />
             </div>
           </>
         )}
@@ -235,22 +242,20 @@ const wrapperStyle = css`
   max-width: 1200px;
   margin: 0 auto;
   box-sizing: border-box;
-  height: auto;
   min-height: 627px;
 `;
 
 const pageInfoStyle = css`
   width: 100%;
   border-bottom: 1px solid ${COLOR.BLACK};
-
   .info {
     div {
-      font-size: 24px;
+      font-size: ${FONT_SIZE.TITLE_SM};
       font-weight: 700;
       margin-bottom: 16px;
     }
     span {
-      font-size: 16px;
+      font-size: ${FONT_SIZE.TEXT_MD};
       font-weight: 400;
       line-height: 24px;
       margin-bottom: 40px;
@@ -263,32 +268,21 @@ const inputSectionStyle = css`
   width: 100%;
   margin-top: 40px;
 
-  .email-form {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 40px;
-  }
-
-  .verificationCode-form {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 40px;
-  }
-
-  .reset-pw-form {
+  .email-form,
+  .verificationCode-form,
+  .reset-pw-form,
+  .check-pw-form {
     display: flex;
     flex-direction: column;
     margin-bottom: 40px;
   }
 
   .check-pw-form {
-    display: flex;
-    flex-direction: column;
     margin-bottom: 80px;
   }
 
   div {
-    font-size: 14px;
+    font-size: ${FONT_SIZE.TEXT_SM};
     font-weight: 400;
     line-height: 14px;
   }
@@ -314,43 +308,23 @@ const inputSectionStyle = css`
       outline: none;
 
       &::placeholder {
-        font-size: 16px;
+        font-size: ${FONT_SIZE.TEXT_MD};
         color: ${COLOR_OPACITY.BLACK_OPACITY30};
       }
     }
-
-    .clear-btn {
-      position: absolute;
-      top: 50%;
-      right: 4px;
-      transform: translateY(-50%);
-      background-color: transparent;
-      border: none;
-      cursor: pointer;
-    }
-  }
-
-  .send-btn {
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 14px;
-    width: 96px;
-    height: 48px;
-    margin-left: 16px;
-    border: none;
-    border-radius: 4px;
-    background-color: ${COLOR.PRIMARY};
-    color: white;
-    cursor: pointer;
   }
 
   .message {
     color: ${COLOR.POINT};
-    font-size: 14px;
+    font-size: ${FONT_SIZE.TEXT_SM};
     font-weight: 400;
     margin-top: 4px;
     display: block;
   }
+`;
+
+const buttonStyle = css`
+  margin-left: 16px;
 `;
 
 const linkStyle = css`
@@ -363,6 +337,12 @@ const linkStyle = css`
   gap: 16px;
 `;
 
-const buttonStyle = css`
-  margin-left: 16px;
+const clearIconStyle = css`
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
 `;

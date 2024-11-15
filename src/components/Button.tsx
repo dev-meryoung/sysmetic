@@ -3,7 +3,7 @@ import { css } from '@emotion/react';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 
 type ButtonShapeTypes = 'block' | 'line' | 'round' | 'text';
-type ButtonSizeTypes = 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+type ButtonSizeTypes = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 type ButtonColorTypes =
   | 'primary'
   | 'point'
@@ -28,24 +28,24 @@ interface ButtonProps {
   disabled?: boolean;
   fontWeight?: number;
   fontSize?: string;
+  width?: number;
 }
 
 type ButtonColors = {
   color: string;
   hoverColor?: string;
   disabledColor?: string;
-  opacity?: number;
 };
 
 const buttonColors: Record<ButtonColorTypes, ButtonColors> = {
   primary: {
     color: COLOR.PRIMARY,
-    hoverColor: COLOR.PRIMARY500,
-    disabledColor: COLOR.GRAY500,
+    hoverColor: COLOR.PRIMARY600,
+    disabledColor: COLOR.GRAY600,
   },
   point: {
-    color: COLOR.PRIMARY,
-    hoverColor: COLOR.POINT500,
+    color: COLOR.POINT,
+    hoverColor: COLOR.POINT600,
     disabledColor: COLOR.POINT200,
   },
   primary600: { color: COLOR.PRIMARY600, hoverColor: COLOR.PRIMARY700 },
@@ -65,33 +65,22 @@ const buttonColors: Record<ButtonColorTypes, ButtonColors> = {
 };
 
 const buttonSizes: Record<ButtonSizeTypes, ReturnType<typeof css>> = {
-  xxs: css`
-    width: 80px;
-    height: 32px;
-  `,
   xs: css`
     width: 120px;
-    height: 48px;
+    height: 32px;
   `,
   sm: css`
     width: 144px;
-    height: 48px;
+    height: 40px;
   `,
   md: css`
-    width: 160px;
     height: 48px;
   `,
   lg: css`
-    width: 360px;
     height: 56px;
   `,
   xl: css`
-    width: 580px;
     height: 136px;
-  `,
-  /* 인풋, 표스퀘어, 아이디찾기, 요청하기, 인증확인 버튼용 (넓이유동적) */
-  xxl: css`
-    padding: 16px 17px;
   `,
 };
 
@@ -102,10 +91,11 @@ const Button: React.FC<ButtonProps> = ({
   size = 'md',
   color = 'primary',
   type = 'button',
-  fullWidth = false,
+  fullWidth = true,
   disabled = false,
   fontWeight = 400,
   fontSize = '16px',
+  width,
 }) => {
   const selectColors = buttonColors[color];
   const selectSizes = buttonSizes[size];
@@ -119,7 +109,8 @@ const Button: React.FC<ButtonProps> = ({
         fullWidth,
         disabled,
         fontWeight,
-        fontSize
+        fontSize,
+        width
       )}
       type={type}
       onClick={handleClick}
@@ -137,7 +128,8 @@ const buttonStyle = (
   fullWidth: boolean,
   disabled: boolean,
   fontWeight: number,
-  fontSize: string
+  fontSize: string,
+  width?: number
 ) => {
   const backgroundColor = disabled
     ? selectColors.disabledColor
@@ -146,7 +138,7 @@ const buttonStyle = (
       : selectColors.color;
 
   const textColor =
-    disabled || selectColors.color === COLOR.GRAY500
+    disabled || selectColors.color === COLOR.GRAY600
       ? COLOR.WHITE
       : shape === 'text' || shape === 'line'
         ? selectColors.color
@@ -171,7 +163,7 @@ const buttonStyle = (
     cursor: ${disabled ? 'not-allowed' : 'pointer'};
     border: ${borderColor};
     outline: none;
-    width: ${fullWidth ? '100%' : 'auto'};
+    width: ${width ? `${width}px` : fullWidth ? '100%' : 'auto'};
     border-radius: ${shape === 'round' ? '50px' : '4px'};
     font-weight: ${fontWeight};
     font-size: ${fontSize};

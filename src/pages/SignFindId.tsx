@@ -3,6 +3,7 @@ import { css } from '@emotion/react';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
+import { FONT_SIZE } from '@/constants/font';
 import { PATH } from '@/constants/path';
 
 const SignFindId = () => {
@@ -54,7 +55,8 @@ const SignFindId = () => {
             label='아이디 찾기'
             handleClick={handleFindBtn}
             color='primary'
-            size='xxl'
+            size='md'
+            width={95}
             shape='block'
             fontSize='14px'
           ></Button>
@@ -80,14 +82,16 @@ const SignFindId = () => {
               label='메인가기'
               handleClick={handleMainBtn}
               color='primaryOpacity10'
-              size='xs'
+              size='md'
+              width={120}
               shape='line'
             ></Button>
             <Button
               label='로그인'
               handleClick={handleSignInBtn}
               color='primary'
-              size='xs'
+              size='md'
+              width={120}
               shape='block'
             ></Button>
           </div>
@@ -117,12 +121,12 @@ const pageInfoStyle = css`
 
   .info {
     div {
-      font-size: 24px;
+      font-size: ${FONT_SIZE.TITLE_SM};
       font-weight: 700;
       margin-bottom: 6px;
     }
     span {
-      font-size: 16px;
+      font-size: ${FONT_SIZE.TEXT_MD};
       font-weight: 400;
       line-height: 24px;
       margin-bottom: 40px;
@@ -137,7 +141,7 @@ const findFormStyle = css`
 
   .writting-layout {
     div {
-      font-size: 14px;
+      font-size: ${FONT_SIZE.TEXT_SM};
       font-weight: 400;
       line-height: 14px;
       margin-bottom: 8px;
@@ -156,7 +160,7 @@ const findFormStyle = css`
       }
 
       &::placeholder {
-        font-size: 16px;
+        font-size: ${FONT_SIZE.TEXT_SM};
         color: ${COLOR_OPACITY.BLACK_OPACITY30};
       }
     }
@@ -169,7 +173,7 @@ const findFormStyle = css`
       position: absolute;
       margin-top: 8px;
       color: ${COLOR.POINT};
-      font-size: 14px;
+      font-size: ${FONT_SIZE.TEXT_SM};
       font-weight: 400;
     }
   }

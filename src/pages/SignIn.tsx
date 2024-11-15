@@ -3,10 +3,11 @@ import { css } from '@emotion/react';
 import CancelOutlined from '@mui/icons-material/CancelOutlined';
 import VisibilityOffOutlined from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlined from '@mui/icons-material/VisibilityOutlined';
-import { Button as MuiButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
+import IconButton from '@/components/IconButton';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
+import { FONT_SIZE } from '@/constants/font';
 import { PATH } from '@/constants/path';
 
 const SignIn = () => {
@@ -43,16 +44,14 @@ const SignIn = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <MuiButton
-            variant='text'
-            onClick={handleClearEmail}
+          <IconButton
+            IconComponent={CancelOutlined}
+            handleClick={handleClearEmail}
+            color='point'
+            size='sm'
+            shape='line'
             css={deleteIconBtnStyle}
-            disableRipple
-          >
-            <CancelOutlined
-              style={{ color: COLOR.POINT, fontSize: '2.4rem' }}
-            />
-          </MuiButton>
+          />
         </div>
         <div css={inputWrapperStyle}>
           <input
@@ -62,39 +61,29 @@ const SignIn = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <MuiButton
-            variant='text'
-            onClick={handlePasswordVisibility}
+          <IconButton
+            IconComponent={
+              showPassword ? VisibilityOffOutlined : VisibilityOutlined
+            }
+            handleClick={handlePasswordVisibility}
+            color='black'
+            size='sm'
+            shape='line'
             css={showIconBtnStyle}
-            disableRipple
-          >
-            {showPassword ? (
-              <VisibilityOffOutlined
-                style={{ color: COLOR.BLACK, fontSize: '2.4rem' }}
-              />
-            ) : (
-              <VisibilityOutlined
-                style={{ color: COLOR.BLACK, fontSize: '2.4rem' }}
-              />
-            )}
-          </MuiButton>
-          <MuiButton
-            variant='text'
-            onClick={handleClearPassword}
+          />
+          <IconButton
+            IconComponent={CancelOutlined}
+            handleClick={handleClearPassword}
+            color='point'
+            size='sm'
+            shape='line'
             css={deleteIconBtnStyle}
-            disableRipple
-          >
-            <CancelOutlined
-              style={{ color: COLOR.POINT, fontSize: '2.4rem' }}
-            />
-          </MuiButton>
+          />
         </div>
       </div>
-
       <div css={staySignInContainerStyle}>
         <input type='checkbox' css={staySignInStyle} /> 로그인 유지
       </div>
-
       <div>
         <Button
           label='로그인'
@@ -102,9 +91,9 @@ const SignIn = () => {
           color='primary'
           size='lg'
           shape='block'
+          width={360}
         ></Button>
       </div>
-
       <div css={linksStyle}>
         <a href='/signup' css={accountStyle}>
           회원가입
@@ -137,15 +126,6 @@ const signInTextStyle = css`
   align-self: center;
 `;
 
-const staySignInContainerStyle = css`
-  display: flex;
-  align-items: center;
-  width: 360px;
-  margin-top: 16px;
-  margin-bottom: 24px;
-  font-size: 14px;
-`;
-
 const containerInputStyle = css`
   display: flex;
   flex-direction: column;
@@ -156,7 +136,6 @@ const containerInputStyle = css`
 
 const inputWrapperStyle = css`
   position: relative;
-  display: flex;
   align-items: center;
 `;
 
@@ -181,20 +160,26 @@ const inputStyle = css`
 
 const showIconBtnStyle = css`
   position: absolute;
-  right: 40px;
+  right: 3.5rem;
   top: 50%;
   transform: translateY(-50%);
   padding: 0;
-  min-width: auto;
 `;
 
 const deleteIconBtnStyle = css`
   position: absolute;
-  right: 8px;
+  right: 0;
   top: 50%;
   transform: translateY(-50%);
-  padding: 0;
-  min-width: auto;
+`;
+
+const staySignInContainerStyle = css`
+  display: flex;
+  align-items: center;
+  width: 360px;
+  margin-top: 16px;
+  margin-bottom: 24px;
+  font-size: ${FONT_SIZE.TEXT_SM};
 `;
 
 const staySignInStyle = css`
@@ -206,7 +191,7 @@ const linksStyle = css`
   margin-top: 16px;
   display: flex;
   gap: 8px;
-  font-size: 14px;
+  font-size: ${FONT_SIZE.TEXT_SM};
   font-weight: 400;
 
   a {
