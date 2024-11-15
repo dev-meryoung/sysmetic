@@ -19,6 +19,8 @@ interface InputProps {
   firstIcon?: SvgIconComponent;
   secondIcon?: SvgIconComponent;
   status?: InputStateTypes;
+  fullWidth?: boolean;
+  width?: number;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onFIconClick?: () => void;
@@ -33,11 +35,13 @@ const Input: React.FC<InputProps> = ({
   secondIcon,
   status = 'normal',
   value,
+  fullWidth = false,
+  width = 360,
   onFIconClick,
   onSIconClick,
   onChange,
 }) => (
-  <div css={inputWrapperStyle(color, status)}>
+  <div css={inputWrapperStyle(color, status, fullWidth, width)}>
     <input
       css={inputStyle}
       type={type}
@@ -50,9 +54,14 @@ const Input: React.FC<InputProps> = ({
   </div>
 );
 
-const inputWrapperStyle = (color: string, status: InputStateTypes) => css`
+const inputWrapperStyle = (
+  color: string,
+  status: InputStateTypes,
+  fullWidth: boolean,
+  width: number
+) => css`
   display: flex;
-  width: 100%;
+  width: ${fullWidth ? '100%' : width ? `${width}px` : 'auto'};
   border: 1px solid
     ${status === 'warn'
       ? COLOR.ERROR_RED
