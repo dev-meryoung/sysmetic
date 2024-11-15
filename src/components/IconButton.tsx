@@ -19,7 +19,7 @@ interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> 
   color?: IconButtonColorTypes;
 }
 
-// hoverColor 는 임시입니다 ~ 나중에 수정필요
+// hoverColor 는 임시입니다 ~ 나중에 수정 필요
 const iconButtonColors = {
   primary: { color: COLOR.PRIMARY, hoverColor: COLOR.PRIMARY600 },
   primary100: { color: COLOR.PRIMARY100, hoverColor: COLOR.PRIMARY200 },
@@ -51,11 +51,11 @@ const IconButton: React.FC<IconButtonProps> = ({
 
   return (
     <button
-      css={iconButtonStyle(shape, selectColor, hoverColor)}
+      css={iconButtonStyle(shape, selectColor, hoverColor, fontSize)}
       onClick={handleClick}
       {...props}
     >
-      <IconComponent style={{ color: selectColor, fontSize }} />
+      <IconComponent style={{ color: shape === 'round' || shape === 'block' ? COLOR.WHITE : selectColor, fontSize }} />
       {label && <span css={labelStyle(shape, selectColor, hoverColor)}>{label}</span>}
     </button>
   );
@@ -64,26 +64,41 @@ const IconButton: React.FC<IconButtonProps> = ({
 const iconButtonStyle = (
   shape: IconButtonShapeTypes,
   color: string,
-  hoverColor: string
+  hoverColor: string,
+  fontSize: number
 ) => css`
   display: inline-flex;
   justify-content: center;
   align-items: center;
   border: none;
-  background-color: ${shape === 'line' ? 'transparent' : color};
+  background-color: ${
+    shape === 'line' ? 'transparent' : color
+  };
   outline: none;
-  color: ${color};
+  width: ${fontSize}px;
+  height: ${fontSize}px;
+  color: ${
+    shape === 'round' || shape === 'block'
+      ? (color === COLOR.PRIMARY ? COLOR.WHITE : color === COLOR.WHITE ? COLOR.BLACK : color)
+      : color
+  };
   cursor: pointer;
   border-radius: ${shape === 'round' ? '50%' : '4px'};
   
-  & :hover {
-    background-color: ${shape === 'line' ? 'transparent' : hoverColor}!important;
-    color: ${shape === 'line' ? hoverColor : color}!important;
+  &:hover {
+    background-color: ${shape === 'line' ? 'transparent' : hoverColor};
+    color: ${
+      shape === 'round' || shape === 'block'
+        ? (color === COLOR.PRIMARY ? COLOR.WHITE : color === COLOR.WHITE ? COLOR.BLACK : color)
+        : hoverColor
+    };
   }
 `;
 
 const labelStyle = (shape: IconButtonShapeTypes, color: string, hoverColor: string) => css`
-  color: ${color};
+  color: ${
+    shape === 'line' ? color : color === COLOR.PRIMARY ? COLOR.WHITE : color === COLOR.WHITE ? COLOR.BLACK : color
+  };
 
   ${shape === 'line' && css`
     &:hover {
