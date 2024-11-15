@@ -1,5 +1,6 @@
 import { css } from '@emotion/react';
 import { Outlet } from 'react-router-dom';
+import ToTopButton from '@/components/ToTopButton';
 import Footer from '@/layouts/Footer';
 import Header from '@/layouts/Header';
 
@@ -9,6 +10,7 @@ const Layout = () => (
     <main>
       <Outlet />
     </main>
+    <ToTopButton />
     <Footer />
   </div>
 );
