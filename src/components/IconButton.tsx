@@ -2,20 +2,28 @@ import React from 'react';
 import { css } from '@emotion/react';
 import { COLOR } from '@/constants/color';
 
-type IconButtonShapeTypes = 'block' | 'round' | 'line';
-type IconButtonSizeTypes = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-type IconButtonColorTypes = 'primary' | 'primary100' | 'primary600' | 'point' | 'white' | 'black';
+type IconButtonShapeTypes = 'block' | 'round' | 'clear';
+type IconButtonSizeTypes = 'sm' | 'md' | 'lg';
+type IconButtonColorTypes =
+  | 'primary'
+  | 'primary100'
+  | 'primary600'
+  | 'point'
+  | 'white'
+  | 'gray'
+  | 'black';
 
 interface IconProps {
   style?: React.CSSProperties;
 }
 
-interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface IconButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   IconComponent: React.ComponentType<IconProps>;
-  label?: string;
   handleClick: React.MouseEventHandler<HTMLButtonElement>;
   shape?: IconButtonShapeTypes;
-  size?: IconButtonSizeTypes;
+  iconSize?: IconButtonSizeTypes;
+  iconBgSize?: IconButtonSizeTypes;
   color?: IconButtonColorTypes;
 }
 
@@ -27,36 +35,41 @@ const iconButtonColors = {
   point: { color: COLOR.POINT, hoverColor: COLOR.POINT600 },
   white: { color: COLOR.WHITE, hoverColor: COLOR.GRAY100 },
   black: { color: COLOR.BLACK, hoverColor: COLOR.GRAY800 },
+  gray: { color: COLOR.GRAY600, hoverColor: COLOR.GRAY800 },
 };
 
-const iconFontSizes = {
-  xs: 14,
-  sm: 20,
-  md: 30,
-  lg: 40,
-  xl: 48,
+const iconSizes = {
+  sm: 16,
+  md: 24,
+  lg: 32,
+};
+
+const iconBgSizes = {
+  sm: 30,
+  md: 40,
+  lg: 48,
 };
 
 const IconButton: React.FC<IconButtonProps> = ({
   IconComponent,
   handleClick,
-  label = '',
-  size = 'md',
+  iconSize = 'md',
+  iconBgSize = 'md',
   color = 'black',
   shape = 'block',
   ...props
 }) => {
   const { color: selectColor, hoverColor } = iconButtonColors[color];
-  const fontSize = iconFontSizes[size];
+  const size = iconSizes[iconSize];
+  const bgSize = iconBgSizes[iconBgSize];
 
   return (
     <button
-      css={iconButtonStyle(shape, selectColor, hoverColor, fontSize)}
+      css={iconButtonStyle(shape, selectColor, hoverColor, size, bgSize)}
       onClick={handleClick}
       {...props}
     >
-      <IconComponent style={{ color: shape === 'round' || shape === 'block' ? COLOR.WHITE : selectColor, fontSize }} />
-      {label && <span css={labelStyle(shape, selectColor, hoverColor)}>{label}</span>}
+      <IconComponent />
     </button>
   );
 };
@@ -65,46 +78,39 @@ const iconButtonStyle = (
   shape: IconButtonShapeTypes,
   color: string,
   hoverColor: string,
-  fontSize: number
+  iconSize: number,
+  bgSize: number
 ) => css`
   display: inline-flex;
   justify-content: center;
   align-items: center;
   border: none;
-  background-color: ${
-    shape === 'line' ? 'transparent' : color
-  };
+  background-color: ${shape === 'clear' ? 'transparent' : color};
   outline: none;
-  width: ${fontSize}px;
-  height: ${fontSize}px;
-  color: ${
-    shape === 'round' || shape === 'block'
-      ? (color === COLOR.PRIMARY ? COLOR.WHITE : color === COLOR.WHITE ? COLOR.BLACK : color)
-      : color
-  };
+  width: ${bgSize}px;
+  height: ${bgSize}px;
   cursor: pointer;
   border-radius: ${shape === 'round' ? '50%' : '4px'};
-  
-  &:hover {
-    background-color: ${shape === 'line' ? 'transparent' : hoverColor};
-    color: ${
-      shape === 'round' || shape === 'block'
-        ? (color === COLOR.PRIMARY ? COLOR.WHITE : color === COLOR.WHITE ? COLOR.BLACK : color)
-        : hoverColor
-    };
+
+  svg {
+    font-size: ${iconSize}px;
+    color: ${shape === 'clear'
+      ? color
+      : color === COLOR.WHITE
+        ? COLOR.BLACK
+        : COLOR.WHITE};
   }
-`;
 
-const labelStyle = (shape: IconButtonShapeTypes, color: string, hoverColor: string) => css`
-  color: ${
-    shape === 'line' ? color : color === COLOR.PRIMARY ? COLOR.WHITE : color === COLOR.WHITE ? COLOR.BLACK : color
-  };
-
-  ${shape === 'line' && css`
-    &:hover {
-      color: ${hoverColor};
-    }
-  `}
+  &:hover {
+    background-color: ${shape === 'clear' ? 'transparent' : hoverColor};
+    color: ${shape === 'round' || shape === 'block'
+      ? color === COLOR.PRIMARY
+        ? COLOR.WHITE
+        : color === COLOR.WHITE
+          ? COLOR.BLACK
+          : color
+      : hoverColor};
+  }
 `;
 
 export default IconButton;
