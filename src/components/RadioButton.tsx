@@ -20,9 +20,9 @@ const RadioButton: React.FC<RadioBtnProps> = ({
   selected,
   onChange,
 }) => (
-  <>
+  <div css={radioWrapperStyle}>
     {options.map((option) => (
-      <label key={option.value} css={labelWrapperStyle}>
+      <label key={option.value} css={labelStyle}>
         <div>
           <input
             type='radio'
@@ -34,15 +34,22 @@ const RadioButton: React.FC<RadioBtnProps> = ({
         {option.label}
       </label>
     ))}
-  </>
+  </div>
 );
 
-const labelWrapperStyle = css`
+const radioWrapperStyle = css`
+  display: flex;
+  gap: 16px;
+`;
+
+const labelStyle = css`
   display: flex;
   align-items: center;
   font-size: ${FONT_SIZE.TEXT_MD};
   font-weight: ${FONT_WEIGHT.REGULAR};
   letter-spacing: -0.32px;
+  cursor: pointer;
+
   div {
     border-radius: 50%;
     &:hover {
@@ -50,11 +57,13 @@ const labelWrapperStyle = css`
       transition: 0.3s;
     }
   }
+
   input[type='radio'] {
     width: 20px;
     height: 20px;
     margin: 10px;
     accent-color: ${COLOR.PRIMARY};
+    cursor: pointer;
   }
 `;
 
