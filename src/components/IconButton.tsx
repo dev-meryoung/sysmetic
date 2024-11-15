@@ -27,7 +27,7 @@ interface IconButtonProps
   color?: IconButtonColorTypes;
 }
 
-// hoverColor 는 임시입니다 ~ 나중에 수정필요
+// hoverColor 는 임시입니다 ~ 나중에 수정 필요
 const iconButtonColors = {
   primary: { color: COLOR.PRIMARY, hoverColor: COLOR.PRIMARY600 },
   primary100: { color: COLOR.PRIMARY100, hoverColor: COLOR.PRIMARY200 },

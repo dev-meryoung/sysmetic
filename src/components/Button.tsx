@@ -4,7 +4,7 @@ import { COLOR, COLOR_OPACITY } from '@/constants/color';
 
 type ButtonShapeTypes = 'block' | 'line' | 'round' | 'text';
 type ButtonSizeTypes = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-type ButtonColorTypes = 'primary' | 'point' | 'primary600' | 'black' | 'primaryOpacity10' | 'pointOpacity10' | 'checkGreen' | 'warnYellow' | 'errorRed' | 'infoBlue';
+type ButtonColorTypes = 'primary' | 'point' | 'primary600' | 'black' | 'transparent' | 'primaryOpacity10' | 'pointOpacity10' | 'checkGreen' | 'warnYellow' | 'errorRed' | 'infoBlue';
 type ButtonActionTypes = 'submit' | 'button';
 
 interface ButtonProps {
@@ -32,6 +32,7 @@ const buttonColors: Record<ButtonColorTypes, ButtonColors> = {
   point: { color: COLOR.POINT, hoverColor: COLOR.POINT600, disabledColor: COLOR.POINT200 },
   primary600: { color: COLOR.PRIMARY600, hoverColor: COLOR.PRIMARY700 },
   black: { color: COLOR.BLACK, hoverColor: COLOR.GRAY800 },
+  transparent: { color: 'transparent', hoverColor: COLOR.PRIMARY700 },
   primaryOpacity10: { color: COLOR.PRIMARY, hoverColor: COLOR_OPACITY.PRIMARY_OPACITY10 },
   pointOpacity10: { color: COLOR.POINT, hoverColor: COLOR_OPACITY.POINT_OPACITY10 },
   checkGreen: { color: COLOR.CHECK_GREEN },
@@ -105,20 +106,21 @@ const buttonStyle = (
       : selectColors.color;
 
   const textColor =
-    disabled || selectColors.color === COLOR.GRAY600
-      ? COLOR.WHITE
-      : shape === 'text' || shape === 'line'
-        ? selectColors.color
-        : COLOR.WHITE;
+  disabled || selectColors.color === COLOR.GRAY600
+    ? COLOR.WHITE
+    : shape === 'text' || shape === 'line' || selectColors.color === 'transparent'
+      ? COLOR.BLACK 
+      : COLOR.WHITE;
 
   const borderColor = shape === 'line' ? `1px solid ${selectColors.color}` : 'none';
   const hoverStyles =
-    !disabled &&
-    css`
-      background-color: ${selectColors.hoverColor};
-      color: ${shape === 'text' || shape === 'line' ? selectColors.color : COLOR.WHITE};
-      ${shape === 'line' && `border-color: ${selectColors.color}`};
-    `;
+  !disabled &&
+  css`
+    background-color: ${selectColors.color === 'transparent' ? 'transparent' : selectColors.hoverColor};
+    color: ${selectColors.color === 'transparent' ? selectColors.hoverColor : COLOR.WHITE};
+    ${shape === 'line' && `border-color: ${selectColors.hoverColor}`};
+  `;
+
 
   return css`
     display: inline-flex;
