@@ -1,7 +1,11 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { PATH } from '@/constants/path';
+import AdminStrategyLayout from '@/layouts/AdminStrategyLayout';
 import Layout from '@/layouts/Layout';
+import MyPageLayout from '@/layouts/MyPageLayout';
 import SignupStepLayout from '@/layouts/SignupStepLayout';
+import StrategyDetailLayout from '@/layouts/StrategyDetailLayout';
+import StrategyListLayout from '@/layouts/StrategyListLayout';
 import Admin from '@/pages/admin/Admin';
 import AdminMethods from '@/pages/admin/AdminMethods';
 import AdminNoticeAdd from '@/pages/admin/AdminNoticeAdd';
@@ -13,16 +17,16 @@ import AdminStrategies from '@/pages/admin/AdminStrategies';
 import AdminUsers from '@/pages/admin/AdminUsers';
 import Faq from '@/pages/Faq';
 import Home from '@/pages/Home';
-import MyInterestList from '@/pages/mypage/MyInterestList';
 import MyPage from '@/pages/mypage/MyPage';
 import MyPageCheck from '@/pages/mypage/MyPageCheck';
+import MyPageOpt from '@/pages/mypage/MyPageOpt';
+import MyPagePassword from '@/pages/mypage/MyPagePassword';
 import MyQnaEdit from '@/pages/mypage/MyQnaEdit';
 import MyStrategyEdit from '@/pages/mypage/MyStrategyEdit';
-import MyStrategyList from '@/pages/mypage/MyStrategyList';
 import Profile from '@/pages/mypage/Profile';
 import ProfileEdit from '@/pages/mypage/ProfileEdit';
-import TraderQnaList from '@/pages/mypage/TraderQnaList';
-import UserQnaList from '@/pages/mypage/UserQnaList';
+import QnaDetail from '@/pages/mypage/QnaDetail';
+import QnaList from '@/pages/mypage/QnaList';
 import Withdraw from '@/pages/mypage/Withdraw';
 import NotFound from '@/pages/NotFound';
 import Notices from '@/pages/Notices';
@@ -36,17 +40,21 @@ import SignUpDone from '@/pages/SignUpDone';
 import SignUpForm from '@/pages/SignUpForm';
 import SignUpType from '@/pages/SignUpType';
 import StrategyAdd from '@/pages/StrategyAdd';
+import StrategyAddInfo from '@/pages/StrategyAddInfo';
 import StrategyDetail from '@/pages/StrategyDetail';
+import StrategyDetailAccount from '@/pages/StrategyDetailAccount';
+import StrategyDetailDaily from '@/pages/StrategyDetailDaily';
+import StrategyDetailMonthly from '@/pages/StrategyDetailMonthly';
 import StrategyList from '@/pages/StrategyList';
-import StrategySearch from '@/pages/StrategySearch';
-import Temp from '@/pages/Temp';
 import TraderList from '@/pages/TraderList';
-import TraderStrategyInfo from '@/pages/TraderStrategyInfo';
 import TraderStrategyList from '@/pages/TraderStrategyList';
 
 const router = createBrowserRouter([
   {
     path: PATH.ROOT,
+    element: <Home />,
+  },
+  {
     element: <Layout />,
     children: [
       {
@@ -84,36 +92,52 @@ const router = createBrowserRouter([
         ],
       },
       {
-        index: true,
-        element: <Home />,
-      },
-      {
         path: PATH.STRATEGIES_LIST,
-        element: <StrategyList />,
+        element: <StrategyListLayout />,
+        children: [
+          {
+            index: true,
+            element: <StrategyList />,
+          },
+          {
+            path: PATH.TRADERS,
+            element: <TraderList />,
+          },
+        ],
       },
       {
         path: PATH.STRATEGIES_DETAIL(),
-        element: <StrategyDetail />,
+        element: <StrategyDetailLayout />,
+        children: [
+          {
+            index: true,
+            element: <StrategyDetail />,
+          },
+          {
+            path: PATH.STRATEGIES_DETAIL_DAILY(),
+            element: <StrategyDetailDaily />,
+          },
+          {
+            path: PATH.STRATEGIES_DETAIL_MONTHLY(),
+            element: <StrategyDetailMonthly />,
+          },
+          {
+            path: PATH.STRATEGIES_DETAIL_ACCOUNT(),
+            element: <StrategyDetailAccount />,
+          },
+        ],
       },
       {
         path: PATH.ADD_QNA(),
         element: <QnaAdd />,
       },
       {
-        path: PATH.TRADERS,
-        element: <TraderList />,
-      },
-      {
         path: PATH.TRADER_STRATEGIES(),
         element: <TraderStrategyList />,
       },
       {
-        path: PATH.STRATEGIES_SEARCH,
-        element: <StrategySearch />,
-      },
-      {
-        path: PATH.STRATEGIES_INFO_TRADER,
-        element: <TraderStrategyInfo />,
+        path: PATH.STRATEGIES_ADD_INFO,
+        element: <StrategyAddInfo />,
       },
       {
         path: PATH.STRATEGIES_ADD,
@@ -121,27 +145,41 @@ const router = createBrowserRouter([
       },
       {
         path: PATH.MYPAGE,
-        element: <MyPage />,
+        element: <MyPageLayout />,
+        children: [
+          {
+            index: true,
+            element: <MyPage />,
+          },
+          {
+            path: PATH.MYPAGE_PROFILE(),
+            element: <Profile />,
+          },
+          {
+            path: PATH.MYPAGE_QNA(),
+            element: <QnaList />,
+          },
+        ],
       },
       {
         path: PATH.MYPAGE_CHECK,
         element: <MyPageCheck />,
       },
       {
-        path: PATH.MYPAGE_PROFILE,
-        element: <Profile />,
-      },
-      {
-        path: PATH.MYPAGE_PROFILE_EDIT,
+        path: PATH.MYPAGE_PROFILE_EDIT(),
         element: <ProfileEdit />,
       },
       {
-        path: PATH.MYPAGE_QNA_USER,
-        element: <UserQnaList />,
+        path: PATH.MYPAGE_PASSWORD(),
+        element: <MyPagePassword />,
       },
       {
-        path: PATH.MYPAGE_QNA_TRADER,
-        element: <TraderQnaList />,
+        path: PATH.MYPAGE_OPT(),
+        element: <MyPageOpt />,
+      },
+      {
+        path: PATH.MYPAGE_QNA_DETAIL(),
+        element: <QnaDetail />,
       },
       {
         path: PATH.MYPAGE_QNA_EDIT(),
@@ -150,14 +188,6 @@ const router = createBrowserRouter([
       {
         path: PATH.MYPAGE_WITHDRAW,
         element: <Withdraw />,
-      },
-      {
-        path: PATH.MYPAGE_INTERESTS,
-        element: <MyInterestList />,
-      },
-      {
-        path: PATH.MYPAGE_STRATEGIES,
-        element: <MyStrategyList />,
       },
       {
         path: PATH.MYPAGE_STRATEGIES_EDIT(),
@@ -184,16 +214,22 @@ const router = createBrowserRouter([
         element: <AdminNoticeEdit />,
       },
       {
-        path: PATH.ADMIN_STOCKS,
-        element: <AdminStocks />,
-      },
-      {
-        path: PATH.ADMIN_METHODS,
-        element: <AdminMethods />,
-      },
-      {
         path: PATH.ADMIN_STRATEGIES,
-        element: <AdminStrategies />,
+        element: <AdminStrategyLayout />,
+        children: [
+          {
+            index: true,
+            element: <AdminStrategies />,
+          },
+          {
+            path: PATH.ADMIN_METHODS,
+            element: <AdminMethods />,
+          },
+          {
+            path: PATH.ADMIN_STOCKS,
+            element: <AdminStocks />,
+          },
+        ],
       },
       {
         path: PATH.ADMIN_QNA,
@@ -210,10 +246,6 @@ const router = createBrowserRouter([
       {
         path: PATH.FAQ,
         element: <Faq />,
-      },
-      {
-        path: PATH.TEMP,
-        element: <Temp />,
       },
     ],
   },
