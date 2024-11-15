@@ -27,7 +27,7 @@ interface InputProps {
   onSIconClick?: () => void;
 }
 
-const Input: React.FC<InputProps> = ({
+const TextInput: React.FC<InputProps> = ({
   type,
   placeholder,
   color = 'default',
@@ -98,4 +98,4 @@ const iconStyle = css`
   cursor: pointer;
 `;
 
-export default Input;
+export default TextInput;
