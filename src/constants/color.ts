@@ -36,6 +36,7 @@ export const COLOR = {
 
 export const COLOR_OPACITY = {
   BLACK_OPACITY30: 'rgba(17, 17, 17, 0.3)',
+  BLACK_OPACITY50: 'rgba(17, 17, 17, 0.5)',
   PRIMARY_OPACITY10: 'rgba(18, 97, 196, 0.1)',
   PRIMARY100_OPACITY30: 'rgba(208, 227, 251, 0.3)',
   POINT_OPACITY30: 'rgba(200, 74, 49, 0.3)',
