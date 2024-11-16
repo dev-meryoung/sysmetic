@@ -1,6 +1,4 @@
 import { css } from '@emotion/react';
-import { SvgIconComponent } from '@mui/icons-material';
-import SvgIcon from '@mui/icons-material/CancelOutlined';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 
@@ -10,57 +8,51 @@ const INPUT_COLOR = {
 
 type InputTypes = 'text' | 'password' | 'email' | 'tel';
 type InputColorTypes = 'default' | 'skyblue';
+type InputIconNumTypes = 'none' | 'single' | 'double';
 export type InputStateTypes = 'normal' | 'warn' | 'success';
 
 interface InputProps {
   type?: InputTypes;
   placeholder?: string;
   color?: InputColorTypes;
-  firstIcon?: SvgIconComponent;
-  secondIcon?: SvgIconComponent;
   status?: InputStateTypes;
   fullWidth?: boolean;
   width?: number;
+  iconNum?: InputIconNumTypes;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onFIconClick?: () => void;
-  onSIconClick?: () => void;
 }
 
 const TextInput: React.FC<InputProps> = ({
   type,
   placeholder,
   color = 'default',
-  firstIcon,
-  secondIcon,
   status = 'normal',
   value,
   fullWidth = false,
   width = 360,
-  onFIconClick,
-  onSIconClick,
+  iconNum = 'none',
   onChange,
 }) => (
-  <div css={inputWrapperStyle(color, status, fullWidth, width)}>
+  <>
     <input
-      css={inputStyle}
+      css={inputStyle(color, status, fullWidth, width, iconNum)}
       type={type}
       value={value}
       onChange={onChange}
       placeholder={placeholder}
     />
-    {firstIcon && <SvgIcon css={iconStyle} onClick={onFIconClick} />}
-    {secondIcon && <SvgIcon css={iconStyle} onClick={onSIconClick} />}
-  </div>
+  </>
 );
 
-const inputWrapperStyle = (
+const inputStyle = (
   color: string,
   status: InputStateTypes,
   fullWidth: boolean,
-  width: number
+  width: number,
+  iconNum: InputIconNumTypes
 ) => css`
-  display: flex;
+  position: relative;
   width: ${fullWidth ? '100%' : width ? `${width}px` : 'auto'};
   border: 1px solid
     ${status === 'warn'
@@ -70,32 +62,40 @@ const inputWrapperStyle = (
         : color === 'skyblue'
           ? INPUT_COLOR.LIGHT_SKY_BLUE
           : COLOR_OPACITY.BLACK_OPACITY30};
-  border-radius: 4px;
-`;
-
-const inputStyle = css`
-  width: 100%;
   height: 48px;
-  border: none;
   outline: none;
   border-radius: 4px;
-  padding: 16px 0 16px 16px;
+  padding: 16px;
+  padding-right: ${iconNum === 'single'
+    ? '48px'
+    : iconNum === 'double'
+      ? '96px'
+      : '16px'};
 
   font-size: ${FONT_SIZE.TEXT_MD};
   font-weight: ${FONT_WEIGHT.REGULAR};
   letter-spacing: -0.32px;
+
+  &:focus {
+    border-color: ${status === 'warn'
+      ? COLOR.ERROR_RED
+      : status === 'success'
+        ? COLOR.CHECK_GREEN
+        : COLOR.BLACK};
+  }
 
   &::placeholder {
     color: ${COLOR_OPACITY.BLACK_OPACITY30};
   }
 `;
 
-const iconStyle = css`
-  width: 48px;
-  height: 48px;
-  padding: 12px;
-  color: ${COLOR.TEXT_BLACK};
-  cursor: pointer;
-`;
+// const iconStyle = css`
+//   position: absolute;
+//   width: 48px;
+//   height: 48px;
+//   padding: 12px;
+//   color: ${COLOR.TEXT_BLACK};
+//   cursor: pointer;
+// `;
 
 export default TextInput;
