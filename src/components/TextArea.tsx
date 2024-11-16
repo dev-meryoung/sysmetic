@@ -1,5 +1,5 @@
 import { css } from '@emotion/react';
-import { COLOR_OPACITY } from '@/constants/color';
+import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 
 type TextAreaTypes = 'default' | 'transparent';
@@ -57,7 +57,7 @@ const textAreaStyle = (
   border: 1px solid
     ${color === 'transparent' ? 'transparent' : COLOR_OPACITY.BLACK_OPACITY30};
   border-radius: 4px;
-  background-color: #fff;
+  background-color: ${COLOR.WHITE};
 
   &::placeholder {
     color: ${COLOR_OPACITY.BLACK_OPACITY30};
