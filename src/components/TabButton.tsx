@@ -1,69 +1,66 @@
-import React, { useState } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { css } from '@emotion/react';
-import { useSearchParams } from 'react-router-dom';
+import Button from '@/components/Button';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 
-type ButtonShapeType = 'block' | 'line';
+type ButtonShapeType = 'round' | 'block' | 'line';
 
 interface TabButtonProps {
+  tabs: string[];
+  currentTab: number;
+  handleTabChange: Dispatch<SetStateAction<number>>;
   shape?: ButtonShapeType;
-  tabsData: {
-    id: number;
-    title: string;
-    content: React.ReactNode;
-  }[];
 }
 
-const TabButton: React.FC<TabButtonProps> = ({ tabsData, shape = 'block' }) => {
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  const [activeTab, setActiveTab] = useState(() => {
-    const tabParam = searchParams.get('tab');
-
-    // tabParam 값이 없거나 유효하지 않으면 첫 번째 탭(id: 0)을 자동으로 선택하도록 처리
-    const tabId =
-      tabParam && !isNaN(Number(tabParam)) && Number(tabParam) >= 0
-        ? parseInt(tabParam)
-        : 0;
-
-    return tabId;
-  });
-
-  const handleTabClick = (tabId: number) => {
-    setActiveTab(tabId);
-    setSearchParams({ tab: tabId.toString() });
+const TabButton: React.FC<TabButtonProps> = ({
+  tabs,
+  currentTab,
+  handleTabChange,
+  shape = 'round',
+}) => {
+  const handleTabClick = (idx: number) => {
+    handleTabChange(idx);
   };
 
   return (
-    <>
-      <div css={tabWrapperStyle}>
-        {tabsData.map((tab) => (
-          <button
-            key={tab.id}
-            className={`tab-button ${shape} ${activeTab === tab.id ? 'active' : ''}`}
-            css={tabBtnStyle}
-            onClick={() => handleTabClick(tab.id)}
-          >
-            {tab.title}
-          </button>
-        ))}
-        {shape === 'line' && (
-          <div
-            className='active-line'
-            css={activeLineStyle}
-            style={{ left: `${activeTab * 90}px` }}
-          />
-        )}
-      </div>
-      <div className='tab-content'>{tabsData[activeTab].content}</div>
-    </>
+    <div css={tabWrapperStyle(shape)}>
+      {shape === 'round'
+        ? tabs.map((tab, idx) => (
+            <Button
+              key={idx}
+              label={tab}
+              width={144}
+              color={currentTab === idx ? 'primary' : 'white'}
+              shape='round'
+              handleClick={() => handleTabClick(idx)}
+            />
+          ))
+        : tabs.map((tab, idx) => (
+            <button
+              key={idx}
+              className={`tab-button ${shape} ${currentTab === idx ? 'active' : ''}`}
+              css={tabBtnStyle}
+              onClick={() => handleTabClick(idx)}
+            >
+              {tab}
+            </button>
+          ))}
+      {shape === 'line' && (
+        <div
+          className='active-line'
+          css={activeLineStyle}
+          style={{ left: `${currentTab * 90}px` }}
+        />
+      )}
+    </div>
   );
 };
 
-const tabWrapperStyle = css`
+const tabWrapperStyle = (shape: ButtonShapeType) => css`
   position: relative;
   display: flex;
+  gap: ${shape === 'round' ? '16px' : '0'};
 `;
 
 const tabBtnStyle = css`
