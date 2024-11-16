@@ -47,10 +47,10 @@ const SignIn = () => {
           <IconButton
             IconComponent={CancelOutlined}
             handleClick={handleClearEmail}
-            color='point'
-            size='sm'
-            shape='line'
-            css={deleteIconBtnStyle}
+            color="point"
+            size="sm"
+            shape="line"
+            css={deleteIconBtnStyle} 
           />
         </div>
         <div css={inputWrapperStyle}>
@@ -169,6 +169,7 @@ const showIconBtnStyle = css`
 const deleteIconBtnStyle = css`
   position: absolute;
   right: 0;
+  padding-right: 16px;
   top: 50%;
   transform: translateY(-50%);
 `;
