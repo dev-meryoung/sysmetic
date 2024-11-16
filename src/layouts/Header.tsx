@@ -21,7 +21,7 @@ const Header = () => (
       </Link>
       <div className='bottom-links'>
         <Link to={PATH.STRATEGIES_LIST}>전략탐색</Link>
-        <Link to={PATH.STRATEGIES_INFO_TRADER}>전략등록</Link>
+        <Link to={PATH.STRATEGIES_ADD}>전략등록</Link>
         <Link to={PATH.NOTICES}>공지사항</Link>
         <a>회사소개</a>
       </div>
