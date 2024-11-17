@@ -24,7 +24,7 @@ const SignFindPw = () => {
   const correctCode = '1'; // 임시 인증번호
 
   const handleClearEmail = () => {
-    setEmail(''); 
+    setEmail('');
     setPassword('');
     setCheckPassword('');
     setVerificationCode('');
@@ -71,7 +71,8 @@ const SignFindPw = () => {
   const handleComplete = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const isPasswordEmpty = password.trim() === '';
-    const isCheckPasswordEmpty = checkPassword.trim() === '' || password !== checkPassword;
+    const isCheckPasswordEmpty =
+      checkPassword.trim() === '' || password !== checkPassword;
 
     setShowPasswordError(isPasswordEmpty);
     setShowCheckPasswordError(isCheckPasswordEmpty);
@@ -114,8 +115,8 @@ const SignFindPw = () => {
               <IconButton
                 IconComponent={CancelOutlined}
                 handleClick={handleClearEmail}
-                color="point"
-                size="sm"
+                color='point'
+                size='sm'
                 css={clearIconStyle}
               />
             </div>
@@ -123,11 +124,11 @@ const SignFindPw = () => {
               <Button
                 label='요청하기'
                 handleClick={handleSendEmailBtn}
-                color="primary"
-                size="md"
-                width= {80}
-                shape="block"
-                fontSize="14px"
+                color='primary'
+                size='md'
+                width={80}
+                shape='block'
+                fontSize='14px'
               />
             </div>
           </div>
@@ -152,12 +153,12 @@ const SignFindPw = () => {
               <Button
                 label='인증확인'
                 handleClick={handleVerificationCodeBtn}
-                color="primary"
-                size="md"
-                width= {80}
-                shape="block"
+                color='primary'
+                size='md'
+                width={80}
+                shape='block'
                 disabled={!showCheckBtn}
-                fontSize="14px"
+                fontSize='14px'
               />
             </div>
           </div>
@@ -206,20 +207,20 @@ const SignFindPw = () => {
               <Button
                 label='메인가기'
                 handleClick={handleMainBtn}
-                color="primaryOpacity10"
-                size= "md"
-                width= {120}
-                shape="line"
-                fontSize="14px"
+                color='primaryOpacity10'
+                size='md'
+                width={120}
+                shape='line'
+                fontSize='14px'
               />
               <Button
                 label='설정 완료'
                 handleClick={handleComplete}
-                color="primary"
-                size= "md"
-                width= {120}
-                shape="block"
-                fontSize="14px"
+                color='primary'
+                size='md'
+                width={120}
+                shape='block'
+                fontSize='14px'
               />
             </div>
           </>
@@ -267,7 +268,10 @@ const inputSectionStyle = css`
   width: 100%;
   margin-top: 40px;
 
-  .email-form, .verificationCode-form, .reset-pw-form, .check-pw-form {
+  .email-form,
+  .verificationCode-form,
+  .reset-pw-form,
+  .check-pw-form {
     display: flex;
     flex-direction: column;
     margin-bottom: 40px;

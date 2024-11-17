@@ -10,7 +10,6 @@ import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE } from '@/constants/font';
 import { PATH } from '@/constants/path';
 
-
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -52,7 +51,7 @@ const SignIn = () => {
             size="sm"
             shape="line"
             css={deleteIconBtnStyle} 
-          />         
+          />
         </div>
         <div css={inputWrapperStyle}>
           <input
@@ -63,21 +62,23 @@ const SignIn = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
           <IconButton
-            IconComponent={showPassword ? VisibilityOffOutlined : VisibilityOutlined}
+            IconComponent={
+              showPassword ? VisibilityOffOutlined : VisibilityOutlined
+            }
             handleClick={handlePasswordVisibility}
-            color="black"
-            size="sm" 
-            shape="line"
+            color='black'
+            size='sm'
+            shape='line'
             css={showIconBtnStyle}
           />
           <IconButton
             IconComponent={CancelOutlined}
             handleClick={handleClearPassword}
-            color="point"
-            size="sm"
-            shape="line"
-            css={deleteIconBtnStyle} 
-          />  
+            color='point'
+            size='sm'
+            shape='line'
+            css={deleteIconBtnStyle}
+          />
         </div>
       </div>
       <div css={staySignInContainerStyle}>
@@ -87,18 +88,17 @@ const SignIn = () => {
         <Button
           label='로그인'
           handleClick={handleSignin}
-          color="primary"
-          size="lg"
-          shape="block"
+          color='primary'
+          size='lg'
+          shape='block'
           width={360}
-          >
-        </Button>
+        ></Button>
       </div>
       <div css={linksStyle}>
         <a href='/signup' css={accountStyle}>
           회원가입
         </a>
-        <a href='/signin/find/id'>계정(이메일) 찾기</a> 
+        <a href='/signin/find/id'>계정(이메일) 찾기</a>
         <a href='/signin/find/pw'>비밀번호 재설정</a>
       </div>
     </div>

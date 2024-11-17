@@ -52,15 +52,14 @@ const SignFindId = () => {
             placeholder="' - ' 를 제외하고 입력해주세요."
           />
           <Button
-            label= '아이디 찾기'
+            label='아이디 찾기'
             handleClick={handleFindBtn}
-            color= "primary"
-            size= "md"
-            width= {95}
-            shape= "block"
-            fontSize= "14px"
-          >
-          </Button>
+            color='primary'
+            size='md'
+            width={95}
+            shape='block'
+            fontSize='14px'
+          ></Button>
           <br />
           {showMessage && (
             <span>해당 휴대번호로 가입한 이메일이 존재하지않습니다.</span>
@@ -80,23 +79,21 @@ const SignFindId = () => {
           </div>
           <div css={linkStyle}>
             <Button
-              label= '메인가기'
-              handleClick= {handleMainBtn}
-              color= "primaryOpacity10"
-              size= "md"
-              width= {120}
-              shape= "line"
-              >
-            </Button>
+              label='메인가기'
+              handleClick={handleMainBtn}
+              color='primaryOpacity10'
+              size='md'
+              width={120}
+              shape='line'
+            ></Button>
             <Button
-              label= '로그인'
-              handleClick= {handleSignInBtn}
-              color= "primary"
-              size= "md"
-              width= {120}
-              shape= "block"
-              >
-            </Button>
+              label='로그인'
+              handleClick={handleSignInBtn}
+              color='primary'
+              size='md'
+              width={120}
+              shape='block'
+            ></Button>
           </div>
         </>
       )}
@@ -211,7 +208,7 @@ const linkStyle = css`
   text-align: center;
   margin-top: 80px;
   margin-bottom: 96px;
-  display: flex;      
-  justify-content: center; 
-  gap: 16px;          
+  display: flex;
+  justify-content: center;
+  gap: 16px;
 `;
