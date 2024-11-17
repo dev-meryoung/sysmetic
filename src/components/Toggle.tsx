@@ -5,7 +5,6 @@ interface ToggleProps {
   checked: boolean;
   handleChange: (value: boolean) => void;
   disabled?: boolean;
-  color?: string;
 }
 
 const Toggle: React.FC<ToggleProps> = ({
@@ -17,8 +16,8 @@ const Toggle: React.FC<ToggleProps> = ({
     css={toggleWrapperStyle(disabled)}
     onClick={() => !disabled && handleChange(!checked)}
   >
-    <div css={switchStyle(checked, disabled)} className="switch">
-      <div css={toggleStyle(checked)} className="thumb" />
+    <div css={switchStyle(checked, disabled)} className='switch'>
+      <div css={toggleStyle(checked)} className='thumb' />
     </div>
   </div>
 );
@@ -49,7 +48,9 @@ const switchStyle = (checked: boolean, disabled: boolean) => css`
   border: 3px solid ${checked ? COLOR.PRIMARY : COLOR.GRAY400};
   background-color: transparent;
   position: relative;
-  transition: border-color 0.3s ease, opacity 0.3s ease;
+  transition:
+    border-color 0.3s ease,
+    opacity 0.3s ease;
   opacity: ${disabled ? 0.5 : 1};
   pointer-events: ${disabled ? 'none' : 'auto'};
 `;
@@ -63,7 +64,9 @@ const toggleStyle = (checked: boolean) => css`
   top: 50%;
   left: ${checked ? 'calc(100% - 12px)' : '4px'};
   transform: translateY(-50%);
-  transition: left 0.3s ease, background-color 0.3s ease;
+  transition:
+    left 0.3s ease,
+    background-color 0.3s ease;
 
   &:hover::after {
     content: '';
