@@ -152,13 +152,15 @@ const buttonStyle = (
     ? COLOR.PRIMARY
     : disabled || selectColors.color === COLOR.GRAY600
       ? COLOR.WHITE
-      : shape === 'text'
-        ? selectColors.color
-        : shape === 'line'
+      : selectColors.color === COLOR.WHITE
+        ? COLOR.BLACK
+        : shape === 'text'
           ? selectColors.color
-          : selectColors.color === 'transparent'
-            ? COLOR.BLACK
-            : COLOR.WHITE;
+          : shape === 'line'
+            ? selectColors.color
+            : selectColors.color === 'transparent'
+              ? COLOR.BLACK
+              : COLOR.WHITE;
 
   const borderColor = isWhiteRound
     ? `1px solid ${COLOR.PRIMARY}`
@@ -169,24 +171,28 @@ const buttonStyle = (
   const hoverStyles =
     !disabled &&
     css`
-      background-color: ${shape === 'text'
-        ? 'transparent'
-        : isWhiteRound
-          ? COLOR.PRIMARY600
+      background-color: ${shape === 'line'
+        ? selectColors.hoverColor
+        : shape === 'text'
+          ? 'transparent'
           : selectColors.color === 'transparent'
             ? 'transparent'
-            : selectColors.hoverColor};
+            : isWhiteRound
+              ? COLOR.PRIMARY600
+              : selectColors.hoverColor};
 
-      color: ${shape === 'text'
+      color: ${selectColors.color === 'transparent'
         ? selectColors.hoverColor
-        : shape === 'line'
-          ? selectColors.color
-          : isWhiteRound
-            ? COLOR.WHITE
-            : COLOR.WHITE};
-
-      ${isWhiteRound ? 'border: none;' : ''};
-      ${shape === 'line' && `border-color: ${selectColors.color}`};
+        : selectColors.color === COLOR.BLACK
+          ? COLOR.WHITE
+          : shape === 'line' || shape === 'text'
+            ? selectColors.color
+            : isWhiteRound
+              ? COLOR.WHITE
+              : COLOR.WHITE};
+      ${shape === 'line' &&
+      selectColors.color !== 'transparent' &&
+      `border-color: ${selectColors.color}`}
     `;
 
   return css`
