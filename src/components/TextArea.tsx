@@ -13,7 +13,7 @@ interface TextAreaProps {
   fullHeight?: boolean;
   width?: number;
   height?: number;
-  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  handleChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
 const TextArea: React.FC<TextAreaProps> = ({
@@ -25,14 +25,14 @@ const TextArea: React.FC<TextAreaProps> = ({
   fullHeight = false,
   width = 700,
   height = 240,
-  onChange,
+  handleChange,
 }) => (
   <textarea
     css={textAreaStyle(color, fullWidth, fullHeight, width, height)}
     placeholder={placeholder}
     value={value}
     maxLength={maxLength}
-    onChange={onChange}
+    onChange={handleChange}
   />
 );
 
