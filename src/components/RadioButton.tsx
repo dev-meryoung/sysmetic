@@ -11,14 +11,14 @@ interface RadioBtnProps {
   options: RadioOptionProps[];
   name: string;
   selected: string;
-  onChange: (value: string) => void;
+  handleChange: (value: string) => void;
 }
 
 const RadioButton: React.FC<RadioBtnProps> = ({
   options,
   name,
   selected,
-  onChange,
+  handleChange,
 }) => (
   <div css={radioWrapperStyle}>
     {options.map((option) => (
@@ -28,7 +28,7 @@ const RadioButton: React.FC<RadioBtnProps> = ({
             type='radio'
             name={name}
             checked={selected === option.value}
-            onChange={() => onChange(option.value)}
+            onChange={() => handleChange(option.value)}
           />
         </div>
         {option.label}

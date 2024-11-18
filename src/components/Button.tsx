@@ -70,11 +70,9 @@ const buttonColors: Record<ButtonColorTypes, ButtonColors> = {
 
 const buttonSizes: Record<ButtonSizeTypes, ReturnType<typeof css>> = {
   xs: css`
-    width: 120px;
     height: 32px;
   `,
   sm: css`
-    width: 144px;
     height: 40px;
   `,
   md: css`

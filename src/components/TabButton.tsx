@@ -61,6 +61,7 @@ const tabWrapperStyle = (shape: ButtonShapeType) => css`
   position: relative;
   display: flex;
   gap: ${shape === 'round' ? '16px' : '0'};
+  width: 100%;
 `;
 
 const tabBtnStyle = css`
@@ -70,7 +71,6 @@ const tabBtnStyle = css`
   font-size: ${FONT_SIZE.TEXT_SM};
   font-weight: ${FONT_WEIGHT.MEDIUM};
   border: 0;
-  position: relative;
 
   :hover {
     cursor: pointer;
@@ -84,11 +84,10 @@ const tabBtnStyle = css`
     border-right: 1px solid ${COLOR.GRAY200};
 
     :hover {
-      background-color: ${COLOR.WHITE};
       color: ${COLOR.PRIMARY600};
-      border-top: 1px solid ${COLOR.WHITE};
-      border-left: 1px solid ${COLOR.WHITE};
-      border-right: 1px solid ${COLOR.WHITE};
+      border-top: 1px solid ${COLOR.GRAY200};
+      border-left: 1px solid ${COLOR.GRAY200};
+      border-right: 1px solid ${COLOR.GRAY200};
     }
 
     &.active {
@@ -103,8 +102,8 @@ const tabBtnStyle = css`
         display: block;
         position: absolute;
         bottom: -1px;
-        left: 100%;
-        width: calc(100vw - 90px);
+        right: 0;
+        width: calc(100% - 90px);
         height: 1px;
         background-color: ${COLOR.PRIMARY100};
       }

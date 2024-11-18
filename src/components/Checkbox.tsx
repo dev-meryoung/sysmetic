@@ -4,14 +4,17 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE } from '@/constants/font';
 
+type SizeTypes = 'sm' | 'md' | 'lg';
 interface CheckboxProps {
   label?: string;
+  size?: SizeTypes;
   checked: boolean;
   handleChange: (checked: boolean) => void;
 }
 
 const Checkbox: React.FC<CheckboxProps> = ({
   label = '',
+  size = 'md',
   checked = false,
   handleChange,
 }) => {
@@ -21,7 +24,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
 
   return (
     <div css={checkboxWrapperStyle}>
-      <div css={checkboxStyle} onClick={handleClick}>
+      <div css={checkboxStyle(size)} onClick={handleClick}>
         {checked ? (
           <CheckBoxIcon
             sx={{
@@ -52,8 +55,8 @@ const checkboxWrapperStyle = css`
   }
 `;
 
-const checkboxStyle = css`
-  margin: 4px;
+const checkboxStyle = (size: SizeTypes) => css`
+  margin: ${size === 'lg' ? '4px' : size === 'md' ? '2px' : '0px'};
   border-radius: 50%;
 
   svg {
@@ -62,7 +65,7 @@ const checkboxStyle = css`
     justify-content: center;
     font-size: ${FONT_SIZE.TITLE_SM};
     cursor: pointer;
-    margin: 8px;
+    margin: ${size === 'lg' ? '8px' : size === 'md' ? '6px' : '2px'};
   }
 
   :hover {

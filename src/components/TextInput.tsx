@@ -20,7 +20,8 @@ interface InputProps {
   width?: number;
   iconNum?: InputIconNumTypes;
   value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
 const TextInput: React.FC<InputProps> = ({
@@ -32,14 +33,16 @@ const TextInput: React.FC<InputProps> = ({
   fullWidth = false,
   width = 360,
   iconNum = 'none',
-  onChange,
+  handleChange,
+  handleKeyDown,
 }) => (
   <>
     <input
       css={inputStyle(color, status, fullWidth, width, iconNum)}
       type={type}
       value={value}
-      onChange={onChange}
+      onChange={handleChange}
+      onKeyDown={handleKeyDown}
       placeholder={placeholder}
     />
   </>
