@@ -2,7 +2,7 @@ import { Fragment, useState } from 'react';
 import { css } from '@emotion/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
-import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
+import { FONT_SIZE } from '@/constants/font';
 
 interface SelectOptionProps {
   label: string;
@@ -27,8 +27,8 @@ const SelectBox: React.FC<SelectBoxProps> = ({
   };
 
   const handleSelectOption = (option: string) => {
-    setIsOpen(!isOpen);
     setIsSelected(option);
+    setIsOpen(false);
   };
 
   return (
@@ -57,6 +57,9 @@ const selectWrppaerStyle = (width: number) => css`
   display: flex;
   flex-direction: column;
   width: ${width ? `${width}px` : 'inherit'};
+
+  font-size: ${FONT_SIZE.TEXT_SM};
+  letter-spacing: -0.28px;
   cursor: pointer;
 `;
 
