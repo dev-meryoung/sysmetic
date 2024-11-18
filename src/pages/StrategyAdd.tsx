@@ -8,6 +8,7 @@ import TextArea from '@/components/TextArea';
 import TextInput from '@/components/TextInput';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
+import { PATH } from '@/constants/path';
 
 const StrategyAdd = () => {
   const navigate = useNavigate();
@@ -31,12 +32,12 @@ const StrategyAdd = () => {
             color='primary'
             width={120}
             fontWeight={500}
-            handleClick={() => navigate('/')}
+            handleClick={() => navigate(PATH.ROOT)}
           />
           <Button
             label='트레이더 가입'
             width={120}
-            handleClick={() => navigate('/signup')}
+            handleClick={() => navigate(PATH.SIGN_UP)}
           />
         </div>
       </div>
