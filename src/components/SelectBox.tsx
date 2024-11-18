@@ -18,7 +18,7 @@ const SelectBox: React.FC<SelectBoxProps> = ({ width = 175 }) => {
 
   return (
     <div css={selectWrppaerStyle(width)} onClick={handleOpenOption}>
-      <div css={selectDefaultStyle}>
+      <div css={selectDefaultStyle(isOpen)}>
         <p>선택</p>
         <KeyboardArrowDownIcon css={iconStyle(isOpen)} />
       </div>
@@ -41,15 +41,14 @@ const selectWrppaerStyle = (width: number) => css`
   cursor: pointer;
 `;
 
-const selectDefaultStyle = css`
+const selectDefaultStyle = (isOpen: boolean) => css`
   display: flex;
   justify-content: space-between;
   align-items: center;
 
   height: 48px;
   padding: 0 16px;
-
-  border: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
+  border: 1px solid ${isOpen ? COLOR.BLACK : COLOR_OPACITY.BLACK_OPACITY30};
   border-radius: 4px;
 `;
 
