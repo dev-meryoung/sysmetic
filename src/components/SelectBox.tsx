@@ -1,32 +1,51 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { css } from '@emotion/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 
+interface SelectOptionProps {
+  label: string;
+  value: string;
+}
 interface SelectBoxProps {
   width?: number;
+  options: SelectOptionProps[];
+  placeholder: string;
 }
 
-const SelectBox: React.FC<SelectBoxProps> = ({ width = 175 }) => {
+const SelectBox: React.FC<SelectBoxProps> = ({
+  width = 175,
+  options,
+  placeholder,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isSelected, setIsSelected] = useState('');
 
-  const handleOpenOption = () => {
+  const handleOpenOptions = () => {
     setIsOpen(!isOpen);
   };
-  console.log(isOpen);
+
+  const handleSelectOption = (option: string) => {
+    setIsOpen(!isOpen);
+    setIsSelected(option);
+  };
 
   return (
-    <div css={selectWrppaerStyle(width)} onClick={handleOpenOption}>
+    <div css={selectWrppaerStyle(width)} onClick={handleOpenOptions}>
       <div css={selectDefaultStyle(isOpen)}>
-        <p>선택</p>
+        {isSelected ? <p>{isSelected}</p> : <p>{placeholder}</p>}
         <KeyboardArrowDownIcon css={iconStyle(isOpen)} />
       </div>
       {isOpen && (
         <ul css={optionStyle}>
-          <li>naver.com</li>
-          <li>hanmail.net</li>
-          <li>nate.com</li>
+          {options.map((option) => (
+            <Fragment key={option.value}>
+              <li onClick={() => handleSelectOption(option.label)}>
+                {option.label}
+              </li>
+            </Fragment>
+          ))}
         </ul>
       )}
     </div>
