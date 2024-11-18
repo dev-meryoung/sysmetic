@@ -19,7 +19,6 @@ export const PATH = {
     `/strategies/${strategyId}/account`,
   ADD_QNA: (strategyId = ':strategyId') => `/strategies/${strategyId}/qna/add`,
   TRADER_STRATEGIES: (userId = ':userId') => `/strategies/traders/${userId}`,
-  STRATEGIES_ADD_INFO: '/strategies/addInfo',
   STRATEGIES_ADD: '/strategies/add',
   STRATEGIES_QNA: (strategyId = ':strategyId') =>
     `/strategies/${strategyId}/qna`,

@@ -39,7 +39,6 @@ import SignUpDone from '@/pages/SignUpDone';
 import SignUpForm from '@/pages/SignUpForm';
 import SignUpType from '@/pages/SignUpType';
 import StrategyAdd from '@/pages/StrategyAdd';
-import StrategyAddInfo from '@/pages/StrategyAddInfo';
 import StrategyDetail from '@/pages/StrategyDetail';
 import StrategyDetailAccount from '@/pages/StrategyDetailAccount';
 import StrategyDetailDaily from '@/pages/StrategyDetailDaily';
@@ -134,10 +133,6 @@ const router = createBrowserRouter([
       {
         path: PATH.TRADER_STRATEGIES(),
         element: <TraderStrategyList />,
-      },
-      {
-        path: PATH.STRATEGIES_ADD_INFO,
-        element: <StrategyAddInfo />,
       },
       {
         path: PATH.STRATEGIES_ADD,
