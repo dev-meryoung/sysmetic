@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useState, useEffect, useRef } from 'react';
 import { css } from '@emotion/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
@@ -23,6 +23,20 @@ const SelectBox: React.FC<SelectBoxProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSelected, setIsSelected] = useState('');
+  const clickRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOther = (e: MouseEvent) => {
+      if (clickRef.current && !clickRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOther);
+    return () => {
+      document.removeEventListener('click', handleClickOther);
+    };
+  }, []);
 
   const handleOpenOptions = () => {
     setIsOpen(!isOpen);
@@ -35,7 +49,11 @@ const SelectBox: React.FC<SelectBoxProps> = ({
   };
 
   return (
-    <div css={selectWrppaerStyle(width)} onClick={handleOpenOptions}>
+    <div
+      css={selectWrppaerStyle(width)}
+      onClick={handleOpenOptions}
+      ref={clickRef}
+    >
       <div css={selectDefaultStyle(isOpen)}>
         {isSelected ? <p>{isSelected}</p> : <p>{placeholder}</p>}
         <KeyboardArrowDownIcon css={iconStyle(isOpen)} />
