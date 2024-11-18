@@ -12,14 +12,14 @@ interface SelectBoxProps {
   width?: number;
   placeholder?: string;
   options: SelectOptionProps[];
-  onChange: (value: string) => void;
+  handleChange: (value: string) => void;
 }
 
 const SelectBox: React.FC<SelectBoxProps> = ({
   width = 175,
   options,
   placeholder = '선택하세요.',
-  onChange,
+  handleChange,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSelected, setIsSelected] = useState('');
@@ -45,7 +45,7 @@ const SelectBox: React.FC<SelectBoxProps> = ({
   const handleSelectOption = (option: string) => {
     setIsSelected(option);
     setIsOpen(false);
-    onChange?.(option);
+    handleChange?.(option);
   };
 
   return (
