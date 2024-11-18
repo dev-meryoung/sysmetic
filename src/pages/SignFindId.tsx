@@ -3,7 +3,7 @@ import { css } from '@emotion/react';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
-import { FONT_SIZE } from '@/constants/font';
+import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 
 const SignFindId = () => {
@@ -52,15 +52,14 @@ const SignFindId = () => {
             placeholder="' - ' 를 제외하고 입력해주세요."
           />
           <Button
-            label= '아이디 찾기'
+            label='아이디 찾기'
             handleClick={handleFindBtn}
-            color= "primary"
-            size= "md"
-            width= {95}
-            shape= "block"
-            fontSize= "14px"
-          >
-          </Button>
+            color='primary'
+            size='md'
+            width={95}
+            shape='block'
+            fontSize='14px'
+          ></Button>
           <br />
           {showMessage && (
             <span>해당 휴대번호로 가입한 이메일이 존재하지않습니다.</span>
@@ -80,23 +79,21 @@ const SignFindId = () => {
           </div>
           <div css={linkStyle}>
             <Button
-              label= '메인가기'
-              handleClick= {handleMainBtn}
-              color= "primaryOpacity10"
-              size= "md"
-              width= {120}
-              shape= "line"
-              >
-            </Button>
+              label='메인가기'
+              handleClick={handleMainBtn}
+              color='primaryOpacity10'
+              size='md'
+              width={120}
+              shape='line'
+            ></Button>
             <Button
-              label= '로그인'
-              handleClick= {handleSignInBtn}
-              color= "primary"
-              size= "md"
-              width= {120}
-              shape= "block"
-              >
-            </Button>
+              label='로그인'
+              handleClick={handleSignInBtn}
+              color='primary'
+              size='md'
+              width={120}
+              shape='block'
+            ></Button>
           </div>
         </>
       )}
@@ -125,12 +122,11 @@ const pageInfoStyle = css`
   .info {
     div {
       font-size: ${FONT_SIZE.TITLE_SM};
-      font-weight: 700;
+      font-weight: ${FONT_WEIGHT.BOLD};
       margin-bottom: 6px;
     }
     span {
       font-size: ${FONT_SIZE.TEXT_MD};
-      font-weight: 400;
       line-height: 24px;
       margin-bottom: 40px;
       display: inline-block;
@@ -145,7 +141,6 @@ const findFormStyle = css`
   .writting-layout {
     div {
       font-size: ${FONT_SIZE.TEXT_SM};
-      font-weight: 400;
       line-height: 14px;
       margin-bottom: 8px;
     }
@@ -177,7 +172,6 @@ const findFormStyle = css`
       margin-top: 8px;
       color: ${COLOR.POINT};
       font-size: ${FONT_SIZE.TEXT_SM};
-      font-weight: 400;
     }
   }
 `;
@@ -196,8 +190,7 @@ const showEmailStyle = css`
 
   .show-email {
     p {
-      font-size: 18px;
-      font-weight: 400;
+      font-size: ${FONT_SIZE.TEXT_LG};
       line-height: 26px;
     }
     span {
@@ -211,7 +204,7 @@ const linkStyle = css`
   text-align: center;
   margin-top: 80px;
   margin-bottom: 96px;
-  display: flex;      
-  justify-content: center; 
-  gap: 16px;          
+  display: flex;
+  justify-content: center;
+  gap: 16px;
 `;

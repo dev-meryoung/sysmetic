@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import IconButton from '@/components/IconButton';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
-import { FONT_SIZE } from '@/constants/font';
+import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 
 const SignFindPw = () => {
@@ -24,7 +24,7 @@ const SignFindPw = () => {
   const correctCode = '1'; // 임시 인증번호
 
   const handleClearEmail = () => {
-    setEmail(''); 
+    setEmail('');
     setPassword('');
     setCheckPassword('');
     setVerificationCode('');
@@ -71,7 +71,8 @@ const SignFindPw = () => {
   const handleComplete = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const isPasswordEmpty = password.trim() === '';
-    const isCheckPasswordEmpty = checkPassword.trim() === '' || password !== checkPassword;
+    const isCheckPasswordEmpty =
+      checkPassword.trim() === '' || password !== checkPassword;
 
     setShowPasswordError(isPasswordEmpty);
     setShowCheckPasswordError(isCheckPasswordEmpty);
@@ -114,8 +115,9 @@ const SignFindPw = () => {
               <IconButton
                 IconComponent={CancelOutlined}
                 handleClick={handleClearEmail}
-                color="point"
-                size="sm"
+                color='point'
+                iconBgSize='md'
+                shape='clear'
                 css={clearIconStyle}
               />
             </div>
@@ -123,11 +125,10 @@ const SignFindPw = () => {
               <Button
                 label='요청하기'
                 handleClick={handleSendEmailBtn}
-                color="primary"
-                size="md"
-                width= {80}
-                shape="block"
-                fontSize="14px"
+                color='primary'
+                size='md'
+                width={80}
+                shape='block'
               />
             </div>
           </div>
@@ -152,12 +153,11 @@ const SignFindPw = () => {
               <Button
                 label='인증확인'
                 handleClick={handleVerificationCodeBtn}
-                color="primary"
-                size="md"
-                width= {80}
-                shape="block"
+                color='primary'
+                size='md'
+                width={80}
+                shape='block'
                 disabled={!showCheckBtn}
-                fontSize="14px"
               />
             </div>
           </div>
@@ -206,20 +206,18 @@ const SignFindPw = () => {
               <Button
                 label='메인가기'
                 handleClick={handleMainBtn}
-                color="primaryOpacity10"
-                size= "md"
-                width= {120}
-                shape="line"
-                fontSize="14px"
+                color='primaryOpacity10'
+                size='md'
+                width={120}
+                shape='line'
               />
               <Button
                 label='설정 완료'
                 handleClick={handleComplete}
-                color="primary"
-                size= "md"
-                width= {120}
-                shape="block"
-                fontSize="14px"
+                color='primary'
+                size='md'
+                width={120}
+                shape='block'
               />
             </div>
           </>
@@ -250,12 +248,11 @@ const pageInfoStyle = css`
   .info {
     div {
       font-size: ${FONT_SIZE.TITLE_SM};
-      font-weight: 700;
+      font-weight: ${FONT_WEIGHT.BOLD};
       margin-bottom: 16px;
     }
     span {
       font-size: ${FONT_SIZE.TEXT_MD};
-      font-weight: 400;
       line-height: 24px;
       margin-bottom: 40px;
       display: inline-block;
@@ -267,7 +264,10 @@ const inputSectionStyle = css`
   width: 100%;
   margin-top: 40px;
 
-  .email-form, .verificationCode-form, .reset-pw-form, .check-pw-form {
+  .email-form,
+  .verificationCode-form,
+  .reset-pw-form,
+  .check-pw-form {
     display: flex;
     flex-direction: column;
     margin-bottom: 40px;
@@ -313,7 +313,6 @@ const inputSectionStyle = css`
   .message {
     color: ${COLOR.POINT};
     font-size: ${FONT_SIZE.TEXT_SM};
-    font-weight: 400;
     margin-top: 4px;
     display: block;
   }

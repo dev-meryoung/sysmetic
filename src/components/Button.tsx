@@ -3,12 +3,13 @@ import { css } from '@emotion/react';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 
 type ButtonShapeTypes = 'block' | 'line' | 'round' | 'text';
-type ButtonSizeTypes = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+type ButtonSizeTypes = 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 type ButtonColorTypes =
   | 'primary'
   | 'point'
   | 'primary600'
   | 'black'
+  | 'textBlack'
   | 'white'
   | 'transparent'
   | 'primaryOpacity10'
@@ -52,6 +53,7 @@ const buttonColors: Record<ButtonColorTypes, ButtonColors> = {
   },
   primary600: { color: COLOR.PRIMARY600, hoverColor: COLOR.PRIMARY700 },
   black: { color: COLOR.BLACK, hoverColor: COLOR.GRAY800 },
+  textBlack: { color: COLOR.TEXT_BLACK, hoverColor: COLOR.GRAY800 },
   white: { color: COLOR.WHITE, hoverColor: COLOR.PRIMARY600 },
   transparent: { color: 'transparent', hoverColor: COLOR.PRIMARY700 },
   primaryOpacity10: {
@@ -69,12 +71,13 @@ const buttonColors: Record<ButtonColorTypes, ButtonColors> = {
 };
 
 const buttonSizes: Record<ButtonSizeTypes, ReturnType<typeof css>> = {
+  xxs: css`
+    height: 24px;
+  `,
   xs: css`
-    width: 120px;
     height: 32px;
   `,
   sm: css`
-    width: 144px;
     height: 40px;
   `,
   md: css`
@@ -97,8 +100,8 @@ const Button: React.FC<ButtonProps> = ({
   type = 'button',
   fullWidth = true,
   disabled = false,
-  fontWeight = 400,
-  fontSize = '16px',
+  fontWeight = 500,
+  fontSize = '14px',
   width,
 }) => {
   const selectColors = buttonColors[color];
@@ -149,11 +152,13 @@ const buttonStyle = (
     ? COLOR.PRIMARY
     : disabled || selectColors.color === COLOR.GRAY600
       ? COLOR.WHITE
-      : shape === 'text' ||
-          shape === 'line' ||
-          selectColors.color === 'transparent'
-        ? COLOR.BLACK
-        : COLOR.WHITE;
+      : shape === 'text'
+        ? selectColors.color
+        : shape === 'line'
+          ? selectColors.color
+          : selectColors.color === 'transparent'
+            ? COLOR.BLACK
+            : COLOR.WHITE;
 
   const borderColor = isWhiteRound
     ? `1px solid ${COLOR.PRIMARY}`
@@ -164,14 +169,24 @@ const buttonStyle = (
   const hoverStyles =
     !disabled &&
     css`
-      background-color: ${isWhiteRound
-        ? COLOR.PRIMARY600
-        : selectColors.color === 'transparent'
-          ? 'transparent'
-          : selectColors.hoverColor};
-      color: ${isWhiteRound ? COLOR.WHITE : COLOR.WHITE};
-      ${isWhiteRound ? 'border: none;' : ''}
-      ${shape === 'line' && `border-color: ${selectColors.hoverColor}`};
+      background-color: ${shape === 'text'
+        ? 'transparent'
+        : isWhiteRound
+          ? COLOR.PRIMARY600
+          : selectColors.color === 'transparent'
+            ? 'transparent'
+            : selectColors.hoverColor};
+
+      color: ${shape === 'text'
+        ? selectColors.hoverColor
+        : shape === 'line'
+          ? selectColors.color
+          : isWhiteRound
+            ? COLOR.WHITE
+            : COLOR.WHITE};
+
+      ${isWhiteRound ? 'border: none;' : ''};
+      ${shape === 'line' && `border-color: ${selectColors.color}`};
     `;
 
   return css`
@@ -185,7 +200,8 @@ const buttonStyle = (
     border-radius: ${shape === 'round' ? '50px' : '4px'};
     font-weight: ${fontWeight};
     font-size: ${fontSize};
-
+    font-family: 'Pretendard Variable', Pretendard, 'Malgun Gothic', Helvetica,
+      'Apple SD Gothic Neo', Sans-serif;
     ${selectSizes}
 
     background-color: ${backgroundColor};

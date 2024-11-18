@@ -157,7 +157,16 @@ const router = createBrowserRouter([
           },
           {
             path: PATH.MYPAGE_QNA(),
-            element: <QnaList />,
+            children: [
+              {
+                index: true,
+                element: <QnaList />,
+              },
+              {
+                path: PATH.MYPAGE_QNA_DETAIL(),
+                element: <QnaDetail />,
+              },
+            ],
           },
         ],
       },
@@ -176,10 +185,6 @@ const router = createBrowserRouter([
       {
         path: PATH.MYPAGE_OPT(),
         element: <MyPageOpt />,
-      },
-      {
-        path: PATH.MYPAGE_QNA_DETAIL(),
-        element: <QnaDetail />,
       },
       {
         path: PATH.MYPAGE_QNA_EDIT(),

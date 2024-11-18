@@ -27,7 +27,7 @@ export const PATH = {
   MYPAGE_PASSWORD: (userId = ':userId') => `/mypage/${userId}/password`,
   MYPAGE_OPT: (userId = ':userId') => `/mypage/${userId}/opt`,
   MYPAGE_QNA: (userId = ':userId') => `/mypage/${userId}/qna`,
-  MYPAGE_QNA_DETAIL: (qnaId = ':qnaId') => `/mypage/qna/${qnaId}`,
+  MYPAGE_QNA_DETAIL: (userId = ':userId', qnaId = ':qnaId') =>`/mypage/${userId}/qna/${qnaId}`,
   MYPAGE_QNA_EDIT: (qnaId = ':qnaId') => `/mypage/qna/${qnaId}/edit`,
   MYPAGE_STRATEGIES_EDIT: (strategyId = ':strategyId') =>
     `/mypage/strategies/${strategyId}`,
