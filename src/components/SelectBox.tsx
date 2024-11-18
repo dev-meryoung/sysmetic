@@ -78,6 +78,7 @@ const selectWrppaerStyle = (width: number) => css`
   display: flex;
   flex-direction: column;
   width: ${width ? `${width}px` : 'inherit'};
+  background-color: ${COLOR.WHITE};
 
   font-size: ${FONT_SIZE.TEXT_SM};
   letter-spacing: -0.28px;
