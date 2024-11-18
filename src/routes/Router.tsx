@@ -14,7 +14,6 @@ import AdminNotices from '@/pages/admin/AdminNotices';
 import AdminQna from '@/pages/admin/AdminQna';
 import AdminStocks from '@/pages/admin/AdminStocks';
 import AdminStrategies from '@/pages/admin/AdminStrategies';
-import AdminUsers from '@/pages/admin/AdminUsers';
 import Faq from '@/pages/Faq';
 import Home from '@/pages/Home';
 import MyPage from '@/pages/mypage/MyPage';
@@ -46,6 +45,7 @@ import StrategyDetailAccount from '@/pages/StrategyDetailAccount';
 import StrategyDetailDaily from '@/pages/StrategyDetailDaily';
 import StrategyDetailMonthly from '@/pages/StrategyDetailMonthly';
 import StrategyList from '@/pages/StrategyList';
+import StrategyQna from '@/pages/StrategyQna';
 import TraderList from '@/pages/TraderList';
 import TraderStrategyList from '@/pages/TraderStrategyList';
 
@@ -144,6 +144,10 @@ const router = createBrowserRouter([
         element: <StrategyAdd />,
       },
       {
+        path: PATH.STRATEGIES_QNA(),
+        element: <StrategyQna />,
+      },
+      {
         path: PATH.MYPAGE,
         element: <MyPageLayout />,
         children: [
@@ -196,10 +200,6 @@ const router = createBrowserRouter([
       {
         path: PATH.ADMIN,
         element: <Admin />,
-      },
-      {
-        path: PATH.ADMIN_USERS,
-        element: <AdminUsers />,
       },
       {
         path: PATH.ADMIN_NOTICES,
