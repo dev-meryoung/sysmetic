@@ -19,6 +19,7 @@ interface InputProps {
   fullWidth?: boolean;
   width?: number;
   iconNum?: InputIconNumTypes;
+  maxLength?: number;
   value: string;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
@@ -33,6 +34,7 @@ const TextInput: React.FC<InputProps> = ({
   fullWidth = false,
   width = 360,
   iconNum = 'none',
+  maxLength,
   handleChange,
   handleKeyDown,
 }) => (
@@ -44,6 +46,7 @@ const TextInput: React.FC<InputProps> = ({
       onChange={handleChange}
       onKeyDown={handleKeyDown}
       placeholder={placeholder}
+      maxLength={maxLength}
     />
   </>
 );
@@ -91,14 +94,5 @@ const inputStyle = (
     color: ${COLOR_OPACITY.BLACK_OPACITY30};
   }
 `;
-
-// const iconStyle = css`
-//   position: absolute;
-//   width: 48px;
-//   height: 48px;
-//   padding: 12px;
-//   color: ${COLOR.TEXT_BLACK};
-//   cursor: pointer;
-// `;
 
 export default TextInput;
