@@ -45,10 +45,10 @@ const SelectBox: React.FC<SelectBoxProps> = ({
     setIsOpen(!isOpen);
   };
 
-  const handleSelectOption = (option: string) => {
-    setIsSelected(option);
+  const handleSelectOption = (option: SelectOptionProps) => {
+    setIsSelected(option.label);
     setIsOpen(false);
-    handleChange?.(option);
+    handleChange?.(option.value);
   };
 
   return (
@@ -65,9 +65,7 @@ const SelectBox: React.FC<SelectBoxProps> = ({
         <ul css={optionStyle}>
           {options.map((option) => (
             <Fragment key={option.value}>
-              <li onClick={() => handleSelectOption(option.label)}>
-                {option.label}
-              </li>
+              <li onClick={() => handleSelectOption(option)}>{option.label}</li>
             </Fragment>
           ))}
         </ul>
