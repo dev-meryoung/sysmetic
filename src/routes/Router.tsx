@@ -24,6 +24,7 @@ import MyQnaEdit from '@/pages/mypage/MyQnaEdit';
 import MyStrategyEdit from '@/pages/mypage/MyStrategyEdit';
 import Profile from '@/pages/mypage/Profile';
 import ProfileEdit from '@/pages/mypage/ProfileEdit';
+import QnaAnswer from '@/pages/mypage/QnaAnswer';
 import QnaDetail from '@/pages/mypage/QnaDetail';
 import QnaList from '@/pages/mypage/QnaList';
 import Withdraw from '@/pages/mypage/Withdraw';
@@ -168,6 +169,10 @@ const router = createBrowserRouter([
             ],
           },
         ],
+      },
+      {
+        path: PATH.MYPAGE_QNA_ANSWER(),
+        element: <QnaAnswer />,
       },
       {
         path: PATH.MYPAGE_CHECK,
