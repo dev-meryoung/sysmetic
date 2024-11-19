@@ -1,12 +1,34 @@
+import { useState } from 'react';
 import { css } from '@emotion/react';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
-import { COLOR_OPACITY } from '@/constants/color';
+import TextArea from '@/components/TextArea';
+import TextInput from '@/components/TextInput';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 
+type InputStateTypes = 'normal' | 'warn';
 const MyQnaEdit = () => {
+  const [ status, setStatus ] = useState<InputStateTypes>('normal');
+  const [value, setValue] = useState('');
+  const [textValue, setTextValue] = useState('');
+  
   const navigate = useNavigate();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    setValue(inputValue);
+  
+    if (inputValue.length < 6) {
+      setStatus('warn');
+    } else {
+      setStatus('normal');
+    }
+  };
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setTextValue(e.target.value);
+  };
 
   const handleBtn = () => {
     navigate(PATH.MYPAGE_QNA_DETAIL());
@@ -17,8 +39,23 @@ const MyQnaEdit = () => {
       <div css={inputWrapperStyle}>
         <div css={titleStyle}>문의글 수정</div>
         <div>
-          <input type='text' placeholder='제목을 입력해주세요.' css={questionStyle} />
-          <textarea name='answer' placeholder='내용을 입력해주세요.' css={answerStyle} />
+          <div css={questionStyle}>
+            <TextInput
+              value={value}
+              status={status}
+              placeholder='제목을 입력해주세요.'
+              fullWidth
+              handleChange={handleChange}
+            />
+          </div>
+          <div css={answerStyle}>
+            <TextArea
+              value={textValue}
+              placeholder='내용을 입력해주세요.'
+              fullWidth
+              handleChange={handleTextChange}
+            />
+          </div>
         </div>
       </div>
       <div css={buttonStyle}>
@@ -27,15 +64,16 @@ const MyQnaEdit = () => {
           handleClick={handleBtn}
           color='primaryOpacity10'
           size='md'
-          shape='line'
+          shape='square'
           width={120}
+          border
         />
         <Button
           label='수정완료'
           handleClick={handleBtn}
           color='primary'
           size='md'
-          shape='block'
+          shape='square'
           width={120}
         />
       </div>
@@ -71,20 +109,10 @@ const titleStyle = css`
 
 const questionStyle = css`
   margin-top: 40px;
-  width: 100%; 
-  height: 64px;
-  padding: 10px; 
-  border: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
-  border-radius: 4px; 
 `;
 
 const answerStyle = css`
   margin-top: 32px;
-  width: 100%; 
-  height: 360px;
-  padding: 10px; 
-  border: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
-  border-radius: 4px; 
 `;
 
 const buttonStyle = css`

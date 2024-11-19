@@ -11,6 +11,7 @@ import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 
+// 투자자랑 트레이더 각자 보이는 화면 나중에 기능넣으면서 추가
 const QnaDetail = () => {
   const navigate = useNavigate();
 
@@ -43,7 +44,7 @@ const QnaDetail = () => {
                 handleClick={handleEditBtn}
                 color='primary'
                 size='xs'
-                shape='text'
+                shape='none'
               />
               <span css={dividerStyle}>|</span>
               <Button
@@ -51,7 +52,7 @@ const QnaDetail = () => {
                 handleClick={handleDeleteBtn}
                 color='primary'
                 size='xs'
-                shape='text'
+                shape='none'
               />
             </div>
           </div>
@@ -116,7 +117,7 @@ const QnaDetail = () => {
           color='black'
           size='md'
           width={80}
-          shape='block'
+          shape='square'
         />
       </div>
     </div>
@@ -128,10 +129,11 @@ export default QnaDetail;
 const wrapperStyle = css`
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center; 
+  justify-content: center; 
   width: 100%;
-  margin: 0 auto;
   max-width: 1200px;
+  margin: 0 auto;
   padding-bottom: 181px;
 `;
 
@@ -187,11 +189,16 @@ const dividerStyle = css`
 
 const strategyWrapperStyle = css`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 32px 21px;
-  width: 100%;
-  border-bottom: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
+  align-items: center; 
+  justify-content: space-between; 
+  padding: 32px 24px;
+  width: 1132px;
+  border: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
+  border-radius: 4px;
+  margin: 0 auto; 
+  position: relative;
+  box-sizing: border-box;
+  margin-top: 24px;
 `;
 
 const tagsAndTitleStyle = css`
@@ -223,9 +230,9 @@ const nicknameStyle = css`
 
 const inputStyle = css`
   margin-top: 32px;
-  padding: 16px;
+  padding: 20px 36px;
   width: 100%;
-  min-height: 320px;
+  min-height: 300px;
 `;
 
 const listWrapperStyle = css`
