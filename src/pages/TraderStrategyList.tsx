@@ -165,6 +165,7 @@ const infoStyle = css`
   align-items: center;
   gap: 32px;
   padding: 35px 24px;
+  border-radius: 4px;
   border: 1px solid ${COLOR.GRAY};
 
   .info-area {
