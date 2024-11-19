@@ -2,22 +2,19 @@ import React from 'react';
 import { css } from '@emotion/react';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 
-type ButtonShapeTypes = 'block' | 'line' | 'round' | 'text';
+type ButtonShapeTypes = 'square' | 'round' | 'none';
 type ButtonSizeTypes = 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 type ButtonColorTypes =
   | 'primary'
   | 'point'
-  | 'primary600'
   | 'black'
+  | 'blackToPrimary'
+  | 'blackToPrimary700'
   | 'textBlack'
   | 'white'
   | 'transparent'
   | 'primaryOpacity10'
-  | 'pointOpacity10'
-  | 'checkGreen'
-  | 'warnYellow'
-  | 'errorRed'
-  | 'infoBlue';
+  | 'pointOpacity10';
 type ButtonActionTypes = 'submit' | 'button';
 
 interface ButtonProps {
@@ -32,6 +29,7 @@ interface ButtonProps {
   fontWeight?: number;
   fontSize?: string;
   width?: number;
+  border?: boolean;
 }
 
 type ButtonColors = {
@@ -40,6 +38,7 @@ type ButtonColors = {
   disabledColor?: string;
 };
 
+// 피그마에 없는 disabled 은 임시로 넣었습니다!
 const buttonColors: Record<ButtonColorTypes, ButtonColors> = {
   primary: {
     color: COLOR.PRIMARY,
@@ -51,23 +50,48 @@ const buttonColors: Record<ButtonColorTypes, ButtonColors> = {
     hoverColor: COLOR.POINT600,
     disabledColor: COLOR.POINT200,
   },
-  primary600: { color: COLOR.PRIMARY600, hoverColor: COLOR.PRIMARY700 },
-  black: { color: COLOR.BLACK, hoverColor: COLOR.GRAY800 },
-  textBlack: { color: COLOR.TEXT_BLACK, hoverColor: COLOR.GRAY800 },
-  white: { color: COLOR.WHITE, hoverColor: COLOR.PRIMARY600 },
-  transparent: { color: 'transparent', hoverColor: COLOR.PRIMARY700 },
+  black: {
+    color: COLOR.BLACK,
+    hoverColor: COLOR.GRAY800,
+    disabledColor: COLOR.GRAY600,
+  },
+  textBlack: {
+    color: COLOR.TEXT_BLACK,
+    hoverColor: COLOR.PRIMARY800,
+    disabledColor: COLOR.GRAY600,
+  },
+  //nav 텍스트
+  blackToPrimary: {
+    color: COLOR.BLACK,
+    hoverColor: COLOR.PRIMARY,
+    disabledColor: COLOR.GRAY600,
+  },
+  //그래프버튼
+  blackToPrimary700: {
+    color: COLOR.BLACK,
+    hoverColor: COLOR.PRIMARY700,
+    disabledColor: COLOR.GRAY600,
+  },
+  white: {
+    color: COLOR.WHITE,
+    hoverColor: COLOR.PRIMARY,
+    disabledColor: COLOR.GRAY600,
+  },
+  transparent: {
+    color: 'transparent',
+    hoverColor: COLOR.PRIMARY700,
+    disabledColor: COLOR.GRAY600,
+  },
   primaryOpacity10: {
     color: COLOR.PRIMARY,
     hoverColor: COLOR_OPACITY.PRIMARY_OPACITY10,
+    disabledColor: COLOR.GRAY600,
   },
   pointOpacity10: {
     color: COLOR.POINT,
     hoverColor: COLOR_OPACITY.POINT_OPACITY10,
+    disabledColor: COLOR.GRAY600,
   },
-  checkGreen: { color: COLOR.CHECK_GREEN },
-  warnYellow: { color: COLOR.WARN_YELLOW },
-  errorRed: { color: COLOR.ERROR_RED },
-  infoBlue: { color: COLOR.INFO_BLUE },
 };
 
 const buttonSizes: Record<ButtonSizeTypes, ReturnType<typeof css>> = {
@@ -94,7 +118,7 @@ const buttonSizes: Record<ButtonSizeTypes, ReturnType<typeof css>> = {
 const Button: React.FC<ButtonProps> = ({
   label,
   handleClick,
-  shape = 'block',
+  shape = 'square',
   size = 'md',
   color = 'primary',
   type = 'button',
@@ -103,6 +127,7 @@ const Button: React.FC<ButtonProps> = ({
   fontWeight = 500,
   fontSize = '14px',
   width,
+  border = false,
 }) => {
   const selectColors = buttonColors[color];
   const selectSizes = buttonSizes[size];
@@ -117,7 +142,9 @@ const Button: React.FC<ButtonProps> = ({
         disabled,
         fontWeight,
         fontSize,
-        width
+        width,
+        border,
+        color
       )}
       type={type}
       onClick={handleClick}
@@ -136,63 +163,84 @@ const buttonStyle = (
   disabled: boolean,
   fontWeight: number,
   fontSize: string,
-  width?: number
+  width?: number,
+  border?: boolean,
+  color?: ButtonColorTypes
 ) => {
-  const isWhiteRound = shape === 'round' && selectColors.color === COLOR.WHITE;
-
   const backgroundColor = disabled
     ? selectColors.disabledColor
-    : isWhiteRound
-      ? COLOR.WHITE
-      : shape === 'text' || shape === 'line'
+    : border
+      ? 'transparent'
+      : shape === 'none'
         ? 'transparent'
         : selectColors.color;
 
-  const textColor = isWhiteRound
-    ? COLOR.PRIMARY
-    : disabled || selectColors.color === COLOR.GRAY600
-      ? COLOR.WHITE
-      : selectColors.color === COLOR.WHITE
-        ? COLOR.BLACK
-        : shape === 'text'
-          ? selectColors.color
-          : shape === 'line'
-            ? selectColors.color
-            : selectColors.color === 'transparent'
-              ? COLOR.BLACK
-              : COLOR.WHITE;
+  const textColor = disabled
+    ? COLOR.WHITE
+    : border
+      ? selectColors.color
+      : shape === 'none'
+        ? selectColors.color
+        : selectColors.color === 'transparent'
+          ? COLOR.BLACK
+          : selectColors.color === COLOR.WHITE
+            ? COLOR.BLACK
+            : COLOR.WHITE;
 
-  const borderColor = isWhiteRound
-    ? `1px solid ${COLOR.PRIMARY}`
-    : shape === 'line'
-      ? `1px solid ${selectColors.color}`
-      : 'none';
+  const borderColor = border ? `1px solid ${selectColors.color}` : 'none';
 
   const hoverStyles =
     !disabled &&
     css`
-      background-color: ${shape === 'line'
+      background-color: ${border
         ? selectColors.hoverColor
-        : shape === 'text'
+        : shape === 'none'
           ? 'transparent'
-          : selectColors.color === 'transparent'
-            ? 'transparent'
-            : isWhiteRound
-              ? COLOR.PRIMARY600
-              : selectColors.hoverColor};
+          : selectColors.hoverColor};
 
-      color: ${selectColors.color === 'transparent'
-        ? selectColors.hoverColor
-        : selectColors.color === COLOR.BLACK
-          ? COLOR.WHITE
-          : shape === 'line' || shape === 'text'
-            ? selectColors.color
-            : isWhiteRound
-              ? COLOR.WHITE
+      color: ${border
+        ? color === 'primaryOpacity10' || color === 'pointOpacity10'
+          ? selectColors.color
+          : COLOR.WHITE
+        : shape === 'none'
+          ? selectColors.hoverColor
+          : selectColors.color === COLOR.WHITE
+            ? COLOR.WHITE
+            : COLOR.WHITE};
+
+      ${border &&
+      (color === 'primaryOpacity10' || color === 'pointOpacity10'
+        ? `border: 1px solid ${selectColors.color}`
+        : `border: none`)};
+    `;
+
+  const activeStyles =
+    !disabled &&
+    css`
+      background-color: ${shape === 'none' && color === 'blackToPrimary700'
+        ? COLOR.PRIMARY
+        : shape === 'none' && color !== 'blackToPrimary700'
+          ? 'transparrent'
+          : (shape === 'round' && color === 'primaryOpacity10') ||
+              (shape === 'square' && color === 'primaryOpacity10')
+            ? 'transparent'
+            : selectColors.color};
+
+      color: ${shape === 'none' && color === 'blackToPrimary700'
+        ? COLOR.WHITE
+        : (shape === 'round' && color === 'primaryOpacity10') ||
+            (shape === 'square' && color === 'primaryOpacity10')
+          ? selectColors.color
+          : shape === 'square' && color === 'white'
+            ? COLOR.BLACK
+            : shape === 'none'
+              ? selectColors.color
               : COLOR.WHITE};
-      ${shape === 'line' &&
-      selectColors.color !== 'transparent' &&
-      `border-color: ${selectColors.color}`}
+
+      border-radius: ${(shape === 'none' && color === 'blackToPrimary700') ||
+      shape === 'round'
+        ? '50px'
+        : '4px'};
     `;
 
   return css`
@@ -215,6 +263,10 @@ const buttonStyle = (
 
     &:hover {
       ${hoverStyles}
+    }
+
+    &:active {
+      ${activeStyles}
     }
 
     span {

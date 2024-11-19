@@ -1,19 +1,43 @@
 import { useState } from 'react';
 import { css } from '@emotion/react';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { useNavigate } from 'react-router-dom';
-import IconButton from '@/components/IconButton';
+import TagTest from '@/assets/images/test-tag.jpg';
 import Pagination from '@/components/Pagination';
+import SelectBox from '@/components/SelectBox';
+import Tag from '@/components/Tag';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 
-// 리스트 스타일 나중에 수정예정
+
+// 테이블 컴포넌트 가져와서 스타일 수정 예정
 
 const QnaList = () => {
   const POSTS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState<number>(0);
   const navigate = useNavigate();
+
+  const strategyOptions = [
+    { label: '최신순', value: '최신순' },
+    { label: '전략순', value: '전략순' }
+  ];
+
+  const statusOptions = [
+    { label: '전체', value: '전체' },
+    { label: '답변대기', value: '답변대기' },
+    { label: '답변완료', value: '답변완료' }
+  ];
+  // 나중에 필터링 할 때 사용
+  const [_selectedStrategy, setSelectedStrategy] = useState<string>('all');
+  const [_selectedStatus, setSelectedStatus] = useState<string>('all');
+
+  const handleStrategyChange = (value: string) => {
+    setSelectedStrategy(value);
+  };
+
+  const handleStatusChange = (value: string) => {
+    setSelectedStatus(value);
+  };
 
   // 임시 게시글 데이터 (나중에 삭제)
   const [posts] = useState(
@@ -31,8 +55,6 @@ const QnaList = () => {
 
   const totalPage = Math.ceil(posts.length / POSTS_PER_PAGE);
 
-  const handleIcon = () => {};
-
   const handleGoDetail = () => {
     navigate(PATH.MYPAGE_QNA_DETAIL());
   };
@@ -41,25 +63,17 @@ const QnaList = () => {
     <div css={wrapperStyle}>
       <div css={filterStyle}>
         <div css={filerWrapperStyle}>
-          <button css={filterButtonStyle}>기준</button>
-          <IconButton
-            IconComponent={KeyboardArrowDownIcon}
-            handleClick={handleIcon}
-            color='black'
-            iconSize='md'
-            shape='clear'
-            css={filterIconBtnStyle}
+          <SelectBox
+            options={strategyOptions}
+            placeholder='정렬 기준'
+            handleChange={handleStrategyChange}
           />
         </div>
         <div css={filerWrapperStyle}>
-          <button css={filterButtonStyle}>답변상태</button>
-          <IconButton
-            IconComponent={KeyboardArrowDownIcon}
-            handleClick={handleIcon}
-            color='black'
-            iconSize='md'
-            shape='clear'
-            css={filterIconBtnStyle}
+          <SelectBox
+            options={statusOptions}
+            placeholder='답변 상태'
+            handleChange={handleStatusChange}
           />
         </div>
       </div>
@@ -118,32 +132,9 @@ const filterStyle = css`
   gap: 16px;
 `;
 
-const filterButtonStyle = css`
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding-left: 12px;
-  width: 175px;
-  height: 48px;
-  font-size: ${FONT_SIZE.TEXT_SM};
-  color: ${COLOR.BLACK};
-  background-color: ${COLOR.WHITE};
-  border: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
-  border-radius: 4px;
-  cursor: pointer;
-`;
-
 const filerWrapperStyle = css`
   position: relative;
   align-items: center;
-`;
-
-const filterIconBtnStyle = css`
-  position: absolute;
-  right: 0;
-  padding-right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
 `;
 
 const postListStyle = css`
