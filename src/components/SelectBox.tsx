@@ -4,6 +4,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE } from '@/constants/font';
 
+type SelectColorTypes = 'skyblue';
 interface SelectOptionProps {
   label: string;
   value: string;
@@ -11,6 +12,7 @@ interface SelectOptionProps {
 interface SelectBoxProps {
   width?: number;
   placeholder?: string;
+  color?: SelectColorTypes;
   options: SelectOptionProps[];
   handleChange: (value: string) => void;
 }
@@ -18,6 +20,7 @@ interface SelectBoxProps {
 const SelectBox: React.FC<SelectBoxProps> = ({
   width = 175,
   options,
+  color,
   placeholder = '선택하세요.',
   handleChange,
 }) => {
@@ -54,7 +57,7 @@ const SelectBox: React.FC<SelectBoxProps> = ({
       onClick={handleOpenOptions}
       ref={clickRef}
     >
-      <div css={selectDefaultStyle(isOpen)}>
+      <div css={selectDefaultStyle(isOpen, color)}>
         {isSelected ? <p>{isSelected}</p> : <p>{placeholder}</p>}
         <KeyboardArrowDownIcon css={iconStyle(isOpen)} />
       </div>
@@ -78,20 +81,26 @@ const selectWrppaerStyle = (width: number) => css`
   display: flex;
   flex-direction: column;
   width: ${width ? `${width}px` : 'inherit'};
-
+  background-color: ${COLOR.WHITE};
+  border-radius: 4px;
   font-size: ${FONT_SIZE.TEXT_SM};
   letter-spacing: -0.28px;
   cursor: pointer;
 `;
 
-const selectDefaultStyle = (isOpen: boolean) => css`
+const selectDefaultStyle = (isOpen: boolean, color?: SelectColorTypes) => css`
   display: flex;
   justify-content: space-between;
   align-items: center;
 
   height: 48px;
   padding: 0 16px;
-  border: 1px solid ${isOpen ? COLOR.BLACK : COLOR_OPACITY.BLACK_OPACITY30};
+  border: 1px solid
+    ${isOpen
+      ? COLOR.BLACK
+      : color === 'skyblue'
+        ? COLOR.PRIMARY100
+        : COLOR_OPACITY.BLACK_OPACITY30};
   border-radius: 4px;
 `;
 

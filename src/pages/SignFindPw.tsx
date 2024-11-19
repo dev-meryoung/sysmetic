@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import IconButton from '@/components/IconButton';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
-import { FONT_SIZE } from '@/constants/font';
+import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 
 const SignFindPw = () => {
@@ -116,7 +116,9 @@ const SignFindPw = () => {
                 IconComponent={CancelOutlined}
                 handleClick={handleClearEmail}
                 color='point'
-                size='sm'
+                iconBgSize='md'
+                shape='clear'
+
                 css={clearIconStyle}
               />
             </div>
@@ -128,7 +130,6 @@ const SignFindPw = () => {
                 size='md'
                 width={80}
                 shape='block'
-                fontSize='14px'
               />
             </div>
           </div>
@@ -158,7 +159,6 @@ const SignFindPw = () => {
                 width={80}
                 shape='block'
                 disabled={!showCheckBtn}
-                fontSize='14px'
               />
             </div>
           </div>
@@ -211,7 +211,6 @@ const SignFindPw = () => {
                 size='md'
                 width={120}
                 shape='line'
-                fontSize='14px'
               />
               <Button
                 label='설정 완료'
@@ -220,7 +219,6 @@ const SignFindPw = () => {
                 size='md'
                 width={120}
                 shape='block'
-                fontSize='14px'
               />
             </div>
           </>
@@ -251,12 +249,11 @@ const pageInfoStyle = css`
   .info {
     div {
       font-size: ${FONT_SIZE.TITLE_SM};
-      font-weight: 700;
+      font-weight: ${FONT_WEIGHT.BOLD};
       margin-bottom: 16px;
     }
     span {
       font-size: ${FONT_SIZE.TEXT_MD};
-      font-weight: 400;
       line-height: 24px;
       margin-bottom: 40px;
       display: inline-block;
@@ -317,7 +314,6 @@ const inputSectionStyle = css`
   .message {
     color: ${COLOR.POINT};
     font-size: ${FONT_SIZE.TEXT_SM};
-    font-weight: 400;
     margin-top: 4px;
     display: block;
   }
