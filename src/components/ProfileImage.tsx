@@ -11,14 +11,20 @@ const sizes: Record<'sm' | 'md' | 'lg' | 'xl' | 'xxl', number> = {
   md: 48,
   lg: 56,
   xl: 96,
-  xxl: 120
+  xxl: 120,
 };
 
-const ProfileImage: React.FC<ProfileImageProps> = ({ src, alt, size = 'md' }) => (
+const ProfileImage: React.FC<ProfileImageProps> = ({
+  src,
+  alt,
+  size = 'md',
+}) => (
   <div
     css={css`
-      width: ${sizes[size]}px;
-      height: ${sizes[size]}px;
+      min-width: ${sizes[size]}px;
+      min-height: ${sizes[size]}px;
+      max-width: ${sizes[size]}px;
+      max-height: ${sizes[size]}px;
       border-radius: 50%;
       overflow: hidden;
       display: inline-block;

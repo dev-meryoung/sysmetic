@@ -1,0 +1,242 @@
+[
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 53,
+    "strategyCount": 26,
+    "nickname": "주식왕"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 69,
+    "strategyCount": 31,
+    "nickname": "금융멘토"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 39,
+    "strategyCount": 19,
+    "nickname": "투자대가"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 41,
+    "strategyCount": 35,
+    "nickname": "스탁매니저"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 60,
+    "strategyCount": 4,
+    "nickname": "주식고수"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 4,
+    "strategyCount": 32,
+    "nickname": "투자고수"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 85,
+    "strategyCount": 32,
+    "nickname": "주식바보"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 66,
+    "strategyCount": 24,
+    "nickname": "스톡픽"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 100,
+    "strategyCount": 7,
+    "nickname": "장기투자자"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 47,
+    "strategyCount": 6,
+    "nickname": "주식의신"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 59,
+    "strategyCount": 44,
+    "nickname": "주식연구소"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 77,
+    "strategyCount": 12,
+    "nickname": "스톡러너"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 5,
+    "strategyCount": 45,
+    "nickname": "주식왕국"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 63,
+    "strategyCount": 20,
+    "nickname": "트레이딩마스터"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 96,
+    "strategyCount": 48,
+    "nickname": "스톡매니아"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 27,
+    "strategyCount": 44,
+    "nickname": "주식토크"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 60,
+    "strategyCount": 18,
+    "nickname": "스탁라인"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 41,
+    "strategyCount": 35,
+    "nickname": "주식투자왕"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 96,
+    "strategyCount": 10,
+    "nickname": "장기투자자"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 90,
+    "strategyCount": 48,
+    "nickname": "주식헬퍼"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 45,
+    "strategyCount": 29,
+    "nickname": "투자멘토"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 25,
+    "strategyCount": 26,
+    "nickname": "금융트렌드"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 69,
+    "strategyCount": 31,
+    "nickname": "투자컨설턴트"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 53,
+    "strategyCount": 28,
+    "nickname": "스탁컴퍼니"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 95,
+    "strategyCount": 1,
+    "nickname": "주식지존"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 79,
+    "strategyCount": 3,
+    "nickname": "스톡소울"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 12,
+    "strategyCount": 2,
+    "nickname": "트레이딩백"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 82,
+    "strategyCount": 6,
+    "nickname": "스톡매니저"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 85,
+    "strategyCount": 48,
+    "nickname": "주식마스터"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 74,
+    "strategyCount": 35,
+    "nickname": "펀드매니저"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 85,
+    "strategyCount": 6,
+    "nickname": "스탁로드"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 69,
+    "strategyCount": 19,
+    "nickname": "투자미래"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 36,
+    "strategyCount": 9,
+    "nickname": "스탁딥"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 12,
+    "strategyCount": 43,
+    "nickname": "주식의길"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 3,
+    "strategyCount": 50,
+    "nickname": "주식명장"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 43,
+    "strategyCount": 27,
+    "nickname": "투자명장"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 64,
+    "strategyCount": 32,
+    "nickname": "금융매니저"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 55,
+    "strategyCount": 17,
+    "nickname": "스톡홀릭"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 22,
+    "strategyCount": 7,
+    "nickname": "펀드관리자"
+  },
+  {
+    "profileImage": "/src/assets/images/test-profile.png",
+    "interestCount": 52,
+    "strategyCount": 46,
+    "nickname": "주식트렌드"
+  }
+]

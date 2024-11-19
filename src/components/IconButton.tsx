@@ -1,7 +1,6 @@
 import React from 'react';
 import { css } from '@emotion/react';
 import { COLOR } from '@/constants/color';
-
 type IconButtonShapeTypes = 'block' | 'round' | 'clear';
 type IconButtonSizeTypes = 'sm' | 'md' | 'lg';
 type IconButtonColorTypes =

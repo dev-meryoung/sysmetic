@@ -118,6 +118,7 @@ const SignFindPw = () => {
                 color='point'
                 iconBgSize='md'
                 shape='clear'
+
                 css={clearIconStyle}
               />
             </div>

@@ -19,8 +19,9 @@ export const PATH = {
     `/strategies/${strategyId}/account`,
   ADD_QNA: (strategyId = ':strategyId') => `/strategies/${strategyId}/qna/add`,
   TRADER_STRATEGIES: (userId = ':userId') => `/strategies/traders/${userId}`,
-  STRATEGIES_ADD_INFO: '/strategies/addInfo',
   STRATEGIES_ADD: '/strategies/add',
+  STRATEGIES_QNA: (strategyId = ':strategyId') =>
+    `/strategies/${strategyId}/qna`,
   MYPAGE: '/mypage',
   MYPAGE_PROFILE: (userId = ':userId') => `/mypage/${userId}/profile`,
   MYPAGE_PROFILE_EDIT: (userId = ':userId') => `/mypage/${userId}/profile/edit`,
@@ -34,7 +35,6 @@ export const PATH = {
   MYPAGE_CHECK: '/mypage/check',
   MYPAGE_WITHDRAW: '/mypage/withdraw',
   ADMIN: '/admin',
-  ADMIN_USERS: '/admin/users',
   ADMIN_NOTICES: '/admin/notices',
   ADMIN_NOTICES_ADD: '/admin/notices/add',
   ADMIN_NOTICES_EDIT: (noticeId = ':noticeId') =>
