@@ -83,7 +83,7 @@ const iconButtonStyle = (
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  border: none;
+  border: ${shape === 'round' ? `1px solid ${COLOR.GRAY200}` : 'none'};
   background-color: ${shape === 'clear' ? 'transparent' : color};
   outline: none;
   width: ${bgSize}px;
