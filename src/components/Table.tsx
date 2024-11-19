@@ -17,6 +17,7 @@ interface ColumnProps<T> {
 interface TableProps<T> {
   data: T[];
   columns: ColumnProps<T>[];
+  className?: string;
   hasCheckbox?: boolean;
   checkedItems?: number[];
   handleCheckboxChange?: (index: number) => void;
@@ -27,6 +28,7 @@ const Table = <T,>({
   data,
   columns,
   hasCheckbox = false,
+  className,
   checkedItems,
   handleCheckboxChange,
   handleHeaderCheckboxChange,
@@ -69,7 +71,7 @@ const Table = <T,>({
   };
 
   return (
-    <table css={tableStyle}>
+    <table css={tableStyle} className={className}>
       <thead>
         <tr>
           {hasCheckbox && (

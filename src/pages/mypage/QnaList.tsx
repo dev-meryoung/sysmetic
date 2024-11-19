@@ -1,63 +1,94 @@
 import { useState } from 'react';
 import { css } from '@emotion/react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import TagTest from '@/assets/images/test-tag.jpg';
 import Pagination from '@/components/Pagination';
 import SelectBox from '@/components/SelectBox';
+import Table from '@/components/Table';
 import Tag from '@/components/Tag';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
-import { PATH } from '@/constants/path';
 
+const POSTS_PER_PAGE = 10;
 
-// 테이블 컴포넌트 가져와서 스타일 수정 예정
+interface QnaListDataProps {
+  questionName: string;
+  strategyName: string;
+  date: string;
+  status: string;
+}
 
 const QnaList = () => {
-  const POSTS_PER_PAGE = 10;
+  const [data] = useState<QnaListDataProps[]>([
+    {
+      questionName: '첫 번째 질문입니다.',
+      strategyName: '주식 성공하는 방법',
+      date: '2024.12.24',
+      status: '답변완료',
+    },
+  ]);
+
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const navigate = useNavigate();
 
   const strategyOptions = [
     { label: '최신순', value: '최신순' },
-    { label: '전략순', value: '전략순' }
+    { label: '전략순', value: '전략순' },
   ];
 
   const statusOptions = [
     { label: '전체', value: '전체' },
     { label: '답변대기', value: '답변대기' },
-    { label: '답변완료', value: '답변완료' }
+    { label: '답변완료', value: '답변완료' },
   ];
-  // 나중에 필터링 할 때 사용
-  const [_selectedStrategy, setSelectedStrategy] = useState<string>('all');
-  const [_selectedStatus, setSelectedStatus] = useState<string>('all');
 
-  const handleStrategyChange = (value: string) => {
-    setSelectedStrategy(value);
-  };
+  const handleStrategyChange = () => {};
 
-  const handleStatusChange = (value: string) => {
-    setSelectedStatus(value);
-  };
+  const handleStatusChange = () => {};
 
-  // 임시 게시글 데이터 (나중에 삭제)
-  const [posts] = useState(
-    Array.from({ length: 2 }, (_, index) => ({
-      qnaId: `qna-${index + 1}`,
-      title: `게시글 ${index + 1}`,
-      status: index % 2 === 0 ? '답변 완료' : '답변 대기',
-    }))
-  );
+  const totalPage = Math.ceil(data.length / POSTS_PER_PAGE);
 
-  const currentPosts = posts.slice(
+  const paginatedData = data.slice(
     currentPage * POSTS_PER_PAGE,
     (currentPage + 1) * POSTS_PER_PAGE
   );
 
-  const totalPage = Math.ceil(posts.length / POSTS_PER_PAGE);
-
-  const handleGoDetail = () => {
-    navigate(PATH.MYPAGE_QNA_DETAIL());
-  };
+  const columns = [
+    {
+      key: 'questionName' as keyof QnaListDataProps,
+      header: '제목',
+      render: (value: string) => (
+        <div css={questionNameStyle}>
+          <Link to='/mypage/${userId}/qna/${qnaId}'>{value}</Link>
+        </div>
+      ),
+    },
+    {
+      key: 'strategyName' as keyof QnaListDataProps,
+      header: '전략명',
+      render: (value: string) => (
+        <div css={strategyStyle}>
+          <div>
+            <Tag src={TagTest} alt='tag' />
+            <Tag src={TagTest} alt='tag' />
+          </div>
+          <span>{value}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'date' as keyof QnaListDataProps,
+      header: '전략일자',
+    },
+    {
+      key: 'status' as keyof QnaListDataProps,
+      header: '진행상태',
+      render: (value: string) => (
+        <span css={value === '답변완료' ? successStyle : waitingStyle}>
+          {value}
+        </span>
+      ),
+    },
+  ];
 
   return (
     <div css={wrapperStyle}>
@@ -77,35 +108,18 @@ const QnaList = () => {
           />
         </div>
       </div>
-
-      <div css={postListStyle}>
-        <div css={postTitleStyle}>
-          <span>제목</span>
-          <span>진행상태</span>
-        </div>
-        {currentPosts.length > 0 ? (
-          <ul css={postItemsStyle}>
-            {currentPosts.map((post) => (
-              <li
-                key={post.qnaId}
-                onClick={handleGoDetail}
-                css={postItemStyle(post.status)}
-              >
-                <span>{post.title}</span>
-                <span>{post.status}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p css={emptyMessageStyle}>게시글이 없습니다.</p>
-        )}
+      <div css={tableWrapperStyle}>
+        <Table
+          className={'tableStyle'}
+          data={paginatedData}
+          columns={columns}
+        />
+        <Pagination
+          totalPage={totalPage}
+          currentPage={currentPage}
+          handlePageChange={(page) => setCurrentPage(page)}
+        />
       </div>
-
-      <Pagination
-        totalPage={totalPage}
-        currentPage={currentPage}
-        handlePageChange={(page) => setCurrentPage(page)}
-      />
     </div>
   );
 };
@@ -137,58 +151,53 @@ const filerWrapperStyle = css`
   align-items: center;
 `;
 
-const postListStyle = css`
-  width: 100%;
-  border-top: 1px solid ${COLOR.PRIMARY700};
-`;
-
-const postTitleStyle = css`
-  height: 48px;
-  display: grid;
-  grid-template-columns: 6fr 1fr;
-  align-items: center;
-  text-align: center;
-  background-color: ${COLOR_OPACITY.PRIMARY100_OPACITY30};
-  font-size: ${FONT_SIZE.TEXT_MD};
+const successStyle = css`
+  color: ${COLOR.CHECK_GREEN};
   font-weight: ${FONT_WEIGHT.BOLD};
-  padding: 10px 16px;
-
-  span:last-of-type {
-    border-left: 1px solid ${COLOR.GRAY300};
-    padding-left: 16px;
-    text-align: center;
-  }
 `;
 
-const postItemsStyle = css`
-  list-style: none;
-  padding: 0;
-  margin: 0;
-`;
-
-const postItemStyle = (status: string) => css`
-  display: grid;
-  grid-template-columns: 6fr 1fr;
-  align-items: center;
-  height: 64px;
-  padding: 0 16px;
-  font-size: ${FONT_SIZE.TEXT_MD};
+const waitingStyle = css`
+  color: ${COLOR.ERROR_RED};
   font-weight: ${FONT_WEIGHT.BOLD};
-  color: ${COLOR.TEXT_BLACK};
-  cursor: pointer;
-
-  span:last-of-type {
-    border-left: 1px solid ${COLOR.GRAY300};
-    padding-left: 16px;
-    text-align: center;
-    color: ${status === '답변 완료' ? COLOR.CHECK_GREEN : COLOR.TEXT_BLACK};
+`;
+const questionNameStyle = css`
+  a {
+    text-decoration: none;
     font-weight: ${FONT_WEIGHT.BOLD};
   }
+  a:active {
+    color: ${COLOR.TEXT_BLACK};
+  }
 `;
 
-const emptyMessageStyle = css`
-  text-align: center;
-  font-size: ${FONT_SIZE.TEXT_MD};
-  color: ${COLOR.GRAY700};
-  margin-top: 20px;
+const strategyStyle = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+
+  > div {
+    display: flex;
+    gap: 4px;
+  }
+`;
+
+const tableWrapperStyle = css`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 32px;
+
+  .tableStyle {
+    thead {
+      background-color: ${COLOR_OPACITY.PRIMARY100_OPACITY30};
+      border-top: 1px solid ${COLOR.PRIMARY700};
+      font-weight: ${FONT_WEIGHT.BOLD};
+    }
+    td {
+      padding: 40px 0;
+      vertical-align: middle;
+      text-align: center;
+    }
+  }
 `;
