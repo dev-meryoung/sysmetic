@@ -31,8 +31,9 @@ const TabButton: React.FC<TabButtonProps> = ({
               key={idx}
               label={tab}
               width={144}
-              color={currentTab === idx ? 'primary' : 'white'}
+              color='primary'
               shape='round'
+              border={currentTab === idx ? false : true}
               handleClick={() => handleTabClick(idx)}
             />
           ))
