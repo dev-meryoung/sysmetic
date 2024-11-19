@@ -3,7 +3,7 @@ import { css } from '@emotion/react';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
-import { FONT_SIZE } from '@/constants/font';
+import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 
 const SignFindId = () => {
@@ -122,12 +122,11 @@ const pageInfoStyle = css`
   .info {
     div {
       font-size: ${FONT_SIZE.TITLE_SM};
-      font-weight: 700;
+      font-weight: ${FONT_WEIGHT.BOLD};
       margin-bottom: 6px;
     }
     span {
       font-size: ${FONT_SIZE.TEXT_MD};
-      font-weight: 400;
       line-height: 24px;
       margin-bottom: 40px;
       display: inline-block;
@@ -142,7 +141,6 @@ const findFormStyle = css`
   .writting-layout {
     div {
       font-size: ${FONT_SIZE.TEXT_SM};
-      font-weight: 400;
       line-height: 14px;
       margin-bottom: 8px;
     }
@@ -174,7 +172,6 @@ const findFormStyle = css`
       margin-top: 8px;
       color: ${COLOR.POINT};
       font-size: ${FONT_SIZE.TEXT_SM};
-      font-weight: 400;
     }
   }
 `;
@@ -193,8 +190,7 @@ const showEmailStyle = css`
 
   .show-email {
     p {
-      font-size: 18px;
-      font-weight: 400;
+      font-size: ${FONT_SIZE.TEXT_LG};
       line-height: 26px;
     }
     span {

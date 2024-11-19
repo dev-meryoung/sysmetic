@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import IconButton from '@/components/IconButton';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
-import { FONT_SIZE } from '@/constants/font';
+import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 
 const SignIn = () => {
@@ -47,10 +47,10 @@ const SignIn = () => {
           <IconButton
             IconComponent={CancelOutlined}
             handleClick={handleClearEmail}
-            color="point"
-            size="sm"
-            shape="line"
-            css={deleteIconBtnStyle} 
+            color='point'
+            iconBgSize='md'
+            shape='clear'
+            css={deleteIconBtnStyle}
           />
         </div>
         <div css={inputWrapperStyle}>
@@ -67,16 +67,16 @@ const SignIn = () => {
             }
             handleClick={handlePasswordVisibility}
             color='black'
-            size='sm'
-            shape='line'
+            iconBgSize='md'
+            shape='clear'
             css={showIconBtnStyle}
           />
           <IconButton
             IconComponent={CancelOutlined}
             handleClick={handleClearPassword}
             color='point'
-            size='sm'
-            shape='line'
+            iconBgSize='md'
+            shape='clear'
             css={deleteIconBtnStyle}
           />
         </div>
@@ -121,8 +121,8 @@ const wrapperStyle = css`
 `;
 
 const signInTextStyle = css`
-  font-size: 32px;
-  font-weight: 700;
+  font-size: ${FONT_SIZE.TITLE_LG};
+  font-weight: ${FONT_WEIGHT.BOLD};
   align-self: center;
 `;
 
@@ -193,7 +193,6 @@ const linksStyle = css`
   display: flex;
   gap: 8px;
   font-size: ${FONT_SIZE.TEXT_SM};
-  font-weight: 400;
 
   a {
     color: ${COLOR.BLACK};
