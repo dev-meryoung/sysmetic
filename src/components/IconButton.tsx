@@ -1,7 +1,7 @@
 import React from 'react';
 import { css } from '@emotion/react';
 import { COLOR } from '@/constants/color';
-type IconButtonShapeTypes = 'block' | 'round' | 'clear';
+type IconButtonShapeTypes = 'square' | 'round' | 'none';
 type IconButtonSizeTypes = 'sm' | 'md' | 'lg';
 type IconButtonColorTypes =
   | 'primary'
@@ -26,7 +26,6 @@ interface IconButtonProps
   color?: IconButtonColorTypes;
 }
 
-// hoverColor 는 임시입니다 ~ 나중에 수정 필요
 const iconButtonColors = {
   primary: { color: COLOR.PRIMARY, hoverColor: COLOR.PRIMARY600 },
   primary100: { color: COLOR.PRIMARY100, hoverColor: COLOR.PRIMARY200 },
@@ -55,7 +54,7 @@ const IconButton: React.FC<IconButtonProps> = ({
   iconSize = 'md',
   iconBgSize = 'md',
   color = 'black',
-  shape = 'block',
+  shape = 'round',
   ...props
 }) => {
   const { color: selectColor, hoverColor } = iconButtonColors[color];
@@ -84,7 +83,7 @@ const iconButtonStyle = (
   justify-content: center;
   align-items: center;
   border: none;
-  background-color: ${shape === 'clear' ? 'transparent' : color};
+  background-color: ${shape === 'none' ? 'transparent' : color};
   outline: none;
   width: ${bgSize}px;
   height: ${bgSize}px;
@@ -93,7 +92,7 @@ const iconButtonStyle = (
 
   svg {
     font-size: ${iconSize}px;
-    color: ${shape === 'clear'
+    color: ${shape === 'none'
       ? color
       : color === COLOR.WHITE
         ? COLOR.BLACK
@@ -101,8 +100,8 @@ const iconButtonStyle = (
   }
 
   &:hover {
-    background-color: ${shape === 'clear' ? 'transparent' : hoverColor};
-    color: ${shape === 'round' || shape === 'block'
+    background-color: ${shape === 'none' ? 'transparent' : hoverColor};
+    color: ${shape === 'round' || shape === 'square'
       ? color === COLOR.PRIMARY
         ? COLOR.WHITE
         : color === COLOR.WHITE

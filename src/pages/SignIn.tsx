@@ -24,7 +24,7 @@ const SignIn = () => {
 
   const handlePasswordVisibility = () => setShowPassword((prev) => !prev);
 
-  const handleClear =
+  const handlenone =
     (setter: React.Dispatch<React.SetStateAction<string>>) => () =>
       setter('');
 
@@ -61,10 +61,10 @@ const SignIn = () => {
             />
             <IconButton
               IconComponent={CancelOutlined}
-              handleClick={handleClear(setEmail)}
+              handleClick={handlenone(setEmail)}
               color='point'
               iconBgSize='md'
-              shape='clear'
+              shape='none'
               css={deleteIconBtnStyle}
             />
           </div>
@@ -87,15 +87,15 @@ const SignIn = () => {
               handleClick={handlePasswordVisibility}
               color='black'
               iconBgSize='md'
-              shape='clear'
+              shape='none'
               css={showIconBtnStyle}
             />
             <IconButton
               IconComponent={CancelOutlined}
-              handleClick={handleClear(setPassword)}
+              handleClick={handlenone(setPassword)}
               color='point'
               iconBgSize='md'
-              shape='clear'
+              shape='none'
               css={deleteIconBtnStyle}
             />
           </div>

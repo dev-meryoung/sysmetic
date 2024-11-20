@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { css } from '@emotion/react';
-import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import ProfileImageTest from '@/assets/images/test-profile.png';
 import TagTest from '@/assets/images/test-tag.jpg';
@@ -37,11 +36,11 @@ const QnaAnswer = () => {
     setTextValue(e.target.value);
   };
 
-  const handleEditBtn = () => {
-    navigate(PATH.MYPAGE_QNA_EDIT('temp-qna-id'));
-  };
+  // const handleEditBtn = () => {
+  //   navigate(PATH.MYPAGE_QNA_EDIT());
+  // };
 
-  const handleDeleteBtn = () => {};
+  // const handleDeleteBtn = () => {};
 
   const handleBtn = () => {
     navigate(PATH.MYPAGE_QNA_DETAIL());

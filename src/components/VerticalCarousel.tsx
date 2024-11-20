@@ -74,7 +74,7 @@ const VerticalCarousel: React.FC<VerticalCarouselProps> = ({ children }) => {
           iconBgSize='lg'
           iconSize='lg'
           color='gray'
-          shape='clear'
+          shape='none'
           handleClick={() => {
             scrollToSlide(currentSlide + 1);
           }}

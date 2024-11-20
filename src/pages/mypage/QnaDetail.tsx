@@ -16,18 +16,18 @@ const QnaDetail = () => {
   const navigate = useNavigate();
 
   const handleEditBtn = () => {
-    navigate(PATH.MYPAGE_QNA_EDIT('temp-qna-id'));
+    navigate(PATH.MYPAGE_QNA_EDIT());
   };
 
   // 나중에삭제
   const handleAnswerBtn = () => {
-    navigate(PATH.MYPAGE_QNA_ANSWER('temp-qna-id'));
+    navigate(PATH.MYPAGE_QNA_ANSWER());
   };
 
   const handleDeleteBtn = () => {};
 
   const handleGoListBtn = () => {
-    navigate(PATH.MYPAGE_QNA('temp-qna-id'));
+    navigate(PATH.MYPAGE_QNA());
   };
 
   return (
