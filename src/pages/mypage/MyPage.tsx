@@ -6,7 +6,6 @@ import ProfileImage from '@/components/ProfileImage';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE } from '@/constants/font';
 import MyInterestList from '@/pages/mypage/MyInterestList';
-
 // import MyStrategyList from '@/pages/mypage/MyStrategyList';
 
 const MyPage = () => (

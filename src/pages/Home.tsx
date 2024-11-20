@@ -3,6 +3,7 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { useNavigate } from 'react-router-dom';
 import tempImage from '@/assets/images/test-profile.png';
 import Button from '@/components/Button';
+import Chart from '@/components/Chart';
 import ProfileImage from '@/components/ProfileImage';
 import VerticalCarousel from '@/components/VerticalCarousel';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
@@ -10,9 +11,15 @@ import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 import Footer from '@/layouts/Footer';
 import Header from '@/layouts/Header';
+import chartData from '@/mocks/chart.json';
 
 const Home = () => {
   const navigate = useNavigate();
+
+  const parsedChartData = chartData as {
+    data1: [number, number][];
+    data2: [number, number][];
+  };
 
   // 시스메틱 인기 트레이더 랭킹 정보
   const mock = [
@@ -225,6 +232,15 @@ const Home = () => {
                 <br /> 플랫폼에 등록된 여러 트레이더들의 투자 전략 성과를 통합한
                 평균을 확인할 수 있습니다.
               </span>
+              <Chart
+                chartData={parsedChartData}
+                name={[
+                  'Sysmetic Traders 통합기준가',
+                  'SM Score 1위: ETF레버리지/인버스',
+                ]}
+                unit={['원', '%']}
+                type={['area', 'line']}
+              />
             </div>
           </div>
         </section>
