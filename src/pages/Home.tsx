@@ -1,6 +1,7 @@
 import { css } from '@emotion/react';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { useNavigate } from 'react-router-dom';
+import tempImage from '@/assets/images/test-profile.png';
 import Button from '@/components/Button';
 import ProfileImage from '@/components/ProfileImage';
 import VerticalCarousel from '@/components/VerticalCarousel';
@@ -18,21 +19,21 @@ const Home = () => {
     {
       rangking: 1,
       name: '부자아빠',
-      image: '/src/assets/images/test-profile.png',
+      image: { tempImage },
       rateOfReturn: '293,485,280',
       likes: 100,
     },
     {
       rangking: 2,
       name: '시스메틱',
-      image: '/src/assets/images/test-profile.png',
+      image: { tempImage },
       rateOfReturn: '293,485,280',
       likes: 1002,
     },
     {
       rangking: 3,
       name: '냠냠',
-      image: '/src/assets/images/test-profile.png',
+      image: { tempImage },
       rateOfReturn: '293,485,280',
       likes: 10020,
     },
@@ -58,7 +59,7 @@ const Home = () => {
       rangking: 1,
       name: '부자아빠',
       strategyName: 'ETF레버리지/인버스',
-      image: '/src/assets/images/test-profile.png',
+      image: { tempImage },
       comparedPreviousDay: '+250%',
       cumulativeReturn: '+24%',
     },
@@ -66,7 +67,7 @@ const Home = () => {
       rangking: 2,
       name: '시스메틱',
       strategyName: 'ETF레버리지/인버스',
-      image: '/src/assets/images/test-profile.png',
+      image: { tempImage },
       comparedPreviousDay: '+250%',
       cumulativeReturn: '+24%',
     },
@@ -74,7 +75,7 @@ const Home = () => {
       rangking: 3,
       name: '냠냠',
       strategyName: 'ETF레버리지/인버스',
-      image: '/src/assets/images/test-profile.png',
+      image: { tempImage },
       comparedPreviousDay: '+278%',
       cumulativeReturn: '+24%',
     },
@@ -82,7 +83,7 @@ const Home = () => {
       rangking: 4,
       name: '시루',
       strategyName: 'ETF레버리지/인버스',
-      image: '/src/assets/images/test-profile.png',
+      image: { tempImage },
       comparedPreviousDay: '+25%',
       cumulativeReturn: '+23%',
     },
@@ -90,7 +91,7 @@ const Home = () => {
       rangking: 5,
       name: '햄버거',
       strategyName: 'ETF레버리지/인버스',
-      image: '/src/assets/images/test-profile.png',
+      image: { tempImage },
       comparedPreviousDay: '+222%',
       cumulativeReturn: '+14%',
     },
@@ -127,7 +128,7 @@ const Home = () => {
                     <ProfileImage
                       size='lg'
                       alt='트레이더 이미지'
-                      src={item.image}
+                      src={tempImage}
                     />
                     <span>{item.name}</span>
                   </div>
@@ -250,7 +251,7 @@ const Home = () => {
                     <ProfileImage
                       size='lg'
                       alt='트레이더 이미지'
-                      src={item.image}
+                      src={tempImage}
                     />
                     <span>{item.name}</span>
                   </div>

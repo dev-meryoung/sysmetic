@@ -1,6 +1,7 @@
 import { css } from '@emotion/react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import tempImage from '@/assets/images/test-profile.png';
 import Button from '@/components/Button';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
@@ -16,11 +17,7 @@ const Footer = () => {
           <div className='layout-info'>
             <div className='link-style'>
               <Link to={PATH.ROOT}>
-                <img
-                  src={'/src/assets/images/simbol.png'}
-                  alt='아이콘'
-                  style={{ width: 80 }}
-                />
+                <img src={tempImage} alt='아이콘' style={{ width: 80 }} />
               </Link>
               <div css={menuStyle}>
                 <Link to={PATH.POLICY}>개인정보처리방침</Link>
