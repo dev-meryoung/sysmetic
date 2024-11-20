@@ -5,8 +5,6 @@ import TabButton from '@/components/TabButton';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 
-// 디테일 페이지 -> 버튼(사이트이동) -> 디테일페이지 는 탭 유지되는데
-// 디테일 페이지 -> 새로고침 하면 탭 유지 안됨, 지금 id 값이 없어서 부정확할 수 있으니 나중에 수정 예정
 const MyPageLayout = () => {
   const [tab, setTab] = useState<number>(0);
   const navigate = useNavigate();
@@ -43,7 +41,7 @@ const MyPageLayout = () => {
         break;
     }
   };
-  // 여기에 해당 페이지 설명 쓰세요!
+
   const discriptionTab = () => {
     switch (tab) {
       case 0:
@@ -64,7 +62,6 @@ const MyPageLayout = () => {
         <div css={textStyle}>{discriptionTab()}</div>
       </div>
       <div css={tabBtnStyle}>
-        {/* TODO: 내관심전략 조건 처리 */}
         <TabButton
           shape='round'
           tabs={['내관심전략', '내정보수정', '상담문의']}
