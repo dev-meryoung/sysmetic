@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import IconButton from '@/components/IconButton';
 import TextInput from '@/components/TextInput';
-import { COLOR, COLOR_OPACITY } from '@/constants/color';
+import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 

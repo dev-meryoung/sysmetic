@@ -7,7 +7,7 @@ import SelectBox from '@/components/SelectBox';
 import Table from '@/components/Table';
 import Tag from '@/components/Tag';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
-import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
+import { FONT_WEIGHT } from '@/constants/font';
 
 const POSTS_PER_PAGE = 10;
 

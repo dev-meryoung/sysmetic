@@ -152,7 +152,7 @@ const Home = () => {
             />
             <Button
               label='전략목록 보기'
-              shape='line'
+              border={true}
               width={160}
               handleClick={() => {
                 navigate(PATH.STRATEGIES_LIST);
@@ -200,7 +200,7 @@ const Home = () => {
             />
             <Button
               label='트레이더 목록보기'
-              shape='line'
+              border={true}
               width={160}
               handleClick={() => {
                 navigate(PATH.TRADERS);
