@@ -23,8 +23,7 @@ const Footer = () => {
                 />
               </Link>
               <div css={menuStyle}>
-                <Link to='/'>서비스 이용약관</Link>
-                <Link to='/'>개인정보처리방침</Link>
+                <Link to={PATH.POLICY}>개인정보처리방침</Link>
                 <Link to={PATH.STRATEGIES_LIST}>전략탐색</Link>
                 <Link to={PATH.STRATEGIES_ADD}>전략등록</Link>
                 <Link to={PATH.NOTICES}>공지사항</Link>
@@ -140,7 +139,7 @@ const menuStyle = css`
     font-weight: ${FONT_WEIGHT.BOLD};
   }
 
-  a:nth-of-type(2) {
+  a:nth-of-type(1) {
     color: ${COLOR.GRAY};
   }
 `;
