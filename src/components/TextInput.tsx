@@ -2,10 +2,6 @@ import { css } from '@emotion/react';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 
-const INPUT_COLOR = {
-  LIGHT_SKY_BLUE: '#AECAED',
-};
-
 type InputTypes = 'text' | 'password' | 'email' | 'tel';
 type InputColorTypes = 'default' | 'skyblue';
 type InputIconNumTypes = 'none' | 'single' | 'double';
@@ -66,7 +62,7 @@ const inputStyle = (
       : status === 'success'
         ? COLOR.CHECK_GREEN
         : color === 'skyblue'
-          ? INPUT_COLOR.LIGHT_SKY_BLUE
+          ? COLOR.PRIMARY100
           : COLOR_OPACITY.BLACK_OPACITY30};
   height: 48px;
   outline: none;
