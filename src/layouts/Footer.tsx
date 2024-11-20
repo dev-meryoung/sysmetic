@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import tempImage from '@/assets/images/test-profile.png';
+import tempImage from '@/assets/images/simbol.png';
 import Button from '@/components/Button';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
