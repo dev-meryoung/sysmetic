@@ -34,7 +34,7 @@ const GradeOptions = [
 
 const PAGE_SIZE = 10;
 
-const Admin = () => {
+const AdminUsers = () => {
   const [tab, setTab] = useState(0);
   const [value, setValue] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('');
@@ -251,4 +251,4 @@ const changeLvDivStyle = css`
 
 const paginationDivStyle = css``;
 
-export default Admin;
+export default AdminUsers;
