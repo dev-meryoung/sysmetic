@@ -109,11 +109,9 @@ const QnaList = () => {
         </div>
       </div>
       <div css={tableWrapperStyle}>
-        <Table
-          className={'tableStyle'}
-          data={paginatedData}
-          columns={columns}
-        />
+        <div css={tableStyle}>
+          <Table data={paginatedData} columns={columns} />
+        </div>
         <Pagination
           totalPage={totalPage}
           currentPage={currentPage}
@@ -187,17 +185,17 @@ const tableWrapperStyle = css`
   flex-direction: column;
   width: 100%;
   gap: 32px;
+`;
 
-  .tableStyle {
-    thead {
-      background-color: ${COLOR_OPACITY.PRIMARY100_OPACITY30};
-      border-top: 1px solid ${COLOR.PRIMARY700};
-      font-weight: ${FONT_WEIGHT.BOLD};
-    }
-    td {
-      padding: 40px 0;
-      vertical-align: middle;
-      text-align: center;
-    }
+const tableStyle = css`
+  thead {
+    background-color: ${COLOR_OPACITY.PRIMARY100_OPACITY30};
+    border-top: 1px solid ${COLOR.PRIMARY700};
+    font-weight: ${FONT_WEIGHT.BOLD};
+  }
+  td {
+    padding: 40px 0;
+    vertical-align: middle;
+    text-align: center;
   }
 `;
