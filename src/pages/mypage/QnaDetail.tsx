@@ -19,6 +19,11 @@ const QnaDetail = () => {
     navigate(PATH.MYPAGE_QNA_EDIT('temp-qna-id'));
   };
 
+  // 나중에삭제
+  const handleAnswerBtn = () => {
+    navigate(PATH.MYPAGE_QNA_ANSWER('temp-qna-id'));
+  };
+
   const handleDeleteBtn = () => {};
 
   const handleGoListBtn = () => {
@@ -54,6 +59,15 @@ const QnaDetail = () => {
                 size='xs'
                 shape='none'
               />
+              {/* 임시버튼 나중에 삭제 */}
+              <span css={dividerStyle}>|</span>
+              <Button
+                label='답변'
+                handleClick={handleAnswerBtn}
+                color='primary'
+                size='xs'
+                shape='none'
+              />
             </div>
           </div>
         </div>
@@ -61,7 +75,7 @@ const QnaDetail = () => {
 
       <div css={strategyWrapperStyle}>
         <div css={tagsAndTitleStyle}>
-          <div css={tagsStyle}>
+          <div css={tagStyle}>
             <Tag src={TagTest} alt='tag' />
           </div>
           <div css={strategyTextStyle}>해당 전략명</div>
@@ -206,7 +220,7 @@ const tagsAndTitleStyle = css`
   flex-direction: column;
 `;
 
-const tagsStyle = css`
+const tagStyle = css`
   display: flex;
   gap: 8px;
 `;
