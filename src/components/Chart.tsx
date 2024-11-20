@@ -202,7 +202,17 @@ const chartWrapperStyle = css`
   gap: 40px;
   min-width: 100%;
 
+  [data-highcharts-chart='0'] {
+    width: 100%;
+    min-height: 500px;
+  }
+
   [data-highcharts-chart='1'] {
+    width: 100%;
+    min-height: 500px;
+  }
+
+  [data-highcharts-chart='2'] {
     width: 100%;
     min-height: 500px;
   }
