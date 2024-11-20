@@ -40,7 +40,8 @@ const Footer = () => {
           </div>
           <Button
             label='관리자모드 바로가기'
-            shape='line'
+            border={true}
+            color='white'
             width={171}
             handleClick={() => {
               navigate(PATH.ADMIN);
@@ -118,14 +119,9 @@ const layoutStyle = css`
     }
   }
 
-  button {
-    color: ${COLOR.WHITE};
-    border: 1px solid ${COLOR.GRAY};
-
-    :hover {
-      background: transparent;
-      border: 1px solid ${COLOR.GRAY};
-    }
+  button:hover {
+    background: transparent;
+    border: 1px solid ${COLOR.WHITE};
   }
 `;
 
