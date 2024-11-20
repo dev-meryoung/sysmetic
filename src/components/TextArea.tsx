@@ -59,6 +59,11 @@ const textAreaStyle = (
   border-radius: 4px;
   background-color: ${COLOR.WHITE};
 
+  &:focus {
+    outline: none;
+    border: 1px solid ${color === 'transparent' ? 'none' : COLOR.BLACK};
+  }
+
   &::placeholder {
     color: ${COLOR_OPACITY.BLACK_OPACITY30};
   }
