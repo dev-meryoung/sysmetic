@@ -6,28 +6,42 @@ import VisibilityOutlined from '@mui/icons-material/VisibilityOutlined';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import IconButton from '@/components/IconButton';
-import { COLOR, COLOR_OPACITY } from '@/constants/color';
+import TextInput from '@/components/TextInput';
+import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+
+type InputStateTypes = 'normal' | 'warn';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [emailStatus, setEmailStatus] = useState<InputStateTypes>('normal');
+  const [passwordStatus, setPasswordStatus] =
+    useState<InputStateTypes>('normal');
   const navigate = useNavigate();
 
-  const handlePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
+  const handlePasswordVisibility = () => setShowPassword((prev) => !prev);
+
+  const handleClear =
+    (setter: React.Dispatch<React.SetStateAction<string>>) => () =>
+      setter('');
+
+  const validateEmail = (value: string) => {
+    setEmail(value);
+    setEmailStatus(
+      value.includes('@') && value.includes('.') ? 'normal' : 'warn'
+    );
   };
 
-  const handleClearEmail = () => {
-    setEmail('');
-  };
-  const handleClearPassword = () => {
-    setPassword('');
+  const validatePassword = (value: string) => {
+    setPassword(value);
+    setPasswordStatus(value.length >= 6 ? 'normal' : 'warn');
   };
 
-  const handleSignin = () => {
+  const handleSignIn = () => {
+    // 로그인 처리 로직 추가 가능
     navigate(PATH.ROOT);
   };
 
@@ -36,64 +50,73 @@ const SignIn = () => {
       <div css={signInTextStyle}>로그인</div>
 
       <div css={containerInputStyle}>
+        {/* 이메일 입력 */}
         <div css={inputWrapperStyle}>
-          <input
-            type='text'
-            placeholder='이메일 주소 (abc@abc.com)'
-            css={inputStyle}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <IconButton
-            IconComponent={CancelOutlined}
-            handleClick={handleClearEmail}
-            color='point'
-            iconBgSize='md'
-            shape='clear'
-            css={deleteIconBtnStyle}
-          />
+          <div css={emailStyle}>
+            <TextInput
+              value={email}
+              status={emailStatus}
+              placeholder='이메일 주소(test@example.com)'
+              handleChange={(e) => validateEmail(e.target.value)}
+            />
+            <IconButton
+              IconComponent={CancelOutlined}
+              handleClick={handleClear(setEmail)}
+              color='point'
+              iconBgSize='md'
+              shape='clear'
+              css={deleteIconBtnStyle}
+            />
+          </div>
         </div>
+
+        {/* 비밀번호 입력 */}
         <div css={inputWrapperStyle}>
-          <input
-            type={showPassword ? 'text' : 'password'}
-            placeholder='비밀번호'
-            css={inputStyle}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <IconButton
-            IconComponent={
-              showPassword ? VisibilityOffOutlined : VisibilityOutlined
-            }
-            handleClick={handlePasswordVisibility}
-            color='black'
-            iconBgSize='md'
-            shape='clear'
-            css={showIconBtnStyle}
-          />
-          <IconButton
-            IconComponent={CancelOutlined}
-            handleClick={handleClearPassword}
-            color='point'
-            iconBgSize='md'
-            shape='clear'
-            css={deleteIconBtnStyle}
-          />
+          <div css={passwordStyle}>
+            <TextInput
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              status={passwordStatus}
+              placeholder='비밀번호'
+              handleChange={(e) => validatePassword(e.target.value)}
+            />
+            <IconButton
+              IconComponent={
+                showPassword ? VisibilityOffOutlined : VisibilityOutlined
+              }
+              handleClick={handlePasswordVisibility}
+              color='black'
+              iconBgSize='md'
+              shape='clear'
+              css={showIconBtnStyle}
+            />
+            <IconButton
+              IconComponent={CancelOutlined}
+              handleClick={handleClear(setPassword)}
+              color='point'
+              iconBgSize='md'
+              shape='clear'
+              css={deleteIconBtnStyle}
+            />
+          </div>
         </div>
       </div>
+
       <div css={staySignInContainerStyle}>
         <input type='checkbox' css={staySignInStyle} /> 로그인 유지
       </div>
+
       <div>
         <Button
           label='로그인'
-          handleClick={handleSignin}
+          handleClick={handleSignIn}
           color='primary'
           size='lg'
-          shape='block'
+          shape='square'
           width={360}
-        ></Button>
+        />
       </div>
+
       <div css={linksStyle}>
         <a href='/signup' css={accountStyle}>
           회원가입
@@ -139,31 +162,12 @@ const inputWrapperStyle = css`
   align-items: center;
 `;
 
-const inputStyle = css`
+const emailStyle = css`
   width: 360px;
-  height: 48px;
-  padding: 8px 12px;
-  border-radius: 4px;
-  border: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
-  outline: none;
-  box-sizing: border-box;
-
-  &:focus {
-    border: 1px solid ${COLOR.PRIMARY};
-  }
-
-  &::placeholder {
-    font-size: 16px;
-    color: ${COLOR_OPACITY.BLACK_OPACITY30};
-  }
 `;
 
-const showIconBtnStyle = css`
-  position: absolute;
-  right: 3.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-  padding: 0;
+const passwordStyle = css`
+  width: 360px;
 `;
 
 const deleteIconBtnStyle = css`
@@ -172,6 +176,14 @@ const deleteIconBtnStyle = css`
   padding-right: 16px;
   top: 50%;
   transform: translateY(-50%);
+`;
+
+const showIconBtnStyle = css`
+  position: absolute;
+  right: 3.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0;
 `;
 
 const staySignInContainerStyle = css`

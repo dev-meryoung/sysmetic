@@ -9,7 +9,7 @@ const MyPageLayout = () => {
   const [tab, setTab] = useState<number>(0);
   const navigate = useNavigate();
   const location = useLocation();
-// 질문상세페이지에서 새로고침하면 되돌아감 (상태유지가 안됨, 일단 나중에 수정예정)
+  // 질문상세페이지에서 새로고침하면 되돌아감 (상태유지가 안됨, 일단 나중에 수정예정)
   useEffect(() => {
     if (location.pathname === PATH.MYPAGE) {
       setTab(0);
@@ -62,6 +62,7 @@ const MyPageLayout = () => {
         <div css={textStyle}>{discriptionTab()}</div>
       </div>
       <div css={tabBtnStyle}>
+        {/* TODO: 내관심전략 조건 처리 */}
         <TabButton
           shape='round'
           tabs={['내관심전략', '내정보수정', '상담문의']}
