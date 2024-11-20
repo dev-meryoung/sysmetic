@@ -1,7 +1,9 @@
 import { css } from '@emotion/react';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { useNavigate } from 'react-router-dom';
+import tempImage from '@/assets/images/test-profile.png';
 import Button from '@/components/Button';
+import Chart from '@/components/Chart';
 import ProfileImage from '@/components/ProfileImage';
 import VerticalCarousel from '@/components/VerticalCarousel';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
@@ -9,30 +11,36 @@ import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 import Footer from '@/layouts/Footer';
 import Header from '@/layouts/Header';
+import chartData from '@/mocks/chart.json';
 
 const Home = () => {
   const navigate = useNavigate();
+
+  const parsedChartData = chartData as {
+    data1: [number, number][];
+    data2: [number, number][];
+  };
 
   // 시스메틱 인기 트레이더 랭킹 정보
   const mock = [
     {
       rangking: 1,
       name: '부자아빠',
-      image: '/src/assets/images/test-profile.png',
+      image: { tempImage },
       rateOfReturn: '293,485,280',
       likes: 100,
     },
     {
       rangking: 2,
       name: '시스메틱',
-      image: '/src/assets/images/test-profile.png',
+      image: { tempImage },
       rateOfReturn: '293,485,280',
       likes: 1002,
     },
     {
       rangking: 3,
       name: '냠냠',
-      image: '/src/assets/images/test-profile.png',
+      image: { tempImage },
       rateOfReturn: '293,485,280',
       likes: 10020,
     },
@@ -58,7 +66,7 @@ const Home = () => {
       rangking: 1,
       name: '부자아빠',
       strategyName: 'ETF레버리지/인버스',
-      image: '/src/assets/images/test-profile.png',
+      image: { tempImage },
       comparedPreviousDay: '+250%',
       cumulativeReturn: '+24%',
     },
@@ -66,7 +74,7 @@ const Home = () => {
       rangking: 2,
       name: '시스메틱',
       strategyName: 'ETF레버리지/인버스',
-      image: '/src/assets/images/test-profile.png',
+      image: { tempImage },
       comparedPreviousDay: '+250%',
       cumulativeReturn: '+24%',
     },
@@ -74,7 +82,7 @@ const Home = () => {
       rangking: 3,
       name: '냠냠',
       strategyName: 'ETF레버리지/인버스',
-      image: '/src/assets/images/test-profile.png',
+      image: { tempImage },
       comparedPreviousDay: '+278%',
       cumulativeReturn: '+24%',
     },
@@ -82,7 +90,7 @@ const Home = () => {
       rangking: 4,
       name: '시루',
       strategyName: 'ETF레버리지/인버스',
-      image: '/src/assets/images/test-profile.png',
+      image: { tempImage },
       comparedPreviousDay: '+25%',
       cumulativeReturn: '+23%',
     },
@@ -90,7 +98,7 @@ const Home = () => {
       rangking: 5,
       name: '햄버거',
       strategyName: 'ETF레버리지/인버스',
-      image: '/src/assets/images/test-profile.png',
+      image: { tempImage },
       comparedPreviousDay: '+222%',
       cumulativeReturn: '+14%',
     },
@@ -127,7 +135,7 @@ const Home = () => {
                     <ProfileImage
                       size='lg'
                       alt='트레이더 이미지'
-                      src={item.image}
+                      src={tempImage}
                     />
                     <span>{item.name}</span>
                   </div>
@@ -224,6 +232,15 @@ const Home = () => {
                 <br /> 플랫폼에 등록된 여러 트레이더들의 투자 전략 성과를 통합한
                 평균을 확인할 수 있습니다.
               </span>
+              <Chart
+                chartData={parsedChartData}
+                name={[
+                  'Sysmetic Traders 통합기준가',
+                  'SM Score 1위: ETF레버리지/인버스',
+                ]}
+                unit={['원', '%']}
+                type={['area', 'line']}
+              />
             </div>
           </div>
         </section>
@@ -250,7 +267,7 @@ const Home = () => {
                     <ProfileImage
                       size='lg'
                       alt='트레이더 이미지'
-                      src={item.image}
+                      src={tempImage}
                     />
                     <span>{item.name}</span>
                   </div>

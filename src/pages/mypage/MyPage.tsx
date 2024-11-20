@@ -1,6 +1,7 @@
 import { css } from '@emotion/react';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
+import tempImage from '@/assets/images/test-profile.png';
 import ProfileImage from '@/components/ProfileImage';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE } from '@/constants/font';
@@ -12,10 +13,7 @@ const MyPage = () => (
     <section css={userInfoStyle}>
       <section className='profile-box'>
         <div className='info-area'>
-          <ProfileImage
-            src='/src/assets/images/test-profile.png'
-            alt='profile'
-          />
+          <ProfileImage src={tempImage} alt='profile' />
           <span>ABC가나다라883</span>
         </div>
         <div className='button-area'>
