@@ -14,10 +14,10 @@ import AdminNotices from '@/pages/admin/AdminNotices';
 import AdminQna from '@/pages/admin/AdminQna';
 import AdminStocks from '@/pages/admin/AdminStocks';
 import AdminStrategies from '@/pages/admin/AdminStrategies';
+import AdminUsers from '@/pages/admin/AdminUsers';
 import Faq from '@/pages/Faq';
 import Home from '@/pages/Home';
 import MyPage from '@/pages/mypage/MyPage';
-import MyPageCheck from '@/pages/mypage/MyPageCheck';
 import MyPageOpt from '@/pages/mypage/MyPageOpt';
 import MyPagePassword from '@/pages/mypage/MyPagePassword';
 import MyQnaEdit from '@/pages/mypage/MyQnaEdit';
@@ -31,6 +31,7 @@ import Withdraw from '@/pages/mypage/Withdraw';
 import NotFound from '@/pages/NotFound';
 import Notices from '@/pages/Notices';
 import NoticesDetail from '@/pages/NoticesDetail';
+import Policy from '@/pages/Policy';
 import QnaAdd from '@/pages/QnaAdd';
 import SignFindId from '@/pages/SignFindId';
 import SignFindPw from '@/pages/SignFindPw';
@@ -175,10 +176,6 @@ const router = createBrowserRouter([
         element: <QnaAnswer />,
       },
       {
-        path: PATH.MYPAGE_CHECK,
-        element: <MyPageCheck />,
-      },
-      {
         path: PATH.MYPAGE_PROFILE_EDIT(),
         element: <ProfileEdit />,
       },
@@ -205,6 +202,10 @@ const router = createBrowserRouter([
       {
         path: PATH.ADMIN,
         element: <Admin />,
+      },
+      {
+        path: PATH.ADMIN_USERS,
+        element: <AdminUsers />,
       },
       {
         path: PATH.ADMIN_NOTICES,
@@ -252,11 +253,15 @@ const router = createBrowserRouter([
         path: PATH.FAQ,
         element: <Faq />,
       },
+      {
+        path: PATH.POLICY,
+        element: <Policy />,
+      },
+      {
+        path: PATH.NOT_FOUND,
+        element: <NotFound />,
+      },
     ],
-  },
-  {
-    path: PATH.NOT_FOUND,
-    element: <NotFound />,
   },
 ]);
 

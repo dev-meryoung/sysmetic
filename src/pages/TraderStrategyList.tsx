@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import { useNavigate } from 'react-router-dom';
+import tempImage from '@/assets/images/test-profile.png';
 import TagTest from '@/assets/images/test-tag.jpg';
 import Button from '@/components/Button';
 import Pagination from '@/components/Pagination';
@@ -122,10 +123,7 @@ const TraderStrategyList = () => {
     <div css={strategyListWrapperStyle}>
       <section css={infoStyle}>
         <div className='info-area'>
-          <ProfileImage
-            src='/src/assets/images/test-profile.png'
-            alt='profile'
-          />
+          <ProfileImage src={tempImage} alt='profile' />
           <span>ABC가나다라883</span>
         </div>
         <div className='button-area'>

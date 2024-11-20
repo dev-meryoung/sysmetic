@@ -9,16 +9,16 @@ import { PATH } from '@/constants/path';
 
 type InputStateTypes = 'normal' | 'warn';
 const MyQnaEdit = () => {
-  const [ status, setStatus ] = useState<InputStateTypes>('normal');
+  const [status, setStatus] = useState<InputStateTypes>('normal');
   const [value, setValue] = useState('');
   const [textValue, setTextValue] = useState('');
-  
+
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     setValue(inputValue);
-  
+
     if (inputValue.length < 6) {
       setStatus('warn');
     } else {
@@ -32,14 +32,14 @@ const MyQnaEdit = () => {
 
   const handleBtn = () => {
     navigate(PATH.MYPAGE_QNA_DETAIL());
-  }
+  };
 
   return (
     <div css={wrapperStyle}>
       <div css={inputWrapperStyle}>
         <div css={titleStyle}>문의글 수정</div>
         <div>
-          <div css={questionStyle}>
+          <div css={questionNameStyle}>
             <TextInput
               value={value}
               status={status}
@@ -48,7 +48,7 @@ const MyQnaEdit = () => {
               handleChange={handleChange}
             />
           </div>
-          <div css={answerStyle}>
+          <div css={questionStyle}>
             <TextArea
               value={textValue}
               placeholder='내용을 입력해주세요.'
@@ -77,9 +77,8 @@ const MyQnaEdit = () => {
           width={120}
         />
       </div>
-
     </div>
-  )
+  );
 };
 
 export default MyQnaEdit;
@@ -100,19 +99,19 @@ const inputWrapperStyle = css`
   display: flex;
   flex-direction: column;
   width: 100%;
-`; 
+`;
 
 const titleStyle = css`
   font-size: ${FONT_SIZE.TITLE_SM};
   font-weight: ${FONT_WEIGHT.BOLD};
 `;
 
-const questionStyle = css`
-  margin-top: 40px;
+const questionNameStyle = css`
+  margin-top: 32px;
 `;
 
-const answerStyle = css`
-  margin-top: 32px;
+const questionStyle = css`
+  margin-top: 40px;
 `;
 
 const buttonStyle = css`

@@ -1,3 +1,3 @@
-const Admin = () => <div>Admin-회원관리페이지</div>;
+const Admin = () => <div>Admin</div>;
 
 export default Admin;

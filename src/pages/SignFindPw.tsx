@@ -4,7 +4,8 @@ import CancelOutlined from '@mui/icons-material/CancelOutlined';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import IconButton from '@/components/IconButton';
-import { COLOR, COLOR_OPACITY } from '@/constants/color';
+import TextInput from '@/components/TextInput';
+import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 
@@ -106,11 +107,10 @@ const SignFindPw = () => {
           <div>계정(이메일)</div>
           <div className='input-row'>
             <div className='input-wrapper'>
-              <input
-                type='text'
+              <TextInput
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 placeholder='이메일 주소(abc@abc.com)'
+                handleChange={(e) => setEmail(e.target.value)}
               />
               <IconButton
                 IconComponent={CancelOutlined}
@@ -118,7 +118,6 @@ const SignFindPw = () => {
                 color='point'
                 iconBgSize='md'
                 shape='clear'
-
                 css={clearIconStyle}
               />
             </div>
@@ -129,7 +128,7 @@ const SignFindPw = () => {
                 color='primary'
                 size='md'
                 width={80}
-                shape='block'
+                shape='square'
               />
             </div>
           </div>
@@ -143,11 +142,10 @@ const SignFindPw = () => {
           <div>이메일 인증번호</div>
           <div className='input-row'>
             <div className='input-wrapper'>
-              <input
-                type='text'
+              <TextInput
                 value={verificationCode}
-                onChange={(e) => setVerificationCode(e.target.value)}
                 placeholder='6자리'
+                handleChange={(e) => setVerificationCode(e.target.value)}
               />
             </div>
             <div css={buttonStyle}>
@@ -157,7 +155,7 @@ const SignFindPw = () => {
                 color='primary'
                 size='md'
                 width={80}
-                shape='block'
+                shape='square'
                 disabled={!showCheckBtn}
               />
             </div>
@@ -172,11 +170,11 @@ const SignFindPw = () => {
               <div>비밀번호 재설정</div>
               <div className='input-row'>
                 <div className='input-wrapper'>
-                  <input
+                  <TextInput
                     type='password'
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
                     placeholder='새 비밀번호'
+                    handleChange={(e) => setPassword(e.target.value)}
                   />
                   {showPasswordError && (
                     <span className='message'>비밀번호를 입력해주세요.</span>
@@ -189,11 +187,11 @@ const SignFindPw = () => {
               <div>비밀번호 확인</div>
               <div className='input-row'>
                 <div className='input-wrapper'>
-                  <input
+                  <TextInput
                     type='password'
                     value={checkPassword}
-                    onChange={(e) => setCheckPassword(e.target.value)}
                     placeholder='비밀번호 확인'
+                    handleChange={(e) => setCheckPassword(e.target.value)}
                   />
                   {showCheckPasswordError && (
                     <span className='message'>
@@ -210,7 +208,8 @@ const SignFindPw = () => {
                 color='primaryOpacity10'
                 size='md'
                 width={120}
-                shape='line'
+                shape='square'
+                border
               />
               <Button
                 label='설정 완료'
@@ -218,7 +217,7 @@ const SignFindPw = () => {
                 color='primary'
                 size='md'
                 width={120}
-                shape='block'
+                shape='square'
               />
             </div>
           </>
@@ -292,23 +291,8 @@ const inputSectionStyle = css`
 
   .input-wrapper {
     position: relative;
-    width: 360px;
     display: flex;
     flex-direction: column;
-
-    input {
-      width: 100%;
-      height: 48px;
-      padding-left: 12px;
-      border-radius: 4px;
-      border: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
-      outline: none;
-
-      &::placeholder {
-        font-size: ${FONT_SIZE.TEXT_MD};
-        color: ${COLOR_OPACITY.BLACK_OPACITY30};
-      }
-    }
   }
 
   .message {
