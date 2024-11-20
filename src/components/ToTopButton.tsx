@@ -58,9 +58,8 @@ const ToTopButton: React.FC<ToTopButtonProps> = ({ handleClick }) => {
 
 const toTopButtonStyle = css`
   position: fixed;
-  bottom: 80px;
-  right: calc(50% - 566px);
-  transform: translateX(-50%);
+  bottom: 48px;
+  right: 48px;
 `;
 
 export default ToTopButton;

@@ -1,6 +1,7 @@
 import { css } from '@emotion/react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import tempImage from '@/assets/images/simbol.png';
 import Button from '@/components/Button';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
@@ -16,15 +17,10 @@ const Footer = () => {
           <div className='layout-info'>
             <div className='link-style'>
               <Link to={PATH.ROOT}>
-                <img
-                  src={'/src/assets/images/simbol.png'}
-                  alt='아이콘'
-                  style={{ width: 80 }}
-                />
+                <img src={tempImage} alt='아이콘' style={{ width: 80 }} />
               </Link>
               <div css={menuStyle}>
-                <Link to='/'>서비스 이용약관</Link>
-                <Link to='/'>개인정보처리방침</Link>
+                <Link to={PATH.POLICY}>개인정보처리방침</Link>
                 <Link to={PATH.STRATEGIES_LIST}>전략탐색</Link>
                 <Link to={PATH.STRATEGIES_ADD}>전략등록</Link>
                 <Link to={PATH.NOTICES}>공지사항</Link>
@@ -41,7 +37,8 @@ const Footer = () => {
           </div>
           <Button
             label='관리자모드 바로가기'
-            shape='line'
+            border={true}
+            color='white'
             width={171}
             handleClick={() => {
               navigate(PATH.ADMIN);
@@ -119,14 +116,9 @@ const layoutStyle = css`
     }
   }
 
-  button {
-    color: ${COLOR.WHITE};
-    border: 1px solid ${COLOR.GRAY};
-
-    :hover {
-      background: transparent;
-      border: 1px solid ${COLOR.GRAY};
-    }
+  button:hover {
+    background: transparent;
+    border: 1px solid ${COLOR.WHITE};
   }
 `;
 
@@ -140,7 +132,7 @@ const menuStyle = css`
     font-weight: ${FONT_WEIGHT.BOLD};
   }
 
-  a:nth-of-type(2) {
+  a:nth-of-type(1) {
     color: ${COLOR.GRAY};
   }
 `;

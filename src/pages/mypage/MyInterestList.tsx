@@ -44,6 +44,7 @@ const MyInterestList = () => {
     { id: 2, name: '폴더 3', items: [] },
     { id: 2, name: '폴더 4', items: [] },
   ]);
+
   const [selectedFolderName, setSelectedFolderName] = useState<string>(
     `${folders[0].name}`
   );
@@ -74,6 +75,13 @@ const MyInterestList = () => {
 
     const pages = Math.ceil(rankedData.length / PAGE_SIZE);
     setTotalPage(pages);
+    setFolders([
+      { id: 1, name: '기본폴더 삭제 X', items: [] },
+      { id: 2, name: '폴더 1', items: [] },
+      { id: 2, name: '폴더 2', items: [] },
+      { id: 2, name: '폴더 3', items: [] },
+      { id: 2, name: '폴더 4', items: [] },
+    ]);
   }, []);
 
   const columns = [

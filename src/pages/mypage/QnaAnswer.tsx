@@ -36,12 +36,6 @@ const QnaAnswer = () => {
     setTextValue(e.target.value);
   };
 
-  // const handleEditBtn = () => {
-  //   navigate(PATH.MYPAGE_QNA_EDIT());
-  // };
-
-  // const handleDeleteBtn = () => {};
-
   const handleBtn = () => {
     navigate(PATH.MYPAGE_QNA_DETAIL());
   };

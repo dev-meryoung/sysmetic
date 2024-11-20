@@ -38,6 +38,7 @@ export const PATH = {
   MYPAGE_CHECK: '/mypage/check',
   MYPAGE_WITHDRAW: '/mypage/withdraw',
   ADMIN: '/admin',
+  ADMIN_USERS: '/admin/users',
   ADMIN_NOTICES: '/admin/notices',
   ADMIN_NOTICES_ADD: '/admin/notices/add',
   ADMIN_NOTICES_EDIT: (noticeId = ':noticeId') =>
@@ -49,6 +50,6 @@ export const PATH = {
   NOTICES: '/notices',
   NOTICES_DETAIL: (noticeId = ':noticeId') => `/notices/${noticeId}`,
   FAQ: '/faq',
-  TEMP: '/temp',
+  POLICY: '/policy',
   NOT_FOUND: '*',
 };

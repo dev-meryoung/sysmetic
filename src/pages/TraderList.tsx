@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { useNavigate } from 'react-router-dom';
+import tempImage from '@/assets/images/test-profile.png';
 import Button from '@/components/Button';
 import Pagination from '@/components/Pagination';
 import ProfileImage from '@/components/ProfileImage';
@@ -102,7 +103,7 @@ const TraderList = () => {
                   onClick={() => navigate(PATH.TRADER_STRATEGIES())}
                 >
                   <ProfileImage
-                    src={profile.profileImage}
+                    src={tempImage}
                     size='xl'
                     alt='트레이더 이미지'
                   />
