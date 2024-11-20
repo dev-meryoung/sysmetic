@@ -1,8 +1,9 @@
 import { css } from '@emotion/react';
+import defaultProfile from '@/assets/images/default-profile.png';
 
 interface ProfileImageProps {
-  src: string;
-  alt: string;
+  src?: string;
+  alt?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
 }
 
@@ -15,8 +16,8 @@ const sizes: Record<'sm' | 'md' | 'lg' | 'xl' | 'xxl', number> = {
 };
 
 const ProfileImage: React.FC<ProfileImageProps> = ({
-  src,
-  alt,
+  src = defaultProfile,
+  alt = 'profile',
   size = 'md',
 }) => (
   <div
@@ -33,6 +34,10 @@ const ProfileImage: React.FC<ProfileImageProps> = ({
     <img
       src={src}
       alt={alt}
+      onError={(e) => {
+        const target = e.target as HTMLImageElement;
+        target.src = defaultProfile;
+      }}
       css={css`
         width: 100%;
         height: 100%;
