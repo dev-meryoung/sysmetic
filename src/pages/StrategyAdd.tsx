@@ -28,8 +28,7 @@ const StrategyAdd = () => {
         <div className='button-box'>
           <Button
             label='메인가기'
-            shape='line'
-            color='primary'
+            border={true}
             width={120}
             fontWeight={500}
             handleClick={() => navigate(PATH.ROOT)}
@@ -111,8 +110,7 @@ const StrategyAdd = () => {
           <Button
             label='이전'
             handleClick={() => {}}
-            shape='line'
-            color='primary'
+            border={true}
             width={120}
           />
           <Button label='전략등록' handleClick={() => {}} width={120} />
