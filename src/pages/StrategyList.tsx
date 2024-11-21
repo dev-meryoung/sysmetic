@@ -259,7 +259,7 @@ const StrategyList = () => {
         <TabButton
           tabs={TAB_NAME}
           currentTab={currentTab}
-          shape='block'
+          shape='square'
           handleTabChange={setCurrentTab}
         />
         <div className='filter-wrapper'>

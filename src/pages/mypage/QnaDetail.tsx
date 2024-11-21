@@ -11,23 +11,21 @@ import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 
-// 투자자랑 트레이더 각자 보이는 화면 나중에 기능넣으면서 추가
 const QnaDetail = () => {
   const navigate = useNavigate();
 
   const handleEditBtn = () => {
-    navigate(PATH.MYPAGE_QNA_EDIT('temp-qna-id'));
+    navigate(PATH.MYPAGE_QNA_EDIT());
   };
 
-  // 나중에삭제
   const handleAnswerBtn = () => {
-    navigate(PATH.MYPAGE_QNA_ANSWER('temp-qna-id'));
+    navigate(PATH.MYPAGE_QNA_ANSWER());
   };
 
   const handleDeleteBtn = () => {};
 
   const handleGoListBtn = () => {
-    navigate(PATH.MYPAGE_QNA('temp-qna-id'));
+    navigate(PATH.MYPAGE_QNA());
   };
 
   return (
