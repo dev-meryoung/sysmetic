@@ -156,11 +156,13 @@ const AdminStrategies = () => {
     <div css={strategyWrapperStyle}>
       <div css={strategySearchDivStyle}>
         <SelectBox
+          placeholder='공개여부'
           color='skyblue'
           options={StatusOption}
           handleChange={handleStatusChange}
         />
         <SelectBox
+          placeholder='승인단계'
           color='skyblue'
           options={StagedOption}
           handleChange={handleStagedChange}
