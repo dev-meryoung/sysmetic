@@ -186,7 +186,7 @@ const AdminStrategies = () => {
 const strategyWrapperStyle = css`
   display: flex;
   flex-direction: column;
-  margin: 96px auto 96px;
+  margin: 0 auto 96px;
   padding: 0 10px;
   max-width: 1200px;
 `;
