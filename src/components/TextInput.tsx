@@ -79,6 +79,7 @@ const inputStyle = (
 
   font-size: ${height <= 48 ? FONT_SIZE.TEXT_MD : FONT_SIZE.TITLE_XS};
   font-weight: ${height <= 48 ? FONT_WEIGHT.REGULAR : FONT_WEIGHT.BOLD};
+  font-family: inherit;
   letter-spacing: -0.32px;
 
   &:focus {
