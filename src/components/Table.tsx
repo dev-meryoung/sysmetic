@@ -93,7 +93,7 @@ const Table = <T,>({
                           : ArrowDropDownOutlinedIcon
                         : UnfoldMoreOutlinedIcon
                     }
-                    shape='clear'
+                    shape='none'
                     handleClick={() => handleSort(column.key)}
                   />
                 )}

@@ -117,8 +117,8 @@ const SignFindPw = () => {
                 handleClick={handleClearEmail}
                 color='point'
                 iconBgSize='md'
-                shape='clear'
-                css={clearIconStyle}
+                shape='none'
+                css={noneIconStyle}
               />
             </div>
             <div css={buttonStyle}>
@@ -317,7 +317,7 @@ const linkStyle = css`
   gap: 16px;
 `;
 
-const clearIconStyle = css`
+const noneIconStyle = css`
   position: absolute;
   top: 50%;
   right: 4px;
