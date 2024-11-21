@@ -275,7 +275,7 @@ const startegytableStyle = css`
       width: 102px;
     }
 
-    &:nth-of-type(6) {
+    &:nth-of-type(7) {
       width: 120px;
     }
   }
