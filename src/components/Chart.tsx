@@ -77,6 +77,7 @@ const Chart: React.FC<ChartDataProps> = ({
     },
     chart: {
       type: 'line',
+      width: null,
       spacingTop: 40,
       zoomType: 'xy',
       zooming: {
@@ -84,6 +85,24 @@ const Chart: React.FC<ChartDataProps> = ({
           enabled: true,
         },
       },
+      style: {
+        fontFamily: 'Pretendard, sans-serif',
+      },
+    },
+    // 화면 크기가 1400px(13인치 노트북) 이하일 경우 높이 500
+    responsive: {
+      rules: [
+        {
+          condition: {
+            maxWidth: 1400,
+          },
+          chartOptions: {
+            chart: {
+              height: 500,
+            },
+          },
+        },
+      ],
     },
     tooltip: {
       style: {
@@ -105,6 +124,7 @@ const Chart: React.FC<ChartDataProps> = ({
         fontWeight: `${FONT_WEIGHT.REGULAR}`,
         fontSize: `${FONT_SIZE.TEXT_MD}`,
       },
+      margin: 48,
     },
     xAxis: {
       type: 'datetime',
@@ -118,11 +138,39 @@ const Chart: React.FC<ChartDataProps> = ({
         rangeDescription: 'Range: 1940 to 2024.',
       },
     },
+    yAxis: [
+      {
+        pointOnColumn: true,
+        labels: {
+          style: {
+            color: `${COLOR.POINT400}`,
+            fontSize: `${FONT_SIZE.TEXT_MD}`,
+          },
+        },
+        title: {
+          text: '',
+        },
+      },
+      {
+        pointOnColumn: true,
+        opposite: true,
+        labels: {
+          style: {
+            color: `${COLOR.PRIMARY}`,
+            fontSize: `${FONT_SIZE.TEXT_MD}`,
+          },
+        },
+        title: {
+          text: '',
+        },
+      },
+    ],
     series: [
       {
         name: name[0],
         type: type[0],
         data: filteredData.data1,
+        yAxis: 0, // 첫 번째 Y축 사용
         color:
           type === 'line'
             ? `${COLOR.POINT400}`
@@ -150,6 +198,7 @@ const Chart: React.FC<ChartDataProps> = ({
         name: name[1],
         type: type[1],
         data: filteredData.data2,
+        yAxis: 1, // 두 번째 Y축 사용
         color:
           type === 'line'
             ? `${COLOR.PRIMARY}`
@@ -178,7 +227,11 @@ const Chart: React.FC<ChartDataProps> = ({
 
   return (
     <div css={chartWrapperStyle}>
-      <HighchartsReact highcharts={Highcharts} options={options} />
+      <HighchartsReact
+        highcharts={Highcharts}
+        options={options}
+        containerProps={{ style: { width: '100%', height: 'auto' } }}
+      />
       <section css={buttonWrapperStyle}>
         {dateFilter.map((period) => (
           <Button
@@ -201,21 +254,7 @@ const chartWrapperStyle = css`
   align-items: center;
   gap: 40px;
   min-width: 100%;
-
-  [data-highcharts-chart='0'] {
-    width: 100%;
-    min-height: 500px;
-  }
-
-  [data-highcharts-chart='1'] {
-    width: 100%;
-    min-height: 500px;
-  }
-
-  [data-highcharts-chart='2'] {
-    width: 100%;
-    min-height: 500px;
-  }
+  width: 100%;
 `;
 
 const buttonWrapperStyle = css`

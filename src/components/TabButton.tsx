@@ -4,7 +4,7 @@ import Button from '@/components/Button';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 
-type ButtonShapeType = 'round' | 'block' | 'line';
+type ButtonShapeType = 'round' | 'square' | 'line';
 
 interface TabButtonProps {
   tabs: string[];

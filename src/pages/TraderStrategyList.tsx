@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
+import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import { useNavigate } from 'react-router-dom';
 import tempImage from '@/assets/images/test-profile.png';
@@ -124,13 +125,25 @@ const TraderStrategyList = () => {
       <section css={infoStyle}>
         <div className='info-area'>
           <ProfileImage src={tempImage} alt='profile' />
-          <span>ABC가나다라883</span>
+          <div className='info'>
+            <span>트레이더</span>
+            <h6>ABC가나다라883</h6>
+          </div>
         </div>
         <div className='button-area'>
-          <span>관심수</span>
-          <div className='icon-btn'>
-            <FavoriteBorderOutlinedIcon />
-            10,000
+          <div className='button'>
+            <span>관심수</span>
+            <div className='icon-btn'>
+              <FavoriteBorderOutlinedIcon />
+              10,000
+            </div>
+          </div>
+          <div className='button'>
+            <span>전략수</span>
+            <div className='icon-btn'>
+              <ContentCopyOutlinedIcon />
+              10,000
+            </div>
           </div>
         </div>
       </section>
@@ -161,7 +174,7 @@ const strategyListWrapperStyle = css`
 const infoStyle = css`
   display: flex;
   align-items: center;
-  gap: 32px;
+  justify-content: space-between;
   padding: 35px 24px;
   border-radius: 4px;
   border: 1px solid ${COLOR.GRAY};
@@ -170,12 +183,28 @@ const infoStyle = css`
     display: flex;
     align-items: center;
     gap: 16px;
+
+    .info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      span {
+        color: ${COLOR.PRIMARY};
+        font-size: ${FONT_SIZE.TEXT_XS};
+      }
+    }
   }
 
   .button-area {
     display: flex;
-    flex-direction: column;
-    gap: 16px;
+    gap: 40px;
+
+    .button {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
 
     .icon-btn {
       display: flex;

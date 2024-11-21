@@ -64,7 +64,7 @@ const SignIn = () => {
               handleClick={handleClear(setEmail)}
               color='point'
               iconBgSize='md'
-              shape='clear'
+              shape='none'
               css={deleteIconBtnStyle}
             />
           </div>
@@ -87,7 +87,7 @@ const SignIn = () => {
               handleClick={handlePasswordVisibility}
               color='black'
               iconBgSize='md'
-              shape='clear'
+              shape='none'
               css={showIconBtnStyle}
             />
             <IconButton
@@ -95,7 +95,7 @@ const SignIn = () => {
               handleClick={handleClear(setPassword)}
               color='point'
               iconBgSize='md'
-              shape='clear'
+              shape='none'
               css={deleteIconBtnStyle}
             />
           </div>

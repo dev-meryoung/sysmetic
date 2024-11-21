@@ -120,6 +120,11 @@ const layoutStyle = css`
     background: transparent;
     border: 1px solid ${COLOR.WHITE};
   }
+
+  button:active {
+    background: transparent;
+    color: ${COLOR.WHITE};
+  }
 `;
 
 const menuStyle = css`

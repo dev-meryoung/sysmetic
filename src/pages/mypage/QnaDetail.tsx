@@ -11,23 +11,21 @@ import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 
-// 투자자랑 트레이더 각자 보이는 화면 나중에 기능넣으면서 추가
 const QnaDetail = () => {
   const navigate = useNavigate();
 
   const handleEditBtn = () => {
-    navigate(PATH.MYPAGE_QNA_EDIT('temp-qna-id'));
+    navigate(PATH.MYPAGE_QNA_EDIT());
   };
 
-  // 나중에삭제
   const handleAnswerBtn = () => {
-    navigate(PATH.MYPAGE_QNA_ANSWER('temp-qna-id'));
+    navigate(PATH.MYPAGE_QNA_ANSWER());
   };
 
   const handleDeleteBtn = () => {};
 
   const handleGoListBtn = () => {
-    navigate(PATH.MYPAGE_QNA('temp-qna-id'));
+    navigate(PATH.MYPAGE_QNA());
   };
 
   return (
@@ -143,8 +141,8 @@ export default QnaDetail;
 const wrapperStyle = css`
   display: flex;
   flex-direction: column;
-  align-items: center; 
-  justify-content: center; 
+  align-items: center;
+  justify-content: center;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
@@ -203,13 +201,13 @@ const dividerStyle = css`
 
 const strategyWrapperStyle = css`
   display: flex;
-  align-items: center; 
-  justify-content: space-between; 
+  align-items: center;
+  justify-content: space-between;
   padding: 32px 24px;
   width: 1132px;
   border: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
   border-radius: 4px;
-  margin: 0 auto; 
+  margin: 0 auto;
   position: relative;
   box-sizing: border-box;
   margin-top: 24px;

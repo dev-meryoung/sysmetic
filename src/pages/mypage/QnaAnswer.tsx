@@ -36,13 +36,6 @@ const QnaAnswer = () => {
     setTextValue(e.target.value);
   };
 
-  // TODO: 이후에 수정해야힘. 배포작업으로 임시 주석처리
-  // const handleEditBtn = () => {
-  //   navigate(PATH.MYPAGE_QNA_EDIT('temp-qna-id'));
-  // };
-
-  // const handleDeleteBtn = () => {};
-
   const handleBtn = () => {
     navigate(PATH.MYPAGE_QNA_DETAIL());
   };

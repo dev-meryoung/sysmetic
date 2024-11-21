@@ -9,15 +9,13 @@ const MyPageLayout = () => {
   const [tab, setTab] = useState<number>(0);
   const navigate = useNavigate();
   const location = useLocation();
-  // 질문상세페이지에서 새로고침하면 되돌아감 (상태유지가 안됨, 일단 나중에 수정예정)
+
   useEffect(() => {
     if (location.pathname === PATH.MYPAGE) {
       setTab(0);
-    } else if (
-      location.pathname.startsWith(PATH.MYPAGE_PROFILE('temp-user-id'))
-    ) {
+    } else if (location.pathname.startsWith(PATH.MYPAGE_PROFILE())) {
       setTab(1);
-    } else if (location.pathname.startsWith(PATH.MYPAGE_QNA('temp-user-id'))) {
+    } else if (location.pathname.startsWith(PATH.MYPAGE_QNA())) {
       setTab(2);
     }
   }, [location.pathname]);
@@ -32,16 +30,16 @@ const MyPageLayout = () => {
         navigate(PATH.MYPAGE);
         break;
       case 1:
-        navigate(PATH.MYPAGE_PROFILE('temp-user-id'));
+        navigate(PATH.MYPAGE_PROFILE());
         break;
       case 2:
-        navigate(PATH.MYPAGE_QNA('temp-user-id'));
+        navigate(PATH.MYPAGE_QNA());
         break;
       default:
         break;
     }
   };
-  // 여기에 해당 페이지 설명 쓰세요!
+
   const discriptionTab = () => {
     switch (tab) {
       case 0:
@@ -62,7 +60,6 @@ const MyPageLayout = () => {
         <div css={textStyle}>{discriptionTab()}</div>
       </div>
       <div css={tabBtnStyle}>
-        {/* TODO: 내관심전략 조건 처리 */}
         <TabButton
           shape='round'
           tabs={['내관심전략', '내정보수정', '상담문의']}
