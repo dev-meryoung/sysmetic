@@ -8,7 +8,7 @@ import SelectBox from '@/components/SelectBox';
 import Table from '@/components/Table';
 import Tag from '@/components/Tag';
 import TextInput from '@/components/TextInput';
-import { COLOR, COLOR_OPACITY } from '@/constants/color';
+import { COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import adminStrategies from '@/mocks/adminStrategies.json';
 
@@ -33,17 +33,11 @@ const StagedOption = [
   { label: '승인요청', value: 'staging' },
 ];
 
-const ApprovalOption = [
-  { label: '승인요청', value: 'approvaling' },
-  { label: '승인', value: 'approved' },
-];
-
 const PAGE_SIZE = 10;
 
 const AdminStrategies = () => {
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedStaged, setSelectedStaged] = useState('');
-  const [selectedApproval, setSelectedApproval] = useState('');
   const [value, SetValue] = useState('');
   //테이블 관련
   const [curPage, setCurPage] = useState(0);
@@ -59,10 +53,6 @@ const AdminStrategies = () => {
     setSelectedStaged(value);
   };
 
-  const handleApprovalChange = (value: string) => {
-    setSelectedApproval(value);
-  };
-
   const handleIconClick = () => {
     console.log(value);
   };
@@ -74,10 +64,6 @@ const AdminStrategies = () => {
   useEffect(() => {
     console.log(selectedStaged);
   }, [selectedStaged]);
-
-  useEffect(() => {
-    console.log(selectedApproval);
-  }, [selectedApproval]);
 
   const getPaginatedData = (page: number) => {
     const startIndex = page * PAGE_SIZE;
