@@ -54,7 +54,7 @@ const IconButton: React.FC<IconButtonProps> = ({
   iconSize = 'md',
   iconBgSize = 'md',
   color = 'black',
-  shape = 'round',
+  shape = 'square',
   ...props
 }) => {
   const { color: selectColor, hoverColor } = iconButtonColors[color];
