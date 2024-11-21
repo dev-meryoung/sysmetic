@@ -5,7 +5,6 @@ import Button from '@/components/Button';
 import Pagination from '@/components/Pagination';
 import Table from '@/components/Table';
 import Tag from '@/components/Tag';
-import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import adminMethods from '@/mocks/adminMethods.json';
 import { useTableStore } from '@/stores/useTableStore';
