@@ -11,6 +11,7 @@ type ButtonColorTypes =
   | 'blackToPrimary'
   | 'blackToPrimary700'
   | 'textBlack'
+  | 'gray200'
   | 'white'
   | 'transparent'
   | 'primaryOpacity10'
@@ -70,6 +71,11 @@ const buttonColors: Record<ButtonColorTypes, ButtonColors> = {
   blackToPrimary700: {
     color: COLOR.BLACK,
     hoverColor: COLOR.PRIMARY700,
+    disabledColor: COLOR.GRAY600,
+  },
+  gray200: {
+    color: COLOR.GRAY200,
+    hoverColor: COLOR.PRIMARY,
     disabledColor: COLOR.GRAY600,
   },
   white: {
@@ -183,11 +189,15 @@ const buttonStyle = (
         ? selectColors.color
         : selectColors.color === 'transparent'
           ? COLOR.BLACK
-          : selectColors.color === COLOR.WHITE
+          : selectColors.color === COLOR.WHITE || selectColors.color === COLOR.GRAY200
             ? COLOR.BLACK
             : COLOR.WHITE;
 
-  const borderColor = border ? `1px solid ${selectColors.color}` : 'none';
+  const borderColor = disabled
+    ? 'none'
+    : border
+      ? `1px solid ${selectColors.color}`
+      : 'none';
 
   const hoverStyles =
     !disabled &&
@@ -204,14 +214,15 @@ const buttonStyle = (
           : COLOR.WHITE
         : shape === 'none'
           ? selectColors.hoverColor
-          : selectColors.color === COLOR.WHITE
+          : selectColors.color === COLOR.WHITE 
             ? COLOR.WHITE
             : COLOR.WHITE};
 
-      ${border &&
-      (color === 'primaryOpacity10' || color === 'pointOpacity10'
-        ? `border: 1px solid ${selectColors.color}`
-        : `border: none`)};
+      ${border && disabled
+        ? `border: none`
+        : color === 'primaryOpacity10' || color === 'pointOpacity10'
+          ? `border: 1px solid ${selectColors.color}`
+          : `border: none`};
     `;
 
   const activeStyles =
@@ -231,7 +242,7 @@ const buttonStyle = (
         : (shape === 'round' && color === 'primaryOpacity10') ||
             (shape === 'square' && color === 'primaryOpacity10')
           ? selectColors.color
-          : shape === 'square' && color === 'white'
+          : shape === 'square' && color === 'white' || shape === 'square' && color === 'gray200'
             ? COLOR.BLACK
             : shape === 'none'
               ? selectColors.color
