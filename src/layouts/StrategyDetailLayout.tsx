@@ -77,7 +77,7 @@ const StrategyDetailLayout = () => {
                 border={true}
                 color='primaryOpacity10'
                 width={80}
-                handleClick={() => {}}
+                handleClick={() => navigate(PATH.STRATEGIES_QNA('10'))}
               />
             </div>
           </div>
