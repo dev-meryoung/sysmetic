@@ -16,6 +16,7 @@ interface InputProps {
   width?: number;
   iconNum?: InputIconNumTypes;
   maxLength?: number;
+  height?: number;
   value: string;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
@@ -31,12 +32,13 @@ const TextInput: React.FC<InputProps> = ({
   width = 360,
   iconNum = 'none',
   maxLength,
+  height = 48,
   handleChange,
   handleKeyDown,
 }) => (
   <>
     <input
-      css={inputStyle(color, status, fullWidth, width, iconNum)}
+      css={inputStyle(color, status, fullWidth, width, height, iconNum)}
       type={type}
       value={value}
       onChange={handleChange}
@@ -52,6 +54,7 @@ const inputStyle = (
   status: InputStateTypes,
   fullWidth: boolean,
   width: number,
+  height: number,
   iconNum: InputIconNumTypes
 ) => css`
   position: relative;
@@ -64,7 +67,7 @@ const inputStyle = (
         : color === 'skyblue'
           ? COLOR.PRIMARY100
           : COLOR_OPACITY.BLACK_OPACITY30};
-  height: 48px;
+  height: ${height}px;
   outline: none;
   border-radius: 4px;
   padding: 16px;
@@ -74,8 +77,8 @@ const inputStyle = (
       ? '96px'
       : '16px'};
 
-  font-size: ${FONT_SIZE.TEXT_MD};
-  font-weight: ${FONT_WEIGHT.REGULAR};
+  font-size: ${height <= 48 ? FONT_SIZE.TEXT_MD : FONT_SIZE.TITLE_XS};
+  font-weight: ${height <= 48 ? FONT_WEIGHT.REGULAR : FONT_WEIGHT.BOLD};
   letter-spacing: -0.32px;
 
   &:focus {
