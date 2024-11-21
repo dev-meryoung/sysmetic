@@ -11,7 +11,6 @@ import TextInput from '@/components/TextInput';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import adminStrategies from '@/mocks/adminStrategies.json';
-import { useTableStore } from '@/stores/useTableStore';
 
 interface AdminStrategyDataProps {
   no: number;
@@ -51,12 +50,6 @@ const AdminStrategies = () => {
   const [data, setData] = useState<AdminStrategyDataProps[]>([]);
   //페이지네이션 관련
   const [totalPage, setTotalPage] = useState(0);
-
-  const checkedItems = useTableStore((state) => state.checkedItems);
-  const toggleCheckbox = useTableStore((state) => state.toggleCheckbox);
-  const toggleAllCheckboxes = useTableStore(
-    (state) => state.toggleAllCheckboxes
-  );
 
   const handleStatusChange = (value: string) => {
     setSelectedStatus(value);
@@ -110,7 +103,7 @@ const AdminStrategies = () => {
   const columns = [
     {
       key: 'no' as keyof AdminStrategyDataProps,
-      header: '순위',
+      header: '순서',
     },
     {
       key: 'traderName' as keyof AdminStrategyDataProps,
@@ -185,52 +178,13 @@ const AdminStrategies = () => {
       </div>
       <div css={strategyInfoStyle}>
         <p>
-          총 <span>40</span>개의 전략이 검색되었습니다.
+          총 <span>40개</span>의 전략이 검색되었습니다.
         </p>
-        <div className='control-button'>
-          <Button
-            label='등록'
-            width={80}
-            handleClick={() => console.log('삭제')}
-          />
-          <Button
-            width={80}
-            color='black'
-            label='삭제'
-            handleClick={() => console.log('삭제')}
-          />
-        </div>
       </div>
       <div css={startegytableStyle}>
-        <Table
-          data={paginatedData}
-          columns={columns}
-          hasCheckbox={true}
-          checkedItems={checkedItems}
-          handleCheckboxChange={toggleCheckbox}
-          handleHeaderCheckboxChange={() =>
-            toggleAllCheckboxes(paginatedData.length)
-          }
-        />
+        <Table data={paginatedData} columns={columns} />
       </div>
-      <div css={changeApprovalDivStyle}>
-        <p>
-          <span>선택한 전략</span>을
-        </p>
-        <SelectBox
-          color='skyblue'
-          placeholder='승인단계 선택'
-          options={ApprovalOption}
-          handleChange={handleApprovalChange}
-        />
-        <Button
-          fontSize='14px'
-          width={80}
-          label='변경'
-          handleClick={() => console.log('변경')}
-        />
-      </div>
-      <div>
+      <div css={strategyPaginationStyle}>
         <Pagination
           totalPage={totalPage}
           currentPage={curPage}
@@ -275,11 +229,13 @@ const strategyInfoStyle = css`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 40px 0 24px;
+  margin: 40px 0;
 
-  .control-button {
-    display: flex;
-    gap: 16px;
+  font-size: ${FONT_SIZE.TITLE_XS};
+  letter-spacing: -0.4px;
+
+  p > span {
+    font-weight: ${FONT_WEIGHT.BOLD};
   }
 `;
 
@@ -293,14 +249,8 @@ const startegytableStyle = css`
   }
 `;
 
-const changeApprovalDivStyle = css`
-  display: flex;
-  gap: 16px;
-  height: 120px;
-  justify-content: center;
-  align-items: center;
-  background-color: ${COLOR_OPACITY.PRIMARY100_OPACITY30};
-  margin: 40px 0 32px;
+const strategyPaginationStyle = css`
+  margin-top: 40px;
 `;
 
 const buttonStyle = css``;
