@@ -240,12 +240,44 @@ const strategyInfoStyle = css`
 `;
 
 const startegytableStyle = css`
+  display: flex;
+  flex-direction: column;
+  gap: 29px;
+
   table > thead > tr > th {
-    padding: 16px 20px;
+    padding: 16px 0;
   }
 
   table > tbody > tr > td {
-    padding: 16px 20px;
+    padding: 24px 0;
+
+    &:nth-of-type(1) {
+      width: 80px;
+    }
+
+    &:nth-of-type(2) {
+      width: 203px;
+    }
+
+    &:nth-of-type(3) {
+      width: 441px;
+    }
+
+    &:nth-of-type(4) {
+      width: 120px;
+    }
+
+    &:nth-of-type(5) {
+      width: 114px;
+    }
+
+    &:nth-of-type(6) {
+      width: 102px;
+    }
+
+    &:nth-of-type(6) {
+      width: 120px;
+    }
   }
 `;
 
