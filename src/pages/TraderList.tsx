@@ -235,10 +235,9 @@ const cardWrapper = css`
 
           span {
             color: ${COLOR.PRIMARY};
-            font-size: 8px;
+            font-size: ${FONT_SIZE.TEXT_XS};
           }
         }
-
         button {
           font-size: ${FONT_SIZE.TEXT_SM};
           background-color: ${COLOR.WHITE};

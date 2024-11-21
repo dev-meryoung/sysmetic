@@ -120,9 +120,9 @@ const carouselWrapperStyle = css`
     position: fixed;
     display: flex;
     flex-direction: column;
-    right: calc(50% - 566px);
+    right: 72px;
     top: 50%;
-    transform: translate(-50%);
+    transform: translateY(-50%);
     gap: 32px;
 
     .carousel-indicator {

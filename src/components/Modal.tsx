@@ -30,7 +30,7 @@ const Modal: React.FC<ModalProps> = ({ width = 336 }) => {
         <IconButton
           IconComponent={CloseOutlinedIcon}
           iconBgSize='lg'
-          shape='clear'
+          shape='none'
           handleClick={closeModal}
         />
       </div>
