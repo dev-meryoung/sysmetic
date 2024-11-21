@@ -1,12 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 import { css } from '@emotion/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import SearchIcon from '@mui/icons-material/Search';
+import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import Pagination from '@/components/Pagination';
 import TabButton from '@/components/TabButton';
 import TextInput from '@/components/TextInput';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
+
+type InputStateTypes = 'normal' | 'warn';
 
 const POSTS_PER_PAGE = 10;
 const tabs = ['회원가입', '투자자', '트레이더'];
@@ -44,6 +46,7 @@ const data = [
 
 const Faq: React.FC = () => {
   const [search, setSearch] = useState('');
+  const [searchStatus, setSearchStatus] = useState<InputStateTypes>('normal');
   const [openAnswer, setOpenAnswer] = useState<number | null>(null);
   const [contentHeights, setContentHeights] = useState<Record<number, number>>(
     {}
@@ -56,6 +59,16 @@ const Faq: React.FC = () => {
   const searchedData = data.filter(
     (item) => item.title.includes(search) || item.question.includes(search)
   );
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+
+    if (e.target.value.length > 6) {
+      setSearchStatus('warn');
+    } else {
+      setSearchStatus('normal');
+    }
+  };
 
   const tabFilteredData = isSearching
     ? searchedData
@@ -105,10 +118,13 @@ const Faq: React.FC = () => {
         <div css={searchStyle}>
           <TextInput
             value={search}
-            handleChange={(e) => setSearch(e.target.value)}
+            status={searchStatus}
+            handleChange={handleChange}
             placeholder='검색어를 입력하세요'
+            color='skyblue'
+            iconNum='single'
           />
-          <SearchIcon css={searchIconStyle} />
+          <SearchOutlinedIcon css={searchIconStyle} />
         </div>
       </div>
 
