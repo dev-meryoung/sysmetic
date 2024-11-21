@@ -24,7 +24,7 @@ const SignFindPw = () => {
 
   const correctCode = '1'; // 임시 인증번호
 
-  const handlenoneEmail = () => {
+  const handleClearEmail = () => {
     setEmail('');
     setPassword('');
     setCheckPassword('');
@@ -114,7 +114,7 @@ const SignFindPw = () => {
               />
               <IconButton
                 IconComponent={CancelOutlined}
-                handleClick={handlenoneEmail}
+                handleClick={handleClearEmail}
                 color='point'
                 iconBgSize='md'
                 shape='none'
