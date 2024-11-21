@@ -14,6 +14,7 @@ import AdminNotices from '@/pages/admin/AdminNotices';
 import AdminQna from '@/pages/admin/AdminQna';
 import AdminStocks from '@/pages/admin/AdminStocks';
 import AdminStrategies from '@/pages/admin/AdminStrategies';
+import AdminStrategiesControl from '@/pages/admin/AdminStrategiesControl';
 import AdminUsers from '@/pages/admin/AdminUsers';
 import Faq from '@/pages/Faq';
 import Home from '@/pages/Home';
@@ -32,7 +33,7 @@ import NotFound from '@/pages/NotFound';
 import Notices from '@/pages/Notices';
 import NoticesDetail from '@/pages/NoticesDetail';
 import Policy from '@/pages/Policy';
-import QnaAdd from '@/pages/QnaAdd';
+import QnaQuestion from '@/pages/QnaQuestion';
 import SignFindId from '@/pages/SignFindId';
 import SignFindPw from '@/pages/SignFindPw';
 import SignIn from '@/pages/SignIn';
@@ -46,7 +47,6 @@ import StrategyDetailAccount from '@/pages/StrategyDetailAccount';
 import StrategyDetailDaily from '@/pages/StrategyDetailDaily';
 import StrategyDetailMonthly from '@/pages/StrategyDetailMonthly';
 import StrategyList from '@/pages/StrategyList';
-import StrategyQna from '@/pages/StrategyQna';
 import TraderList from '@/pages/TraderList';
 import TraderStrategyList from '@/pages/TraderStrategyList';
 
@@ -129,8 +129,8 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: PATH.ADD_QNA(),
-        element: <QnaAdd />,
+        path: PATH.STRATEGIES_QNA(),
+        element: <QnaQuestion />,
       },
       {
         path: PATH.TRADER_STRATEGIES(),
@@ -139,10 +139,6 @@ const router = createBrowserRouter([
       {
         path: PATH.STRATEGIES_ADD,
         element: <StrategyAdd />,
-      },
-      {
-        path: PATH.STRATEGIES_QNA(),
-        element: <StrategyQna />,
       },
       {
         path: PATH.MYPAGE,
@@ -218,6 +214,10 @@ const router = createBrowserRouter([
       {
         path: PATH.ADMIN_NOTICES_EDIT(),
         element: <AdminNoticeEdit />,
+      },
+      {
+        path: PATH.ADMIN_STRATEGIES_CONTROL(),
+        element: <AdminStrategiesControl />,
       },
       {
         path: PATH.ADMIN_STRATEGIES,

@@ -15,7 +15,7 @@ const StrategyAdd = () => {
 
   const conditionalRender = {
     none: (
-      <div css={infoContentBoxStyle}>
+      <div css={infoBoxStyle}>
         <img className='add-image' src={tempImage} alt='add' />
         <div className='text-box'>
           <h6>트레이더가 되시면 투자전략을 등록하고 공유할 수 있습니다.</h6>
@@ -121,7 +121,7 @@ const StrategyAdd = () => {
 
   return (
     <div css={wrapperStyle}>
-      <div css={infoBoxStyle}>
+      <div css={titleBoxStyle}>
         <h5>전략등록</h5>
         <span>
           시스메틱에서 투자전략을 등록하고 공유해보세요.
@@ -144,7 +144,7 @@ const wrapperStyle = css`
   }
 `;
 
-const infoBoxStyle = css`
+const titleBoxStyle = css`
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -154,7 +154,7 @@ const infoBoxStyle = css`
   border-bottom: 1px solid ${COLOR.TEXT_BLACK};
 `;
 
-const infoContentBoxStyle = css`
+const infoBoxStyle = css`
   display: flex;
   flex-direction: column;
   justify-content: center;

@@ -15,9 +15,7 @@ const MyPageLayout = () => {
       setTab(0);
     } else if (location.pathname.startsWith(PATH.MYPAGE_PROFILE())) {
       setTab(1);
-    } else if (
-      location.pathname.startsWith(PATH.MYPAGE_QNA())
-    ) {
+    } else if (location.pathname.startsWith(PATH.MYPAGE_QNA())) {
       setTab(2);
     }
   }, [location.pathname]);

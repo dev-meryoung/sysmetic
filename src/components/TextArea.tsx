@@ -48,16 +48,21 @@ const textAreaStyle = (
   padding: 16px;
   resize: none;
 
-  font-size: ${FONT_SIZE.TEXT_SM};
+  font-size: ${FONT_SIZE.TEXT_MD};
   font-weight: ${FONT_WEIGHT.REGULAR};
   font-family: inherit;
   letter-spacing: -0.28px;
-  line-height: 100%;
+  line-height: 24px;
 
   border: 1px solid
     ${color === 'transparent' ? 'transparent' : COLOR_OPACITY.BLACK_OPACITY30};
   border-radius: 4px;
   background-color: ${COLOR.WHITE};
+
+  &:focus {
+    outline: none;
+    border: 1px solid ${color === 'transparent' ? 'none' : COLOR.BLACK};
+  }
 
   &::placeholder {
     color: ${COLOR_OPACITY.BLACK_OPACITY30};

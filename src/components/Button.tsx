@@ -189,7 +189,8 @@ const buttonStyle = (
         ? selectColors.color
         : selectColors.color === 'transparent'
           ? COLOR.BLACK
-          : selectColors.color === COLOR.WHITE || selectColors.color === COLOR.GRAY200
+          : selectColors.color === COLOR.WHITE ||
+              selectColors.color === COLOR.GRAY200
             ? COLOR.BLACK
             : COLOR.WHITE;
 
@@ -214,7 +215,7 @@ const buttonStyle = (
           : COLOR.WHITE
         : shape === 'none'
           ? selectColors.hoverColor
-          : selectColors.color === COLOR.WHITE 
+          : selectColors.color === COLOR.WHITE
             ? COLOR.WHITE
             : COLOR.WHITE};
 
@@ -242,7 +243,8 @@ const buttonStyle = (
         : (shape === 'round' && color === 'primaryOpacity10') ||
             (shape === 'square' && color === 'primaryOpacity10')
           ? selectColors.color
-          : shape === 'square' && color === 'white' || shape === 'square' && color === 'gray200'
+          : (shape === 'square' && color === 'white') ||
+              (shape === 'square' && color === 'gray200')
             ? COLOR.BLACK
             : shape === 'none'
               ? selectColors.color

@@ -1,0 +1,72 @@
+[
+  {
+    "profileImage": "test",
+    "nickname": "유저123",
+    "date": "2024-11-20T14:00:00",
+    "content": "안녕하세요! 좋은 하루 보내세요.",
+    "isAuthor": false
+  },
+  {
+    "profileImage": "test",
+    "nickname": "사용자456",
+    "date": "2024-11-19T10:15:30",
+    "content": "이 코멘트는 정말 흥미로워요!",
+    "isAuthor": true
+  },
+  {
+    "profileImage": "test",
+    "nickname": "개발자789",
+    "date": "2024-11-18T08:45:00",
+    "content": "잘 읽었습니다. 감사합니다.",
+    "isAuthor": false
+  },
+  {
+    "profileImage": "test",
+    "nickname": "테스터101",
+    "date": "2024-11-17T16:20:00",
+    "content": "수정 사항이 필요할 것 같아요.",
+    "isAuthor": true
+  },
+  {
+    "profileImage": "test",
+    "nickname": "새내기202",
+    "date": "2024-11-16T09:30:00",
+    "content": "여기 너무 유용해요!",
+    "isAuthor": false
+  },
+  {
+    "profileImage": "test",
+    "nickname": "프로123",
+    "date": "2024-11-15T11:00:00",
+    "content": "간단한 의견 남깁니다.",
+    "isAuthor": true
+  },
+  {
+    "profileImage": "test",
+    "nickname": "코멘터리456",
+    "date": "2024-11-14T18:00:00",
+    "content": "정말 멋진 작업이네요!",
+    "isAuthor": false
+  },
+  {
+    "profileImage": "test",
+    "nickname": "어드민789",
+    "date": "2024-11-13T21:10:00",
+    "content": "여기에 추가 의견 드립니다.",
+    "isAuthor": true
+  },
+  {
+    "profileImage": "test",
+    "nickname": "익명101",
+    "date": "2024-11-12T07:00:00",
+    "content": "흥미로운 내용이네요!",
+    "isAuthor": false
+  },
+  {
+    "profileImage": "test",
+    "nickname": "유저222",
+    "date": "2024-11-11T23:30:00",
+    "content": "고생 많으셨습니다!",
+    "isAuthor": false
+  }
+]
