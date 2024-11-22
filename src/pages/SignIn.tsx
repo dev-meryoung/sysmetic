@@ -3,13 +3,12 @@ import { css } from '@emotion/react';
 import CancelOutlined from '@mui/icons-material/CancelOutlined';
 import VisibilityOffOutlined from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlined from '@mui/icons-material/VisibilityOutlined';
-import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import IconButton from '@/components/IconButton';
 import TextInput from '@/components/TextInput';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
-import { PATH } from '@/constants/path';
+import { useLogin } from '@/hooks/useAuth';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -17,12 +16,12 @@ const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const loginMutation = useLogin();
 
   const emailRegEx =
     /^[A-Za-z0-9]([-_.]?[A-Za-z0-9])*@[A-Za-z0-9]([-_.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$/i;
   const passwordRegEx =
     /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
-  const navigate = useNavigate();
 
   const handlePasswordVisibility = () => setShowPassword((prev) => !prev);
 
@@ -48,7 +47,8 @@ const SignIn = () => {
     if (!isPasswordValid) setPasswordError(true);
 
     if (isEmailValid && isPasswordValid) {
-      navigate(PATH.ROOT);
+      // TODO: rememberMe 체크 여부를 관리해서 해당 값으로 적용해주세요.
+      loginMutation.mutate({ email, password, rememberMe: false });
     }
   };
 
