@@ -170,11 +170,13 @@ const Faq: React.FC = () => {
         )}
       </div>
 
-      <Pagination
-        totalPage={totalPage}
-        currentPage={currentPage}
-        handlePageChange={(page) => setCurrentPage(page)}
-      />
+      {paginatedData.length > 0 && (
+        <Pagination
+          totalPage={totalPage}
+          currentPage={currentPage}
+          handlePageChange={(page) => setCurrentPage(page)}
+        />
+      )}
     </div>
   );
 };
@@ -300,7 +302,7 @@ const noResultsStyle = css`
   text-align: center;
   color: ${COLOR.GRAY600};
   font-size: ${FONT_SIZE.TEXT_MD};
-  margin-top: 20px;
+  margin-top: 80px;
 `;
 
 const arrowIconStyle = (isOpen: boolean) => css`
