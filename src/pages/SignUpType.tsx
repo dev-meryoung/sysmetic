@@ -1,90 +1,102 @@
 import React, { useState } from 'react';
 import { css } from '@emotion/react';
+import Button from '@/components/Button';
+import RadioButton from '@/components/RadioButton';
+import { COLOR, COLOR_OPACITY } from '@/constants/color';
+import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 
 export interface ContentProps {
   id: number;
   name: string;
   title: string;
   license: string;
-  agree: string;
 }
 
+const ServiceOptions = [
+  { label: '동의합니다.', value: 'true' },
+  { label: '동의하지 않습니다.', value: 'false' },
+];
+const PersonalOptions = [
+  { label: '동의합니다.', value: 'true' },
+  { label: '동의하지 않습니다.', value: 'false' },
+];
+const ThirdOptions = [
+  { label: '동의합니다.', value: 'true' },
+  { label: '동의하지 않습니다.', value: 'false' },
+];
+
 const SignUpType = () => {
-  const [isRadioToggled, setIsRadioToggled] = useState<boolean[]>([]);
-
-  const handleRadioToggle = (i: number, v: boolean) => {
-    const updatedToggled = [...isRadioToggled];
-    updatedToggled[i] = v;
-    setIsRadioToggled(updatedToggled);
-  };
-
-  const contentLists: ContentProps[] = [
-    {
-      id: 1,
-      name: 'termsAgree1',
-      title: '홈페이지 이용약관',
-      license:
-        '김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영김대영바보김바대보영',
-      agree: '홈페이지 회원 서비스 이용약관에 동의하십니까?',
-    },
-    {
-      id: 2,
-      name: 'termsAgree2',
-      title: '개인정보 취급방침',
-      license:
-        '개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침개인정보취급방침',
-      agree: '개인정보 취급방침에 동의하십니까?',
-    },
-    {
-      id: 3,
-      name: 'termsAgree3',
-      title: '제3자 정보제공',
-      license:
-        '제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공제3자 정보제공',
-      agree: '제3자 정보제공에 동의하십니까?',
-    },
-  ];
+  const [isServiceChecked, setIsServiceChecked] = useState('false');
+  const [isPersonalChecked, setIsPersonalChecked] = useState('false');
+  const [isThirdChecked, setIsThirdChecked] = useState('false');
 
   return (
     <div css={wrapperStyle}>
       <div css={contentsDivStyle}>
-        {contentLists.map((contentList, i) => (
-          <React.Fragment key={contentList.id}>
-            <div className='content-box'>
-              <h2>{contentList.title}</h2>
-              <div className='content-div'>
-                <p>{contentList.license}</p>
-              </div>
-              <div className='bottom'>
-                <h3>{contentList.agree}</h3>
-                <div className='radio-div'>
-                  <label>
-                    <input
-                      type='radio'
-                      name={contentList.name}
-                      checked={isRadioToggled[i] === true}
-                      onChange={() => handleRadioToggle(i, true)}
-                    />
-                    동의합니다.
-                  </label>
-                  <label>
-                    <input
-                      type='radio'
-                      name={contentList.name}
-                      checked={isRadioToggled[i] === false}
-                      onChange={() => handleRadioToggle(i, false)}
-                    />
-                    동의하지 않습니다.
-                  </label>
-                </div>
-              </div>
-            </div>
-          </React.Fragment>
-        ))}
+        <div className='terms-and-conditions'>
+          <h6>홈페이지 이용약관</h6>
+          <div className='content-box'>
+            <p>
+              가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하
+            </p>
+          </div>
+          <div className='agreement'>
+            <p>홈페이지 회원 서비스 이용약관에 동의하십니까?</p>
+            <RadioButton
+              options={ServiceOptions}
+              name='service'
+              selected={isServiceChecked}
+              handleChange={setIsServiceChecked}
+            />
+          </div>
+        </div>
+        <div className='terms-and-conditions'>
+          <h6>개인정보 취급방침</h6>
+          <div className='content-box'>
+            <p>
+              가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하
+            </p>
+          </div>
+          <div className='agreement'>
+            <p>개인정보 취급방침에 동의하십니까?</p>
+            <RadioButton
+              options={PersonalOptions}
+              name='personal'
+              selected={isPersonalChecked}
+              handleChange={setIsPersonalChecked}
+            />
+          </div>
+        </div>
+        <div className='terms-and-conditions'>
+          <h6>제 3자 정보제공</h6>
+          <div className='content-box'>
+            <p>
+              가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하
+            </p>
+          </div>
+          <div className='agreement'>
+            <p>제 3자 정보제공에 동의하십니까?</p>
+            <RadioButton
+              options={ThirdOptions}
+              name='third'
+              selected={isThirdChecked}
+              handleChange={setIsThirdChecked}
+            />
+          </div>
+        </div>
       </div>
       <div css={buttonDivStyle}>
-        <button className='back-btn'>이전</button>
-        <button className='next-btn'>다음</button>
+        <Button
+          width={120}
+          border={true}
+          label='이전'
+          handleClick={() => console.log('이전')}
+        />
+        <Button
+          width={120}
+          label='다음'
+          handleClick={() => console.log('다음')}
+        />
       </div>
     </div>
   );
@@ -95,104 +107,51 @@ const wrapperStyle = css`
   height: 100%;
   max-width: 1200px;
   padding: 0 10px;
-  margin: 0 auto;
-  color: #000;
-  letter-spacing: -0.4px;
+  margin: 80px auto 96px;
   display: flex;
   flex-direction: column;
 `;
 
 const contentsDivStyle = css`
-  height: auto;
-  margin-top: 80px;
-  h2 {
-    width: 140px;
-    height: 20px;
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: -0.4px;
-    margin-bottom: 16px;
-  }
+  display: flex;
+  flex-direction: column;
 
-  h3 {
-    width: 293px;
-    height: 16px;
-    font-size: 16px;
-    letter-spacing: -0.32px;
-  }
-
-  .content-box {
-    // padding-bottom: 119px;
-    margin-bottom: 64px;
-  }
-
-  .content-div {
-    border: 1px solid #1261c44d;
-    padding: 30px 26px;
-    height: 250px;
-
-    p {
-      height: 186px;
-      overflow: auto;
-      line-height: 160%;
-    }
-  }
-
-  .bottom {
+  .terms-and-conditions {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    margin-bottom: 80px;
 
-    .radio-div {
-      width: 300px;
-      height: 48px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
+    h6 {
+      letter-spacing: -0.4px;
+      margin-bottom: 16px;
+    }
 
-      label {
-        display: flex;
-        align-items: center;
-      }
+    .content-box {
+      height: 240px;
+      padding: 24px;
+      border: 1px solid ${COLOR_OPACITY.PRIMARY_OPACITY10};
+      border-radius: 4px;
 
-      input[type='radio'] {
-        width: 24px;
-        height: 24px;
-        margin: 12px;
-        accent-color: #1261c4;
+      p {
+        height: 192px;
+        overflow: auto;
+        letter-spacing: -0.32px;
+        line-height: 160%;
       }
     }
+  }
+
+  .agreement {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 `;
 
 const buttonDivStyle = css`
   display: flex;
-  margin: 0 auto 96px;
+  margin: 0 auto;
   gap: 16px;
-
-  button {
-    width: 120px;
-    height: 48px;
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 400;
-    letter-spacing: -0.28px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-
-  .back-btn {
-    border: 1px solid #1261c4;
-    background-color: rgba(18, 97, 196, 0);
-    color: #1261c4;
-  }
-
-  .next-btn {
-    border: none;
-    background-color: #1261c4;
-    color: #fff;
-  }
 `;
 
 export default SignUpType;

@@ -1,12 +1,12 @@
 import { css } from '@emotion/react';
+import profileImg from '@/assets/images/default-profile.png';
+import Button from '@/components/Button';
+import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 
 const SignUpDone = () => (
   <div css={wrapperStyle}>
     <div css={profileDivStyle}>
-      <img
-        src='https://img.animalplanet.co.kr/news/2020/08/06/700/yaj83kp9p731j819tcda.jpg'
-        alt='my-profile'
-      />
+      <img src={profileImg} alt='my-profile' />
     </div>
     <div css={contentsDivStyle}>
       <h2>축하합니다. Sysmetic 회원가입이 완료되었습니다!</h2>
@@ -17,8 +17,17 @@ const SignUpDone = () => (
       </p>
     </div>
     <div css={buttonDivStyle}>
-      <button className='main-btn'>메인가기</button>
-      <button className='login-btn'>로그인</button>
+      <Button
+        border={true}
+        width={120}
+        label='메인가기'
+        handleClick={() => console.log('메인가기')}
+      />
+      <Button
+        width={120}
+        label='로그인'
+        handleClick={() => console.log('로그인')}
+      />
     </div>
   </div>
 );
@@ -29,9 +38,7 @@ const wrapperStyle = css`
   max-width: 1200px;
   padding: 0 10px;
   margin: 0 auto;
-  color: #000;
   letter-spacing: -0.4px;
-  font-weight: 400;
   display: flex;
   flex-direction: column;
 `;
@@ -41,9 +48,7 @@ const profileDivStyle = css`
   height: 300px;
   margin: 96px auto 0;
   border-radius: 300px;
-  background-color: #f9f9f9;
-  font-size: 36px;
-  color: #000;
+  font-size: ${FONT_SIZE.TITLE_LG};
   letter-spacing: -0.72px;
   display: flex;
   align-items: center;
@@ -60,8 +65,8 @@ const contentsDivStyle = css`
   margin-top: 40px;
 
   h2 {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: ${FONT_SIZE.TITLE_XS};
+    font-weight: ${FONT_WEIGHT.BOLD};
   }
 
   p {
@@ -72,31 +77,8 @@ const contentsDivStyle = css`
 
 const buttonDivStyle = css`
   display: flex;
-  margin: 64px auto 96px;
+  margin: 80px auto 96px;
   gap: 16px;
-
-  button {
-    width: 120px;
-    height: 48px;
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 400;
-    letter-spacing: -0.28px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-
-  .main-btn {
-    border: 1px solid #1261c4;
-    background-color: rgba(18, 97, 196, 0);
-    color: #1261c4;
-  }
-
-  .login-btn {
-    border: none;
-    background-color: #1261c4;
-    color: #fff;
-  }
 `;
 
 export default SignUpDone;
