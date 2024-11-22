@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import TagTest from '@/assets/images/test-tag.jpg';
 import Button from '@/components/Button';
+import Modal from '@/components/Modal';
 import Pagination from '@/components/Pagination';
 import Table from '@/components/Table';
 import Tag from '@/components/Tag';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import adminStocks from '@/mocks/adminStocks.json';
+import { useModalStore } from '@/stores/useModalStore';
 import { useTableStore } from '@/stores/useTableStore';
 
 interface AdminStocksDataProps {
@@ -20,21 +22,6 @@ const AdminStocks = () => {
   //테이블 관련
   const [curPage, setCurPage] = useState(0);
   const [data, setData] = useState<AdminStocksDataProps[]>([]);
-  //페이지네이션 관련
-  const [totalPage, setTotalPage] = useState(0);
-  const getPaginatedData = (page: number) => {
-    const startIndex = page * PAGE_SIZE;
-    const endIndex = startIndex + PAGE_SIZE;
-    return data.slice(startIndex, endIndex);
-  };
-
-  const checkedItems = useTableStore((state) => state.checkedItems);
-  const toggleCheckbox = useTableStore((state) => state.toggleCheckbox);
-  const toggleAllCheckboxes = useTableStore(
-    (state) => state.toggleAllCheckboxes
-  );
-
-  const paginatedData = getPaginatedData(curPage);
   const columns = [
     {
       key: 'no' as keyof AdminStocksDataProps,
@@ -72,6 +59,44 @@ const AdminStocks = () => {
       ),
     },
   ];
+  //페이지네이션 관련
+  const [totalPage, setTotalPage] = useState(0);
+  const getPaginatedData = (page: number) => {
+    const startIndex = page * PAGE_SIZE;
+    const endIndex = startIndex + PAGE_SIZE;
+    return data.slice(startIndex, endIndex);
+  };
+  const paginatedData = getPaginatedData(curPage);
+
+  //모달 관련
+  const { openModal, closeModal } = useModalStore();
+  const openStocksModal = () => {
+    openModal(
+      <div css={delModalStyle}>
+        <p>해당 종목을 삭제하시겠습니까?</p>
+        <div className='del-modal-btn'>
+          <Button
+            width={120}
+            border={true}
+            label='아니오'
+            handleClick={closeModal}
+          />
+          <Button width={120} label='예' handleClick={deleteClick} />
+        </div>
+      </div>
+    );
+  };
+  const deleteClick = () => {
+    //? 데이터 삭제 코드
+    closeModal();
+  };
+
+  //체크박스 관련
+  const checkedItems = useTableStore((state) => state.checkedItems);
+  const toggleCheckbox = useTableStore((state) => state.toggleCheckbox);
+  const toggleAllCheckboxes = useTableStore(
+    (state) => state.toggleAllCheckboxes
+  );
 
   useEffect(() => {
     // 순서를 기준으로
@@ -102,7 +127,7 @@ const AdminStocks = () => {
             width={80}
             color='black'
             label='삭제'
-            handleClick={() => console.log('삭제')}
+            handleClick={openStocksModal}
           />
         </div>
       </div>
@@ -125,6 +150,7 @@ const AdminStocks = () => {
           handlePageChange={setCurPage}
         />
       </div>
+      <Modal />
     </div>
   );
 };
@@ -204,6 +230,23 @@ const tagStyle = css`
   flex-direction: column;
   gap: 12px;
   align-items: flex-start;
+`;
+
+const delModalStyle = css`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  padding: 8px 16px 0;
+
+  font-size: ${FONT_SIZE.TEXT_MD};
+  letter-spacing: -0.32px;
+
+  .del-modal-btn {
+    display: flex;
+    gap: 16px;
+  }
 `;
 
 export default AdminStocks;
