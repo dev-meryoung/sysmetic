@@ -20,7 +20,8 @@ const SignIn = () => {
 
   const emailRegEx =
     /^[A-Za-z0-9]([-_.]?[A-Za-z0-9])*@[A-Za-z0-9]([-_.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$/i;
-  const passwordRegEx = /^[A-Za-z0-9]{8,20}$/;
+  const passwordRegEx =
+    /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
   const navigate = useNavigate();
 
   const handlePasswordVisibility = () => setShowPassword((prev) => !prev);
