@@ -90,10 +90,7 @@ const Faq: React.FC = () => {
       <div css={indexStyle}>
         <div css={titleStyle}>자주 묻는 질문</div>
         <div css={descriptionStyle}>
-          회원탈퇴를 신청하기 전에 안내사항을 꼭 확인해주세요.
-          <br />
-          탈퇴한 아이디는 본인과 다인 모두 재사용 및 복구가 불가하오니 신중하게
-          선택하시기 바랍니다.
+          자주 묻는 질문과 답변을 한눈에 확인하실 수 있습니다.
         </div>
       </div>
 
@@ -245,6 +242,8 @@ const faqQuestionStyle = css`
   align-items: center;
   cursor: pointer;
   border-bottom: 1px solid ${COLOR.GRAY};
+  min-height: 72px;
+  position: relative;
 `;
 
 const faqQuestionAndTitleStyle = css`
@@ -261,6 +260,8 @@ const faqTitleStyle = css`
 `;
 
 const faqAnswerStyle = (isOpen: boolean) => css`
+  overflow: hidden;
+  max-height: ${isOpen ? '1000px' : '0'};
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -268,7 +269,6 @@ const faqAnswerStyle = (isOpen: boolean) => css`
   font-size: ${FONT_SIZE.TEXT_SM};
   font-weight: ${FONT_WEIGHT.REGULAR};
   color: ${COLOR.GRAY800};
-  overflow: hidden;
   opacity: ${isOpen ? '1' : '0'};
   transform: ${isOpen ? 'translateY(0)' : 'translateY(-10px)'};
   transition:
