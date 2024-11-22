@@ -1,20 +1,22 @@
 import { css } from '@emotion/react';
 import { Outlet } from 'react-router-dom';
+import { COLOR } from '@/constants/color';
+import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 
 const SignupStepLayout = () => (
   <div css={signUpStepLayoutWrapperStyle}>
     <h1 className='title'>회원가입</h1>
     <div className='step-inner-layout'>
       <div css={signUpStepStyle}>
-        <div className='step'>
+        <div className='step1'>
           <h2>STEP 1</h2>
           <h3>약관동의</h3>
         </div>
-        <div className='step'>
+        <div className='step2'>
           <h2>STEP 2</h2>
           <h3>정보입력</h3>
         </div>
-        <div className='step'>
+        <div className='step3'>
           <h2>STEP 3</h2>
           <h3>가입완료</h3>
         </div>
@@ -27,7 +29,6 @@ const SignupStepLayout = () => (
 const signUpStepLayoutWrapperStyle = css`
   width: 100%;
   margin: 0 auto;
-  color: #000;
   letter-spacing: -0.4px;
 
   h1 {
@@ -37,13 +38,13 @@ const signUpStepLayoutWrapperStyle = css`
   .step-inner-layout {
     width: 100%;
     height: 120px;
-    background-color: #ccc;
+    background-color: ${COLOR.GRAY};
   }
 
   .title {
     height: 24px;
-    font-weight: 700;
-    font-size: 24px;
+    font-weight: ${FONT_WEIGHT.BOLD};
+    font-size: ${FONT_SIZE.TITLE_SM};
     line-height: 24px;
     margin: 96px auto 40px;
     padding: 0 10px;
@@ -56,26 +57,27 @@ const signUpStepStyle = css`
   display: flex;
   padding: 0 10px;
 
-  .step {
+  .step1,
+  .step2,
+  .step3 {
     width: 160px;
     height: 120px;
     padding: 17px 54px 33px 24px;
     flex-shrink: 0;
-    background-color: #1261c4;
-    color: #fff;
+    color: ${COLOR.WHITE};
     line-height: 160%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 
     h2 {
-      font-size: 18px;
+      font-size: ${FONT_SIZE.TEXT_LG};
       letter-spacing: -0.36px;
     }
 
     h3 {
-      font-size: 24px;
-      font-weight: 700;
+      font-size: ${FONT_SIZE.TITLE_SM};
+      font-weight: ${FONT_WEIGHT.BOLD};
       letter-spacing: -0.48px;
     }
   }
