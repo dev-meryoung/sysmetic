@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
@@ -7,8 +7,6 @@ import TabButton from '@/components/TabButton';
 import TextInput from '@/components/TextInput';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
-
-type InputStateTypes = 'normal' | 'warn';
 
 const POSTS_PER_PAGE = 10;
 const tabs = ['회원가입', '투자자', '트레이더'];
@@ -46,40 +44,59 @@ const data = [
 
 const Faq: React.FC = () => {
   const [search, setSearch] = useState('');
-  const [searchStatus, setSearchStatus] = useState<InputStateTypes>('normal');
   const [openAnswer, setOpenAnswer] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [currentTab, setCurrentTab] = useState(0);
+  const [filteredData, setFilteredData] = useState(data);
 
-  const isSearching = search.trim() !== '';
+  const handleSearch = () => {
+    const trimmedSearch = search.trim().toLowerCase();
+    const result = trimmedSearch
+      ? data.filter(
+          (item) =>
+            item.title.toLowerCase().includes(trimmedSearch) ||
+            item.question.toLowerCase().includes(trimmedSearch)
+        )
+      : data;
 
-  const searchedData = data.filter(
-    (item) => item.title.includes(search) || item.question.includes(search)
-  );
+    if (result.length > 0) {
+      const firstCategory = result[0].category;
+      const tabIndex = tabs.indexOf(firstCategory);
+      setCurrentTab(tabIndex);
+    }
+    setFilteredData(result);
+    setCurrentPage(0);
+  };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-
-    if (e.target.value.length > 6) {
-      setSearchStatus('warn');
-    } else {
-      setSearchStatus('normal');
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
     }
   };
 
-  const tabFilteredData = isSearching
-    ? searchedData
-    : searchedData.filter((item) => item.category === tabs[currentTab]);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+  };
+
+  const tabFilteredData = filteredData.filter(
+    (item) => item.category === tabs[currentTab]
+  );
+
+  useEffect(() => {
+    if (!search.trim()) {
+      setCurrentTab(0);
+      setFilteredData(data.filter((item) => item.category === tabs[0]));
+    }
+  }, [search]);
+
+  useEffect(() => {
+    setFilteredData(data.filter((item) => item.category === tabs[currentTab]));
+  }, [currentTab]);
 
   const totalPage = Math.ceil(tabFilteredData.length / POSTS_PER_PAGE);
-
   const paginatedData = tabFilteredData.slice(
     currentPage * POSTS_PER_PAGE,
     (currentPage + 1) * POSTS_PER_PAGE
-  );
-
-  const answerRefs = useRef<Record<number, HTMLDivElement | null>>(
-    data.reduce((acc, item) => ({ ...acc, [item.id]: null }), {})
   );
 
   const toggleOpen = (id: number) =>
@@ -98,13 +115,13 @@ const Faq: React.FC = () => {
         <div css={searchStyle}>
           <TextInput
             value={search}
-            status={searchStatus}
             handleChange={handleChange}
             placeholder='검색어를 입력하세요'
             color='skyblue'
             iconNum='single'
+            handleKeyDown={handleKeyDown}
           />
-          <SearchOutlinedIcon css={searchIconStyle} />
+          <SearchOutlinedIcon onClick={handleSearch} css={searchIconStyle} />
         </div>
       </div>
 
@@ -112,7 +129,10 @@ const Faq: React.FC = () => {
         <TabButton
           tabs={tabs}
           currentTab={currentTab}
-          handleTabChange={setCurrentTab}
+          handleTabChange={(tabIndex) => {
+            setCurrentTab(tabIndex);
+            setCurrentPage(0);
+          }}
           shape='line'
         />
       </div>
@@ -138,10 +158,7 @@ const Faq: React.FC = () => {
                 css={arrowIconStyle(openAnswer === item.id)}
               />
             </div>
-            <div
-              ref={(el) => (answerRefs.current[item.id] = el)}
-              css={faqAnswerStyle(openAnswer === item.id)}
-            >
+            <div css={faqAnswerStyle(openAnswer === item.id)}>
               {item.answer.split('\n').map((line, idx) => (
                 <p key={idx}>{line}</p>
               ))}
