@@ -160,10 +160,7 @@ const Faq: React.FC = () => {
             </div>
             <div
               ref={(el) => (answerRefs.current[item.id] = el)}
-              css={faqAnswerStyle(
-                openAnswer === item.id,
-                contentHeights[item.id] || 0
-              )}
+              css={faqAnswerStyle(openAnswer === item.id)}
             >
               {item.answer.split('\n').map((line, idx) => (
                 <p key={idx}>{line}</p>
@@ -280,7 +277,7 @@ const faqTitleStyle = css`
   font-weight: ${FONT_WEIGHT.BOLD};
 `;
 
-const faqAnswerStyle = (isOpen: boolean, contentHeight: number) => css`
+const faqAnswerStyle = (isOpen: boolean) => css`
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -288,7 +285,6 @@ const faqAnswerStyle = (isOpen: boolean, contentHeight: number) => css`
   font-size: ${FONT_SIZE.TEXT_SM};
   font-weight: ${FONT_WEIGHT.REGULAR};
   color: ${COLOR.GRAY800};
-  max-height: ${isOpen ? `${contentHeight}px` : '0'};
   overflow: hidden;
   opacity: ${isOpen ? '1' : '0'};
   transform: ${isOpen ? 'translateY(0)' : 'translateY(-10px)'};
