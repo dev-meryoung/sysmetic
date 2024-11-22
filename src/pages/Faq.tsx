@@ -48,9 +48,6 @@ const Faq: React.FC = () => {
   const [search, setSearch] = useState('');
   const [searchStatus, setSearchStatus] = useState<InputStateTypes>('normal');
   const [openAnswer, setOpenAnswer] = useState<number | null>(null);
-  const [contentHeights, setContentHeights] = useState<Record<number, number>>(
-    {}
-  );
   const [currentPage, setCurrentPage] = useState(0);
   const [currentTab, setCurrentTab] = useState(0);
 
@@ -87,20 +84,6 @@ const Faq: React.FC = () => {
 
   const toggleOpen = (id: number) =>
     setOpenAnswer((prev) => (prev === id ? null : id));
-
-  const calculateHeights = () => {
-    const newHeights = Object.entries(answerRefs.current).reduce(
-      (acc, [id, ref]) => ({ ...acc, [id]: ref?.scrollHeight || 0 }),
-      {}
-    );
-    setContentHeights(newHeights);
-  };
-
-  useEffect(() => {
-    calculateHeights();
-    window.addEventListener('resize', calculateHeights);
-    return () => window.removeEventListener('resize', calculateHeights);
-  }, []);
 
   return (
     <div css={wrapperStyle}>
