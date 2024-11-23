@@ -1,30 +1,35 @@
 import { css } from '@emotion/react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useParams, useLocation } from 'react-router-dom';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 
-const SignupStepLayout = () => (
-  <div css={signUpStepLayoutWrapperStyle}>
-    <h1 className='title'>회원가입</h1>
-    <div className='step-inner-layout'>
-      <div css={signUpStepStyle}>
-        <div className='step1'>
-          <h2>STEP 1</h2>
-          <h3>약관동의</h3>
-        </div>
-        <div className='step2'>
-          <h2>STEP 2</h2>
-          <h3>정보입력</h3>
-        </div>
-        <div className='step3'>
-          <h2>STEP 3</h2>
-          <h3>가입완료</h3>
+const SignupStepLayout = () => {
+  const { type } = useParams();
+  const location = useLocation().pathname;
+
+  return (
+    <div css={signUpStepLayoutWrapperStyle}>
+      <h1 className='title'>회원가입</h1>
+      <div className='step-inner-layout'>
+        <div css={signUpStepStyle(location, type)}>
+          <div className='step1'>
+            <h2>STEP 1</h2>
+            <h3>약관동의</h3>
+          </div>
+          <div className='step2'>
+            <h2>STEP 2</h2>
+            <h3>정보입력</h3>
+          </div>
+          <div className='step3'>
+            <h2>STEP 3</h2>
+            <h3>가입완료</h3>
+          </div>
         </div>
       </div>
+      <Outlet />
     </div>
-    <Outlet />
-  </div>
-);
+  );
+};
 
 const signUpStepLayoutWrapperStyle = css`
   width: 100%;
@@ -51,7 +56,7 @@ const signUpStepLayoutWrapperStyle = css`
   }
 `;
 
-const signUpStepStyle = css`
+const signUpStepStyle = (location: string, type: string | undefined) => css`
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
@@ -80,6 +85,22 @@ const signUpStepStyle = css`
       font-weight: ${FONT_WEIGHT.BOLD};
       letter-spacing: -0.48px;
     }
+  }
+
+  .step1 {
+    background-color: ${location === `/signup/step/${type}`
+      ? COLOR.PRIMARY
+      : COLOR.GRAY};
+  }
+  .step2 {
+    background-color: ${location === `/signup/step/${type}/form`
+      ? COLOR.PRIMARY
+      : COLOR.GRAY};
+  }
+  .step3 {
+    background-color: ${location === `/signup/step/${type}/done`
+      ? COLOR.PRIMARY
+      : COLOR.GRAY};
   }
 `;
 
