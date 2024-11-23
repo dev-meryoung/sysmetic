@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { css } from '@emotion/react';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE } from '@/constants/font';
@@ -34,7 +34,7 @@ const RangeSlider = ({
     return Math.round(value / step) * step;
   };
 
-  const handleMouseDown = (event: React.MouseEvent, type: 'min' | 'max') => {
+  const handleMouseDown = (type: 'min' | 'max') => {
     setIsDragging(type);
   };
 
@@ -106,7 +106,7 @@ const RangeSlider = ({
       style={{
         left: `${position}%`,
       }}
-      onMouseDown={(e) => handleMouseDown(e, type)}
+      onMouseDown={() => handleMouseDown(type)}
     >
       <div css={innerThumbStyle} />
       <div css={tooltipStyle}>{value}%</div>
