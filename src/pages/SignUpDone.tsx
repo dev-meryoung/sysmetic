@@ -1,36 +1,45 @@
 import { css } from '@emotion/react';
+import { useNavigate } from 'react-router-dom';
 import profileImg from '@/assets/images/default-profile.png';
 import Button from '@/components/Button';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
+import { PATH } from '@/constants/path';
+const SignUpDone = () => {
+  const navigate = useNavigate();
 
-const SignUpDone = () => (
-  <div css={wrapperStyle}>
-    <div css={profileDivStyle}>
-      <img src={profileImg} alt='my-profile' />
+  const handleMainBtnClick = () => {
+    navigate(PATH.ROOT);
+  };
+
+  const handleLoginBtnClick = () => {
+    navigate(PATH.SIGN_IN);
+  };
+
+  return (
+    <div css={wrapperStyle}>
+      <div css={profileDivStyle}>
+        <img src={profileImg} alt='my-profile' />
+      </div>
+      <div css={contentsDivStyle}>
+        <h2>축하합니다. Sysmetic 회원가입이 완료되었습니다!</h2>
+        <p>
+          Sysmetic과 함께 투자하는 전략들을 만나보세요. <br />
+          좋은 전략을 Follow 하고, 문의하기를 통해 직접 트레이더에게 문의하실 수
+          있습니다.
+        </p>
+      </div>
+      <div css={buttonDivStyle}>
+        <Button
+          border={true}
+          width={120}
+          label='메인가기'
+          handleClick={handleMainBtnClick}
+        />
+        <Button width={120} label='로그인' handleClick={handleLoginBtnClick} />
+      </div>
     </div>
-    <div css={contentsDivStyle}>
-      <h2>축하합니다. Sysmetic 회원가입이 완료되었습니다!</h2>
-      <p>
-        Sysmetic과 함께 투자하는 전략들을 만나보세요. <br />
-        좋은 전략을 Follow 하고, 문의하기를 통해 직접 트레이더에게 문의하실 수
-        있습니다.
-      </p>
-    </div>
-    <div css={buttonDivStyle}>
-      <Button
-        border={true}
-        width={120}
-        label='메인가기'
-        handleClick={() => console.log('메인가기')}
-      />
-      <Button
-        width={120}
-        label='로그인'
-        handleClick={() => console.log('로그인')}
-      />
-    </div>
-  </div>
-);
+  );
+};
 
 const wrapperStyle = css`
   width: 100%;

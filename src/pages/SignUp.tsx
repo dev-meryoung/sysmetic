@@ -1,46 +1,60 @@
 import { css } from '@emotion/react';
+import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
+import { PATH } from '@/constants/path';
 
-const SignUp = () => (
-  <div css={wrapperStyle}>
-    <h1 css={titleStyle}>회원가입</h1>
-    <div css={contentsDivStyle}>
-      <h2>
-        <span>시스메틱</span>에 오신 것을 환영합니다.
-      </h2>
-      <p>
-        시스메틱 홈페이지의 회원이 되시면 전략탐색, 전략등록 등 다양한 서비스를
-        이용하실 수 있습니다.
-      </p>
-      <p>투자자로 가입 시, 관심있는 전략만 별도로 관리할 수 있습니다.</p>
-      <p>트레이더로 가입 시, 자신의 전략을 저장하고 공유할 수 있습니다.</p>
+const SignUp = () => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(PATH.SIGN_UP_TYPE('investor'));
+  };
+
+  const handleTraderClick = () => {
+    navigate(PATH.SIGN_UP_TYPE('trader'));
+  };
+
+  return (
+    <div css={wrapperStyle}>
+      <h1 css={titleStyle}>회원가입</h1>
+      <div css={contentsDivStyle}>
+        <h2>
+          <span>시스메틱</span>에 오신 것을 환영합니다.
+        </h2>
+        <p>
+          시스메틱 홈페이지의 회원이 되시면 전략탐색, 전략등록 등 다양한
+          서비스를 이용하실 수 있습니다.
+        </p>
+        <p>투자자로 가입 시, 관심있는 전략만 별도로 관리할 수 있습니다.</p>
+        <p>트레이더로 가입 시, 자신의 전략을 저장하고 공유할 수 있습니다.</p>
+      </div>
+      <div css={buttonDivStyle}>
+        <Button
+          size='xl'
+          fontWeight={700}
+          fontSize='32px'
+          width={580}
+          label='투자자 가입'
+          handleClick={handleClick}
+        />
+        <Button
+          size='xl'
+          fontWeight={700}
+          fontSize='32px'
+          width={580}
+          color='primary700'
+          label='트레이더 가입'
+          handleClick={handleTraderClick}
+        />
+      </div>
+      <div css={alertDivStyle}>
+        <p>* 일반회원은 투자자로 가입하시면 됩니다.</p>
+      </div>
     </div>
-    <div css={buttonDivStyle}>
-      <Button
-        size='xl'
-        fontWeight={700}
-        fontSize='32px'
-        width={580}
-        label='투자자 가입'
-        handleClick={() => console.log('투자자')}
-      />
-      <Button
-        size='xl'
-        fontWeight={700}
-        fontSize='32px'
-        width={580}
-        color='primary700'
-        label='트레이더 가입'
-        handleClick={() => console.log('트레이더')}
-      />
-    </div>
-    <div css={alertDivStyle}>
-      <p>* 일반회원은 투자자로 가입하시면 됩니다.</p>
-    </div>
-  </div>
-);
+  );
+};
 
 const wrapperStyle = css`
   position: relative;

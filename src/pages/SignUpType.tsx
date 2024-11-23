@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { css } from '@emotion/react';
+import { useNavigate, useParams } from 'react-router-dom';
 import Button from '@/components/Button';
 import RadioButton from '@/components/RadioButton';
-import { COLOR, COLOR_OPACITY } from '@/constants/color';
-import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
+import { COLOR_OPACITY } from '@/constants/color';
+import { PATH } from '@/constants/path';
 
 export interface ContentProps {
   id: number;
@@ -29,6 +30,16 @@ const SignUpType = () => {
   const [isServiceChecked, setIsServiceChecked] = useState('false');
   const [isPersonalChecked, setIsPersonalChecked] = useState('false');
   const [isThirdChecked, setIsThirdChecked] = useState('false');
+  const { type } = useParams();
+  const navigate = useNavigate();
+
+  const handleBackBtnClick = () => {
+    navigate(PATH.SIGN_UP);
+  };
+
+  const handleNextBtnClick = () => {
+    navigate(PATH.SIGN_UP_FORM(type));
+  };
 
   return (
     <div css={wrapperStyle}>
@@ -90,13 +101,9 @@ const SignUpType = () => {
           width={120}
           border={true}
           label='이전'
-          handleClick={() => console.log('이전')}
+          handleClick={handleBackBtnClick}
         />
-        <Button
-          width={120}
-          label='다음'
-          handleClick={() => console.log('다음')}
-        />
+        <Button width={120} label='다음' handleClick={handleNextBtnClick} />
       </div>
     </div>
   );

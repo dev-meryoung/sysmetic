@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
+import { useNavigate, useParams } from 'react-router-dom';
 import profileImg from '@/assets/images/default-profile.png';
 import Button from '@/components/Button';
 import RadioButton from '@/components/RadioButton';
@@ -7,6 +8,7 @@ import SelectBox from '@/components/SelectBox';
 import TextInput from '@/components/TextInput';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
+import { PATH } from '@/constants/path';
 
 const RadioOption1 = [
   { label: '관심 전략과 정보 수신에 동의합니다.', value: 'true' },
@@ -28,6 +30,7 @@ const EmailOptions = [
 ];
 
 const SignUpForm = () => {
+  // 입력 폼
   const [id, setId] = useState('');
   const [pw, setPw] = useState('');
   const [checkPw, setCheckPw] = useState('');
@@ -37,9 +40,20 @@ const SignUpForm = () => {
   const [selectedEmail, setSelectedEmail] = useState('');
   const [isFirstChecked, setIsFirstChecked] = useState('false');
   const [isSecondChecked, setIsSecondChecked] = useState('false');
+  // 라우팅 관련
+  const { type } = useParams();
+  const navigate = useNavigate();
 
   const handleEmailChange = (value: string) => {
     setSelectedEmail(value);
+  };
+
+  const handleBackBtnClick = () => {
+    navigate(PATH.SIGN_UP_TYPE(type));
+  };
+
+  const handleNextBtnClick = () => {
+    navigate(PATH.SIGN_UP_DONE(type));
   };
 
   useEffect(() => {
@@ -157,13 +171,9 @@ const SignUpForm = () => {
           border={true}
           width={120}
           label='이전'
-          handleClick={() => console.log('이전')}
+          handleClick={handleBackBtnClick}
         />
-        <Button
-          width={120}
-          label='다음'
-          handleClick={() => console.log('다음')}
-        />
+        <Button width={120} label='다음' handleClick={handleNextBtnClick} />
       </div>
     </div>
   );
