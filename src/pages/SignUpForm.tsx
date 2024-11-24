@@ -8,6 +8,7 @@ import IconButton from '@/components/IconButton';
 import ProfileImage from '@/components/ProfileImage';
 import RadioButton from '@/components/RadioButton';
 import SelectBox from '@/components/SelectBox';
+import Dot from '@/components/signup/Dot';
 import TextInput from '@/components/TextInput';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
@@ -99,7 +100,10 @@ const SignUpForm = () => {
       <div css={subTitleStyle}>정보입력</div>
       <div css={formDivStyle}>
         <div className='email-form'>
-          <p>이메일</p>
+          <p>
+            이메일
+            <Dot />
+          </p>
           <div>
             <TextInput
               width={160}
@@ -128,7 +132,10 @@ const SignUpForm = () => {
           <p>support message</p>
         </div>
         <div className='input-form'>
-          <p>비밀번호</p>
+          <p>
+            비밀번호
+            <Dot />
+          </p>
           <TextInput
             type='password'
             value={pw}
@@ -137,7 +144,10 @@ const SignUpForm = () => {
           <p>support message</p>
         </div>
         <div className='input-form'>
-          <p>비밀번호 확인</p>
+          <p>
+            비밀번호 확인
+            <Dot />
+          </p>
           <div className='check-pw'>
             <TextInput
               type='password'
@@ -153,7 +163,10 @@ const SignUpForm = () => {
           <p>support message</p>
         </div>
         <div className='input-form'>
-          <p>닉네임</p>
+          <p>
+            닉네임
+            <Dot />
+          </p>
           <TextInput
             value={nickname}
             handleChange={(e) => setNickname(e.target.value)}
@@ -161,7 +174,10 @@ const SignUpForm = () => {
           <p>support message</p>
         </div>
         <div className='input-form'>
-          <p>이름</p>
+          <p>
+            이름
+            <Dot />
+          </p>
           <TextInput
             value={name}
             handleChange={(e) => setName(e.target.value)}
@@ -169,12 +185,18 @@ const SignUpForm = () => {
           <p>support message</p>
         </div>
         <div className='input-form'>
-          <p>생년월일</p>
+          <p>
+            생년월일
+            <Dot />
+          </p>
           <Calendar type='date' dateProps={{ date, setDate }} />
           <p>support message</p>
         </div>
         <div className='input-form'>
-          <p>휴대번호</p>
+          <p>
+            휴대번호
+            <Dot />
+          </p>
           <TextInput
             type='tel'
             value={phoneNum}

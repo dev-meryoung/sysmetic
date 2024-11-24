@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { css } from '@emotion/react';
 import { useNavigate, useParams } from 'react-router-dom';
-import Terms from '@/components/admin/Terms';
-import TermsCommon from '@/components/admin/TermsCommon';
 import Button from '@/components/Button';
 import RadioButton from '@/components/RadioButton';
+import Terms from '@/components/signup/Terms';
+import TermsCommon from '@/components/signup/TermsCommon';
 import { COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE } from '@/constants/font';
 import { PATH } from '@/constants/path';
