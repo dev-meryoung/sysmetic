@@ -3,6 +3,7 @@ import { css } from '@emotion/react';
 import { useNavigate, useParams } from 'react-router-dom';
 import profileImg from '@/assets/images/default-profile.png';
 import Button from '@/components/Button';
+import Calendar from '@/components/Calendar';
 import RadioButton from '@/components/RadioButton';
 import SelectBox from '@/components/SelectBox';
 import TextInput from '@/components/TextInput';
@@ -40,6 +41,7 @@ const SignUpForm = () => {
   const [selectedEmail, setSelectedEmail] = useState('');
   const [isFirstChecked, setIsFirstChecked] = useState('false');
   const [isSecondChecked, setIsSecondChecked] = useState('false');
+  const [date, setDate] = useState('');
   // 라우팅 관련
   const { type } = useParams();
   const navigate = useNavigate();
@@ -132,6 +134,11 @@ const SignUpForm = () => {
             value={name}
             handleChange={(e) => setName(e.target.value)}
           />
+          <p>support message</p>
+        </div>
+        <div className='input-form'>
+          <p>생년월일</p>
+          <Calendar type='date' dateProps={{ date, setDate }} />
           <p>support message</p>
         </div>
         <div className='input-form'>
