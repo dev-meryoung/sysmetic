@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { css } from '@emotion/react';
 import { useNavigate, useParams } from 'react-router-dom';
+import Terms from '@/components/admin/Terms';
+import TermsCommon from '@/components/admin/TermsCommon';
 import Button from '@/components/Button';
 import RadioButton from '@/components/RadioButton';
 import { COLOR_OPACITY } from '@/constants/color';
+import { FONT_SIZE } from '@/constants/font';
 import { PATH } from '@/constants/path';
 
 export interface ContentProps {
@@ -21,15 +24,11 @@ const PersonalOptions = [
   { label: '동의합니다.', value: 'true' },
   { label: '동의하지 않습니다.', value: 'false' },
 ];
-const ThirdOptions = [
-  { label: '동의합니다.', value: 'true' },
-  { label: '동의하지 않습니다.', value: 'false' },
-];
 
 const SignUpType = () => {
   const [isServiceChecked, setIsServiceChecked] = useState('false');
   const [isPersonalChecked, setIsPersonalChecked] = useState('false');
-  const [isThirdChecked, setIsThirdChecked] = useState('false');
+
   const { type } = useParams();
   const navigate = useNavigate();
 
@@ -46,11 +45,7 @@ const SignUpType = () => {
       <div css={contentsDivStyle}>
         <div className='terms-and-conditions'>
           <h6>홈페이지 이용약관</h6>
-          <div className='content-box'>
-            <p>
-              가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하
-            </p>
-          </div>
+          <Terms type={type} />
           <div className='agreement'>
             <p>홈페이지 회원 서비스 이용약관에 동의하십니까?</p>
             <RadioButton
@@ -63,11 +58,7 @@ const SignUpType = () => {
         </div>
         <div className='terms-and-conditions'>
           <h6>개인정보 취급방침</h6>
-          <div className='content-box'>
-            <p>
-              가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하
-            </p>
-          </div>
+          <TermsCommon />
           <div className='agreement'>
             <p>개인정보 취급방침에 동의하십니까?</p>
             <RadioButton
@@ -75,23 +66,6 @@ const SignUpType = () => {
               name='personal'
               selected={isPersonalChecked}
               handleChange={setIsPersonalChecked}
-            />
-          </div>
-        </div>
-        <div className='terms-and-conditions'>
-          <h6>제 3자 정보제공</h6>
-          <div className='content-box'>
-            <p>
-              가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하
-            </p>
-          </div>
-          <div className='agreement'>
-            <p>제 3자 정보제공에 동의하십니까?</p>
-            <RadioButton
-              options={ThirdOptions}
-              name='third'
-              selected={isThirdChecked}
-              handleChange={setIsThirdChecked}
             />
           </div>
         </div>
@@ -129,8 +103,11 @@ const contentsDivStyle = css`
     margin-bottom: 80px;
 
     h6 {
-      letter-spacing: -0.4px;
       margin-bottom: 16px;
+    }
+    div > h6 {
+      font-size: ${FONT_SIZE.TEXT_MD};
+      letter-spacing: -0.4px;
     }
 
     .content-box {
@@ -138,12 +115,15 @@ const contentsDivStyle = css`
       padding: 24px;
       border: 1px solid ${COLOR_OPACITY.PRIMARY_OPACITY10};
       border-radius: 4px;
+      overflow: auto;
+      line-height: 160%;
 
       p {
-        height: 192px;
-        overflow: auto;
-        letter-spacing: -0.32px;
-        line-height: 160%;
+        margin-bottom: 16px;
+        tab-size: 4;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
       }
     }
   }
