@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
+import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
 import { useNavigate, useParams } from 'react-router-dom';
-import profileImg from '@/assets/images/default-profile.png';
 import Button from '@/components/Button';
 import Calendar from '@/components/Calendar';
+import IconButton from '@/components/IconButton';
+import ProfileImage from '@/components/ProfileImage';
 import RadioButton from '@/components/RadioButton';
 import SelectBox from '@/components/SelectBox';
 import TextInput from '@/components/TextInput';
@@ -152,7 +154,17 @@ const SignUpForm = () => {
         </div>
         <div className='img-form'>
           <p>프로필 이미지 설정</p>
-          <img src={profileImg} alt='profile-img' />
+          <div>
+            <ProfileImage size='xxl' />
+            <IconButton
+              color='realGray'
+              shape='round'
+              iconBgSize='lg'
+              IconComponent={CameraAltOutlinedIcon}
+              handleClick={() => console.log('프로필')}
+              css={iconStyle}
+            />
+          </div>
         </div>
       </div>
       <div css={subTitleStyle}>
@@ -265,12 +277,10 @@ const formDivStyle = css`
     flex-direction: column;
     gap: 16px;
 
-    img {
+    div {
+      position: relative;
       width: 120px;
       height: 120px;
-      border-radius: 300px;
-      overflow: hidden;
-      background: lightgray 50% / cover no-repeat;
     }
   }
 `;
@@ -288,6 +298,12 @@ const buttonDivStyle = css`
   display: flex;
   margin: 80px auto 96px;
   gap: 16px;
+`;
+
+const iconStyle = css`
+  position: absolute;
+  right: 0;
+  bottom: 0;
 `;
 
 export default SignUpForm;
