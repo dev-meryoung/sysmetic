@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, ChangeEvent } from 'react';
 import { css } from '@emotion/react';
 import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -40,6 +40,7 @@ const SignUpForm = () => {
   const [nickname, setNickname] = useState('');
   const [name, setName] = useState('');
   const [phoneNum, setPhoneNum] = useState('');
+  const [profileImg, setProfileImg] = useState('');
   const [selectedEmail, setSelectedEmail] = useState('');
   const [isFirstChecked, setIsFirstChecked] = useState('false');
   const [isSecondChecked, setIsSecondChecked] = useState('false');
@@ -47,6 +48,35 @@ const SignUpForm = () => {
   // 라우팅 관련
   const { type } = useParams();
   const navigate = useNavigate();
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (reader.result) {
+          setProfileImg(reader.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // 파일 탐색기 열기
+  const handleOpenFileExplorer = () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+
+    fileInput.addEventListener('change', (e: Event) => {
+      const input = e.target as HTMLInputElement;
+      handleFileChange({
+        target: input,
+      } as ChangeEvent<HTMLInputElement>);
+    });
+
+    fileInput.click();
+  };
 
   const handleEmailChange = (value: string) => {
     setSelectedEmail(value);
@@ -155,13 +185,13 @@ const SignUpForm = () => {
         <div className='img-form'>
           <p>프로필 이미지 설정</p>
           <div>
-            <ProfileImage size='xxl' />
+            <ProfileImage size='xxl' alt='profile' src={profileImg} />
             <IconButton
               color='realGray'
               shape='round'
               iconBgSize='lg'
               IconComponent={CameraAltOutlinedIcon}
-              handleClick={() => console.log('프로필')}
+              handleClick={handleOpenFileExplorer}
               css={iconStyle}
             />
           </div>
