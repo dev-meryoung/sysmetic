@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { css } from '@emotion/react';
 import { Outlet, useParams, useLocation } from 'react-router-dom';
 import { COLOR } from '@/constants/color';
@@ -6,6 +7,10 @@ import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 const SignupStepLayout = () => {
   const { type } = useParams();
   const location = useLocation().pathname;
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
 
   return (
     <div css={signUpStepLayoutWrapperStyle}>
