@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Button from '@/components/Button';
@@ -28,6 +28,7 @@ const PersonalOptions = [
 const SignUpType = () => {
   const [isServiceChecked, setIsServiceChecked] = useState('false');
   const [isPersonalChecked, setIsPersonalChecked] = useState('false');
+  const [isDisabled, setIsDisabled] = useState(false);
 
   const { type } = useParams();
   const navigate = useNavigate();
@@ -39,6 +40,12 @@ const SignUpType = () => {
   const handleNextBtnClick = () => {
     navigate(PATH.SIGN_UP_FORM(type));
   };
+
+  useEffect(() => {
+    setIsDisabled(
+      !(isServiceChecked === 'true' && isPersonalChecked === 'true')
+    );
+  }, [isServiceChecked, isPersonalChecked]);
 
   return (
     <div css={wrapperStyle}>
@@ -77,7 +84,12 @@ const SignUpType = () => {
           label='이전'
           handleClick={handleBackBtnClick}
         />
-        <Button width={120} label='다음' handleClick={handleNextBtnClick} />
+        <Button
+          width={120}
+          label='다음'
+          handleClick={handleNextBtnClick}
+          disabled={isDisabled}
+        />
       </div>
     </div>
   );
@@ -111,7 +123,7 @@ const contentsDivStyle = css`
     }
 
     .content-box {
-      height: 240px;
+      height: 400px;
       padding: 24px;
       border: 1px solid ${COLOR_OPACITY.PRIMARY_OPACITY10};
       border-radius: 4px;

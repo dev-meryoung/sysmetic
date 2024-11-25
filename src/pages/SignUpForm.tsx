@@ -50,14 +50,17 @@ const SignUpForm = () => {
   const [name, setName] = useState('');
   const [phoneNum, setPhoneNum] = useState('');
   const [profileImg, setProfileImg] = useState('');
+  const [date, setDate] = useState('');
   const [selectedEmail, setSelectedEmail] = useState('');
+  //정보수신 동의
   const [isFirstChecked, setIsFirstChecked] = useState('false');
   const [isSecondChecked, setIsSecondChecked] = useState('false');
-  const [date, setDate] = useState('');
+  const [isDisabled, setIsDisabled] = useState(true);
   // 라우팅 관련
   const { type } = useParams();
   const navigate = useNavigate();
 
+  //status 관련 (인풋창 border 색상)
   const [idStatus, setIdStatus] = useState<InputStateTypes>('normal');
   const [pwStatus, setPwStatus] = useState<InputStateTypes>('normal');
   const [checkPwStatus, setCheckPwStatus] = useState<InputStateTypes>('normal');
@@ -112,7 +115,7 @@ const SignUpForm = () => {
     setId(e.target.value);
 
     if (REGEX.ID_REGEX.test(e.target.value)) {
-      setIdStatus('normal');
+      setIdStatus('pass');
     } else {
       setIdStatus('warn');
     }
@@ -122,7 +125,7 @@ const SignUpForm = () => {
     setPw(e.target.value);
 
     if (REGEX.PW_REGEX.test(e.target.value)) {
-      setPwStatus('normal');
+      setPwStatus('pass');
     } else {
       setPwStatus('warn');
     }
@@ -131,8 +134,8 @@ const SignUpForm = () => {
   const handleCheckPwInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setCheckPw(e.target.value);
 
-    if (REGEX.PW_REGEX.test(e.target.value)) {
-      setCheckPwStatus('normal');
+    if (e.target.value === pw) {
+      setCheckPwStatus('pass');
     } else {
       setCheckPwStatus('warn');
     }
@@ -142,7 +145,7 @@ const SignUpForm = () => {
     setNickname(e.target.value);
 
     if (REGEX.NICKNAME_REGEX.test(e.target.value)) {
-      setNicknameStatus('normal');
+      setNicknameStatus('pass');
     } else {
       setNicknameStatus('warn');
     }
@@ -152,7 +155,7 @@ const SignUpForm = () => {
     setName(e.target.value);
 
     if (REGEX.NAME_REGEX.test(e.target.value)) {
-      setNameStatus('normal');
+      setNameStatus('pass');
     } else {
       setNameStatus('warn');
     }
@@ -162,7 +165,7 @@ const SignUpForm = () => {
     setPhoneNum(e.target.value);
 
     if (REGEX.PHONE_REGEX.test(e.target.value)) {
-      setPhoneNumStatus('normal');
+      setPhoneNumStatus('pass');
     } else {
       setPhoneNumStatus('warn');
     }
@@ -171,6 +174,30 @@ const SignUpForm = () => {
   useEffect(() => {
     console.log(selectedEmail);
   }, [selectedEmail]);
+
+  useEffect(() => {
+    setIsDisabled(
+      !(
+        isFirstChecked === 'true' &&
+        isSecondChecked === 'true' &&
+        idStatus === 'pass' &&
+        pwStatus === 'pass' &&
+        checkPwStatus === 'pass' &&
+        nicknameStatus === 'pass' &&
+        nameStatus === 'pass' &&
+        phoneNumStatus === 'pass'
+      )
+    );
+  }, [
+    isFirstChecked,
+    isSecondChecked,
+    idStatus,
+    pwStatus,
+    checkPwStatus,
+    nicknameStatus,
+    nameStatus,
+    phoneNumStatus,
+  ]);
 
   return (
     <div css={wrapperStyle}>
@@ -207,7 +234,7 @@ const SignUpForm = () => {
               />
             </div>
           </div>
-          {idStatus !== 'normal' ? (
+          {idStatus !== 'pass' ? (
             <p>영문, 숫자, 특수문자 중 1개 이상 조합하여 사용</p>
           ) : (
             <></>
@@ -224,7 +251,7 @@ const SignUpForm = () => {
             value={pw}
             handleChange={handlePwInputChange}
           />
-          {pwStatus !== 'normal' ? (
+          {pwStatus !== 'pass' ? (
             <p>6~20자의 영문, 숫자, 특수문자를 모두 조합하여 사용</p>
           ) : (
             <></>
@@ -260,7 +287,7 @@ const SignUpForm = () => {
               handleClick={() => console.log('중복확인')}
             />
           </div>
-          {nicknameStatus !== 'normal' ? (
+          {nicknameStatus !== 'pass' ? (
             <p>3~10자의 한글, 숫자 중 1개 이상 조합하여 사용</p>
           ) : (
             <></>
@@ -276,11 +303,7 @@ const SignUpForm = () => {
             value={name}
             handleChange={handleNameInputChange}
           />
-          {nameStatus !== 'normal' ? (
-            <p>1~10자의 한글만 조합하여 사용</p>
-          ) : (
-            <></>
-          )}
+          {nameStatus !== 'pass' ? <p>1~10자의 한글만 조합하여 사용</p> : <></>}
         </div>
         <div className='input-form'>
           <p>
@@ -301,8 +324,8 @@ const SignUpForm = () => {
             value={phoneNum}
             handleChange={handlePhoneInputChange}
           />
-          {phoneNumStatus !== 'normal' ? (
-            <p>'-' 제외, 11자의 숫자만 조합하여 사용</p>
+          {phoneNumStatus !== 'pass' ? (
+            <p>010으로 시작하는 11자의 숫자만 조합하여 사용('-' 제외)</p>
           ) : (
             <></>
           )}
@@ -347,7 +370,12 @@ const SignUpForm = () => {
           label='이전'
           handleClick={handleBackBtnClick}
         />
-        <Button width={120} label='다음' handleClick={handleNextBtnClick} />
+        <Button
+          width={120}
+          label='가입 완료'
+          handleClick={handleNextBtnClick}
+          disabled={isDisabled}
+        />
       </div>
     </div>
   );
