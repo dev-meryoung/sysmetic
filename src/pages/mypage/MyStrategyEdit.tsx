@@ -53,26 +53,28 @@ const MyStrategyEdit = () => {
           </div>
           <div className='form-item'>
             <span>운용 종목</span>
-            <Checkbox
-              checked={true}
-              handleChange={() => {}}
-              label='해외 주식'
-            />
-            <Checkbox
-              checked={true}
-              handleChange={() => {}}
-              label='해외 주식'
-            />
-            <Checkbox
-              checked={true}
-              handleChange={() => {}}
-              label='해외 주식'
-            />
-            <Checkbox
-              checked={true}
-              handleChange={() => {}}
-              label='해외 주식'
-            />
+            <div className='options'>
+              <Checkbox
+                checked={true}
+                handleChange={() => {}}
+                label='해외 주식'
+              />
+              <Checkbox
+                checked={true}
+                handleChange={() => {}}
+                label='해외 주식'
+              />
+              <Checkbox
+                checked={true}
+                handleChange={() => {}}
+                label='해외 주식'
+              />
+              <Checkbox
+                checked={true}
+                handleChange={() => {}}
+                label='해외 주식'
+              />
+            </div>
           </div>
           <div className='form-item form-item-top'>
             <span>
@@ -394,14 +396,20 @@ const formBoxStyle = css`
       padding: 16px 0;
       border-bottom: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
 
-      span {
+      span:first-child {
         width: 84px;
         font-weight: ${FONT_WEIGHT.BOLD};
+        line-height: 24px;
 
         .explain-text {
           font-size: ${FONT_SIZE.TEXT_SM};
           font-weight: ${FONT_WEIGHT.REGULAR};
         }
+      }
+
+      .options {
+        display: flex;
+        gap: 8px;
       }
 
       .file-box {
