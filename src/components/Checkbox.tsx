@@ -30,15 +30,20 @@ const Checkbox: React.FC<CheckboxProps> = ({
     <div css={checkboxWrapperStyle(size)}>
       <div css={checkboxBgStyle(size, disabled)} onClick={handleClick}>
         <div css={checkboxStyle(disabled)}>
-          {checked ? (
+          {checked || disabled ? (
             <CheckBoxIcon
               sx={{
                 color: COLOR.WHITE,
                 fill: COLOR.PRIMARY,
               }}
+              className='blank'
             />
           ) : (
-            <CheckBoxOutlineBlankIcon className='blank' />
+            <CheckBoxOutlineBlankIcon
+              sx={{
+                fill: COLOR.BLACK,
+              }}
+            />
           )}
         </div>
       </div>
@@ -65,7 +70,7 @@ const checkboxStyle = (disabled: boolean) => css`
   position: relative;
   width: 15px;
   height: 15px;
-  background-color: ${disabled === true ? COLOR.GRAY600 : COLOR.WHITE};
+  background-color: ${disabled === true ? '' : COLOR.WHITE};
 
   svg {
     display: flex;
@@ -75,7 +80,7 @@ const checkboxStyle = (disabled: boolean) => css`
   }
 
   .blank {
-    fill: ${disabled === true ? COLOR.GRAY600 : COLOR.BLACK};
+    fill: ${disabled === true ? COLOR.GRAY600 : COLOR.PRIMARY};
   }
 `;
 
