@@ -69,6 +69,7 @@ const tabBtnStyle = css`
   color: ${COLOR.GRAY700};
   width: 90px;
   height: 48px;
+  font-family: inherit;
   font-size: ${FONT_SIZE.TEXT_SM};
   font-weight: ${FONT_WEIGHT.MEDIUM};
   border: 0;
@@ -77,7 +78,7 @@ const tabBtnStyle = css`
     cursor: pointer;
   }
 
-  &.block {
+  &.square {
     background-color: ${COLOR.GRAY200};
     border-radius: 4px 4px 0px 0px;
     border-top: 1px solid ${COLOR.GRAY200};
