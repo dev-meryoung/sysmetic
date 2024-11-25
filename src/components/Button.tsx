@@ -59,7 +59,7 @@ const buttonColors: Record<ButtonColorTypes, ButtonColors> = {
   },
   textBlack: {
     color: COLOR.TEXT_BLACK,
-    hoverColor: COLOR.PRIMARY800,
+    hoverColor: COLOR.GRAY800,
     disabledColor: COLOR.GRAY600,
   },
   //nav 텍스트
