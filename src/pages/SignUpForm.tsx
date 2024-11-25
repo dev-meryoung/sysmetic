@@ -9,7 +9,7 @@ import ProfileImage from '@/components/ProfileImage';
 import RadioButton from '@/components/RadioButton';
 import SelectBox from '@/components/SelectBox';
 import Dot from '@/components/signup/Dot';
-import TextInput from '@/components/TextInput';
+import TextInput, { InputStateTypes } from '@/components/TextInput';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
@@ -33,6 +33,14 @@ const EmailOptions = [
   { label: 'empal.com', value: 'empal' },
 ];
 
+const REGEX = {
+  ID_REGEX: /^[a-zA-Z\d\W_]+$/,
+  PW_REGEX: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,20}$/,
+  NAME_REGEX: /^[가-힣]{1,10}$/,
+  NICKNAME_REGEX: /^[가-힣\d]{3,10}$/,
+  PHONE_REGEX: /^010\d{8}$/,
+};
+
 const SignUpForm = () => {
   // 입력 폼
   const [id, setId] = useState('');
@@ -49,6 +57,15 @@ const SignUpForm = () => {
   // 라우팅 관련
   const { type } = useParams();
   const navigate = useNavigate();
+
+  const [idStatus, setIdStatus] = useState<InputStateTypes>('normal');
+  const [pwStatus, setPwStatus] = useState<InputStateTypes>('normal');
+  const [checkPwStatus, setCheckPwStatus] = useState<InputStateTypes>('normal');
+  const [nicknameStatus, setNicknameStatus] =
+    useState<InputStateTypes>('normal');
+  const [nameStatus, setNameStatus] = useState<InputStateTypes>('normal');
+  const [phoneNumStatus, setPhoneNumStatus] =
+    useState<InputStateTypes>('normal');
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -91,6 +108,66 @@ const SignUpForm = () => {
     navigate(PATH.SIGN_UP_DONE(type));
   };
 
+  const handleIdInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setId(e.target.value);
+
+    if (REGEX.ID_REGEX.test(e.target.value)) {
+      setIdStatus('normal');
+    } else {
+      setIdStatus('warn');
+    }
+  };
+
+  const handlePwInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setPw(e.target.value);
+
+    if (REGEX.PW_REGEX.test(e.target.value)) {
+      setPwStatus('normal');
+    } else {
+      setPwStatus('warn');
+    }
+  };
+
+  const handleCheckPwInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setCheckPw(e.target.value);
+
+    if (REGEX.PW_REGEX.test(e.target.value)) {
+      setCheckPwStatus('normal');
+    } else {
+      setCheckPwStatus('warn');
+    }
+  };
+
+  const handleNicknameInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setNickname(e.target.value);
+
+    if (REGEX.NICKNAME_REGEX.test(e.target.value)) {
+      setNicknameStatus('normal');
+    } else {
+      setNicknameStatus('warn');
+    }
+  };
+
+  const handleNameInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setName(e.target.value);
+
+    if (REGEX.NAME_REGEX.test(e.target.value)) {
+      setNameStatus('normal');
+    } else {
+      setNameStatus('warn');
+    }
+  };
+
+  const handlePhoneInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setPhoneNum(e.target.value);
+
+    if (REGEX.PHONE_REGEX.test(e.target.value)) {
+      setPhoneNumStatus('normal');
+    } else {
+      setPhoneNumStatus('warn');
+    }
+  };
+
   useEffect(() => {
     console.log(selectedEmail);
   }, [selectedEmail]);
@@ -106,9 +183,10 @@ const SignUpForm = () => {
           </p>
           <div>
             <TextInput
+              status={idStatus}
               width={160}
               value={id}
-              handleChange={(e) => setId(e.target.value)}
+              handleChange={handleIdInputChange}
             />
             <span>@</span>
             <SelectBox
@@ -129,7 +207,11 @@ const SignUpForm = () => {
               />
             </div>
           </div>
-          <p>support message</p>
+          {idStatus !== 'normal' ? (
+            <p>영문, 숫자, 특수문자 중 1개 이상 조합하여 사용</p>
+          ) : (
+            <></>
+          )}
         </div>
         <div className='input-form'>
           <p>
@@ -137,22 +219,40 @@ const SignUpForm = () => {
             <Dot />
           </p>
           <TextInput
+            status={pwStatus}
             type='password'
             value={pw}
-            handleChange={(e) => setPw(e.target.value)}
+            handleChange={handlePwInputChange}
           />
-          <p>support message</p>
+          {pwStatus !== 'normal' ? (
+            <p>6~20자의 영문, 숫자, 특수문자를 모두 조합하여 사용</p>
+          ) : (
+            <></>
+          )}
         </div>
         <div className='input-form'>
           <p>
             비밀번호 확인
             <Dot />
           </p>
-          <div className='check-pw'>
+          <TextInput
+            status={checkPwStatus}
+            type='password'
+            value={checkPw}
+            handleChange={handleCheckPwInputChange}
+          />
+          {checkPw !== pw ? <p>비밀번호가 일치하지 않습니다.</p> : <></>}
+        </div>
+        <div className='input-form'>
+          <p>
+            닉네임
+            <Dot />
+          </p>
+          <div className='check-nickname'>
             <TextInput
-              type='password'
-              value={checkPw}
-              handleChange={(e) => setCheckPw(e.target.value)}
+              status={nicknameStatus}
+              value={nickname}
+              handleChange={handleNicknameInputChange}
             />
             <Button
               width={80}
@@ -160,18 +260,11 @@ const SignUpForm = () => {
               handleClick={() => console.log('중복확인')}
             />
           </div>
-          <p>support message</p>
-        </div>
-        <div className='input-form'>
-          <p>
-            닉네임
-            <Dot />
-          </p>
-          <TextInput
-            value={nickname}
-            handleChange={(e) => setNickname(e.target.value)}
-          />
-          <p>support message</p>
+          {nicknameStatus !== 'normal' ? (
+            <p>3~10자의 한글, 숫자 중 1개 이상 조합하여 사용</p>
+          ) : (
+            <></>
+          )}
         </div>
         <div className='input-form'>
           <p>
@@ -179,10 +272,15 @@ const SignUpForm = () => {
             <Dot />
           </p>
           <TextInput
+            status={nameStatus}
             value={name}
-            handleChange={(e) => setName(e.target.value)}
+            handleChange={handleNameInputChange}
           />
-          <p>support message</p>
+          {nameStatus !== 'normal' ? (
+            <p>1~10자의 한글만 조합하여 사용</p>
+          ) : (
+            <></>
+          )}
         </div>
         <div className='input-form'>
           <p>
@@ -190,7 +288,7 @@ const SignUpForm = () => {
             <Dot />
           </p>
           <Calendar type='date' dateProps={{ date, setDate }} />
-          <p>support message</p>
+          {date ? <></> : <p>생년월일을 선택해 주세요.</p>}
         </div>
         <div className='input-form'>
           <p>
@@ -198,11 +296,16 @@ const SignUpForm = () => {
             <Dot />
           </p>
           <TextInput
+            status={phoneNumStatus}
             type='tel'
             value={phoneNum}
-            handleChange={(e) => setPhoneNum(e.target.value)}
+            handleChange={handlePhoneInputChange}
           />
-          <p>support message</p>
+          {phoneNumStatus !== 'normal' ? (
+            <p>'-' 제외, 11자의 숫자만 조합하여 사용</p>
+          ) : (
+            <></>
+          )}
         </div>
         <div className='img-form'>
           <p>프로필 이미지 설정</p>
@@ -316,6 +419,11 @@ const formDivStyle = css`
 
     p:last-child {
       color: ${COLOR.POINT};
+    }
+
+    .check-nickname {
+      display: flex;
+      gap: 16px;
     }
   }
 
