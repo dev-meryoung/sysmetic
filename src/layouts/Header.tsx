@@ -1,38 +1,49 @@
 import { css } from '@emotion/react';
 import { Link } from 'react-router-dom';
 import logo from '@/assets/images/logo.png';
-import { COLOR } from '@/constants/color';
+import Breadcrumb from '@/components/Breadcrumb';
+import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 
 const Header = () => (
   <header css={wrapperStyle}>
-    <div css={headerTopBgStyle}>
-      <div css={headerTopStyle}>
-        <div className='top-links'>
-          <Link to={PATH.SIGN_UP}>회원가입</Link>
-          <Link to={PATH.SIGN_IN}>로그인</Link>
+    <div css={headerStyle}>
+      <div css={headerTopBgStyle}>
+        <div css={headerTopStyle}>
+          <div className='top-links'>
+            <Link to={PATH.SIGN_UP}>회원가입</Link>
+            <Link to={PATH.SIGN_IN}>로그인</Link>
+          </div>
+        </div>
+      </div>
+      <div css={headerBottomStyle}>
+        <Link to={PATH.ROOT}>
+          <img className='bottom-logo' src={logo} />
+        </Link>
+        <div className='bottom-links'>
+          <Link to={PATH.STRATEGIES_LIST}>전략탐색</Link>
+          <Link to={PATH.STRATEGIES_ADD}>전략등록</Link>
+          <Link to={PATH.NOTICES}>공지사항</Link>
+          <Link to={PATH.FAQ}>자주묻는질문</Link>
         </div>
       </div>
     </div>
-    <div css={headerBottomStyle}>
-      <Link to={PATH.ROOT}>
-        <img className='bottom-logo' src={logo} />
-      </Link>
-      <div className='bottom-links'>
-        <Link to={PATH.STRATEGIES_LIST}>전략탐색</Link>
-        <Link to={PATH.STRATEGIES_ADD}>전략등록</Link>
-        <Link to={PATH.NOTICES}>공지사항</Link>
-        <Link to={PATH.FAQ}>자주묻는질문</Link>
-      </div>
-    </div>
+    <Breadcrumb />
   </header>
 );
 
 const wrapperStyle = css`
   width: 100%;
   margin: 0 auto;
-  box-shadow: 0px 4px 2px 0px #0000000d;
+`;
+
+const headerStyle = css`
+  width: 100%;
+  height: 100%;
+  position: relative;
+  margin: 0 auto;
+  box-shadow: 0px 4px 2px 0px ${COLOR_OPACITY.BLACK_OPACITY5};
 `;
 
 const headerTopBgStyle = css`
