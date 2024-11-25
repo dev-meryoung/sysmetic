@@ -201,8 +201,8 @@ const MyStrategyEdit = () => {
           />
         </div>
         <div className='account-box'>
-          {commentMockData.map((n, idx) => (
-            <div className='account' key={idx}>
+          {commentMockData.map((n) => (
+            <div className='account' key={n.nickname}>
               <Checkbox checked={false} handleChange={() => {}} />
               <img src={tempImage} />
               <span>

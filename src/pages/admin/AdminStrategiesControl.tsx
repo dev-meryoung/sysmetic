@@ -191,8 +191,8 @@ const AdminStrategiesControl = () => {
     실계좌정보: (
       <div css={accountBoxStyle}>
         <div className='account-box'>
-          {commentMockData.map((n, idx) => (
-            <div className='account' key={idx}>
+          {commentMockData.map((n) => (
+            <div className='account' key={n.nickname}>
               <img src={tempImage} />
               <span>
                 실계좌정보의제목실계좌정보의제목실계좌정보의제목실계좌정보의제목실계좌정보의제목
