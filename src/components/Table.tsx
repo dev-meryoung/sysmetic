@@ -137,7 +137,7 @@ const tableStyle = css`
 
   th,
   td {
-    padding: 16px;
+    padding: 16px 0;
     vertical-align: middle;
     text-align: center;
   }
