@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import { CalendarTodayOutlined } from '@mui/icons-material';
-import { COLOR, COLOR_OPACITY } from '@/constants/color';
+import { COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE } from '@/constants/font';
 
 type CalendarActionTypes = 'date' | 'month' | 'periodDate' | 'periodMonth';
