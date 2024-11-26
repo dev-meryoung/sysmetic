@@ -6,35 +6,38 @@ import { COLOR } from '@/constants/color';
 import { useModalStore } from '@/stores/useModalStore';
 
 interface ModalProps {
-  width?: number;
+  id: string;
 }
 
-const Modal: React.FC<ModalProps> = ({ width = 336 }) => {
-  const { isOpen, content, closeModal } = useModalStore();
+const Modal: React.FC<ModalProps> = ({ id }) => {
+  const { closeModal } = useModalStore();
+  const modal = useModalStore((state) => state.modals[id]);
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
 
-    if (isOpen) {
+    if (modal?.isOpen) {
       dialog.showModal();
     } else {
       dialog.close();
     }
-  }, [isOpen]);
+  }, [modal?.isOpen]);
+
+  if (!modal?.isOpen) return null;
 
   return (
-    <dialog ref={dialogRef} css={modalStyle(width)}>
+    <dialog ref={dialogRef} css={modalStyle(modal.width)}>
       <div className='close-btn'>
         <IconButton
           IconComponent={CloseOutlinedIcon}
           iconBgSize='lg'
           shape='none'
-          handleClick={closeModal}
+          handleClick={() => closeModal(id)}
         />
       </div>
-      {content}
+      {modal.content}
     </dialog>
   );
 };
