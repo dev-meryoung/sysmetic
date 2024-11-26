@@ -6,6 +6,7 @@ import TextInput from '@/components/TextInput';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+import { useFindEmail } from '@/hooks/useAuthApi';
 
 type InputStateTypes = 'normal' | 'warn';
 
@@ -14,28 +15,49 @@ const SignFindId = () => {
   const [nameStatus, setNameStatus] = useState<InputStateTypes>('normal');
   const [phone, setPhone] = useState('');
   const [phoneStatus, setPhoneStatus] = useState<InputStateTypes>('normal');
+  const [email, setEmail] = useState('');
   const [showEmail, setShowEmail] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
+  const findMutation = useFindEmail();
 
   const navigate = useNavigate();
 
-  const handleFindBtn = () => {
-    if (name.trim() === '' || phone.trim() === '') {
+  const nameRegEx = /^[가-힣]{1,10}$/i;
+  const phoneRegEx = /^010\d{8}$/;
+
+  const handleFindBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    const isNameValid = nameRegEx.test(name);
+    const isPhoneValid = phoneRegEx.test(phone);
+
+    if (!isNameValid || !isPhoneValid) {
       setShowMessage(true);
       setShowEmail(false);
-      setNameStatus('warn');
-      setPhoneStatus('warn');
-    } else {
-      setShowMessage(false);
-      setShowEmail(true);
-      setNameStatus('normal');
-      setPhoneStatus('normal');
+      setNameStatus(isNameValid ? 'normal' : 'warn');
+      setPhoneStatus(isPhoneValid ? 'normal' : 'warn');
+      return;
     }
+
+    findMutation.mutate(
+      { name, phoneNumber: phone },
+      {
+        onSuccess: (data) => {
+          setEmail(data.email);
+          setShowMessage(false);
+          setShowEmail(true);
+          setNameStatus('normal');
+          setPhoneStatus('normal');
+        },
+        onError: () => {
+          setShowMessage(true);
+          setShowEmail(false);
+          setNameStatus('warn');
+          setPhoneStatus('warn');
+        },
+      }
+    );
   };
-
-  const handleMainBtn = () => navigate(PATH.ROOT);
-
-  const handleSignInBtn = () => navigate(PATH.SIGN_IN);
 
   return (
     <div css={wrapperStyle}>
@@ -72,11 +94,11 @@ const SignFindId = () => {
                 width={360}
               />
               <Button
-                label='아이디 찾기'
+                label='계정(이메일) 찾기'
                 handleClick={handleFindBtn}
                 color='primary'
                 size='md'
-                width={95}
+                width={128}
                 shape='square'
                 fontSize='14px'
               />
@@ -95,14 +117,14 @@ const SignFindId = () => {
               <p>
                 해당 정보로 가입된 계정(이메일)은
                 <br />
-                <span>fast@fastcampus.com</span> 입니다.
+                <span>{email}</span> 입니다.
               </p>
             </div>
           </div>
           <div css={linkStyle}>
             <Button
               label='메인가기'
-              handleClick={handleMainBtn}
+              handleClick={() => navigate(PATH.ROOT)}
               color='primaryOpacity10'
               size='md'
               width={120}
@@ -111,7 +133,7 @@ const SignFindId = () => {
             />
             <Button
               label='로그인'
-              handleClick={handleSignInBtn}
+              handleClick={() => navigate(PATH.SIGN_IN)}
               color='primary'
               size='md'
               width={120}

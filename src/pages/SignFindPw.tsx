@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { css } from '@emotion/react';
 import CancelOutlined from '@mui/icons-material/CancelOutlined';
 import { useNavigate } from 'react-router-dom';
@@ -8,102 +8,143 @@ import TextInput from '@/components/TextInput';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+import { useCheckEmailCodeForPassword, useReset } from '@/hooks/useAuthApi';
 
-type InputStateTypes = 'normal' | 'warn';
+type StatusTypes = 'normal' | 'warn';
 
 const SignFindPw = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [checkPassword, setCheckPassword] = useState('');
-  const [showPasswordError, setShowPasswordError] = useState(false);
-  const [showCheckPasswordError, setShowCheckPasswordError] = useState(false);
-  const [verificationCode, setVerificationCode] = useState('');
-  const [verificationCodeStatus, setVerificationCodeStatus] =
-    useState<InputStateTypes>('normal');
-  const [emailStatus, setEmailStatus] = useState<InputStateTypes>('normal');
-  const [passwordStatus, setPasswordStatus] =
-    useState<InputStateTypes>('normal');
-  const [checkPasswordStatus, setCheckPasswordStatus] =
-    useState<InputStateTypes>('normal');
-  const [showMessage, setShowMessage] = useState(false);
-  const [checkNumber, setCheckNumber] = useState(false);
-  const [showCheckBtn, setShowCheckBtn] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    checkPassword: '',
+    verificationCode: '',
+  });
+  const [statuses, setStatuses] = useState<{
+    email: StatusTypes;
+    password: StatusTypes;
+    checkPassword: StatusTypes;
+    verificationCode: StatusTypes;
+  }>({
+    email: 'normal',
+    password: 'normal',
+    checkPassword: 'normal',
+    verificationCode: 'normal',
+  });
+
+  const [messages, setMessages] = useState({
+    emailError: '',
+    verificationCodeError: '',
+    passwordError: '',
+    checkPasswordError: '',
+  });
   const [showResetSection, setShowResetSection] = useState(false);
+  const [showCheckBtn, setShowCheckBtn] = useState(false);
+  const emailCodeMutation = useCheckEmailCodeForPassword();
+  const resetMutation = useReset();
   const navigate = useNavigate();
 
-  const correctCode = '1';
+  const emailRegEx =
+    /^[A-Za-z0-9]([-_.]?[A-Za-z0-9])*@[A-Za-z0-9]([-_.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$/i;
+  const passwordRegEx =
+    /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,20}$/;
 
-  const handleClearEmail = () => {
-    setEmail('');
-    setPassword('');
-    setCheckPassword('');
-    setVerificationCode('');
-    setShowPasswordError(false);
-    setShowCheckPasswordError(false);
-  };
+  const handleChange =
+    (field: keyof typeof formData) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFormData({ ...formData, [field]: e.target.value });
+      setMessages({ ...messages, [`${field}Error`]: '' });
+    };
 
-  const handleSendEmailBtn = () => {
-    if (email.trim() === '') {
-      setShowMessage(true);
-      setShowCheckBtn(false);
-      setEmailStatus('warn');
-    } else {
-      setShowMessage(false);
+  const handleSendEmail = () => {
+    if (!emailRegEx.test(formData.email)) {
       setShowCheckBtn(true);
-      setShowPasswordError(false);
-      setShowCheckPasswordError(false);
-      setEmailStatus('normal');
+      setStatuses({ ...statuses, email: 'warn' });
+      setMessages({
+        ...messages,
+        emailError: '유효하지 않은 이메일 주소입니다.',
+      });
+      return;
     }
+
+    setStatuses({ ...statuses, email: 'normal' });
+    setMessages({ ...messages, emailError: '' });
+
+    emailCodeMutation.mutate(
+      // 임시인증번호, {email: formData.email, authCode: formData.verificationCode} 나중에 변경
+      { email: formData.email, authCode: '123456' },
+      {
+        onError: () => {
+          setMessages({
+            ...messages,
+            emailError: '해당 이메일로 가입된 계정이 존재하지 않습니다.',
+          });
+        },
+      }
+    );
   };
 
-  const handleVerificationCodeBtn = () => {
-    if (verificationCode.trim() === '') {
-      setCheckNumber(false);
-      setShowResetSection(false);
-      setVerificationCodeStatus('warn');
-    } else if (verificationCode === correctCode) {
-      setCheckNumber(false);
-      setShowResetSection(true);
-      setShowPasswordError(false);
-      setShowCheckPasswordError(false);
-      setVerificationCodeStatus('normal');
-    } else {
-      setCheckNumber(true);
-      setShowResetSection(false);
-      setVerificationCodeStatus('warn');
-    }
+  const handleVerifyCode = (serverCode: string) => {
+    const isValid = formData.verificationCode === serverCode;
+    setStatuses({ ...statuses, verificationCode: isValid ? 'normal' : 'warn' });
+    setMessages({
+      ...messages,
+      verificationCodeError: isValid ? '' : '잘못된 인증번호입니다.',
+    });
+    setShowResetSection(isValid);
   };
-
-  useEffect(() => {
-    if (email.trim() === '' || verificationCode.trim() === '') {
-      setShowCheckBtn(false);
-      setShowResetSection(false);
-      setVerificationCodeStatus('normal');
-      setShowMessage(false);
-    } else {
-      setShowCheckBtn(true);
-    }
-  }, [email, verificationCode]);
 
   const handleComplete = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    const isPasswordEmpty = password.trim() === '';
-    const isCheckPasswordEmpty =
-      checkPassword.trim() === '' || password !== checkPassword;
+    const isPasswordValid = passwordRegEx.test(formData.password);
+    const isPasswordMatch = formData.password === formData.checkPassword;
 
-    setPasswordStatus(isPasswordEmpty ? 'warn' : 'normal');
-    setCheckPasswordStatus(isCheckPasswordEmpty ? 'warn' : 'normal');
+    setStatuses({
+      ...statuses,
+      password: isPasswordValid ? 'normal' : 'warn',
+      checkPassword: isPasswordMatch ? 'normal' : 'warn',
+    });
 
-    if (isPasswordEmpty || isCheckPasswordEmpty) {
-      setShowPasswordError(isPasswordEmpty);
-      setShowCheckPasswordError(isCheckPasswordEmpty);
-      return;
+    setMessages({
+      ...messages,
+      passwordError: isPasswordValid
+        ? ''
+        : '비밀번호는 6~20자의 문자, 숫자, 특수문자를 포함해야 합니다.',
+      checkPasswordError: isPasswordMatch
+        ? ''
+        : '비밀번호가 일치하지 않습니다.',
+    });
+
+    if (isPasswordValid && isPasswordMatch) {
+      resetMutation.mutate({
+        emailAuthCode: formData.verificationCode,
+        email: formData.email,
+        password: formData.password,
+        rewritePassword: formData.checkPassword,
+      });
+      navigate(PATH.SIGN_IN);
     }
-    navigate(PATH.SIGN_IN);
   };
 
-  const handleMainBtn = () => {
-    navigate(PATH.ROOT);
+  const handleClearEmail = () => {
+    setFormData({
+      email: '',
+      password: '',
+      checkPassword: '',
+      verificationCode: '',
+    });
+    setStatuses({
+      email: 'normal',
+      password: 'normal',
+      checkPassword: 'normal',
+      verificationCode: 'normal',
+    });
+    setMessages({
+      emailError: '',
+      verificationCodeError: '',
+      passwordError: '',
+      checkPasswordError: '',
+    });
+    setShowResetSection(false);
   };
 
   return (
@@ -126,11 +167,12 @@ const SignFindPw = () => {
           <div className='input-row'>
             <div className='input-wrapper'>
               <TextInput
-                value={email}
-                status={emailStatus}
+                value={formData.email}
+                status={statuses.email}
                 placeholder='이메일 주소(abc@abc.com)'
-                handleChange={(e) => setEmail(e.target.value)}
+                handleChange={handleChange('email')}
               />
+
               <IconButton
                 IconComponent={CancelOutlined}
                 handleClick={handleClearEmail}
@@ -143,7 +185,7 @@ const SignFindPw = () => {
             <div css={buttonStyle}>
               <Button
                 label='요청하기'
-                handleClick={handleSendEmailBtn}
+                handleClick={handleSendEmail}
                 color='primary'
                 size='md'
                 width={80}
@@ -151,27 +193,26 @@ const SignFindPw = () => {
               />
             </div>
           </div>
-          {showMessage && (
-            <span className='message'>
-              해당 이메일로 가입된 계정이 존재하지 않습니다.
-            </span>
+          {messages.emailError && (
+            <span className='message'>{messages.emailError}</span>
           )}
         </div>
+
         <div className='verificationCode-form'>
           <div>이메일 인증번호</div>
           <div className='input-row'>
             <div className='input-wrapper'>
               <TextInput
-                value={verificationCode}
-                status={verificationCodeStatus}
+                value={formData.verificationCode}
+                status={statuses.verificationCode}
                 placeholder='6자리'
-                handleChange={(e) => setVerificationCode(e.target.value)}
+                handleChange={handleChange('verificationCode')}
               />
             </div>
             <div css={buttonStyle}>
               <Button
                 label='인증확인'
-                handleClick={handleVerificationCodeBtn}
+                handleClick={() => handleVerifyCode('123456')} // 나중에 수정
                 color='primary'
                 size='md'
                 width={80}
@@ -180,10 +221,11 @@ const SignFindPw = () => {
               />
             </div>
           </div>
-          {checkNumber && (
-            <span className='message'>잘못된 인증번호입니다.</span>
+          {messages.verificationCodeError && (
+            <span className='message'>{messages.verificationCodeError}</span>
           )}
         </div>
+
         {showResetSection && (
           <>
             <div className='reset-pw-form'>
@@ -192,13 +234,13 @@ const SignFindPw = () => {
                 <div className='input-wrapper'>
                   <TextInput
                     type='password'
-                    value={password}
-                    status={passwordStatus}
+                    value={formData.password}
+                    status={statuses.password}
                     placeholder='새 비밀번호'
-                    handleChange={(e) => setPassword(e.target.value)}
+                    handleChange={handleChange('password')}
                   />
-                  {showPasswordError && (
-                    <span className='message'>비밀번호를 입력해주세요.</span>
+                  {messages.passwordError && (
+                    <span className='message'>{messages.passwordError}</span>
                   )}
                 </div>
               </div>
@@ -210,23 +252,24 @@ const SignFindPw = () => {
                 <div className='input-wrapper'>
                   <TextInput
                     type='password'
-                    value={checkPassword}
-                    status={checkPasswordStatus}
+                    value={formData.checkPassword}
+                    status={statuses.checkPassword}
                     placeholder='비밀번호 확인'
-                    handleChange={(e) => setCheckPassword(e.target.value)}
+                    handleChange={handleChange('checkPassword')}
                   />
-                  {showCheckPasswordError && (
+                  {messages.checkPasswordError && (
                     <span className='message'>
-                      비밀번호가 일치하지 않습니다.
+                      {messages.checkPasswordError}
                     </span>
                   )}
                 </div>
               </div>
             </div>
+
             <div css={linkStyle}>
               <Button
                 label='메인가기'
-                handleClick={handleMainBtn}
+                handleClick={() => navigate(PATH.ROOT)}
                 color='primaryOpacity10'
                 size='md'
                 width={120}
