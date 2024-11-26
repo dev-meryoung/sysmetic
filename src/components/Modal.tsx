@@ -3,15 +3,16 @@ import { css } from '@emotion/react';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import IconButton from '@/components/IconButton';
 import { COLOR } from '@/constants/color';
-import { useModalStore } from '@/stores/useModalStore';
+import useDetailModal from '@/stores/useModalStore';
 
 interface ModalProps {
+  content?: React.ReactElement;
   id: string;
 }
 
-const Modal: React.FC<ModalProps> = ({ id }) => {
-  const { closeModal } = useModalStore();
-  const modal = useModalStore((state) => state.modals[id]);
+export const Modal: React.FC<ModalProps> = ({ content, id }) => {
+  const { closeModal } = useDetailModal();
+  const modal = useDetailModal((state) => state.modals[id]);
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -23,7 +24,7 @@ const Modal: React.FC<ModalProps> = ({ id }) => {
     } else {
       dialog.close();
     }
-  }, [modal?.isOpen]);
+  }, [modal?.isOpen, id]);
 
   if (!modal?.isOpen) return null;
 
@@ -37,18 +38,18 @@ const Modal: React.FC<ModalProps> = ({ id }) => {
           handleClick={() => closeModal(id)}
         />
       </div>
-      {modal.content}
+      {content}
     </dialog>
   );
 };
 
-const modalStyle = (width: number) => css`
+const modalStyle = (width?: number) => css`
   position: relative;
   background: ${COLOR.WHITE};
   border-radius: 4px;
-  width: ${width}px;
   border: 0;
   padding: 24px;
+  width: ${width ? `${width}px` : '336px'};
 
   .close-btn {
     position: absolute;
