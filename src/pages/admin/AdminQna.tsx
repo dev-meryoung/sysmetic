@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import TagTest from '@/assets/images/test-tag.jpg';
 import Button from '@/components/Button';
+import Modal from '@/components/Modal';
 import Pagination from '@/components/Pagination';
 import SelectBox from '@/components/SelectBox';
 import TabButton from '@/components/TabButton';
@@ -11,6 +12,7 @@ import TextInput from '@/components/TextInput';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import qna from '@/mocks/qna.json';
+import useModalStore from '@/stores/useModalStore';
 import { useTableStore } from '@/stores/useTableStore';
 
 interface AdminQnaDataProps {
@@ -28,6 +30,25 @@ const SearchOption = [
 ];
 
 const PAGE_SIZE = 10;
+
+const DelModal = () => (
+  <div css={ModalStyle}>
+    <p>해당 전략을 삭제하시겠습니까?</p>
+    <div className='btn'>
+      <Button
+        width={120}
+        border={true}
+        label='아니오'
+        handleClick={() => console.log('아니오')}
+      />
+      <Button
+        width={120}
+        label='예'
+        handleClick={() => console.log('아니오')}
+      />
+    </div>
+  </div>
+);
 
 const AdminQna = () => {
   const [tab, setTab] = useState(0);
@@ -119,6 +140,8 @@ const AdminQna = () => {
     const pages = Math.ceil(arrangedData.length / PAGE_SIZE);
     setTotalPage(pages);
   }, []);
+  //모달
+  const deleteModal = useModalStore();
 
   return (
     <div css={adminQnaWrapperStyle}>
@@ -158,7 +181,7 @@ const AdminQna = () => {
           width={80}
           color='black'
           label='삭제'
-          handleClick={() => console.log('삭제')}
+          handleClick={() => deleteModal.openModal('delete')}
         />
       </div>
       <div css={adminQnaListStyle}>
@@ -180,6 +203,7 @@ const AdminQna = () => {
           handlePageChange={setCurPage}
         />
       </div>
+      <Modal content={<DelModal />} id='delete' />
     </div>
   );
 };
@@ -281,5 +305,23 @@ const tagStyle = css`
   flex-direction: column;
   gap: 12px;
   align-items: flex-start;
+`;
+
+const ModalStyle = css`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  padding-top: 8px;
+
+  p {
+    line-height: 160%;
+  }
+
+  .btn {
+    display: flex;
+    gap: 16px;
+  }
 `;
 export default AdminQna;
