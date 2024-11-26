@@ -125,7 +125,7 @@ const AdminStrategies = () => {
       render: () => (
         <div css={buttonStyle}>
           <Button
-            label='관리'
+            label='상세관리'
             shape='round'
             size='xs'
             color='primary'

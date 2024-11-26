@@ -71,23 +71,31 @@ const AdminStocks = () => {
   //모달 관련
   const { openModal, closeModal } = useModalStore();
   const openStocksModal = () => {
-    openModal(
-      <div css={delModalStyle}>
-        <p>해당 종목을 삭제하시겠습니까?</p>
-        <div className='del-modal-btn'>
-          <Button
-            width={120}
-            border={true}
-            label='아니오'
-            handleClick={closeModal}
-          />
-          <Button width={120} label='예' handleClick={deleteClick} />
+    if (checkedItems.length > 0) {
+      openModal(
+        <div css={delModalStyle}>
+          <p>해당 종목을 삭제하시겠습니까?</p>
+          <div className='del-modal-btn'>
+            <Button
+              width={120}
+              border={true}
+              label='아니오'
+              handleClick={closeModal}
+            />
+            <Button width={120} label='예' handleClick={handleDeleteClick} />
+          </div>
         </div>
-      </div>
-    );
+      );
+    }
   };
-  const deleteClick = () => {
+  const handleDeleteClick = () => {
     //? 데이터 삭제 코드
+    //1. data.filter()를 통해 체크된 항목을 제외한 새로운 데이터 생성
+    //2. setData(변수명)을 통해 data 상태 업데이트
+    //3. 페이지 수 최신화 업데이트
+
+    //4.체크박스 상태 초기화 및 모달 닫기
+    toggleAllCheckboxes(0);
     closeModal();
   };
 
