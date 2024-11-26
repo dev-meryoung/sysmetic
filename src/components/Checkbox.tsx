@@ -47,7 +47,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
           )}
         </div>
       </div>
-      {label && <span>{label}</span>}
+      {label && <span onClick={handleClick}>{label}</span>}
     </div>
   );
 };
@@ -60,6 +60,7 @@ const checkboxWrapperStyle = (size: SizeTypes) => css`
   span {
     font-size: ${FONT_SIZE.TEXT_SM};
     color: ${COLOR.BLACK};
+    cursor: pointer;
   }
 `;
 
