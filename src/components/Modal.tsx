@@ -3,35 +3,39 @@ import { css } from '@emotion/react';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import IconButton from '@/components/IconButton';
 import { COLOR } from '@/constants/color';
-import { useModalStore } from '@/stores/useModalStore';
+import useDetailModal from '@/stores/useModalStore';
 
 interface ModalProps {
-  width?: number;
+  content?: React.ReactElement;
+  id: string;
 }
 
-const Modal: React.FC<ModalProps> = ({ width = 336 }) => {
-  const { isOpen, content, closeModal } = useModalStore();
+export const Modal: React.FC<ModalProps> = ({ content, id }) => {
+  const { closeModal } = useDetailModal();
+  const modal = useDetailModal((state) => state.modals[id]);
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
 
-    if (isOpen) {
+    if (modal?.isOpen) {
       dialog.showModal();
     } else {
       dialog.close();
     }
-  }, [isOpen]);
+  }, [modal?.isOpen, id]);
+
+  if (!modal?.isOpen) return null;
 
   return (
-    <dialog ref={dialogRef} css={modalStyle(width)}>
+    <dialog ref={dialogRef} css={modalStyle(modal.width)}>
       <div className='close-btn'>
         <IconButton
           IconComponent={CloseOutlinedIcon}
           iconBgSize='lg'
           shape='none'
-          handleClick={closeModal}
+          handleClick={() => closeModal(id)}
         />
       </div>
       {content}
@@ -39,13 +43,13 @@ const Modal: React.FC<ModalProps> = ({ width = 336 }) => {
   );
 };
 
-const modalStyle = (width: number) => css`
+const modalStyle = (width?: number) => css`
   position: relative;
   background: ${COLOR.WHITE};
   border-radius: 4px;
-  width: ${width}px;
   border: 0;
   padding: 24px;
+  width: ${width ? `${width}px` : '336px'};
 
   .close-btn {
     position: absolute;
