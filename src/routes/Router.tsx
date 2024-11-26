@@ -11,6 +11,7 @@ import AdminMethods from '@/pages/admin/AdminMethods';
 import AdminNoticeAdd from '@/pages/admin/AdminNoticeAdd';
 import AdminNoticeEdit from '@/pages/admin/AdminNoticeEdit';
 import AdminNotices from '@/pages/admin/AdminNotices';
+import AdminNoticesDetail from '@/pages/admin/AdminNoticesDetail';
 import AdminQna from '@/pages/admin/AdminQna';
 import AdminStocks from '@/pages/admin/AdminStocks';
 import AdminStrategies from '@/pages/admin/AdminStrategies';
@@ -214,6 +215,10 @@ const router = createBrowserRouter([
       {
         path: PATH.ADMIN_NOTICES_EDIT(),
         element: <AdminNoticeEdit />,
+      },
+      {
+        path: PATH.ADMIN_NOTICES_DETAIL(),
+        element: <AdminNoticesDetail />,
       },
       {
         path: PATH.ADMIN_STRATEGIES_CONTROL(),

@@ -144,7 +144,10 @@ const Home = () => {
                       <FavoriteBorderIcon />
                       {item.likes}
                     </div>
-                    <h3>{item.rateOfReturn} 원</h3>
+                    <div className='price-area'>
+                      <h3>{item.rateOfReturn}</h3>
+                      <h6>원</h6>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -389,7 +392,7 @@ const cardStyle = css`
       width: 100%;
       height: 200px;
       padding: 24px;
-      border: 1px solid ${COLOR_OPACITY.PRIMARY100_OPACITY30};
+      border: 1px solid ${COLOR.PRIMARY100};
       background-color: ${COLOR.WHITE};
 
       .current-situation {
@@ -437,8 +440,18 @@ const cardStyle = css`
           color: ${COLOR.ERROR_RED};
 
           svg {
-            font-size: ${FONT_SIZE.TEXT_XS};
+            font-size: ${FONT_SIZE.TITLE_XS};
             color: ${COLOR.ERROR_RED};
+          }
+        }
+
+        .price-area {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          h6 {
+            font-weight: ${FONT_WEIGHT.REGULAR};
           }
         }
       }
