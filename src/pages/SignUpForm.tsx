@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Button from '@/components/Button';
 import Calendar from '@/components/Calendar';
 import IconButton from '@/components/IconButton';
+import Modal from '@/components/Modal';
 import ProfileImage from '@/components/ProfileImage';
 import RadioButton from '@/components/RadioButton';
 import SelectBox from '@/components/SelectBox';
@@ -13,6 +14,7 @@ import TextInput, { InputStateTypes } from '@/components/TextInput';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+import { useModalStore } from '@/stores/useModalStore';
 
 const RadioOption1 = [
   { label: '관심 전략과 정보 수신에 동의합니다.', value: 'true' },
@@ -52,6 +54,8 @@ const SignUpForm = () => {
   const [profileImg, setProfileImg] = useState('');
   const [date, setDate] = useState('');
   const [selectedEmail, setSelectedEmail] = useState('');
+  // 모달 내 변수
+  const [authCode, setAuthCode] = useState('');
   //정보수신 동의
   const [isFirstChecked, setIsFirstChecked] = useState('false');
   const [isSecondChecked, setIsSecondChecked] = useState('false');
@@ -171,6 +175,45 @@ const SignUpForm = () => {
     }
   };
 
+  const { openModal, closeModal } = useModalStore();
+
+  const handleAuthModal = () => {
+    openModal(
+      <div css={AuthModalStyle}>
+        <h6>
+          해당 이메일로 코드가 전송되었습니다.
+          <br />
+          3분 이내로 입력해 주시기 바랍니다.
+        </h6>
+        <div className='input-form'>
+          <p>
+            인증번호 입력
+            <Dot />
+          </p>
+          <TextInput
+            width={312}
+            value={authCode}
+            handleChange={(e) => setAuthCode(e.target.value)}
+          />
+          <p>support message</p>
+        </div>
+        <div className='auth-btn'>
+          <Button
+            width={120}
+            border={true}
+            label='취소'
+            handleClick={closeModal}
+          />
+          <Button
+            width={120}
+            label='인증하기'
+            handleClick={() => console.log('인증하기')}
+          />
+        </div>
+      </div>
+    );
+  };
+
   useEffect(() => {
     console.log(selectedEmail);
   }, [selectedEmail]);
@@ -230,7 +273,7 @@ const SignUpForm = () => {
                 color='textBlack'
                 width={96}
                 label='이메일 인증'
-                handleClick={() => console.log('이메일 인증')}
+                handleClick={handleAuthModal}
               />
             </div>
           </div>
@@ -377,6 +420,7 @@ const SignUpForm = () => {
           disabled={isDisabled}
         />
       </div>
+      <Modal width={360} />
     </div>
   );
 };
@@ -492,6 +536,43 @@ const iconStyle = css`
   position: absolute;
   right: 0;
   bottom: 0;
+`;
+
+const AuthModalStyle = css`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0 0;
+
+  font-size: ${FONT_SIZE.TEXT_MD};
+
+  h6 {
+    font-size: ${FONT_SIZE.TEXT_MD};
+    font-weight: ${FONT_WEIGHT.REGULAR};
+    line-height: 160%;
+  }
+
+  .input-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 32px 0 40px;
+
+    p::first-of-type {
+      font-size: ${FONT_SIZE.TEXT_SM};
+    }
+
+    p:last-child {
+      font-size: ${FONT_SIZE.TEXT_SM};
+      color: ${COLOR.POINT};
+    }
+  }
+
+  .auth-btn {
+    display: flex;
+    gap: 16px;
+  }
 `;
 
 export default SignUpForm;
