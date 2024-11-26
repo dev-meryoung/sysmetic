@@ -4,7 +4,6 @@ import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
 import { useNavigate, useParams } from 'react-router-dom';
 import Button from '@/components/Button';
 import Calendar from '@/components/Calendar';
-import IconButton from '@/components/IconButton';
 import Modal from '@/components/Modal';
 import ProfileImage from '@/components/ProfileImage';
 import RadioButton from '@/components/RadioButton';
