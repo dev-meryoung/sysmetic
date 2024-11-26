@@ -9,6 +9,8 @@ import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 
+type InputStateTypes = 'normal' | 'warn';
+
 const SignFindPw = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -16,13 +18,20 @@ const SignFindPw = () => {
   const [showPasswordError, setShowPasswordError] = useState(false);
   const [showCheckPasswordError, setShowCheckPasswordError] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
+  const [verificationCodeStatus, setVerificationCodeStatus] =
+    useState<InputStateTypes>('normal');
+  const [emailStatus, setEmailStatus] = useState<InputStateTypes>('normal');
+  const [passwordStatus, setPasswordStatus] =
+    useState<InputStateTypes>('normal');
+  const [checkPasswordStatus, setCheckPasswordStatus] =
+    useState<InputStateTypes>('normal');
   const [showMessage, setShowMessage] = useState(false);
   const [checkNumber, setCheckNumber] = useState(false);
   const [showCheckBtn, setShowCheckBtn] = useState(false);
   const [showResetSection, setShowResetSection] = useState(false);
   const navigate = useNavigate();
 
-  const correctCode = '1'; // 임시 인증번호
+  const correctCode = '1';
 
   const handleClearEmail = () => {
     setEmail('');
@@ -37,11 +46,13 @@ const SignFindPw = () => {
     if (email.trim() === '') {
       setShowMessage(true);
       setShowCheckBtn(false);
+      setEmailStatus('warn');
     } else {
       setShowMessage(false);
       setShowCheckBtn(true);
       setShowPasswordError(false);
       setShowCheckPasswordError(false);
+      setEmailStatus('normal');
     }
   };
 
@@ -49,14 +60,17 @@ const SignFindPw = () => {
     if (verificationCode.trim() === '') {
       setCheckNumber(false);
       setShowResetSection(false);
+      setVerificationCodeStatus('warn');
     } else if (verificationCode === correctCode) {
       setCheckNumber(false);
       setShowResetSection(true);
       setShowPasswordError(false);
       setShowCheckPasswordError(false);
+      setVerificationCodeStatus('normal');
     } else {
       setCheckNumber(true);
       setShowResetSection(false);
+      setVerificationCodeStatus('warn');
     }
   };
 
@@ -64,6 +78,8 @@ const SignFindPw = () => {
     if (email.trim() === '' || verificationCode.trim() === '') {
       setShowCheckBtn(false);
       setShowResetSection(false);
+      setVerificationCodeStatus('normal');
+      setShowMessage(false);
     } else {
       setShowCheckBtn(true);
     }
@@ -75,10 +91,12 @@ const SignFindPw = () => {
     const isCheckPasswordEmpty =
       checkPassword.trim() === '' || password !== checkPassword;
 
-    setShowPasswordError(isPasswordEmpty);
-    setShowCheckPasswordError(isCheckPasswordEmpty);
+    setPasswordStatus(isPasswordEmpty ? 'warn' : 'normal');
+    setCheckPasswordStatus(isCheckPasswordEmpty ? 'warn' : 'normal');
 
     if (isPasswordEmpty || isCheckPasswordEmpty) {
+      setShowPasswordError(isPasswordEmpty);
+      setShowCheckPasswordError(isCheckPasswordEmpty);
       return;
     }
     navigate(PATH.SIGN_IN);
@@ -109,6 +127,7 @@ const SignFindPw = () => {
             <div className='input-wrapper'>
               <TextInput
                 value={email}
+                status={emailStatus}
                 placeholder='이메일 주소(abc@abc.com)'
                 handleChange={(e) => setEmail(e.target.value)}
               />
@@ -144,6 +163,7 @@ const SignFindPw = () => {
             <div className='input-wrapper'>
               <TextInput
                 value={verificationCode}
+                status={verificationCodeStatus}
                 placeholder='6자리'
                 handleChange={(e) => setVerificationCode(e.target.value)}
               />
@@ -173,6 +193,7 @@ const SignFindPw = () => {
                   <TextInput
                     type='password'
                     value={password}
+                    status={passwordStatus}
                     placeholder='새 비밀번호'
                     handleChange={(e) => setPassword(e.target.value)}
                   />
@@ -190,6 +211,7 @@ const SignFindPw = () => {
                   <TextInput
                     type='password'
                     value={checkPassword}
+                    status={checkPasswordStatus}
                     placeholder='비밀번호 확인'
                     handleChange={(e) => setCheckPassword(e.target.value)}
                   />
