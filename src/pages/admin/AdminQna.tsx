@@ -13,7 +13,6 @@ import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import qna from '@/mocks/qna.json';
 import { useTableStore } from '@/stores/useTableStore';
 
-
 interface AdminQnaDataProps {
   no: number;
   traderName: string;
