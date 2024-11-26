@@ -89,15 +89,27 @@ const SignUpForm = () => {
 
   // 파일 탐색기 열기
   const handleOpenFileExplorer = () => {
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
     const fileInput = document.createElement('input');
+
     fileInput.type = 'file';
-    fileInput.accept = 'image/*';
+    fileInput.accept = 'image/jpg,image/jpeg,image/png,image/gif';
 
     fileInput.addEventListener('change', (e: Event) => {
       const input = e.target as HTMLInputElement;
-      handleFileChange({
-        target: input,
-      } as ChangeEvent<HTMLInputElement>);
+      if (input.files && input.files.length > 0) {
+        const file = input.files[0];
+        if (file.size > MAX_FILE_SIZE) {
+          alert(
+            '5MB 이하의 jp(e)g, png, gif 형식의 이미지만 설정할 수 있습니다.'
+          );
+          return;
+        }
+
+        handleFileChange({
+          target: input,
+        } as ChangeEvent<HTMLInputElement>);
+      }
     });
 
     fileInput.click();
@@ -375,16 +387,9 @@ const SignUpForm = () => {
         </div>
         <div className='img-form'>
           <p>프로필 이미지 설정</p>
-          <div>
+          <div className='img-div' onClick={handleOpenFileExplorer}>
             <ProfileImage size='xxl' alt='profile' src={profileImg} />
-            <IconButton
-              color='realGray'
-              shape='round'
-              iconBgSize='lg'
-              IconComponent={CameraAltOutlinedIcon}
-              handleClick={handleOpenFileExplorer}
-              css={iconStyle}
-            />
+            <CameraAltOutlinedIcon className='icon' css={iconStyle} />
           </div>
         </div>
       </div>
@@ -509,10 +514,17 @@ const formDivStyle = css`
     flex-direction: column;
     gap: 16px;
 
+    .img-div {
+      &:hover .icon {
+        background-color: ${COLOR.GRAY700};
+      }
+    }
+
     div {
       position: relative;
       width: 120px;
       height: 120px;
+      cursor: pointer;
     }
   }
 `;
@@ -536,6 +548,16 @@ const iconStyle = css`
   position: absolute;
   right: 0;
   bottom: 0;
+  width: 48px;
+  height: 48px;
+  padding: 12px;
+  color: ${COLOR.WHITE};
+  background-color: ${COLOR.GRAY};
+  border-radius: 50%;
+
+  &:hover {
+    background-color: ${COLOR.GRAY700};
+  }
 `;
 
 const AuthModalStyle = css`
