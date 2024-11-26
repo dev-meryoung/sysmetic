@@ -11,7 +11,6 @@ const App = () => {
     <>
       <GlobalStyles />
       <RouterProvider router={router} />
-      {/* 상태에 따라 모달을 렌더링 */}
       {Object.keys(modals).map((id) => (
         <Modal key={id} id={id} />
       ))}
