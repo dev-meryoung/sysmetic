@@ -12,24 +12,11 @@ const Profile: React.FC = () => {
   const navigate = useNavigate();
   const [phoneNumber, setPhoneNumber] = useState<string>('');
 
-  const handleEditBtn = () => {
-    navigate(PATH.MYPAGE_PROFILE_EDIT());
-  };
-  const handlePwBtn = () => {
-    navigate(PATH.MYPAGE_PASSWORD());
-  };
-  const handleOtpBtn = () => {
-    navigate(PATH.MYPAGE_OPT());
-  };
-  const handleWithdrawBtn = () => {
-    navigate(PATH.MYPAGE_WITHDRAW);
-  };
-
   function maskPhoneNumber(phone: string): string {
     return phone.replace(/(\d{2})$/, '**');
   }
 
-  // 나중에 API 받으면 수정
+  // 계정 조회 API 추후 수정
   useEffect(() => {
     const fetchPhoneNumber = async () => {
       const mockPhoneNumber = '010-0000-0000';
@@ -46,7 +33,7 @@ const Profile: React.FC = () => {
             <span>계정 정보</span>
             <Button
               label='변경하기'
-              handleClick={handleEditBtn}
+              handleClick={() => navigate(PATH.MYPAGE_PROFILE_EDIT())}
               color='primary'
               size='md'
               width={80}
@@ -89,7 +76,7 @@ const Profile: React.FC = () => {
             <span>비밀번호</span>
             <Button
               label='변경하기'
-              handleClick={handlePwBtn}
+              handleClick={() => navigate(PATH.MYPAGE_PASSWORD())}
               color='primary'
               size='md'
               width={80}
@@ -104,7 +91,7 @@ const Profile: React.FC = () => {
             <span>정보수신동의</span>
             <Button
               label='변경하기'
-              handleClick={handleOtpBtn}
+              handleClick={() => navigate(PATH.MYPAGE_OPT())}
               color='primary'
               size='md'
               width={80}
@@ -116,7 +103,7 @@ const Profile: React.FC = () => {
       <div css={withdrawBtnStyle}>
         <Button
           label='회원탈퇴'
-          handleClick={handleWithdrawBtn}
+          handleClick={() => navigate(PATH.MYPAGE_WITHDRAW)}
           color='gray200'
           size='sm'
           width={96}

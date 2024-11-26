@@ -13,24 +13,31 @@ const MypagePassword: React.FC = () => {
   const [checkPassword, setCheckPassword] = useState('');
   const [showPasswordError, setShowPasswordError] = useState(false);
   const [showCheckPasswordError, setShowCheckPasswordError] = useState(false);
+
+  const passwordRegEx =
+    /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,20}$/;
+
   const navigate = useNavigate();
 
   const handleComplete = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+
+    const isPasswordValid = passwordRegEx.test(newPassword);
     const isCurrentPasswordEmpty = currentPassword.trim() === '';
     const isCheckPasswordInvalid =
       checkPassword.trim() === '' || newPassword !== checkPassword;
 
-    setShowPasswordError(isCurrentPasswordEmpty);
+    setShowPasswordError(!isPasswordValid);
     setShowCheckPasswordError(isCheckPasswordInvalid);
 
-    if (isCurrentPasswordEmpty || isCheckPasswordInvalid) {
+    if (isCurrentPasswordEmpty) {
       return;
     }
-    navigate(PATH.MYPAGE_PROFILE());
-  };
 
-  const handleBack = () => {
+    if (!isPasswordValid || isCheckPasswordInvalid) {
+      return;
+    }
+
     navigate(PATH.MYPAGE_PROFILE());
   };
 
@@ -96,7 +103,7 @@ const MypagePassword: React.FC = () => {
       <div css={buttonStyle}>
         <Button
           label='이전'
-          handleClick={handleBack}
+          handleClick={() => navigate(PATH.MYPAGE_PROFILE())}
           color='primaryOpacity10'
           size='md'
           shape='square'

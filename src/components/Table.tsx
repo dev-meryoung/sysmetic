@@ -36,13 +36,13 @@ const Table = <T,>({
   const [sortConfig, setSortConfig] = useState<{
     key: keyof T;
     direction: 'asc' | 'desc';
-  }>({ key: columns[0].key, direction: 'asc' });
+  } | null>(null); // 초기값을 null로 설정하여 정렬 미적용
 
   const handleSort = (key: keyof T) => {
     setSortConfig((prevConfig) => ({
       key,
       direction:
-        prevConfig.key === key && prevConfig.direction === 'asc'
+        prevConfig?.key === key && prevConfig.direction === 'asc' // 수정
           ? 'desc'
           : 'asc',
     }));
