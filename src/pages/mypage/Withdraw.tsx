@@ -54,20 +54,20 @@ const Withdraw: React.FC = () => {
       </div>
       <div css={buttonStyle}>
         <Button
-          label="회원탈퇴"
+          label='회원탈퇴'
           handleClick={() => handleNavigation(PATH.ROOT)}
-          color="primaryOpacity10"
-          size="md"
-          shape="square"
+          color='primaryOpacity10'
+          size='md'
+          shape='square'
           width={120}
           border
         />
         <Button
-          label="취소"
+          label='취소'
           handleClick={() => handleNavigation(PATH.MYPAGE_PROFILE())}
-          color="primary"
-          size="md"
-          shape="square"
+          color='primary'
+          size='md'
+          shape='square'
           width={120}
         />
       </div>

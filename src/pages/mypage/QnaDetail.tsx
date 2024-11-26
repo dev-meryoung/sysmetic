@@ -141,8 +141,8 @@ export default QnaDetail;
 const wrapperStyle = css`
   display: flex;
   flex-direction: column;
-  align-items: center; 
-  justify-content: center; 
+  align-items: center;
+  justify-content: center;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
@@ -201,13 +201,13 @@ const dividerStyle = css`
 
 const strategyWrapperStyle = css`
   display: flex;
-  align-items: center; 
-  justify-content: space-between; 
+  align-items: center;
+  justify-content: space-between;
   padding: 32px 24px;
   width: 1132px;
   border: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
   border-radius: 4px;
-  margin: 0 auto; 
+  margin: 0 auto;
   position: relative;
   box-sizing: border-box;
   margin-top: 24px;

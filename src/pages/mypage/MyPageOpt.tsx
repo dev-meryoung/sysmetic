@@ -38,20 +38,20 @@ const MypageOpt: React.FC = () => {
       </div>
       <div css={buttonStyle}>
         <Button
-          label="이전"
+          label='이전'
           handleClick={() => navigate(PATH.MYPAGE_PROFILE())}
-          color="primaryOpacity10"
-          size="md"
-          shape="square"
+          color='primaryOpacity10'
+          size='md'
+          shape='square'
           width={120}
           border
         />
         <Button
-          label="수정완료"
+          label='수정완료'
           handleClick={() => navigate(PATH.MYPAGE_PROFILE())}
-          color="primary"
-          size="md"
-          shape="square"
+          color='primary'
+          size='md'
+          shape='square'
           width={120}
         />
       </div>
