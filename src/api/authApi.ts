@@ -8,7 +8,7 @@ export interface LoginRequestData {
 
 // 로그인 API
 export const login = async (loginData: LoginRequestData) => {
-  const response = await axiosInstance.post('/auth/login', loginData);
+  const response = await axiosInstance.post('/v1/auth/login', loginData);
 
   return response.data;
 };
