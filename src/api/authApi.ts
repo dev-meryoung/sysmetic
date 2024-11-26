@@ -13,6 +13,13 @@ export const login = async (loginData: LoginRequestData) => {
   return response.data;
 };
 
+// 로그아웃 API
+export const logout = async () => {
+  const response = await axiosInstance.post('/v1/auth/logout');
+
+  return response.data;
+};
+
 // 이메일 찾기 API
 export const findEmail = async () => {};
 
@@ -24,9 +31,6 @@ export const checkEmailCodeForPassword = async () => {};
 
 // 비밀번호 재설정 API
 export const resetPassword = async () => {};
-
-// 로그아웃 API
-export const logout = async () => {};
 
 // 회원가입 API
 export const register = async () => {};
