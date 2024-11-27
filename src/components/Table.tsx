@@ -7,11 +7,11 @@ import Checkbox from '@/components/Checkbox';
 import IconButton from '@/components/IconButton';
 import { COLOR } from '@/constants/color';
 
-interface ColumnProps<T> {
+export interface ColumnProps<T> {
   key: keyof T;
   header: string;
   sortable?: boolean;
-  render?: (value: T[keyof T], item: T) => ReactNode;
+  render?: (value: T[keyof T], item: T, rowIndex: number) => ReactNode;
 }
 
 interface TableProps<T> {
@@ -36,13 +36,13 @@ const Table = <T,>({
   const [sortConfig, setSortConfig] = useState<{
     key: keyof T;
     direction: 'asc' | 'desc';
-  } | null>(null); // 초기값을 null로 설정하여 정렬 미적용
+  } | null>(null);
 
   const handleSort = (key: keyof T) => {
     setSortConfig((prevConfig) => ({
       key,
       direction:
-        prevConfig?.key === key && prevConfig.direction === 'asc' // 수정
+        prevConfig?.key === key && prevConfig.direction === 'asc'
           ? 'desc'
           : 'asc',
     }));
@@ -116,7 +116,7 @@ const Table = <T,>({
             {columns.map((column) => (
               <td key={column.key as string}>
                 {column.render
-                  ? column.render(item[column.key], item)
+                  ? column.render(item[column.key], item, index)
                   : String(item[column.key])}
               </td>
             ))}

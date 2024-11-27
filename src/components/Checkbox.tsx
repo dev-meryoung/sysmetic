@@ -9,6 +9,7 @@ interface CheckboxProps {
   label?: string;
   size?: SizeTypes;
   checked: boolean;
+  disabled?: boolean;
   handleChange: (checked: boolean) => void;
 }
 
@@ -16,62 +17,96 @@ const Checkbox: React.FC<CheckboxProps> = ({
   label = '',
   size = 'md',
   checked = false,
+  disabled = false,
   handleChange,
 }) => {
   const handleClick = () => {
-    handleChange(!checked);
+    if (!disabled) {
+      handleChange(!checked);
+    }
   };
 
   return (
-    <div css={checkboxWrapperStyle}>
-      <div css={checkboxStyle(size)} onClick={handleClick}>
-        {checked ? (
-          <CheckBoxIcon
-            sx={{
-              color: COLOR.WHITE,
-              fill: COLOR.PRIMARY,
-            }}
-          />
-        ) : (
-          <CheckBoxOutlineBlankIcon
-            sx={{
-              color: COLOR.GRAY800,
-            }}
-          />
-        )}
+    <div css={checkboxWrapperStyle(size)}>
+      <div css={checkboxBgStyle(size, disabled)} onClick={handleClick}>
+        <div css={checkboxStyle(disabled)}>
+          {checked || disabled ? (
+            <CheckBoxIcon
+              sx={{
+                color: COLOR.WHITE,
+                fill: COLOR.PRIMARY,
+              }}
+              className='blank'
+            />
+          ) : (
+            <CheckBoxOutlineBlankIcon
+              sx={{
+                fill: COLOR.BLACK,
+              }}
+            />
+          )}
+        </div>
       </div>
-      {label && <span>{label}</span>}
+      {label && <span onClick={handleClick}>{label}</span>}
     </div>
   );
 };
 
-const checkboxWrapperStyle = css`
+const checkboxWrapperStyle = (size: SizeTypes) => css`
   display: flex;
   align-items: center;
+  gap: ${size === 'sm' ? '4px' : ''};
 
   span {
     font-size: ${FONT_SIZE.TEXT_SM};
     color: ${COLOR.BLACK};
+    cursor: pointer;
   }
 `;
 
-const checkboxStyle = (size: SizeTypes) => css`
-  margin: ${size === 'lg' ? '4px' : size === 'md' ? '2px' : '0px'};
-  border-radius: 50%;
+const checkboxStyle = (disabled: boolean) => css`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 15px;
+  height: 15px;
+  background-color: ${disabled === true ? '' : COLOR.WHITE};
 
   svg {
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: ${FONT_SIZE.TITLE_SM};
-    cursor: pointer;
-    margin: ${size === 'lg' ? '8px' : size === 'md' ? '6px' : '2px'};
   }
 
-  :hover {
-    background-color: ${COLOR_OPACITY.PRIMARY_OPACITY10};
-    transition: 0.3s;
+  .blank {
+    fill: ${disabled === true ? COLOR.GRAY600 : COLOR.PRIMARY};
   }
+`;
+
+const checkboxBgStyle = (size: SizeTypes, disabled: boolean) => css`
+  width: ${size === 'sm' ? '28px' : size === 'md' ? '40px' : '48px'};
+  height: ${size === 'sm' ? '28px' : size === 'md' ? '40px' : '48px'};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: ${disabled ? 'not-allowed' : 'pointer'};
+  position: relative;
+
+  ${disabled === false &&
+  css`
+    &:hover::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: ${COLOR_OPACITY.PRIMARY_OPACITY10};
+    }
+  `}
 `;
 
 export default Checkbox;

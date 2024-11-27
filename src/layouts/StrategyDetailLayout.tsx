@@ -42,7 +42,7 @@ const StrategyDetailLayout = () => {
     ];
 
     navigate(pathArr[currentTab]);
-  }, [currentTab]);
+  }, [currentTab, navigate]);
 
   return (
     <div css={wrapperStyle}>
@@ -53,7 +53,7 @@ const StrategyDetailLayout = () => {
               <ProfileImage />
               <span>트레이더명</span>
             </div>
-            <div className='like-info'>
+            <div className='count-info'>
               <span>관심수</span>
               <div>
                 <FavoriteBorder sx={{ color: COLOR.POINT, fontSize: '20px' }} />
@@ -293,12 +293,12 @@ const infoBoxStyle = css`
         gap: 16px;
       }
 
-      .like-info {
+      .count-info {
         display: flex;
         flex-direction: column;
         gap: 16px;
 
-        span:first-of-type {
+        span:first-child {
           font-size: ${FONT_SIZE.TEXT_SM};
         }
 

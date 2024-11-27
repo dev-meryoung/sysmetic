@@ -1,15 +1,32 @@
 import { create } from 'zustand';
 
-interface ModalStateProps {
+interface ModalConfig {
   isOpen: boolean;
-  content: React.ReactNode | null;
-  openModal: (content: React.ReactNode) => void;
-  closeModal: () => void;
+  width?: number;
 }
 
-export const useModalStore = create<ModalStateProps>((set) => ({
-  isOpen: false,
-  content: null,
-  openModal: (content) => set({ isOpen: true, content }),
-  closeModal: () => set({ isOpen: false, content: null }),
+interface ModalStateProps {
+  modals: Record<string, ModalConfig>;
+  openModal: (id: string, width?: number) => void;
+  closeModal: (id: string) => void;
+}
+
+const useModalStore = create<ModalStateProps>((set) => ({
+  modals: {},
+  openModal: (id: string, width: number = 336) =>
+    set((state: ModalStateProps) => ({
+      modals: {
+        ...state.modals,
+        [id]: { isOpen: true, width },
+      },
+    })),
+  closeModal: (id: string) =>
+    set((state: ModalStateProps) => ({
+      modals: {
+        ...state.modals,
+        [id]: { ...state.modals[id], isOpen: false },
+      },
+    })),
 }));
+
+export default useModalStore;
