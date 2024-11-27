@@ -4,10 +4,12 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import ToTopButton from '@/components/ToTopButton';
 import Footer from '@/layouts/Footer';
 import Header from '@/layouts/Header';
+import useAuthStore from '@/stores/useAuthStore';
 
 const Layout = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { nickname } = useAuthStore();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -15,7 +17,7 @@ const Layout = () => {
 
   return (
     <div css={containerStyle}>
-      <Header />
+      <Header nickname={nickname} />
       <main>
         <Outlet />
       </main>

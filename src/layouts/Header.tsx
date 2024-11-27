@@ -1,38 +1,18 @@
-import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import logo from '@/assets/images/logo.png';
 import Breadcrumb from '@/components/Breadcrumb';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 import { useLogout } from '@/hooks/useAuthApi';
-import { parseUserToken } from '@/utils/authUtils';
 
-const Header = () => {
-  const navigate = useNavigate();
+interface HeaderProps {
+  nickname: string;
+}
+
+const Header: React.FC<HeaderProps> = ({ nickname }) => {
   const { mutate: logout } = useLogout();
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(!!parseUserToken());
-  const [nickname, setNickname] = useState<string>('');
-
-  useEffect(() => {
-    const token = parseUserToken();
-    setIsLoggedIn(!!token);
-
-    if (token) {
-      setNickname(token['nickname']);
-    }
-  }, []);
-
-  const handleLogout = () => {
-    logout(undefined, {
-      onSuccess: () => {
-        localStorage.removeItem('token');
-        setIsLoggedIn(false);
-        navigate(PATH.ROOT);
-      },
-    });
-  };
 
   return (
     <header css={wrapperStyle}>
@@ -40,14 +20,14 @@ const Header = () => {
         <div css={headerTopBgStyle}>
           <div css={headerTopStyle}>
             <div className='top-links'>
-              {isLoggedIn ? (
+              {!!nickname ? (
                 <>
                   <span>
                     <span className='nickname'>{nickname}</span>
                     님! 승승장구하는 하루 보내세요
                   </span>
                   <Link to={PATH.MYPAGE}>마이페이지</Link>
-                  <a onClick={handleLogout}>로그아웃</a>
+                  <a onClick={() => logout()}>로그아웃</a>
                 </>
               ) : (
                 <>
