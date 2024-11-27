@@ -49,6 +49,7 @@ export const PATH = {
   ADMIN_STRATEGIES_CONTROL: (strategyId = ':strategyId') =>
     `/admin/strategies/${strategyId}`,
   ADMIN_QNA: '/admin/qna',
+  ADMIN_QNA_DETAIL: (qnaId = ':qnaId') => `/admin/qna/${qnaId}`,
   NOTICES: '/notices',
   NOTICES_DETAIL: (noticeId = ':noticeId') => `/notices/${noticeId}`,
   FAQ: '/faq',
