@@ -267,7 +267,7 @@ const iconWrapperStyle = css`
   position: absolute;
   bottom: 0;
   left: 80px;
-  background-color: ${COLOR.GRAY400};
+  background-color: ${COLOR.GRAY};
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -275,6 +275,10 @@ const iconWrapperStyle = css`
   width: 48px;
   height: 48px;
   cursor: pointer;
+
+    &:hover {
+    background-color: ${COLOR.GRAY700};
+  }
 `;
 
 const iconStyle = css`
