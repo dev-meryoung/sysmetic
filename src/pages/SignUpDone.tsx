@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import { useNavigate, useParams } from 'react-router-dom';
-import profileImg from '@/assets/images/default-profile.png';
+import congratulation from '@/assets/images/congratulation.png';
 import Button from '@/components/Button';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
@@ -20,7 +20,7 @@ const SignUpDone = () => {
   return (
     <div css={wrapperStyle}>
       <div css={profileDivStyle}>
-        <img src={profileImg} alt='my-profile' />
+        <img src={congratulation} alt='congratulation' />
       </div>
       <div css={contentsDivStyle}>
         <h2>축하합니다. Sysmetic 회원가입이 완료되었습니다!</h2>
@@ -63,10 +63,9 @@ const wrapperStyle = css`
 `;
 
 const profileDivStyle = css`
-  width: 300px;
+  width: 330px;
   height: 300px;
   margin: 96px auto 0;
-  border-radius: 300px;
   font-size: ${FONT_SIZE.TITLE_LG};
   letter-spacing: -0.72px;
   display: flex;
