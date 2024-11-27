@@ -222,7 +222,7 @@ const adminATitleStyle = css`
   .info {
     display: flex;
     align-items: center;
-    gap: 32px;
+    gap: 8px;
   }
 
   .profile {
