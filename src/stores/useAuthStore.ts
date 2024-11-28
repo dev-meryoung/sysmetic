@@ -7,6 +7,7 @@ interface AuthConfig {
   isLoggedIn: boolean;
   memberId: number;
   email: string;
+  phoneNumber: string;
   nickname: string;
   roleCode: RoleCodeTypes;
   profileImage: string | null;
@@ -23,6 +24,7 @@ const resetState = (set: Function) => {
     isLoggedIn: false,
     memberId: 0,
     email: '',
+    phoneNumber: '',
     nickname: '',
     role: '',
     profileImage: null,
@@ -35,6 +37,7 @@ const updateState = (set: Function, authData: AuthConfig) => {
     isLoggedIn: true,
     memberId: authData.memberId,
     email: authData.email,
+    phoneNumber: authData.phoneNumber,
     nickname: authData.nickname,
     roleCode: authData.roleCode,
     profileImage: authData.profileImage,
@@ -45,6 +48,7 @@ const useAuthStore = create<AuthStateProps>((set) => ({
   isLoggedIn: false,
   memberId: 0,
   email: '',
+  phoneNumber: '',
   nickname: '',
   roleCode: '',
   profileImage: null,
