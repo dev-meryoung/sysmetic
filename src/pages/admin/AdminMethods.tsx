@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import TagTest from '@/assets/images/test-tag.jpg';
 import Button from '@/components/Button';
@@ -8,7 +8,7 @@ import Table from '@/components/Table';
 import Tag from '@/components/Tag';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import adminMethods from '@/mocks/adminMethods.json';
-import { useModalStore } from '@/stores/useModalStore';
+import useModalStore from '@/stores/useModalStore';
 import { useTableStore } from '@/stores/useTableStore';
 
 interface AdminMethodsDataProps {
@@ -16,7 +16,41 @@ interface AdminMethodsDataProps {
   type: string;
 }
 
+interface DelModalProps {
+  toggleAllCheckBoxes: (value: number) => void;
+}
+
 const PAGE_SIZE = 10;
+
+const DelModal: React.FC<DelModalProps> = ({ toggleAllCheckBoxes }) => {
+  const delModal = useModalStore();
+
+  const handleDeleteClick = () => {
+    //? 데이터 삭제 코드
+    //1. data.filter()를 통해 체크된 항목을 제외한 새로운 데이터 생성
+    //2. setData(변수명)을 통해 data 상태 업데이트
+    //3. 페이지 수 최신화 업데이트
+
+    //4.체크박스 상태 초기화 및 모달 닫기
+    toggleAllCheckBoxes(0);
+    delModal.closeModal('delete');
+  };
+
+  return (
+    <div css={delModalStyle}>
+      <p>해당 종목을 삭제하시겠습니까?</p>
+      <div className='del-modal-btn'>
+        <Button
+          width={120}
+          border={true}
+          label='아니오'
+          handleClick={() => delModal.closeModal('delete')}
+        />
+        <Button width={120} label='예' handleClick={handleDeleteClick} />
+      </div>
+    </div>
+  );
+};
 
 const AdminMethods = () => {
   //테이블 관련
@@ -75,34 +109,12 @@ const AdminMethods = () => {
     },
   ];
 
-  const handleDeleteClick = () => {
-    //? 데이터 삭제 코드
-    //1. data.filter()를 통해 체크된 항목을 제외한 새로운 데이터 생성
-    //2. setData(변수명)을 통해 data 상태 업데이트
-    //3. 페이지 수 최신화 업데이트
+  //모달 관련
+  const delModal = useModalStore();
 
-    //4.체크박스 상태 초기화 및 모달 닫기
-    toggleAllCheckboxes(0);
-    closeModal();
-  };
-
-  const { openModal, closeModal } = useModalStore();
   const openDeleteModal = () => {
     if (checkedItems.length > 0) {
-      openModal(
-        <div css={delModalStyle}>
-          <p>해당 매매방식을 삭제하시겠습니까?</p>
-          <div className='del-modal-btn'>
-            <Button
-              width={120}
-              border={true}
-              label='아니오'
-              handleClick={closeModal}
-            />
-            <Button width={120} label='예' handleClick={handleDeleteClick} />
-          </div>
-        </div>
-      );
+      delModal.openModal('delete');
     }
   };
 
@@ -158,7 +170,10 @@ const AdminMethods = () => {
           handlePageChange={setCurPage}
         />
       </div>
-      <Modal />
+      <Modal
+        content={<DelModal toggleAllCheckBoxes={toggleAllCheckboxes} />}
+        id='delete'
+      />
     </div>
   );
 };
