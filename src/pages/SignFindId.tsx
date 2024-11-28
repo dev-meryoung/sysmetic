@@ -11,34 +11,31 @@ type InputStateTypes = 'normal' | 'warn';
 
 const SignFindId = () => {
   const [name, setName] = useState('');
+  const [nameStatus, setNameStatus] = useState<InputStateTypes>('normal');
   const [phone, setPhone] = useState('');
+  const [phoneStatus, setPhoneStatus] = useState<InputStateTypes>('normal');
   const [showEmail, setShowEmail] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
-  const [nameStatus, setNameStatus] = useState<InputStateTypes>('normal');
+
   const navigate = useNavigate();
 
   const handleFindBtn = () => {
     if (name.trim() === '' || phone.trim() === '') {
       setShowMessage(true);
       setShowEmail(false);
+      setNameStatus('warn');
+      setPhoneStatus('warn');
     } else {
       setShowMessage(false);
       setShowEmail(true);
+      setNameStatus('normal');
+      setPhoneStatus('normal');
     }
   };
 
-  const handleMainBtn = () => {
-    navigate(PATH.ROOT);
-  };
+  const handleMainBtn = () => navigate(PATH.ROOT);
 
-  const handleSignInBtn = () => {
-    navigate(PATH.SIGN_IN);
-  };
-
-  const validateName = (value: string) => {
-    setName(value);
-    setNameStatus(value.trim() !== '' ? 'normal' : 'warn');
-  };
+  const handleSignInBtn = () => navigate(PATH.SIGN_IN);
 
   return (
     <div css={wrapperStyle}>
@@ -52,6 +49,7 @@ const SignFindId = () => {
           </span>
         </div>
       </div>
+
       <div css={findFormStyle}>
         <div className='writting-layout'>
           <div css={inputWrapperStyle}>
@@ -60,7 +58,7 @@ const SignFindId = () => {
               value={name}
               status={nameStatus}
               placeholder='이름을 입력하세요'
-              handleChange={(e) => validateName(e.target.value)}
+              handleChange={(e) => setName(e.target.value)}
             />
           </div>
           <div css={inputWrapperStyle}>
@@ -68,6 +66,7 @@ const SignFindId = () => {
             <div className='input-items'>
               <TextInput
                 value={phone}
+                status={phoneStatus}
                 placeholder="' - ' 를 제외하고 입력하세요"
                 handleChange={(e) => setPhone(e.target.value)}
                 width={360}
@@ -88,6 +87,7 @@ const SignFindId = () => {
           </div>
         </div>
       </div>
+
       {showEmail && (
         <>
           <div css={showEmailStyle}>

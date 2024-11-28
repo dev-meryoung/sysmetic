@@ -5,22 +5,28 @@ import VisibilityOffOutlined from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlined from '@mui/icons-material/VisibilityOutlined';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
+import Checkbox from '@/components/Checkbox';
 import IconButton from '@/components/IconButton';
 import TextInput from '@/components/TextInput';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
-
-type InputStateTypes = 'normal' | 'warn';
+import { useLogin } from '@/hooks/useAuthApi';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [emailStatus, setEmailStatus] = useState<InputStateTypes>('normal');
-  const [passwordStatus, setPasswordStatus] =
-    useState<InputStateTypes>('normal');
+  const [emailError, setEmailError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const loginMutation = useLogin();
   const navigate = useNavigate();
+
+  const emailRegEx =
+    /^[A-Za-z0-9]([-_.]?[A-Za-z0-9])*@[A-Za-z0-9]([-_.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$/i;
+  const passwordRegEx =
+    /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,20}$/;
 
   const handlePasswordVisibility = () => setShowPassword((prev) => !prev);
 
@@ -30,19 +36,39 @@ const SignIn = () => {
 
   const validateEmail = (value: string) => {
     setEmail(value);
-    setEmailStatus(
-      value.includes('@') && value.includes('.') ? 'normal' : 'warn'
-    );
+    setEmailError(!emailRegEx.test(value));
   };
 
   const validatePassword = (value: string) => {
     setPassword(value);
-    setPasswordStatus(value.length >= 6 ? 'normal' : 'warn');
+    setPasswordError(!passwordRegEx.test(value));
   };
 
   const handleSignIn = () => {
-    // 로그인 처리 로직 추가 가능
-    navigate(PATH.ROOT);
+    const isEmailValid = emailRegEx.test(email);
+    const isPasswordValid = passwordRegEx.test(password);
+
+    if (!isEmailValid) setEmailError(true);
+    if (!isPasswordValid) setPasswordError(true);
+
+    if (isEmailValid && isPasswordValid) {
+      loginMutation.mutate(
+        { email, password, rememberMe },
+        {
+          onSuccess: () => {
+            navigate(PATH.ROOT);
+          },
+          onError: () => {
+            setEmailError(true);
+            setPasswordError(true);
+          },
+        }
+      );
+    }
+  };
+
+  const handleRememberMeChange = () => {
+    setRememberMe((prev) => !prev);
   };
 
   return (
@@ -50,12 +76,11 @@ const SignIn = () => {
       <div css={signInTextStyle}>로그인</div>
 
       <div css={containerInputStyle}>
-        {/* 이메일 입력 */}
         <div css={inputWrapperStyle}>
           <div css={emailStyle}>
             <TextInput
               value={email}
-              status={emailStatus}
+              status={emailError ? 'warn' : 'normal'}
               placeholder='이메일 주소(test@example.com)'
               handleChange={(e) => validateEmail(e.target.value)}
             />
@@ -68,15 +93,19 @@ const SignIn = () => {
               css={deleteIconBtnStyle}
             />
           </div>
+          {emailError && (
+            <span css={messageStyle}>
+              올바른 이메일 주소 방식으로 입력하셔야 합니다.
+            </span>
+          )}
         </div>
 
-        {/* 비밀번호 입력 */}
         <div css={inputWrapperStyle}>
           <div css={passwordStyle}>
             <TextInput
               type={showPassword ? 'text' : 'password'}
               value={password}
-              status={passwordStatus}
+              status={passwordError ? 'warn' : 'normal'}
               placeholder='비밀번호'
               handleChange={(e) => validatePassword(e.target.value)}
             />
@@ -99,11 +128,17 @@ const SignIn = () => {
               css={deleteIconBtnStyle}
             />
           </div>
+          {passwordError && (
+            <span css={messageStyle}>
+              비밀번호는 8~20자의 영문, 숫자로 구성되어야 합니다.
+            </span>
+          )}
         </div>
       </div>
 
       <div css={staySignInContainerStyle}>
-        <input type='checkbox' css={staySignInStyle} /> 로그인 유지
+        <Checkbox checked={rememberMe} handleChange={handleRememberMeChange} />
+        로그인 유지
       </div>
 
       <div>
@@ -163,10 +198,12 @@ const inputWrapperStyle = css`
 `;
 
 const emailStyle = css`
+  position: relative;
   width: 360px;
 `;
 
 const passwordStyle = css`
+  position: relative;
   width: 360px;
 `;
 
@@ -195,11 +232,6 @@ const staySignInContainerStyle = css`
   font-size: ${FONT_SIZE.TEXT_SM};
 `;
 
-const staySignInStyle = css`
-  margin-right: 8px;
-  cursor: pointer;
-`;
-
 const linksStyle = css`
   margin-top: 16px;
   display: flex;
@@ -214,4 +246,11 @@ const linksStyle = css`
 
 const accountStyle = css`
   margin-right: 100px;
+`;
+
+const messageStyle = css`
+  color: ${COLOR.POINT};
+  font-size: ${FONT_SIZE.TEXT_SM};
+  margin-top: 4px;
+  display: block;
 `;
