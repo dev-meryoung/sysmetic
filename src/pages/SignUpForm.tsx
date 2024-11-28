@@ -2,6 +2,7 @@ import { useEffect, useState, ChangeEvent } from 'react';
 import { css } from '@emotion/react';
 import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
 import { useNavigate, useParams } from 'react-router-dom';
+import { checkEmail } from '@/api/authApi';
 import Button from '@/components/Button';
 import Calendar from '@/components/Calendar';
 import Modal from '@/components/Modal';
@@ -14,6 +15,11 @@ import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 import useModalStore from '@/stores/useModalStore';
+
+interface checkModalProps {
+  isExist?: boolean;
+  setDisabled?: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
 const RadioOption1 = [
   { label: '관심 전략과 정보 수신에 동의합니다.', value: 'true' },
@@ -32,6 +38,7 @@ const EmailOptions = [
   { label: 'nate.com', value: 'nate' },
   { label: 'yahoo.com', value: 'yahoo' },
   { label: 'empal.com', value: 'empal' },
+  { label: 'test.com', value: 'test' },
 ];
 
 const REGEX = {
@@ -58,6 +65,11 @@ const AuthModal = () => {
     } else {
       setAuthCodeStatus('warn');
     }
+  };
+
+  const handleAuthBtnClick = () => {
+    console.log('인증되었습니다.');
+    authModal.closeModal('auth');
   };
 
   return (
@@ -92,22 +104,29 @@ const AuthModal = () => {
           label='취소'
           handleClick={() => authModal.closeModal('auth')}
         />
-        <Button
-          width={120}
-          label='인증하기'
-          handleClick={() => console.log('인증하기')}
-        />
+        <Button width={120} label='인증하기' handleClick={handleAuthBtnClick} />
       </div>
     </div>
   );
 };
 
-const CheckIdModal = () => {
+const CheckIdModal: React.FC<checkModalProps> = ({
+  isExist,
+  setDisabled = () => {},
+}) => {
   const checkIdModal = useModalStore();
-  const [isExist, setIsExist] = useState(false);
+
   const handleBtnClick = () => {
     checkIdModal.closeModal('checkId');
   };
+
+  useEffect(() => {
+    if (!isExist) {
+      setDisabled(false);
+    } else {
+      setDisabled(true);
+    }
+  }, [isExist, setDisabled]);
 
   return (
     <div css={defaultModalStyle}>
@@ -155,6 +174,9 @@ const SignUpForm = () => {
   const authModal = useModalStore();
   const checkIdModal = useModalStore();
   const checkNicknameModal = useModalStore();
+  const [checkIdDisabled, setCheckIdDisabled] = useState(true);
+  const [checkIdAuthDisabled, setCheckIdAuthDisabled] = useState(true);
+  const [isExist, setIsExist] = useState(false);
   //정보수신 동의
   const [isFirstChecked, setIsFirstChecked] = useState('false');
   const [isSecondChecked, setIsSecondChecked] = useState('false');
@@ -292,8 +314,16 @@ const SignUpForm = () => {
     }
   };
   //이메일 중복확인 모달
-  const handleCheckIdModal = () => {
-    checkIdModal.openModal('checkId');
+  const handleCheckIdModal = async () => {
+    if (id && selectedEmail) {
+      const emailData = await checkEmail(id, selectedEmail);
+      if (emailData === 200) {
+        setIsExist(false);
+      } else {
+        setIsExist(true);
+      }
+      checkIdModal.openModal('checkId');
+    }
   };
   //닉네임 중복확인 모달
   const handleCheckNicknameModal = () => {
@@ -327,6 +357,14 @@ const SignUpForm = () => {
     nameStatus,
     phoneNumStatus,
   ]);
+  // 중복확인 on/off
+  useEffect(() => {
+    if (id && selectedEmail) {
+      setCheckIdDisabled(false);
+    } else {
+      setCheckIdDisabled(true);
+    }
+  }, [id, selectedEmail]);
 
   return (
     <div css={wrapperStyle}>
@@ -354,12 +392,14 @@ const SignUpForm = () => {
                 width={80}
                 label='중복확인'
                 handleClick={handleCheckIdModal}
+                disabled={checkIdDisabled}
               />
               <Button
                 color='textBlack'
                 width={96}
                 label='이메일 인증'
                 handleClick={handleOpenAuthModal}
+                disabled={checkIdAuthDisabled}
               />
             </div>
           </div>
@@ -500,7 +540,15 @@ const SignUpForm = () => {
         />
       </div>
       <Modal content={<AuthModal />} id='auth' />
-      <Modal content={<CheckIdModal />} id='checkId' />
+      <Modal
+        content={
+          <CheckIdModal
+            isExist={isExist}
+            setDisabled={setCheckIdAuthDisabled}
+          />
+        }
+        id='checkId'
+      />
       <Modal content={<CheckNicknameModal />} id='checkNickname' />
     </div>
   );
