@@ -13,6 +13,13 @@ export const login = async (loginData: LoginRequestData) => {
   return response.data;
 };
 
+// Token 유효성 검증 및 회원 정보 조회 API
+export const checkAuth = async () => {
+  const response = await axiosInstance.get('/v1/auth');
+
+  return response.data;
+};
+
 // 로그아웃 API
 export const logout = async () => {
   const response = await axiosInstance.post('/v1/auth/logout');
