@@ -63,11 +63,11 @@ const AddModal = () => {
 
   return (
     <div css={addModalStyle}>
-      <p>매매방식 등록</p>
+      <p>종목 등록</p>
       <table>
         <thead>
           <tr>
-            <th>매매방식</th>
+            <th>종목명</th>
             <th>아이콘</th>
           </tr>
         </thead>
@@ -126,11 +126,11 @@ const ModModal = () => {
 
   return (
     <div css={addModalStyle}>
-      <p>매매방식 수정</p>
+      <p>종목 수정</p>
       <table>
         <thead>
           <tr>
-            <th>매매방식</th>
+            <th>종목명</th>
             <th>아이콘</th>
           </tr>
         </thead>
