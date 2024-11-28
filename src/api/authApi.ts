@@ -49,13 +49,18 @@ export const checkNickname = async () => {};
 export const checkEmail = async (
   id: string,
   selectedEmail: string
-): Promise<string | null> => {
+): Promise<number> => {
   try {
     const email = `${id}@${selectedEmail}.com`;
     const response = await axiosInstance.get(
-      `v1/auth/check-duplicate-email?email=${email}`
+      `v1/auth/check-duplicate-email?email=${email}`,
+      {
+        validateStatus: (status) =>
+          (status >= 200 && status < 300) || status === 409,
+      }
     );
-    return response.data.data;
+
+    return response.data.code;
   } catch (error) {
     console.error('이메일 중복확인 이멀전씨', error);
     throw new Error('이메일 중복확인 임어준씨');
