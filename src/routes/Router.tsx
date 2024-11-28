@@ -13,6 +13,7 @@ import AdminNoticeEdit from '@/pages/admin/AdminNoticeEdit';
 import AdminNotices from '@/pages/admin/AdminNotices';
 import AdminNoticesDetail from '@/pages/admin/AdminNoticesDetail';
 import AdminQna from '@/pages/admin/AdminQna';
+import AdminQnaDetail from '@/pages/admin/AdminQnaDetail';
 import AdminStocks from '@/pages/admin/AdminStocks';
 import AdminStrategies from '@/pages/admin/AdminStrategies';
 import AdminStrategiesControl from '@/pages/admin/AdminStrategiesControl';
@@ -245,6 +246,10 @@ const router = createBrowserRouter([
       {
         path: PATH.ADMIN_QNA,
         element: <AdminQna />,
+      },
+      {
+        path: PATH.ADMIN_QNA_DETAIL(),
+        element: <AdminQnaDetail />,
       },
       {
         path: PATH.NOTICES,
