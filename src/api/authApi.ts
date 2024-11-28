@@ -46,8 +46,21 @@ export const register = async () => {};
 export const checkNickname = async () => {};
 
 // 이메일 중복 확인 API
-export const checkEmail = async () => {};
-
+export const checkEmail = async (
+  id: string,
+  selectedEmail: string
+): Promise<string | null> => {
+  try {
+    const email = `${id}@${selectedEmail}.com`;
+    const response = await axiosInstance.get(
+      `v1/auth/check-duplicate-email?email=${email}`
+    );
+    return response.data.data;
+  } catch (error) {
+    console.error('이메일 중복확인 이멀전씨', error);
+    throw new Error('이메일 중복확인 임어준씨');
+  }
+};
 // 이메일 인증 코드 전송(회원가입) API
 export const sendEmailCode = async () => {};
 
