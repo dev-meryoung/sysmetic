@@ -1,0 +1,162 @@
+[
+  {
+    "no": 1,
+    "traderName": "Trader1",
+    "strategyName": "Strategy1",
+    "enrollDate": "2024-04-26",
+    "isOn": false,
+    "staged": "승인"
+  },
+  {
+    "no": 2,
+    "traderName": "Trader2",
+    "strategyName": "Strategy2",
+    "enrollDate": "2024-07-09",
+    "isOn": false,
+    "staged": "승인요청"
+  },
+  {
+    "no": 3,
+    "traderName": "Trader3",
+    "strategyName": "Strategy3",
+    "enrollDate": "2024-01-30",
+    "isOn": false,
+    "staged": "승인요청"
+  },
+  {
+    "no": 4,
+    "traderName": "Trader4",
+    "strategyName": "Strategy4",
+    "enrollDate": "2024-06-19",
+    "isOn": true,
+    "staged": "승인"
+  },
+  {
+    "no": 5,
+    "traderName": "Trader5",
+    "strategyName": "Strategy5",
+    "enrollDate": "2024-05-12",
+    "isOn": false,
+    "staged": "반려"
+  },
+  {
+    "no": 6,
+    "traderName": "Trader6",
+    "strategyName": "Strategy6",
+    "enrollDate": "2024-05-10",
+    "isOn": true,
+    "staged": "승인요청"
+  },
+  {
+    "no": 7,
+    "traderName": "Trader7",
+    "strategyName": "Strategy7",
+    "enrollDate": "2024-11-11",
+    "isOn": false,
+    "staged": "승인요청"
+  },
+  {
+    "no": 8,
+    "traderName": "Trader8",
+    "strategyName": "Strategy8",
+    "enrollDate": "2024-01-27",
+    "isOn": false,
+    "staged": "승인요청"
+  },
+  {
+    "no": 9,
+    "traderName": "Trader9",
+    "strategyName": "Strategy9",
+    "enrollDate": "2024-01-24",
+    "isOn": false,
+    "staged": "승인"
+  },
+  {
+    "no": 10,
+    "traderName": "Trader10",
+    "strategyName": "Strategy10",
+    "enrollDate": "2024-05-15",
+    "isOn": true,
+    "staged": "승인요청"
+  },
+  {
+    "no": 11,
+    "traderName": "Trader11",
+    "strategyName": "Strategy11",
+    "enrollDate": "2024-07-17",
+    "isOn": false,
+    "staged": "요청전"
+  },
+  {
+    "no": 12,
+    "traderName": "Trader12",
+    "strategyName": "Strategy12",
+    "enrollDate": "2024-01-21",
+    "isOn": true,
+    "staged": "반려"
+  },
+  {
+    "no": 13,
+    "traderName": "Trader13",
+    "strategyName": "Strategy13",
+    "enrollDate": "2024-02-06",
+    "isOn": false,
+    "staged": "승인"
+  },
+  {
+    "no": 14,
+    "traderName": "Trader14",
+    "strategyName": "Strategy14",
+    "enrollDate": "2024-10-14",
+    "isOn": false,
+    "staged": "요청전"
+  },
+  {
+    "no": 15,
+    "traderName": "Trader15",
+    "strategyName": "Strategy15",
+    "enrollDate": "2023-12-24",
+    "isOn": false,
+    "staged": "승인"
+  },
+  {
+    "no": 16,
+    "traderName": "Trader16",
+    "strategyName": "Strategy16",
+    "enrollDate": "2024-03-17",
+    "isOn": true,
+    "staged": "반려"
+  },
+  {
+    "no": 17,
+    "traderName": "Trader17",
+    "strategyName": "Strategy17",
+    "enrollDate": "2024-07-09",
+    "isOn": false,
+    "staged": "요청전"
+  },
+  {
+    "no": 18,
+    "traderName": "Trader18",
+    "strategyName": "Strategy18",
+    "enrollDate": "2024-06-12",
+    "isOn": false,
+    "staged": "요청전"
+  },
+  {
+    "no": 19,
+    "traderName": "Trader19",
+    "strategyName": "Strategy19",
+    "enrollDate": "2024-01-22",
+    "isOn": false,
+    "staged": "반려"
+  },
+  {
+    "no": 20,
+    "traderName": "Trader20",
+    "strategyName": "Strategy20Strategy20Strategy20Strategy20",
+    "enrollDate": "2023-12-26",
+    "isOn": false,
+    "staged": "승인"
+  }
+]
