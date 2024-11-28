@@ -15,6 +15,7 @@ import {
   useGetInquiryDetailUser,
   useDeleteInquiry,
 } from '@/hooks/useCommonApi';
+import useAuthStore from '@/stores/useAuthStore';
 import useModalStore from '@/stores/useModalStore';
 
 interface QnaDataTypes {
@@ -28,7 +29,7 @@ interface QnaDataTypes {
   inquiryTitle: string;
   inquiryRegistrationDate: string;
   inquirerNickname: string;
-  inquiryStatus: 'open' | 'closed';
+  inquiryStatus: 'unclosed' | 'closed';
   strategyName: string;
   traderNickname: string;
   inquiryContent: string;
@@ -64,7 +65,7 @@ interface ApiResponse {
 }
 
 const QnaDetail = () => {
-  const [userType, _setUserType] = useState<'user' | 'trader'>('user'); // 나중에 수정
+  const { roleCode } = useAuthStore();
   const [qnaData, setQnaData] = useState<QnaDataTypes | null>(null);
   const [strategyData, setStrategyData] = useState<StrategyDataTypes | null>(
     null
@@ -79,7 +80,8 @@ const QnaDetail = () => {
   const fetchData = useCallback(() => {
     const params = { inquiryId: Number(inquiryId) };
 
-    const queryFn = userType === 'user' ? userQuery : traderQuery;
+    const queryFn = roleCode === 'USER' ? userQuery : traderQuery;
+
     queryFn.mutate(params, {
       onSuccess: (data: ApiResponse) => {
         setQnaData(data.qna);
@@ -90,16 +92,17 @@ const QnaDetail = () => {
         console.error('Error fetching Q&A data:', error);
       },
     });
-  }, [inquiryId, userType, userQuery, traderQuery]);
+  }, [inquiryId, roleCode, userQuery, traderQuery]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   const deleteMutation = useDeleteInquiry();
+  const isAnswerPresent = () => answerData.length > 0;
 
   const handleDeleteBtn = () => {
-    if (answerData) {
+    if (isAnswerPresent()) {
       alert('답변이 존재하는 문의는 삭제할 수 없습니다.');
       return;
     }
@@ -107,7 +110,7 @@ const QnaDetail = () => {
   };
 
   const confirmDelete = () => {
-    if (answerData) {
+    if (isAnswerPresent()) {
       alert('답변이 존재하는 문의는 삭제할 수 없습니다.');
       closeModal('delete-confirm');
       return;
@@ -132,13 +135,17 @@ const QnaDetail = () => {
             <span css={titleStyle}>{qnaData.inquiryTitle}</span>
             <span css={statusStyle}>{qnaData.inquiryStatus}</span>
             <div css={infoStyle}>
-              <div css={dateAndButtonsStyle}>
+              <div css={dateAndWriterStyle}>
                 <div css={dateStyle}>
-                  <span>작성일</span>
+                  <span css={dateNameStyle}>작성일</span>
                   <span>{qnaData.inquiryRegistrationDate}</span>
                 </div>
+                <div css={writerStyle}>
+                  <span css={writerNameStyle}>작성자</span>
+                  <span>{qnaData.inquirerNickname}</span>
+                </div>
                 <div css={buttonStyle}>
-                  {userType === 'user' && (
+                  {roleCode === 'USER' && (
                     <>
                       <Button
                         label='수정'
@@ -157,7 +164,7 @@ const QnaDetail = () => {
                       />
                     </>
                   )}
-                  {userType === 'trader' && (
+                  {roleCode === 'TRADER' && (
                     <Button
                       label='답변하기'
                       handleClick={() =>
@@ -325,15 +332,29 @@ const infoStyle = css`
   justify-content: space-between;
 `;
 
-const dateAndButtonsStyle = css`
+const dateAndWriterStyle = css`
   display: flex;
   align-items: center;
+  margin-top: 16px;
   gap: 32px;
 `;
 
 const dateStyle = css`
   display: flex;
   gap: 8px;
+`;
+
+const dateNameStyle = css`
+  font-weight: ${FONT_WEIGHT.MEDIUM};
+`;
+
+const writerStyle = css`
+  display: flex;
+  gap: 8px;
+`;
+
+const writerNameStyle = css`
+  font-weight: ${FONT_WEIGHT.MEDIUM};
 `;
 
 const buttonStyle = css`

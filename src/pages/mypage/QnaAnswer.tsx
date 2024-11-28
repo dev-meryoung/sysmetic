@@ -1,8 +1,6 @@
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { css } from '@emotion/react';
 import { useNavigate, useParams } from 'react-router-dom';
-import ProfileImageTest from '@/assets/images/test-profile.png';
-import TagTest from '@/assets/images/test-tag.jpg';
 import Button from '@/components/Button';
 import ProfileImage from '@/components/ProfileImage';
 import Tag from '@/components/Tag';
@@ -11,7 +9,21 @@ import TextInput from '@/components/TextInput';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
-import { useCreateAnswer } from '@/hooks/useCommonApi';
+import {
+  useGetInquiryDetailTrader,
+  useCreateAnswer,
+} from '@/hooks/useCommonApi';
+
+interface InquiryDataTypes {
+  inquiryId: number;
+  inquiryTitle: string;
+  inquiryContent: string;
+  inquiryStatus: string;
+  inquiryRegistrationDate: string;
+  inquirerNickname: string;
+  strategyName: string;
+  traderNickname: string;
+}
 
 type InputStateTypes = 'normal' | 'warn';
 
@@ -19,26 +31,52 @@ const QnaAnswer = () => {
   const [status, setStatus] = useState<InputStateTypes>('normal');
   const [titleValue, setTitleValue] = useState('');
   const [contentValue, setContentValue] = useState('');
+  const [inquiryData, setInquiryData] = useState<InquiryDataTypes | null>(null);
 
   const navigate = useNavigate();
+  const { inquiryId } = useParams<{ inquiryId: string }>();
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const getInquiryDetail = useGetInquiryDetailTrader();
+  const fetchData = useCallback(() => {
+    if (!inquiryId) return;
+
+    const params = { inquiryId: Number(inquiryId) };
+    getInquiryDetail.mutate(params, {
+      onSuccess: (data) => {
+        if (!data) {
+          alert('문의내역 조회에 실패했습니다.');
+          return;
+        }
+        setInquiryData(data);
+        setTitleValue(data.inquiryTitle);
+      },
+      onError: () => {
+        alert('문의내역 조회에 실패했습니다.');
+      },
+    });
+  }, [getInquiryDetail, inquiryId]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    if (value.trim() === '') {
-      setStatus('warn');
-    } else {
-      setStatus('normal');
-    }
+    setStatus(value.trim() === '' ? 'warn' : 'normal');
     setTitleValue(value);
-    setContentValue(value);
+  };
+
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setContentValue(e.target.value);
   };
 
   const createAnswer = useCreateAnswer();
-  const { inquiryId } = useParams<{ inquiryId: string }>();
-
   const handleSubmit = () => {
+    if (!titleValue.trim() || !contentValue.trim()) {
+      alert('제목과 내용을 입력해주세요.');
+      return;
+    }
+
     createAnswer.mutate(
       {
         inquiryId: Number(inquiryId),
@@ -56,7 +94,7 @@ const QnaAnswer = () => {
     );
   };
 
-  const handleBtn = () => {
+  const handleBack = () => {
     navigate(PATH.MYPAGE_QNA_DETAIL());
   };
 
@@ -65,39 +103,44 @@ const QnaAnswer = () => {
   return (
     <div css={wrapperStyle}>
       <span css={pageInfoStyle}>답변하기</span>
-      <div className='question-section' css={titleWrapperStyle}>
-        <span css={titleStyle}>
-          미국발 경제악화가 한국 증시에 미치는 영향은 뭘까?
-        </span>
-        <span css={statusStyle}>답변대기</span>
-        <div css={infoStyle}>
-          <div css={dateAndWriterStyle}>
-            <div css={dateStyle}>
-              <span css={dateNameStyle}>작성일</span>
-              <span>2024.11.18</span>
-            </div>
-            <div css={writerStyle}>
-              <span css={writerNameStyle}>작성자</span>
-              <span>질문자이름</span>
+
+      {inquiryData && (
+        <div className='question-section' css={titleWrapperStyle}>
+          <span css={titleStyle}>{inquiryData.inquiryTitle}</span>
+          <span css={statusStyle}>{inquiryData.inquiryStatus}</span>
+          <div css={infoStyle}>
+            <div css={dateAndWriterStyle}>
+              <div css={dateStyle}>
+                <span css={dateNameStyle}>작성일</span>
+                <span>{inquiryData.inquiryRegistrationDate}</span>
+              </div>
+              <div css={writerStyle}>
+                <span css={writerNameStyle}>작성자</span>
+                <span>{inquiryData.inquirerNickname}</span>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div css={strategyWrapperStyle}>
-        <div css={tagsAndTitleStyle}>
-          <div css={tagStyle}>
-            <Tag src={TagTest} alt='tag' />
+          <div css={strategyWrapperStyle}>
+            <div css={tagsAndTitleStyle}>
+              <div css={tagStyle}>
+                <Tag src='default-tag.png' alt='tag' />
+              </div>
+              <div css={strategyTextStyle}>{inquiryData.strategyName}</div>
+            </div>
+            <div css={profileStyle}>
+              <ProfileImage
+                src='default-profile.png'
+                alt='profileImg'
+                size='md'
+              />
+              <span css={nicknameStyle}>{inquiryData.traderNickname}</span>
+            </div>
           </div>
-          <div css={strategyTextStyle}>해당 전략명</div>
-        </div>
-        <div css={profileStyle}>
-          <ProfileImage src={ProfileImageTest} alt='profileImg' size='md' />
-          <span css={nicknameStyle}>닉네임</span>
-        </div>
-      </div>
 
-      <div css={inputStyle}>뭔가요?</div>
+          <div css={inputStyle}>{inquiryData.inquiryContent}</div>
+        </div>
+      )}
 
       <div className='comment-section' css={answerWrapperStyle}>
         <div css={answerNameStyle}>
@@ -106,7 +149,7 @@ const QnaAnswer = () => {
             status={status}
             placeholder='제목을 입력해주세요.'
             fullWidth
-            handleChange={handleChange}
+            handleChange={handleTitleChange}
           />
         </div>
         <div css={answerStyle}>
@@ -114,7 +157,7 @@ const QnaAnswer = () => {
             value={contentValue}
             placeholder='내용을 입력해주세요.'
             fullWidth
-            handleChange={handleChange}
+            handleChange={handleContentChange}
           />
         </div>
       </div>
@@ -122,7 +165,7 @@ const QnaAnswer = () => {
       <div css={goDetailBtnStyle}>
         <Button
           label='이전'
-          handleClick={handleBtn}
+          handleClick={handleBack}
           color='primaryOpacity10'
           size='md'
           shape='square'
@@ -142,6 +185,8 @@ const QnaAnswer = () => {
     </div>
   );
 };
+
+export default QnaAnswer;
 
 const wrapperStyle = css`
   padding-top: 96px;
@@ -283,5 +328,3 @@ const goDetailBtnStyle = css`
   align-items: center;
   gap: 16px;
 `;
-
-export default QnaAnswer;

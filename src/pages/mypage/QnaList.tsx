@@ -13,6 +13,7 @@ import {
   useGetInquiryListTrader,
   useGetInquiryListUser,
 } from '@/hooks/useCommonApi';
+import useAuthStore from '@/stores/useAuthStore';
 
 const POSTS_PER_PAGE = 10;
 
@@ -24,19 +25,19 @@ interface QnaListDataProps {
 }
 
 const strategyOptions = [
-  { label: '최신순', value: 'date_desc' },
-  { label: '전략명', value: 'strategyName_asc' },
+  { label: '최신순', value: ' registrationDate' },
+  { label: '전략명', value: 'strategyName' },
 ];
 
 const statusOptions = [
   { label: '전체', value: 'all' },
-  { label: '답변대기', value: '답변대기' },
-  { label: '답변완료', value: '답변완료' },
+  { label: '답변대기', value: 'closed' },
+  { label: '답변완료', value: 'unclosed' },
 ];
 
 const QnaList = () => {
-  const [userType, _setUserType] = useState<'user' | 'trader'>('user'); // 나중에 수정
-  const [sortConfig, setSortConfig] = useState<string>('date_desc');
+  const { roleCode } = useAuthStore();
+  const [sortConfig, setSortConfig] = useState<string>('registrationDate');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState<number>(0);
   const userQuery = useGetInquiryListUser();
@@ -49,26 +50,26 @@ const QnaList = () => {
       page: currentPage + 1,
     };
 
-    if (userType === 'user') {
+    if (roleCode === 'USER') {
       userQuery.mutate(params);
-    } else if (userType === 'trader') {
+    } else if (roleCode === 'TRADER') {
       traderQuery.mutate(params);
     }
-  }, [userType, sortConfig, statusFilter, currentPage, userQuery, traderQuery]);
+  }, [roleCode, sortConfig, statusFilter, currentPage, userQuery, traderQuery]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   const data =
-    userType === 'user' ? userQuery.data?.data : traderQuery.data?.data;
+    roleCode === 'USER' ? userQuery.data?.data : traderQuery.data?.data;
   const total =
-    userType === 'user' ? userQuery.data?.total : traderQuery.data?.total;
+    roleCode === 'USER' ? userQuery.data?.total : traderQuery.data?.total;
   const totalPage = Math.ceil((total || 0) / POSTS_PER_PAGE);
 
   const columns = [
     {
-      key: 'questionName' as keyof QnaListDataProps,
+      key: 'inquiryTitle' as keyof QnaListDataProps,
       header: '제목',
       render: (value: string) => (
         <div css={questionContainerStyle}>
@@ -91,14 +92,14 @@ const QnaList = () => {
       ),
     },
     {
-      key: 'date' as keyof QnaListDataProps,
+      key: 'inquiryRegistrationDate' as keyof QnaListDataProps,
       header: '전략일자',
     },
     {
-      key: 'status' as keyof QnaListDataProps,
+      key: 'inquiryStatu' as keyof QnaListDataProps,
       header: '진행상태',
       render: (value: string) => (
-        <span css={value === '답변완료' ? successStyle : waitingStyle}>
+        <span css={value === 'unclosed' ? successStyle : waitingStyle}>
           {value}
         </span>
       ),
