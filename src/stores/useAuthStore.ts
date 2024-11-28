@@ -1,11 +1,14 @@
 import { create } from 'zustand';
 import { checkAuth } from '@/api';
 
+type RoleCodeTypes = '' | 'USER' | 'TRADER' | 'MANAGER' | 'ADMIN';
+
 interface AuthConfig {
+  isLoggedIn: boolean;
   memberId: number;
   email: string;
   nickname: string;
-  role: string;
+  roleCode: RoleCodeTypes;
   profileImage: string | null;
 }
 
@@ -17,6 +20,7 @@ interface AuthStateProps extends AuthConfig {
 
 const resetState = (set: Function) => {
   set({
+    isLoggedIn: false,
     memberId: 0,
     email: '',
     nickname: '',
@@ -28,19 +32,21 @@ const resetState = (set: Function) => {
 
 const updateState = (set: Function, authData: AuthConfig) => {
   set({
+    isLoggedIn: true,
     memberId: authData.memberId,
     email: authData.email,
     nickname: authData.nickname,
-    role: authData.role,
+    roleCode: authData.roleCode,
     profileImage: authData.profileImage,
   });
 };
 
 const useAuthStore = create<AuthStateProps>((set) => ({
+  isLoggedIn: false,
   memberId: 0,
   email: '',
   nickname: '',
-  role: '',
+  roleCode: '',
   profileImage: null,
 
   setAuthState: (authData) => updateState(set, authData),
@@ -53,7 +59,7 @@ const useAuthStore = create<AuthStateProps>((set) => ({
     if (token) {
       try {
         const authData = await checkAuth();
-        updateState(set, authData);
+        updateState(set, authData.data);
       } catch {
         resetState(set);
       }

@@ -6,12 +6,10 @@ import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 import { useLogout } from '@/hooks/useAuthApi';
+import useAuthStore from '@/stores/useAuthStore';
 
-interface HeaderProps {
-  nickname: string;
-}
-
-const Header: React.FC<HeaderProps> = ({ nickname }) => {
+const Header = () => {
+  const { isLoggedIn, nickname } = useAuthStore();
   const { mutate: logout } = useLogout();
 
   return (
@@ -20,7 +18,7 @@ const Header: React.FC<HeaderProps> = ({ nickname }) => {
         <div css={headerTopBgStyle}>
           <div css={headerTopStyle}>
             <div className='top-links'>
-              {!!nickname ? (
+              {isLoggedIn ? (
                 <>
                   <span>
                     <span className='nickname'>{nickname}</span>
