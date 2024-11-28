@@ -13,7 +13,7 @@ import TextInput, { InputStateTypes } from '@/components/TextInput';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
-import { useModalStore } from '@/stores/useModalStore';
+import useModalStore from '@/stores/useModalStore';
 
 const RadioOption1 = [
   { label: '관심 전략과 정보 수신에 동의합니다.', value: 'true' },
@@ -40,6 +40,104 @@ const REGEX = {
   NAME_REGEX: /^[가-힣]{1,10}$/,
   NICKNAME_REGEX: /^[가-힣\d]{3,10}$/,
   PHONE_REGEX: /^010\d{8}$/,
+  AUTHCODE_REGEX: /^[A-Z0-9]{6}$/,
+};
+
+const AuthModal = () => {
+  // 모달 내 변수
+  const [authCode, setAuthCode] = useState('');
+  const [authCodeStatus, setAuthCodeStatus] =
+    useState<InputStateTypes>('normal');
+  const authModal = useModalStore();
+
+  const handleAuthCodeChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setAuthCode(e.target.value);
+
+    if (REGEX.AUTHCODE_REGEX.test(e.target.value)) {
+      setAuthCodeStatus('pass');
+    } else {
+      setAuthCodeStatus('warn');
+    }
+  };
+
+  return (
+    <div css={AuthModalStyle}>
+      <h6>
+        해당 이메일로 코드가 전송되었습니다.
+        <br />
+        3분 이내로 입력해 주시기 바랍니다.
+      </h6>
+      <div className='input-form'>
+        <p>
+          인증번호 입력
+          <Dot />
+        </p>
+        <TextInput
+          maxLength={6}
+          status={authCodeStatus}
+          width={312}
+          value={authCode}
+          handleChange={handleAuthCodeChange}
+        />
+        {authCodeStatus !== 'pass' ? (
+          <p>6자리의 영문 대문자, 숫자만 조합하여 사용</p>
+        ) : (
+          <></>
+        )}
+      </div>
+      <div className='auth-btn'>
+        <Button
+          width={120}
+          border={true}
+          label='취소'
+          handleClick={() => authModal.closeModal('auth')}
+        />
+        <Button
+          width={120}
+          label='인증하기'
+          handleClick={() => console.log('인증하기')}
+        />
+      </div>
+    </div>
+  );
+};
+
+const CheckIdModal = () => {
+  const checkIdModal = useModalStore();
+  const [isExist, setIsExist] = useState(false);
+  const handleBtnClick = () => {
+    checkIdModal.closeModal('checkId');
+  };
+
+  return (
+    <div css={defaultModalStyle}>
+      {isExist ? (
+        <p>중복된 이메일입니다.</p>
+      ) : (
+        <p>사용할 수 있는 아이디입니다.</p>
+      )}
+      <div>
+        <Button width={120} label='확인' handleClick={handleBtnClick} />
+      </div>
+    </div>
+  );
+};
+
+const CheckNicknameModal = () => {
+  const checkNicknameModal = useModalStore();
+
+  return (
+    <div css={defaultModalStyle}>
+      <p>중복된 닉네임입니다.</p>
+      <div>
+        <Button
+          width={120}
+          label='확인'
+          handleClick={() => checkNicknameModal.closeModal('checkNickname')}
+        />
+      </div>
+    </div>
+  );
 };
 
 const SignUpForm = () => {
@@ -53,8 +151,10 @@ const SignUpForm = () => {
   const [profileImg, setProfileImg] = useState('');
   const [date, setDate] = useState('');
   const [selectedEmail, setSelectedEmail] = useState('');
-  // 모달 내 변수
-  const [authCode, setAuthCode] = useState('');
+  // 모달 변수
+  const authModal = useModalStore();
+  const checkIdModal = useModalStore();
+  const checkNicknameModal = useModalStore();
   //정보수신 동의
   const [isFirstChecked, setIsFirstChecked] = useState('false');
   const [isSecondChecked, setIsSecondChecked] = useState('false');
@@ -185,44 +285,19 @@ const SignUpForm = () => {
       setPhoneNumStatus('warn');
     }
   };
-
-  const { openModal, closeModal } = useModalStore();
-
-  const handleAuthModal = () => {
-    openModal(
-      <div css={AuthModalStyle}>
-        <h6>
-          해당 이메일로 코드가 전송되었습니다.
-          <br />
-          3분 이내로 입력해 주시기 바랍니다.
-        </h6>
-        <div className='input-form'>
-          <p>
-            인증번호 입력
-            <Dot />
-          </p>
-          <TextInput
-            width={312}
-            value={authCode}
-            handleChange={(e) => setAuthCode(e.target.value)}
-          />
-          <p>support message</p>
-        </div>
-        <div className='auth-btn'>
-          <Button
-            width={120}
-            border={true}
-            label='취소'
-            handleClick={closeModal}
-          />
-          <Button
-            width={120}
-            label='인증하기'
-            handleClick={() => console.log('인증하기')}
-          />
-        </div>
-      </div>
-    );
+  //이메일 인증 모달
+  const handleOpenAuthModal = () => {
+    if (idStatus === 'pass' && selectedEmail) {
+      authModal.openModal('auth', 360);
+    }
+  };
+  //이메일 중복확인 모달
+  const handleCheckIdModal = () => {
+    checkIdModal.openModal('checkId');
+  };
+  //닉네임 중복확인 모달
+  const handleCheckNicknameModal = () => {
+    checkNicknameModal.openModal('checkNickname');
   };
 
   useEffect(() => {
@@ -278,13 +353,13 @@ const SignUpForm = () => {
               <Button
                 width={80}
                 label='중복확인'
-                handleClick={() => console.log('중복확인')}
+                handleClick={handleCheckIdModal}
               />
               <Button
                 color='textBlack'
                 width={96}
                 label='이메일 인증'
-                handleClick={handleAuthModal}
+                handleClick={handleOpenAuthModal}
               />
             </div>
           </div>
@@ -338,7 +413,7 @@ const SignUpForm = () => {
             <Button
               width={80}
               label='중복확인'
-              handleClick={() => console.log('중복확인')}
+              handleClick={handleCheckNicknameModal}
             />
           </div>
           {nicknameStatus !== 'pass' ? (
@@ -424,7 +499,9 @@ const SignUpForm = () => {
           disabled={isDisabled}
         />
       </div>
-      <Modal width={360} />
+      <Modal content={<AuthModal />} id='auth' />
+      <Modal content={<CheckIdModal />} id='checkId' />
+      <Modal content={<CheckNicknameModal />} id='checkNickname' />
     </div>
   );
 };
@@ -591,6 +668,18 @@ const AuthModalStyle = css`
   }
 
   .auth-btn {
+    display: flex;
+    gap: 16px;
+  }
+`;
+
+const defaultModalStyle = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding-top: 8px;
+  div {
     display: flex;
     gap: 16px;
   }
