@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
+import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 import TagTest from '@/assets/images/test-tag.jpg';
 import Button from '@/components/Button';
+import IconButton from '@/components/IconButton';
 import Modal from '@/components/Modal';
 import Pagination from '@/components/Pagination';
 import Table from '@/components/Table';
 import Tag from '@/components/Tag';
+import TextInput from '@/components/TextInput';
+import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import adminStocks from '@/mocks/adminStocks.json';
 import useModalStore from '@/stores/useModalStore';
@@ -52,6 +56,132 @@ const DelModal: React.FC<DelModalProps> = ({ toggleAllCheckBoxes }) => {
   );
 };
 
+const AddModal = () => {
+  const addModal = useModalStore();
+  const [stocksValue, setStocksValue] = useState('');
+  const [iconValue, setIconValue] = useState('');
+
+  return (
+    <div css={addModalStyle}>
+      <p>매매방식 등록</p>
+      <table>
+        <thead>
+          <tr>
+            <th>매매방식</th>
+            <th>아이콘</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <TextInput
+                width={224}
+                value={stocksValue}
+                handleChange={(e) => setStocksValue(e.target.value)}
+              />
+              <p>1글자 이상 입력하세요.</p>
+            </td>
+            <td>
+              <p>등록아이콘</p>
+              <div>
+                <TextInput
+                  width={302}
+                  value={iconValue}
+                  handleChange={(e) => setIconValue(e.target.value)}
+                />
+                <IconButton
+                  color='white'
+                  iconBgSize='lg'
+                  iconSize='md'
+                  IconComponent={AddPhotoAlternateOutlinedIcon}
+                  handleClick={() => console.log('클릭')}
+                />
+              </div>
+              <p>jp(e)g, png 형식의 파일만 첨부 가능합니다.</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div className='btn'>
+        <Button
+          border={true}
+          width={120}
+          label='취소'
+          handleClick={() => addModal.closeModal('add')}
+        />
+        <Button
+          width={120}
+          label='등록하기'
+          handleClick={() => console.log('click')}
+        />
+      </div>
+    </div>
+  );
+};
+
+const ModModal = () => {
+  const modModal = useModalStore();
+  const [stocksValue, setStocksValue] = useState('');
+  const [iconValue, setIconValue] = useState('');
+
+  return (
+    <div css={addModalStyle}>
+      <p>매매방식 수정</p>
+      <table>
+        <thead>
+          <tr>
+            <th>매매방식</th>
+            <th>아이콘</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <TextInput
+                width={224}
+                value={stocksValue}
+                handleChange={(e) => setStocksValue(e.target.value)}
+              />
+              <p>1글자 이상 입력하세요.</p>
+            </td>
+            <td>
+              <p>등록아이콘</p>
+              <div>
+                <TextInput
+                  width={302}
+                  value={iconValue}
+                  handleChange={(e) => setIconValue(e.target.value)}
+                />
+                <IconButton
+                  color='white'
+                  iconBgSize='lg'
+                  iconSize='md'
+                  IconComponent={AddPhotoAlternateOutlinedIcon}
+                  handleClick={() => console.log('클릭')}
+                />
+              </div>
+              <p>jp(e)g, png 형식의 파일만 첨부 가능합니다.</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div className='btn'>
+        <Button
+          border={true}
+          width={120}
+          label='취소'
+          handleClick={() => modModal.closeModal('add')}
+        />
+        <Button
+          width={120}
+          label='등록하기'
+          handleClick={() => console.log('click')}
+        />
+      </div>
+    </div>
+  );
+};
+
 const AdminStocks = () => {
   //테이블 관련
   const [curPage, setCurPage] = useState(0);
@@ -88,7 +218,7 @@ const AdminStocks = () => {
           color='primary'
           border={true}
           width={80}
-          handleClick={() => {}}
+          handleClick={openModifyModal}
         />
       ),
     },
@@ -111,11 +241,21 @@ const AdminStocks = () => {
 
   //모달관련
   const delModal = useModalStore();
+  const addModal = useModalStore();
+  const modModal = useModalStore();
 
   const openDeleteModal = () => {
     if (checkedItems.length > 0) {
       delModal.openModal('delete');
     }
+  };
+
+  const openAddModal = () => {
+    addModal.openModal('add', 648);
+  };
+
+  const openModifyModal = () => {
+    modModal.openModal('modify', 648);
   };
 
   useEffect(() => {
@@ -138,11 +278,7 @@ const AdminStocks = () => {
           총 <span>5개</span>의 종목이 있습니다.
         </p>
         <div className='manage-btn'>
-          <Button
-            width={80}
-            label='등록'
-            handleClick={() => console.log('등록')}
-          />
+          <Button width={80} label='등록' handleClick={openAddModal} />
           <Button
             width={80}
             color='black'
@@ -174,6 +310,8 @@ const AdminStocks = () => {
         content={<DelModal toggleAllCheckBoxes={toggleAllCheckboxes} />}
         id='delete'
       />
+      <Modal content={<AddModal />} id='add' />
+      <Modal content={<ModModal />} id='modify' />
     </div>
   );
 };
@@ -269,6 +407,81 @@ const delModalStyle = css`
   .del-modal-btn {
     display: flex;
     gap: 16px;
+  }
+`;
+
+const addModalStyle = css`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  p {
+    font-size: ${FONT_SIZE.TEXT_SM};
+    margin-bottom: 20px;
+  }
+
+  table > thead > tr {
+    display: flex;
+
+    height: 48px;
+    background-color: ${COLOR.GRAY100};
+
+    th {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      &:nth-of-type(1) {
+        width: 240px;
+      }
+      &:nth-of-type(2) {
+        width: 360px;
+      }
+    }
+  }
+
+  table > tbody > tr {
+    display: flex;
+
+    td {
+      display: flex;
+      flex-direction: column;
+      // justify-content: center;
+      // align-items: center;
+      padding: 8px 0 8px 8px;
+      gap: 8px;
+
+      &:nth-of-type(1) {
+        width: 240px;
+        margin-top: 30px;
+      }
+
+      &:nth-of-type(2) {
+        width: 360px;
+      }
+
+      div {
+        display: flex;
+      }
+
+      p {
+        &:nth-of-type(1) {
+          margin-bottom: 8px;
+        }
+        &:last-child {
+          margin-bottom: 24px;
+          color: ${COLOR.POINT};
+        }
+      }
+    }
+  }
+
+  .btn {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    padding-top: 32px;
+    border-top: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
   }
 `;
 
