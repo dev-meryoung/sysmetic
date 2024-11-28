@@ -170,7 +170,7 @@ const ModModal = () => {
           border={true}
           width={120}
           label='취소'
-          handleClick={() => modModal.closeModal('add')}
+          handleClick={() => modModal.closeModal('modify')}
         />
         <Button
           width={120}
