@@ -1,169 +1,208 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { css } from '@emotion/react';
 import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight';
+import { useParams } from 'react-router-dom';
 import { Link, useNavigate } from 'react-router-dom';
-import ProfileImageTest from '@/assets/images/test-profile.png';
-import TagTest from '@/assets/images/test-tag.jpg';
 import Button from '@/components/Button';
+import Modal from '@/components/Modal';
 import ProfileImage from '@/components/ProfileImage';
 import Tag from '@/components/Tag';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+import {
+  useGetInquiryDetailTrader,
+  useGetInquiryDetailUser,
+  useDeleteInquiry,
+} from '@/hooks/useCommonApi';
+import useModalStore from '@/stores/useModalStore';
 
-interface AnswerData {
-  id: string;
+interface QnaDataTypes {
+  page: number;
+  sort: string;
+  closed: string;
+  searchType: string;
+  searchText: string;
+  inquiryId: number;
+  inquiryAnswerId: number;
+  inquiryTitle: string;
+  inquiryRegistrationDate: string;
+  inquirerNickname: string;
+  inquiryStatus: 'open' | 'closed';
+  strategyName: string;
+  traderNickname: string;
+  inquiryContent: string;
+  answerTitle: string;
+  answerRegistrationDate: string;
+  answerContent: string;
+  previousTitle: string;
+  previousWriteDate: string;
+  nextTitle: string;
+  nextWriteDate: string;
+}
+
+interface StrategyDataTypes {
+  name: string;
+  profileImage: string;
+  nickName: string;
+  tag: string;
+}
+
+interface AnswerDataTypes {
+  id: number;
   title: string;
-  content: string;
   date: string;
+  content: string;
   profileImage: string;
   nickname: string;
 }
 
+interface ApiResponse {
+  qna: QnaDataTypes;
+  strategy: StrategyDataTypes;
+  answers: AnswerDataTypes[];
+}
+
 const QnaDetail = () => {
-  const [userType] = useState('investor'); // 임시 유저타입 지정 (추후 삭제)
+  const [userType, _setUserType] = useState<'user' | 'trader'>('user'); // 나중에 수정
+  const [qnaData, setQnaData] = useState<QnaDataTypes | null>(null);
+  const [strategyData, setStrategyData] = useState<StrategyDataTypes | null>(
+    null
+  );
+  const [answerData, setAnswerData] = useState<AnswerDataTypes[]>([]);
   const navigate = useNavigate();
+  const { openModal, closeModal } = useModalStore();
+  const { inquiryId } = useParams<{ inquiryId: string }>();
+  const userQuery = useGetInquiryDetailUser();
+  const traderQuery = useGetInquiryDetailTrader();
 
-  const [qnaData, setQnaData] = useState({
-    title: '질문 제목이 없습니다.',
-    status: '답변대기',
-    date: '-',
-    content: '내용이 없습니다.',
-  });
+  const fetchData = useCallback(() => {
+    const params = { inquiryId: Number(inquiryId) };
 
-  const [strategyData, setStrategyData] = useState({
-    tag: TagTest,
-    name: '전략명',
-    profileImage: ProfileImageTest,
-    nickName: '닉네임',
-  });
+    const queryFn = userType === 'user' ? userQuery : traderQuery;
+    queryFn.mutate(params, {
+      onSuccess: (data: ApiResponse) => {
+        setQnaData(data.qna);
+        setStrategyData(data.strategy);
+        setAnswerData(data.answers || []);
+      },
+      onError: (error: unknown) => {
+        console.error('Error fetching Q&A data:', error);
+      },
+    });
+  }, [inquiryId, userType, userQuery, traderQuery]);
 
-  const [answerData, setAnswerData] = useState<AnswerData[]>([
-    {
-      id: '1',
-      title: 'RE : 임시답변, 나중에 삭제!',
-      date: '2024.11.25',
-      profileImage: ProfileImageTest,
-      nickname: '트레짱짱',
-      content: '자고싶다!',
-    },
-  ]);
-
-  // 문의내역 조회 API (문의 및 답변)
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const qnaResponse = await fetch('/api/qna/detail');
-        const qnaResult = await qnaResponse.json();
-
-        setQnaData({
-          title: qnaResult.title || '질문 제목이 없습니다.',
-          status: qnaResult.status || '답변대기',
-          date: qnaResult.date || '-',
-          content: qnaResult.content || '내용이 없습니다.',
-        });
-
-        const strategyResponse = await fetch('/api/qna/strategy');
-        const strategyResult = await strategyResponse.json();
-        setStrategyData({
-          tag: strategyResult.tag || TagTest,
-          name: strategyResult.name || '전략명 없음',
-          profileImage: strategyResult.profileImage || ProfileImageTest,
-          nickName: strategyResult.nickName || '닉네임 없음',
-        });
-
-        const answerResponse = await fetch('/api/qna/answers');
-        const answerResult = await answerResponse.json();
-        setAnswerData(answerResult || []);
-      } catch (error) {
-        console.error('데이터 로드 실패:', error);
-      }
-    };
-
     fetchData();
-  }, []);
+  }, [fetchData]);
 
-  // 답변 데이터 갱신 API
-  // const fetchUpdatedAnswers = async () => {
-  //   try {
-  //     const response = await fetch('/api/qna/answers');
-  //     const result = await response.json();
-  //     setAnswerData(result || []);
-  //   } catch (error) {
-  //     console.error('답변 데이터 갱신 실패:', error);
-  //   }
-  // };
+  const deleteMutation = useDeleteInquiry();
 
   const handleDeleteBtn = () => {
-    // Q&A 삭제 기능 구현 예정
+    if (answerData) {
+      alert('답변이 존재하는 문의는 삭제할 수 없습니다.');
+      return;
+    }
+    openModal('delete-confirm');
+  };
+
+  const confirmDelete = () => {
+    if (answerData) {
+      alert('답변이 존재하는 문의는 삭제할 수 없습니다.');
+      closeModal('delete-confirm');
+      return;
+    }
+
+    deleteMutation.mutate(Number(inquiryId), {
+      onSuccess: () => {
+        closeModal('delete-confirm');
+        navigate(PATH.MYPAGE_QNA());
+      },
+      onError: () => {
+        closeModal('delete-confirm');
+      },
+    });
   };
 
   return (
     <div css={wrapperStyle}>
-      <div className='question-section' css={titleWrapperStyle}>
-        <span css={titleStyle}>{qnaData.title}</span>
-        <span css={statusStyle}>{qnaData.status}</span>
-        <div css={infoStyle}>
-          <div css={dateAndButtonsStyle}>
-            <div css={dateStyle}>
-              <span>작성일</span>
-              <span>{qnaData.date}</span>
-            </div>
-            <div css={buttonStyle}>
-              {userType === 'investor' && (
-                <>
-                  <Button
-                    label='수정'
-                    handleClick={() => navigate(PATH.MYPAGE_QNA_EDIT())}
-                    color='primary'
-                    size='xs'
-                    shape='none'
-                  />
-                  <span css={dividerStyle}>|</span>
-                  <Button
-                    label='삭제'
-                    handleClick={handleDeleteBtn}
-                    color='primary'
-                    size='xs'
-                    shape='none'
-                  />
-                </>
-              )}
-              {userType === 'trader' && (
-                <Button
-                  label='답변하기'
-                  handleClick={() =>
-                    navigate(PATH.MYPAGE_QNA_ANSWER(), {
-                      state: { qnaId: 'QNA_ID' },
-                    })
-                  }
-                  color='primary'
-                  size='xs'
-                  shape='none'
-                />
-              )}
+      {qnaData && (
+        <>
+          <div className='question-section' css={titleWrapperStyle}>
+            <span css={titleStyle}>{qnaData.inquiryTitle}</span>
+            <span css={statusStyle}>{qnaData.inquiryStatus}</span>
+            <div css={infoStyle}>
+              <div css={dateAndButtonsStyle}>
+                <div css={dateStyle}>
+                  <span>작성일</span>
+                  <span>{qnaData.inquiryRegistrationDate}</span>
+                </div>
+                <div css={buttonStyle}>
+                  {userType === 'user' && (
+                    <>
+                      <Button
+                        label='수정'
+                        handleClick={() => navigate(PATH.MYPAGE_QNA_EDIT())}
+                        color='primary'
+                        size='xs'
+                        shape='none'
+                      />
+                      <span css={dividerStyle}>|</span>
+                      <Button
+                        label='삭제'
+                        handleClick={handleDeleteBtn}
+                        color='primary'
+                        size='xs'
+                        shape='none'
+                      />
+                    </>
+                  )}
+                  {userType === 'trader' && (
+                    <Button
+                      label='답변하기'
+                      handleClick={() =>
+                        navigate(PATH.MYPAGE_QNA_ANSWER(), {
+                          state: { qnaId: qnaData.inquiryId },
+                        })
+                      }
+                      color='primary'
+                      size='xs'
+                      shape='none'
+                    />
+                  )}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div css={strategyWrapperStyle}>
-        <div css={tagsAndTitleStyle}>
-          <div css={tagStyle}>
-            <Tag src={strategyData.tag} alt='tag' />
+          <div css={strategyWrapperStyle}>
+            {strategyData?.name === 'null' ? (
+              <div css={deletedStrategyStyle}>해당 전략이 삭제되었습니다.</div>
+            ) : (
+              <>
+                <div css={tagsAndTitleStyle}>
+                  <div css={tagStyle}>
+                    <Tag
+                      src={strategyData?.tag || 'default-tag.png'}
+                      alt='tag'
+                    />
+                  </div>
+                  <div css={strategyTextStyle}>{strategyData?.name}</div>
+                </div>
+                <div css={profileStyle}>
+                  <ProfileImage
+                    src={strategyData?.profileImage}
+                    alt='profileImg'
+                    size='md'
+                  />
+                  <span css={nicknameStyle}>{strategyData?.nickName}</span>
+                </div>
+              </>
+            )}
           </div>
-          <div css={strategyTextStyle}>{strategyData.name}</div>
-        </div>
-        <div css={profileStyle}>
-          <ProfileImage
-            src={strategyData.profileImage}
-            alt='profileImg'
-            size='md'
-          />
-          <span css={nicknameStyle}>{strategyData.nickName}</span>
-        </div>
-      </div>
-      <div css={inputStyle}>{qnaData.content}</div>
+          <div css={inputStyle}>{qnaData.inquiryContent}</div>
+        </>
+      )}
 
       {answerData.map((answer) => (
         <div key={answer.id} css={wrapperStyle}>
@@ -172,7 +211,7 @@ const QnaDetail = () => {
               <SubdirectoryArrowRightIcon css={commentIconStyle} />
               {answer.title.startsWith('RE:')
                 ? answer.title
-                : `RE: ${answer.title}`}{' '}
+                : `RE: ${answer.title}`}
             </div>
             <div css={infoStyle}>
               <div css={dateStyle}>
@@ -194,22 +233,24 @@ const QnaDetail = () => {
       ))}
 
       <div css={listWrapperStyle}>
-        <div css={listItemStyle}>
-          <span css={stepperStyle}>이전</span>
-          {/* 나중에 api 있을 때 변경 */}
-          {/* <Link to={`/qna-detail/${previousPostId}`} css={listItemTilteStyle}> */}
-          <Link to='' css={listItemTilteStyle}>
-            12월 이벤트 개최
-          </Link>
-          <span css={listItemDateStyle}>2024.11.17</span>
-        </div>
-        <div css={listItemStyle}>
-          <span css={stepperStyle}>다음</span>
-          <Link to='' css={listItemTilteStyle}>
-            홈페이지 개선사항 안내
-          </Link>
-          <span css={listItemDateStyle}>2024.11.19</span>
-        </div>
+        {qnaData?.previousTitle && qnaData?.previousWriteDate && (
+          <div css={listItemStyle}>
+            <span css={stepperStyle}>이전</span>
+            <Link to={`/qna/${qnaData.inquiryId - 1}`} css={listItemTilteStyle}>
+              {qnaData.previousTitle}
+            </Link>
+            <span css={listItemDateStyle}>{qnaData.previousWriteDate}</span>
+          </div>
+        )}
+        {qnaData?.nextTitle && qnaData?.nextWriteDate && (
+          <div css={listItemStyle}>
+            <span css={stepperStyle}>다음</span>
+            <Link to={`/qna/${qnaData.inquiryId + 1}`} css={listItemTilteStyle}>
+              {qnaData.nextTitle}
+            </Link>
+            <span css={listItemDateStyle}>{qnaData.nextWriteDate}</span>
+          </div>
+        )}
       </div>
 
       <div css={goListBtnStyle}>
@@ -222,6 +263,24 @@ const QnaDetail = () => {
           shape='square'
         />
       </div>
+
+      <Modal
+        id='delete-confirm'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>문의를 삭제하시겠습니까?</p>
+            <div css={modalButtonWrapperStyle}>
+              <Button
+                label='아니오'
+                handleClick={() => closeModal('delete-confirm')}
+                color='primaryOpacity10'
+                border
+              />
+              <Button label='예' handleClick={confirmDelete} color='primary' />
+            </div>
+          </div>
+        }
+      />
     </div>
   );
 };
@@ -402,4 +461,33 @@ const commentIconStyle = css`
   transform: translateY(-10%);
   vertical-align: middle;
   margin-right: 8px;
+`;
+
+const deletedStrategyStyle = css`
+  width: 100%;
+  text-align: center;
+  font-size: ${FONT_SIZE.TEXT_MD};
+  border-radius: 4px;
+`;
+
+const modalContentStyle = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+`;
+
+const modalTextStyle = css`
+  font-size: ${FONT_SIZE.TEXT_LG};
+  text-align: center;
+  margin-top: 32px;
+  margin-bottom: 24px;
+`;
+
+const modalButtonWrapperStyle = css`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 16px;
 `;

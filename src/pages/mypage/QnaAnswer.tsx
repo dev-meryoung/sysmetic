@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { css } from '@emotion/react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import ProfileImageTest from '@/assets/images/test-profile.png';
 import TagTest from '@/assets/images/test-tag.jpg';
 import Button from '@/components/Button';
@@ -11,34 +11,56 @@ import TextInput from '@/components/TextInput';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+import { useCreateAnswer } from '@/hooks/useCommonApi';
 
 type InputStateTypes = 'normal' | 'warn';
 
 const QnaAnswer = () => {
   const [status, setStatus] = useState<InputStateTypes>('normal');
-  const [value, setValue] = useState('');
-  const [textValue, setTextValue] = useState('');
+  const [titleValue, setTitleValue] = useState('');
+  const [contentValue, setContentValue] = useState('');
 
   const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    setValue(inputValue);
-
-    if (inputValue.length < 6) {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { value } = e.target;
+    if (value.trim() === '') {
       setStatus('warn');
     } else {
       setStatus('normal');
     }
+    setTitleValue(value);
+    setContentValue(value);
   };
 
-  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setTextValue(e.target.value);
+  const createAnswer = useCreateAnswer();
+  const { inquiryId } = useParams<{ inquiryId: string }>();
+
+  const handleSubmit = () => {
+    createAnswer.mutate(
+      {
+        inquiryId: Number(inquiryId),
+        answerTitle: titleValue,
+        answerContent: contentValue,
+      },
+      {
+        onSuccess: () => {
+          navigate(PATH.MYPAGE_QNA_DETAIL());
+        },
+        onError: () => {
+          alert('답변등록에 실패했습니다.');
+        },
+      }
+    );
   };
 
   const handleBtn = () => {
     navigate(PATH.MYPAGE_QNA_DETAIL());
   };
+
+  const isSubmitDisabled = !titleValue.trim() || !contentValue.trim();
 
   return (
     <div css={wrapperStyle}>
@@ -80,7 +102,7 @@ const QnaAnswer = () => {
       <div className='comment-section' css={answerWrapperStyle}>
         <div css={answerNameStyle}>
           <TextInput
-            value={value}
+            value={titleValue}
             status={status}
             placeholder='제목을 입력해주세요.'
             fullWidth
@@ -89,10 +111,10 @@ const QnaAnswer = () => {
         </div>
         <div css={answerStyle}>
           <TextArea
-            value={textValue}
+            value={contentValue}
             placeholder='내용을 입력해주세요.'
             fullWidth
-            handleChange={handleTextChange}
+            handleChange={handleChange}
           />
         </div>
       </div>
@@ -109,11 +131,12 @@ const QnaAnswer = () => {
         />
         <Button
           label='답변완료'
-          handleClick={handleBtn}
+          handleClick={handleSubmit}
           color='primary'
           size='md'
           shape='square'
           width={120}
+          disabled={isSubmitDisabled}
         />
       </div>
     </div>

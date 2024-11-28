@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { css } from '@emotion/react';
 import { Link } from 'react-router-dom';
 import TagTest from '@/assets/images/test-tag.jpg';
@@ -9,7 +9,10 @@ import Tag from '@/components/Tag';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
-import qnaList from '@/mocks/qna-list.json';
+import {
+  useGetInquiryListTrader,
+  useGetInquiryListUser,
+} from '@/hooks/useCommonApi';
 
 const POSTS_PER_PAGE = 10;
 
@@ -32,43 +35,36 @@ const statusOptions = [
 ];
 
 const QnaList = () => {
+  const [userType, _setUserType] = useState<'user' | 'trader'>('user'); // 나중에 수정
   const [sortConfig, setSortConfig] = useState<string>('date_desc');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [filteredData, setFilteredData] = useState<QnaListDataProps[]>(qnaList);
+  const userQuery = useGetInquiryListUser();
+  const traderQuery = useGetInquiryListTrader();
 
-  useEffect(() => {
-    const dataFiltered = () => {
-      let result = [...qnaList];
-
-      if (statusFilter !== 'all') {
-        result = result.filter((item) => item.status === statusFilter);
-      }
-
-      const [key, direction] = sortConfig.split('_') as [
-        keyof QnaListDataProps,
-        'asc' | 'desc',
-      ];
-      result.sort((a, b) => {
-        if (a[key] < b[key]) return direction === 'asc' ? -1 : 1;
-        if (a[key] > b[key]) return direction === 'asc' ? 1 : -1;
-        return 0;
-      });
-
-      setFilteredData(result);
-      setCurrentPage(0);
+  const fetchData = useCallback(() => {
+    const params = {
+      sort: sortConfig,
+      closed: statusFilter === 'all' ? '' : statusFilter,
+      page: currentPage + 1,
     };
 
-    dataFiltered();
-  }, [sortConfig, statusFilter]);
+    if (userType === 'user') {
+      userQuery.mutate(params);
+    } else if (userType === 'trader') {
+      traderQuery.mutate(params);
+    }
+  }, [userType, sortConfig, statusFilter, currentPage, userQuery, traderQuery]);
 
-  const setPaginatedData = (page: number) => {
-    const startIndex = page * POSTS_PER_PAGE;
-    return filteredData.slice(startIndex, startIndex + POSTS_PER_PAGE);
-  };
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
-  const paginatedData = setPaginatedData(currentPage);
-  const totalPage = Math.ceil(filteredData.length / POSTS_PER_PAGE);
+  const data =
+    userType === 'user' ? userQuery.data?.data : traderQuery.data?.data;
+  const total =
+    userType === 'user' ? userQuery.data?.total : traderQuery.data?.total;
+  const totalPage = Math.ceil((total || 0) / POSTS_PER_PAGE);
 
   const columns = [
     {
@@ -114,7 +110,7 @@ const QnaList = () => {
       <div css={filterStyle}>
         <div css={countStyle}>
           <span>총</span>
-          <span>{filteredData.length}개</span>
+          <span>{total || 0}개</span>
         </div>
         <div css={filterWrapperStyle}>
           <SelectBox
@@ -131,10 +127,10 @@ const QnaList = () => {
       </div>
 
       <div css={tableWrapperStyle}>
-        {filteredData.length > 0 ? (
+        {data && data.length > 0 ? (
           <>
             <div css={tableStyle}>
-              <Table data={paginatedData} columns={columns} />
+              <Table data={data} columns={columns} />
             </div>
             <Pagination
               totalPage={totalPage}
@@ -263,7 +259,7 @@ const tableStyle = css`
 
 const noDataStyle = css`
   text-align: center;
-  margin-top: 20px;
+  margin-top: 80px;
   font-size: ${FONT_SIZE.TEXT_LG};
   color: ${COLOR_OPACITY.BLACK_OPACITY50};
 `;
