@@ -28,7 +28,7 @@ export const updateUser = async (updateUserData: UpdateUserData | FormData) => {
   const isFormData = updateUserData instanceof FormData;
 
   const response = await axiosInstance.patch(
-    `/v1/member/info`,
+    `/v1/member/info/{id}`,
     updateUserData,
     {
       headers: isFormData
@@ -45,7 +45,7 @@ export const updatePassword = async (
   updatePasswordData: UpdatePasswordData
 ) => {
   const response = await axiosInstance.patch(
-    `/v1/member/info/password`,
+    `/v1/member/info/password/{id}`,
     updatePasswordData
   );
   return response.data;
@@ -54,7 +54,7 @@ export const updatePassword = async (
 // 회원 정보성 수신동의 변경 API
 export const updateOpt = async (updateOptData: UpdateOptData) => {
   const response = await axiosInstance.patch(
-    `/v1/member/consent`,
+    `/v1/member/consent/{id}`,
     updateOptData
   );
   return response.data;
@@ -62,6 +62,6 @@ export const updateOpt = async (updateOptData: UpdateOptData) => {
 
 // 회원 탈퇴 API
 export const deleteUser = async () => {
-  const response = await axiosInstance.post('/v1/member/{id}');
+  const response = await axiosInstance.delete('/v1/member/{id}');
   return response.data;
 };
