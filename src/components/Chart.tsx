@@ -75,6 +75,9 @@ const Chart: React.FC<ChartDataProps> = ({
     title: {
       text: '',
     },
+    accessibility: {
+      enabled: false,
+    },
     chart: {
       type: 'line',
       width: null,
