@@ -56,7 +56,7 @@ export const checkEmail = async (
       `v1/auth/check-duplicate-email?email=${email}`,
       {
         validateStatus: (status) =>
-          (status >= 200 && status < 300) || status === 409,
+          (status >= 200 && status < 300) || status === 400,
       }
     );
 

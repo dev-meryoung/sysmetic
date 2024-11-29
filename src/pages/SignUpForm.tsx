@@ -16,11 +16,6 @@ import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 import useModalStore from '@/stores/useModalStore';
 
-interface checkModalProps {
-  isExist?: boolean;
-  setDisabled?: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
 const RadioOption1 = [
   { label: '관심 전략과 정보 수신에 동의합니다.', value: 'true' },
   { label: '관심 전략과 정보 수신에 동의하지 않습니다.', value: 'false' },
@@ -42,7 +37,7 @@ const EmailOptions = [
 ];
 
 const REGEX = {
-  ID_REGEX: /^[a-zA-Z\d\W_]+$/,
+  ID_REGEX: /^[a-zA-Z\d_]+$/,
   PW_REGEX: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,20}$/,
   NAME_REGEX: /^[가-힣]{1,10}$/,
   NICKNAME_REGEX: /^[가-힣\d]{3,10}$/,
@@ -110,55 +105,6 @@ const AuthModal = () => {
   );
 };
 
-const CheckIdModal: React.FC<checkModalProps> = ({
-  isExist,
-  setDisabled = () => {},
-}) => {
-  const checkIdModal = useModalStore();
-
-  const handleBtnClick = () => {
-    checkIdModal.closeModal('checkId');
-  };
-
-  useEffect(() => {
-    if (!isExist) {
-      setDisabled(false);
-    } else {
-      setDisabled(true);
-    }
-  }, [isExist, setDisabled]);
-
-  return (
-    <div css={defaultModalStyle}>
-      {isExist ? (
-        <p>중복된 이메일입니다.</p>
-      ) : (
-        <p>사용할 수 있는 아이디입니다.</p>
-      )}
-      <div>
-        <Button width={120} label='확인' handleClick={handleBtnClick} />
-      </div>
-    </div>
-  );
-};
-
-const CheckNicknameModal = () => {
-  const checkNicknameModal = useModalStore();
-
-  return (
-    <div css={defaultModalStyle}>
-      <p>중복된 닉네임입니다.</p>
-      <div>
-        <Button
-          width={120}
-          label='확인'
-          handleClick={() => checkNicknameModal.closeModal('checkNickname')}
-        />
-      </div>
-    </div>
-  );
-};
-
 const SignUpForm = () => {
   // 입력 폼
   const [id, setId] = useState('');
@@ -172,10 +118,10 @@ const SignUpForm = () => {
   const [selectedEmail, setSelectedEmail] = useState('');
   // 모달 변수
   const authModal = useModalStore();
-  const checkIdModal = useModalStore();
-  const checkNicknameModal = useModalStore();
+  // 버튼 상태
   const [checkIdDisabled, setCheckIdDisabled] = useState(true);
-  const [checkIdAuthDisabled, setCheckIdAuthDisabled] = useState(true);
+  const [idAuthBtnDisabled, setIdAuthBtnDisabled] = useState(true);
+  //계정 존재여부
   const [isExist, setIsExist] = useState(false);
   //정보수신 동의
   const [isFirstChecked, setIsFirstChecked] = useState('false');
@@ -271,10 +217,10 @@ const SignUpForm = () => {
   const handleCheckPwInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setCheckPw(e.target.value);
 
-    if (e.target.value === pw) {
-      setCheckPwStatus('pass');
-    } else {
+    if (e.target.value !== pw) {
       setCheckPwStatus('warn');
+    } else {
+      setCheckPwStatus('pass');
     }
   };
 
@@ -313,26 +259,19 @@ const SignUpForm = () => {
       authModal.openModal('auth', 360);
     }
   };
-  //이메일 중복확인 모달
-  const handleCheckIdModal = async () => {
+  //이메일 중복확인
+  const handleCheckId = async () => {
     if (id && selectedEmail) {
       const emailData = await checkEmail(id, selectedEmail);
       if (emailData === 200) {
-        setIsExist(false);
+        setIsExist(false); // 계정 중복 여부
+        setIdAuthBtnDisabled(false); // 이메일 인증 버튼 상태
       } else {
         setIsExist(true);
+        setIdAuthBtnDisabled(true);
       }
-      checkIdModal.openModal('checkId');
     }
   };
-  //닉네임 중복확인 모달
-  const handleCheckNicknameModal = () => {
-    checkNicknameModal.openModal('checkNickname');
-  };
-
-  useEffect(() => {
-    console.log(selectedEmail);
-  }, [selectedEmail]);
 
   useEffect(() => {
     setIsDisabled(
@@ -391,7 +330,7 @@ const SignUpForm = () => {
               <Button
                 width={80}
                 label='중복확인'
-                handleClick={handleCheckIdModal}
+                handleClick={handleCheckId}
                 disabled={checkIdDisabled}
               />
               <Button
@@ -399,15 +338,18 @@ const SignUpForm = () => {
                 width={96}
                 label='이메일 인증'
                 handleClick={handleOpenAuthModal}
-                disabled={checkIdAuthDisabled}
+                disabled={idAuthBtnDisabled}
               />
             </div>
           </div>
-          {idStatus !== 'pass' ? (
-            <p>영문, 숫자, 특수문자 중 1개 이상 조합하여 사용</p>
-          ) : (
-            <></>
-          )}
+          <p>
+            {idStatus === 'warn' &&
+              '영문, 숫자, 특수문자 중 1개 이상 조합하여 사용'}
+            {idStatus === 'pass' && !selectedEmail && '이메일을 선택해주세요.'}
+            {idStatus === 'pass' &&
+              selectedEmail &&
+              (isExist ? '중복된 이메일입니다.' : null)}
+          </p>
         </div>
         <div className='input-form'>
           <p>
@@ -420,10 +362,8 @@ const SignUpForm = () => {
             value={pw}
             handleChange={handlePwInputChange}
           />
-          {pwStatus !== 'pass' ? (
+          {pwStatus === 'warn' && (
             <p>6~20자의 영문, 숫자, 특수문자를 모두 조합하여 사용</p>
-          ) : (
-            <></>
           )}
         </div>
         <div className='input-form'>
@@ -437,7 +377,7 @@ const SignUpForm = () => {
             value={checkPw}
             handleChange={handleCheckPwInputChange}
           />
-          {checkPw !== pw ? <p>비밀번호가 일치하지 않습니다.</p> : <></>}
+          {checkPw !== pw && <p>비밀번호가 일치하지 않습니다.</p>}
         </div>
         <div className='input-form'>
           <p>
@@ -453,13 +393,11 @@ const SignUpForm = () => {
             <Button
               width={80}
               label='중복확인'
-              handleClick={handleCheckNicknameModal}
+              handleClick={() => console.log('click')}
             />
           </div>
-          {nicknameStatus !== 'pass' ? (
+          {nicknameStatus === 'warn' && (
             <p>3~10자의 한글, 숫자 중 1개 이상 조합하여 사용</p>
-          ) : (
-            <></>
           )}
         </div>
         <div className='input-form'>
@@ -472,7 +410,7 @@ const SignUpForm = () => {
             value={name}
             handleChange={handleNameInputChange}
           />
-          {nameStatus !== 'pass' ? <p>1~10자의 한글만 조합하여 사용</p> : <></>}
+          {nameStatus === 'warn' && <p>1~10자의 한글만 조합하여 사용</p>}
         </div>
         <div className='input-form'>
           <p>
@@ -480,7 +418,7 @@ const SignUpForm = () => {
             <Dot />
           </p>
           <Calendar type='date' dateProps={{ date, setDate }} />
-          {date ? <></> : <p>생년월일을 선택해 주세요.</p>}
+          {!date && <p>생년월일을 선택해 주세요.</p>}
         </div>
         <div className='input-form'>
           <p>
@@ -493,10 +431,8 @@ const SignUpForm = () => {
             value={phoneNum}
             handleChange={handlePhoneInputChange}
           />
-          {phoneNumStatus !== 'pass' ? (
-            <p>010으로 시작하는 11자의 숫자만 조합하여 사용('-' 제외)</p>
-          ) : (
-            <></>
+          {phoneNumStatus === 'warn' && (
+            <p>010으로 시작하는 11자의 숫자만 조합하여 사용 ('-' 제외)</p>
           )}
         </div>
         <div className='img-form'>
@@ -540,16 +476,16 @@ const SignUpForm = () => {
         />
       </div>
       <Modal content={<AuthModal />} id='auth' />
-      <Modal
+      {/* <Modal
         content={
           <CheckIdModal
             isExist={isExist}
-            setDisabled={setCheckIdAuthDisabled}
+            setDisabled={setIdAuthBtnDisabled}
           />
         }
         id='checkId'
-      />
-      <Modal content={<CheckNicknameModal />} id='checkNickname' />
+      /> */}
+      {/* <Modal content={<CheckNicknameModal />} id='checkNickname' /> */}
     </div>
   );
 };
