@@ -26,7 +26,7 @@ const resetState = (set: Function) => {
     email: '',
     phoneNumber: '',
     nickname: '',
-    role: '',
+    roleCode: '',
     profileImage: null,
   });
   localStorage.removeItem('token');
