@@ -1,29 +1,31 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { css } from '@emotion/react';
 import { useNavigate } from 'react-router-dom';
-import ProfileImageTest from '@/assets/images/test-profile.png';
 import Button from '@/components/Button';
 import ProfileImage from '@/components/ProfileImage';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+import useAuthStore from '@/stores/useAuthStore';
 
 const Profile: React.FC = () => {
   const navigate = useNavigate();
-  const [phoneNumber, setPhoneNumber] = useState<string>('');
+  const { initializeAuth, isLoggedIn, email, nickname, profileImage } =
+    useAuthStore();
 
-  function maskPhoneNumber(phone: string): string {
-    return phone.replace(/(\d{2})$/, '**');
-  }
+  // function maskPhoneNumber(phone: string): string {
+  //   return phone.replace(/(\d{2})$/, '**');
+  // }
 
-  // 계정 조회 API 추후 수정
   useEffect(() => {
-    const fetchPhoneNumber = async () => {
-      const mockPhoneNumber = '010-0000-0000';
-      setPhoneNumber(mockPhoneNumber);
-    };
-    fetchPhoneNumber();
-  }, []);
+    initializeAuth();
+  }, [initializeAuth]);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate(PATH.SIGN_IN, { replace: true });
+    }
+  }, [isLoggedIn, navigate]);
 
   return (
     <div css={wrapperStyle}>
@@ -43,28 +45,29 @@ const Profile: React.FC = () => {
           <div css={profileInfoStyle}>
             <div className='profile-img'>
               <ProfileImage
-                src={ProfileImageTest}
+                src={profileImage || '/default-profile.png'}
                 alt='profileImage'
                 size='xxl'
               />
             </div>
             <div className='user-name-email'>
               <div css={userName}>
-                <span>홍길동</span>
+                <span>{nickname}</span>
               </div>
               <div css={userEmailStyle}>
                 <span>계정(이메일)</span>
-                <span>fastcampus@sysmatic.com</span>
+                <span>{email}</span>
               </div>
             </div>
             <div className='user-nickname-hp'>
               <div css={userNicknameStyle}>
                 <span>닉네임</span>
-                <span>패스트캠퍼스</span>
+                <span>{nickname}</span>
               </div>
               <div css={useHpStyle}>
+                {/* 나중에 연동 */}
                 <span>전화번호</span>
-                <span>{maskPhoneNumber(phoneNumber)}</span>
+                <span>010-0000-0000</span>
               </div>
             </div>
           </div>

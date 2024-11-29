@@ -103,16 +103,23 @@ const QnaDetail = () => {
 
   const handleDeleteBtn = () => {
     if (isAnswerPresent()) {
-      alert('답변이 존재하는 문의는 삭제할 수 없습니다.');
+      openModal('error-delete');
       return;
     }
     openModal('delete-confirm');
   };
 
+  const handleEditBtn = () => {
+    if (isAnswerPresent()) {
+      openModal('error-edit');
+      return;
+    }
+    navigate(PATH.MYPAGE_QNA_EDIT());
+  };
+
   const confirmDelete = () => {
     if (isAnswerPresent()) {
-      alert('답변이 존재하는 문의는 삭제할 수 없습니다.');
-      closeModal('delete-confirm');
+      openModal('error-delete');
       return;
     }
 
@@ -149,7 +156,7 @@ const QnaDetail = () => {
                     <>
                       <Button
                         label='수정'
-                        handleClick={() => navigate(PATH.MYPAGE_QNA_EDIT())}
+                        handleClick={handleEditBtn}
                         color='primary'
                         size='xs'
                         shape='none'
@@ -271,6 +278,26 @@ const QnaDetail = () => {
         />
       </div>
 
+      <Modal
+        id='error-edit'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>
+              답변이 존재할 시 문의를 수정할 수 없습니다.
+            </p>
+          </div>
+        }
+      />
+      <Modal
+        id='error-delete'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>
+              답변이 존재할 시 문의를 삭제할 수 없습니다.
+            </p>
+          </div>
+        }
+      />
       <Modal
         id='delete-confirm'
         content={

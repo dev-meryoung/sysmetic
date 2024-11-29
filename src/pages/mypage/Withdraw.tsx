@@ -1,15 +1,35 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
 import { useNavigate } from 'react-router-dom';
+import withdrawImg1 from '@/assets/images/withdraw1.png';
+import withdrawImg2 from '@/assets/images/withdraw2.png';
+import withdrawImg3 from '@/assets/images/withdraw3.png';
 import Button from '@/components/Button';
 import Checkbox from '@/components/Checkbox';
+import Modal from '@/components/Modal';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+import { useDeleteUser } from '@/hooks/useUserApi';
+import useAuthStore from '@/stores/useAuthStore';
+import useModalStore from '@/stores/useModalStore';
 
 const Withdraw: React.FC = () => {
   const [isChecked, setIsChecked] = useState(false);
   const navigate = useNavigate();
+  const { initializeAuth, isLoggedIn, nickname } = useAuthStore();
+  const { openModal } = useModalStore();
+  const deleteUser = useDeleteUser();
+
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate(PATH.SIGN_IN, { replace: true });
+    }
+  }, [isLoggedIn, navigate]);
 
   const handleNavigation = (path: string) => navigate(path);
 
@@ -18,6 +38,19 @@ const Withdraw: React.FC = () => {
     '탈퇴 즉시 회원님의 모든 개인정보는 삭제됩니다.',
     '탈퇴 후 2주일간 동일한 이메일주소로 회원가입이 불가합니다.',
   ];
+
+  const images = [withdrawImg1, withdrawImg2, withdrawImg3];
+
+  const handleComplete = () => {
+    deleteUser.mutate(undefined, {
+      onSuccess: () => {
+        navigate(PATH.SIGN_IN);
+      },
+      onError: () => {
+        openModal('withdraw-confirm');
+      },
+    });
+  };
 
   return (
     <div css={wrapperStyle}>
@@ -31,14 +64,16 @@ const Withdraw: React.FC = () => {
         </div>
       </div>
       <div css={warningStyle}>
-        홍길동님, 잠시만요!
+        {nickname}님, 잠시만요!
         <br />
         정말로 탈퇴하시겠습니까?
       </div>
       <div css={infoContainerStyle}>
         {infoData.map((info, index) => (
           <div key={index} css={infoStyle}>
-            <div css={imgStyle}>img</div>
+            <div css={imgStyle}>
+              <img src={images[index]} alt={`withdrawImg${index + 1}`} />
+            </div>
             <span>{info}</span>
           </div>
         ))}
@@ -55,12 +90,13 @@ const Withdraw: React.FC = () => {
       <div css={buttonStyle}>
         <Button
           label='회원탈퇴'
-          handleClick={() => handleNavigation(PATH.ROOT)}
+          handleClick={handleComplete}
           color='primaryOpacity10'
           size='md'
           shape='square'
           width={120}
           border
+          disabled={!isChecked}
         />
         <Button
           label='취소'
@@ -71,6 +107,14 @@ const Withdraw: React.FC = () => {
           width={120}
         />
       </div>
+      <Modal
+        id='withdraw-confirm'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>회원탈퇴에 실패했습니다.</p>
+          </div>
+        }
+      />
     </div>
   );
 };
@@ -170,4 +214,19 @@ const buttonStyle = css`
   display: flex;
   gap: 16px;
   justify-content: center;
+`;
+
+const modalContentStyle = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+`;
+
+const modalTextStyle = css`
+  font-size: ${FONT_SIZE.TEXT_LG};
+  text-align: center;
+  margin-top: 32px;
+  margin-bottom: 24px;
 `;

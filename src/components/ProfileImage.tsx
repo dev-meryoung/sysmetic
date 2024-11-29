@@ -2,7 +2,7 @@ import { css } from '@emotion/react';
 import defaultProfile from '@/assets/images/default-profile.png';
 
 interface ProfileImageProps {
-  src?: string;
+  src?: string | null;
   alt?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
 }
@@ -32,7 +32,7 @@ const ProfileImage: React.FC<ProfileImageProps> = ({
     `}
   >
     <img
-      src={src}
+      src={src || defaultProfile}
       alt={alt}
       onError={(e) => {
         const target = e.target as HTMLImageElement;

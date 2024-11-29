@@ -1,131 +1,124 @@
 import { useState } from 'react';
 import { css } from '@emotion/react';
 import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import DefaultProfileImg from '@/assets/images/default-profile.png';
 import Button from '@/components/Button';
+import Modal from '@/components/Modal';
 import ProfileImage from '@/components/ProfileImage';
 import TextInput from '@/components/TextInput';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+import { useCheckNickname } from '@/hooks/useAuthApi';
+import { useUpdateUser } from '@/hooks/useUserApi';
+import useAuthStore from '@/stores/useAuthStore';
+import useModalStore from '@/stores/useModalStore';
 
 type InputStateTypes = 'normal' | 'warn';
 
 const ProfileEdit: React.FC = () => {
-  const [nickname, setNickname] = useState('');
+  const {
+    memberId: userId,
+    nickname: storeNickname,
+    profileImage: storeProfileImage,
+  } = useAuthStore();
+  const [nickname, setNickname] = useState(storeNickname || '');
+  const [profileImage, setProfileImage] = useState<File | null>(null);
   const [nicknameStatus, setNicknameStatus] =
     useState<InputStateTypes>('normal');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneStatus, setPhoneStatus] = useState<InputStateTypes>('normal');
-  const [profileImage, setProfileImage] = useState<string>(DefaultProfileImg);
-  const [_isNicknameChecked, setIsNicknameChecked] = useState(false);
+  const [isNicknameChecked, setIsNicknameChecked] = useState(false);
   const navigate = useNavigate();
+  const { openModal } = useModalStore();
 
-  const handleNicknameCheck = async () => {
-    const nicknameRegex = /^[가-힣0-9]{3,10}$/;
+  const { mutate: checkNickname } = useCheckNickname();
+  const { mutate: updateUser } = useUpdateUser();
 
-    if (!nicknameRegex.test(nickname.trim())) {
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setProfileImage(file);
+    }
+  };
+
+  const handleNicknameCheck = () => {
+    if (!/^[가-힣0-9]{3,10}$/.test(nickname.trim())) {
       setNicknameStatus('warn');
       return;
     }
 
-    try {
-      await axios.get('https://3.39.211.122.nip.io/auth/check-nickname', {
-        params: { nickname: nickname.trim() },
-        headers: { accept: 'application/json' },
-      });
-
-      setIsNicknameChecked(true);
-      setNicknameStatus('normal');
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        const statusCode = err.response?.status;
-        const errorMessage =
-          err.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
-
-        if (statusCode === 400 || statusCode === 409) {
-          setNicknameStatus('warn');
-          console.error(errorMessage);
-        } else {
-          console.error('닉네임 중복 검사 실패:', err.message);
-        }
-      } else {
-        console.error('알 수 없는 에러 발생:', err);
-      }
-    }
+    checkNickname(nickname, {
+      onSuccess: () => {
+        setIsNicknameChecked(true);
+        setNicknameStatus('normal');
+      },
+      onError: () => {
+        setNicknameStatus('warn');
+      },
+    });
   };
 
   const handleNicknameChange = (value: string) => {
     setNickname(value);
     setIsNicknameChecked(false);
-
-    if (value.trim() === '' || value.length < 3 || value.length > 10) {
-      setNicknameStatus('warn');
-    } else {
-      setNicknameStatus('normal');
-    }
+    setNicknameStatus('normal');
   };
 
   const handlePhoneChange = (value: string) => {
     const numbersOnly = value.replace(/[^0-9]/g, '');
     setPhoneNumber(numbersOnly);
-
-    if (/^010\d{8}$/.test(numbersOnly)) {
-      setPhoneStatus('normal');
-    } else {
-      setPhoneStatus('warn');
-    }
+    setPhoneStatus(/^010\d{8}$/.test(numbersOnly) ? 'normal' : 'warn');
   };
 
   const handleComplete = () => {
-    let isValid = true;
-
-    const nicknameRegex = /^[가-힣0-9]{3,10}$/;
-
-    if (!nicknameRegex.test(nickname.trim())) {
-      setNicknameStatus('warn');
-      isValid = false;
+    if (
+      nicknameStatus === 'warn' ||
+      phoneStatus === 'warn' ||
+      !isNicknameChecked
+    ) {
+      openModal('update-confirm');
     }
 
-    if (!/^010\d{8}$/.test(phoneNumber)) {
-      setPhoneStatus('warn');
-      isValid = false;
+    const formData = new FormData();
+    formData.append('userId', userId.toString());
+    formData.append('nickName', nickname);
+    formData.append('phoneNumber', phoneNumber);
+    formData.append('nickNameDuplCheck', String(true));
+    if (profileImage) {
+      formData.append('profileImage', profileImage);
     }
 
-    if (!_isNicknameChecked) {
-      setNicknameStatus('warn');
-      console.error('닉네임 중복 확인을 완료해주세요.');
-      isValid = false;
-    }
-
-    if (isValid) {
-      navigate(PATH.MYPAGE_PROFILE());
-    }
-  };
-
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => setProfileImage(reader.result as string);
-      reader.readAsDataURL(file);
-    }
+    updateUser(formData, {
+      onSuccess: () => {
+        navigate(PATH.MYPAGE_PROFILE());
+      },
+      onError: () => {
+        openModal('update-confirm');
+      },
+    });
   };
 
   return (
     <div css={wrapperStyle}>
       <div css={indexStyle}>
         <div css={titleStyle}>계정정보 변경</div>
-        <div css={descriptionStyle}>계정정보 변경 페이지입니다!</div>
+        <div css={descriptionStyle}>계정정보 변경 페이지입니다.</div>
       </div>
 
       <div css={editWrapperStyle}>
         <span css={textStyle}>프로필 이미지 설정</span>
         <div css={profileImgStyle}>
           <label css={labelStyle}>
-            <ProfileImage src={profileImage} alt='profileImage' size='xxl' />
+            <ProfileImage
+              src={
+                profileImage
+                  ? URL.createObjectURL(profileImage)
+                  : storeProfileImage
+              }
+              alt='profileImage'
+              size='xxl'
+            />
             <div css={iconWrapperStyle}>
               <CameraAltOutlinedIcon css={iconStyle} />
             </div>
@@ -142,13 +135,11 @@ const ProfileEdit: React.FC = () => {
           <div>
             <span>닉네임</span>
             <div className='input-row'>
-              {
-                <TextInput
-                  value={nickname}
-                  handleChange={(e) => handleNicknameChange(e.target.value)}
-                  status={nicknameStatus}
-                />
-              }
+              <TextInput
+                value={nickname}
+                handleChange={(e) => handleNicknameChange(e.target.value)}
+                status={nicknameStatus}
+              />
               <Button
                 label='중복확인'
                 handleClick={handleNicknameCheck}
@@ -156,10 +147,11 @@ const ProfileEdit: React.FC = () => {
                 size='md'
                 width={80}
                 shape='square'
+                disabled={isNicknameChecked}
               />
             </div>
             {nicknameStatus === 'warn' && (
-              <span className='message'>유효한 닉네임을 입력해주세요.</span>
+              <span className='error-message'>중복된 닉네임입니다.</span>
             )}
           </div>
 
@@ -173,8 +165,8 @@ const ProfileEdit: React.FC = () => {
               />
             </div>
             {phoneStatus === 'warn' && (
-              <span className='message'>
-                '-'를 제외한 휴대번호를 입력해주세요.
+              <span className='error-message'>
+                "-"를 제외한 유효한 휴대번호를 입력해주세요.
               </span>
             )}
           </div>
@@ -200,6 +192,14 @@ const ProfileEdit: React.FC = () => {
           width={120}
         />
       </div>
+      <Modal
+        id='update-confirm'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>계정정보 변경에 실패했습니다.</p>
+          </div>
+        }
+      />
     </div>
   );
 };
@@ -276,7 +276,7 @@ const iconWrapperStyle = css`
   height: 48px;
   cursor: pointer;
 
-    &:hover {
+  &:hover {
     background-color: ${COLOR.GRAY700};
   }
 `;
@@ -305,8 +305,14 @@ const inputSectionStyle = css`
     width: 100%;
   }
 
-  .message {
+  .error-message {
     color: ${COLOR.POINT};
+    margin-top: 8px;
+    font-size: ${FONT_SIZE.TEXT_SM};
+  }
+
+  .success-message {
+    color: ${COLOR.CHECK_GREEN};
     margin-top: 8px;
     font-size: ${FONT_SIZE.TEXT_SM};
   }
@@ -317,4 +323,19 @@ const buttonStyle = css`
   display: flex;
   align-items: center;
   gap: 16px;
+`;
+
+const modalContentStyle = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+`;
+
+const modalTextStyle = css`
+  font-size: ${FONT_SIZE.TEXT_LG};
+  text-align: center;
+  margin-top: 32px;
+  margin-bottom: 24px;
 `;

@@ -1,44 +1,80 @@
 import { useState } from 'react';
 import { css } from '@emotion/react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Button from '@/components/Button';
+import Modal from '@/components/Modal';
 import TextInput from '@/components/TextInput';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+import { useUpdatePassword } from '@/hooks/useUserApi';
+import useModalStore from '@/stores/useModalStore';
+
+type InputStateTypes = 'normal' | 'warn' | 'success';
 
 const MypagePassword: React.FC = () => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [checkPassword, setCheckPassword] = useState('');
-  const [showPasswordError, setShowPasswordError] = useState(false);
-  const [showCheckPasswordError, setShowCheckPasswordError] = useState(false);
+  const [currentPasswordStatus, setCurrentPasswordStatus] =
+    useState<InputStateTypes>('normal');
+  const [newPasswordStatus, setNewPasswordStatus] =
+    useState<InputStateTypes>('normal');
+  const [checkPasswordStatus, setCheckPasswordStatus] =
+    useState<InputStateTypes>('normal');
+  const { openModal } = useModalStore();
 
-  const passwordRegEx =
-    /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,20}$/;
+  const updatePassword = useUpdatePassword();
 
   const navigate = useNavigate();
+  const PASSWORD_REGEX =
+    /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,20}$/;
+
+  const isPasswordValid = (password: string) =>
+    PASSWORD_REGEX.test(password.trim());
+
+  const { userId } = useParams<{ userId: string }>();
 
   const handleComplete = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    const isPasswordValid = passwordRegEx.test(newPassword);
-    const isCurrentPasswordEmpty = currentPassword.trim() === '';
-    const isCheckPasswordInvalid =
-      checkPassword.trim() === '' || newPassword !== checkPassword;
+    const isCurrentPasswordValid = isPasswordValid(currentPassword);
+    const isNewPasswordValid = isPasswordValid(newPassword);
+    const isCheckPasswordValid = newPassword === checkPassword;
 
-    setShowPasswordError(!isPasswordValid);
-    setShowCheckPasswordError(isCheckPasswordInvalid);
+    setCurrentPasswordStatus(isCurrentPasswordValid ? 'normal' : 'warn');
+    setNewPasswordStatus(isNewPasswordValid ? 'normal' : 'warn');
+    setCheckPasswordStatus(isCheckPasswordValid ? 'normal' : 'warn');
 
-    if (isCurrentPasswordEmpty) {
+    if (
+      !isCurrentPasswordValid ||
+      !isNewPasswordValid ||
+      !isCheckPasswordValid
+    ) {
       return;
     }
 
-    if (!isPasswordValid || isCheckPasswordInvalid) {
+    if (currentPassword === newPassword) {
+      openModal('same-confirm');
       return;
     }
 
-    navigate(PATH.MYPAGE_PROFILE());
+    updatePassword.mutate(
+      {
+        userId: Number(userId),
+        currentPassword,
+        newPassword,
+        newPasswordConfirm: newPassword,
+      },
+      {
+        onSuccess: () => {
+          navigate(PATH.MYPAGE_PROFILE());
+        },
+        onError: () => {
+          openModal('update-confirm');
+        },
+      }
+    );
   };
 
   return (
@@ -59,9 +95,10 @@ const MypagePassword: React.FC = () => {
                 type='password'
                 value={currentPassword}
                 handleChange={(e) => setCurrentPassword(e.target.value)}
+                status={currentPasswordStatus}
               />
             </div>
-            {showPasswordError && (
+            {currentPasswordStatus === 'warn' && (
               <span className='message'>현재 비밀번호를 입력해주세요.</span>
             )}
           </div>
@@ -75,9 +112,10 @@ const MypagePassword: React.FC = () => {
                 type='password'
                 value={newPassword}
                 handleChange={(e) => setNewPassword(e.target.value)}
+                status={newPasswordStatus}
               />
             </div>
-            {showPasswordError && (
+            {newPasswordStatus === 'warn' && (
               <span className='message'>새 비밀번호를 입력해주세요.</span>
             )}
           </div>
@@ -91,9 +129,10 @@ const MypagePassword: React.FC = () => {
                 type='password'
                 value={checkPassword}
                 handleChange={(e) => setCheckPassword(e.target.value)}
+                status={checkPasswordStatus}
               />
             </div>
-            {showCheckPasswordError && (
+            {checkPasswordStatus === 'warn' && (
               <span className='message'>비밀번호가 일치하지 않습니다.</span>
             )}
           </div>
@@ -119,6 +158,23 @@ const MypagePassword: React.FC = () => {
           width={120}
         />
       </div>
+
+      <Modal
+        id='same-confirm'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>현재 비밀번호와 같습니다.</p>
+          </div>
+        }
+      />
+      <Modal
+        id='update-confirm'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>비밀번호 변경에 실패했습니다.</p>
+          </div>
+        }
+      />
     </div>
   );
 };
@@ -202,4 +258,19 @@ const requiredStyle = css`
   font-size: ${FONT_SIZE.TEXT_MD};
   margin-left: 4px;
   display: inline;
+`;
+
+const modalContentStyle = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+`;
+
+const modalTextStyle = css`
+  font-size: ${FONT_SIZE.TEXT_LG};
+  text-align: center;
+  margin-top: 32px;
+  margin-bottom: 24px;
 `;

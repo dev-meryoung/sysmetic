@@ -3,17 +3,39 @@ import { css } from '@emotion/react';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import Checkbox from '@/components/Checkbox';
+import Modal from '@/components/Modal';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+import { useUpdateOpt } from '@/hooks/useUserApi';
+import useModalStore from '@/stores/useModalStore';
 
 const MypageOpt: React.FC = () => {
   const [checkboxStates, setCheckboxStates] = useState([false, false]);
   const navigate = useNavigate();
+  const { openModal } = useModalStore();
+  const updateOpt = useUpdateOpt();
 
   const handleCheckboxChange = (index: number) => {
     setCheckboxStates((prev) =>
       prev.map((state, i) => (i === index ? !state : state))
+    );
+  };
+
+  const handleComplete = () => {
+    updateOpt.mutate(
+      {
+        receiveInfoConsent: true,
+        receiveMarketingConsent: true,
+      },
+      {
+        onSuccess: () => {
+          navigate(PATH.MYPAGE_PROFILE());
+        },
+        onError: () => {
+          openModal('update-confirm');
+        },
+      }
     );
   };
 
@@ -48,13 +70,22 @@ const MypageOpt: React.FC = () => {
         />
         <Button
           label='수정완료'
-          handleClick={() => navigate(PATH.MYPAGE_PROFILE())}
+          handleClick={handleComplete}
           color='primary'
           size='md'
           shape='square'
           width={120}
         />
       </div>
+
+      <Modal
+        id='update-confirm'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>정보수정 동의 변경에 실패했습니다.</p>
+          </div>
+        }
+      />
     </div>
   );
 };
@@ -110,4 +141,19 @@ const buttonStyle = css`
   margin-top: 76px;
   display: flex;
   gap: 16px;
+`;
+
+const modalContentStyle = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+`;
+
+const modalTextStyle = css`
+  font-size: ${FONT_SIZE.TEXT_LG};
+  text-align: center;
+  margin-top: 32px;
+  margin-bottom: 24px;
 `;

@@ -1,6 +1,12 @@
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { checkAuth, login, LoginRequestData, logout } from '@/api';
+import {
+  checkAuth,
+  login,
+  LoginRequestData,
+  logout,
+  checkNickname,
+} from '@/api';
 import { PATH } from '@/constants/path';
 import useAuthStore from '@/stores/useAuthStore';
 
@@ -32,3 +38,8 @@ export const useLogout = () => {
     },
   });
 };
+
+export const useCheckNickname = () =>
+  useMutation({
+    mutationFn: checkNickname,
+  });
