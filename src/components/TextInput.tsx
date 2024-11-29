@@ -17,6 +17,7 @@ interface InputProps {
   iconNum?: InputIconNumTypes;
   maxLength?: number;
   height?: number;
+  disabled?: boolean;
   value: string;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
@@ -33,6 +34,7 @@ const TextInput: React.FC<InputProps> = ({
   iconNum = 'none',
   maxLength,
   height = 48,
+  disabled = false,
   handleChange,
   handleKeyDown,
 }) => (
@@ -45,6 +47,7 @@ const TextInput: React.FC<InputProps> = ({
       onKeyDown={handleKeyDown}
       placeholder={placeholder}
       maxLength={maxLength}
+      disabled={disabled}
     />
   </>
 );

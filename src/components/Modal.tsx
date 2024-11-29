@@ -44,7 +44,7 @@ export const Modal: React.FC<ModalProps> = ({ content, id }) => {
 };
 
 const modalStyle = (width?: number) => css`
-  position: relative;
+  position: fixed;
   background: ${COLOR.WHITE};
   border-radius: 4px;
   border: 0;

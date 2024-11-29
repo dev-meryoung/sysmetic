@@ -1,22 +1,151 @@
 import { css } from '@emotion/react';
+import { Close } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import tempImage from '@/assets/images/test-profile.png';
+import addInfoImage from '@/assets/images/strategy-add-page.png';
 import Button from '@/components/Button';
 import Checkbox from '@/components/Checkbox';
+import Modal from '@/components/Modal';
 import SelectBox from '@/components/SelectBox';
 import TextArea from '@/components/TextArea';
 import TextInput from '@/components/TextInput';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+import useStrategyAdd from '@/hooks/useStrategyAdd';
 
 const StrategyAdd = () => {
+  const {
+    methodOptions,
+    stockOptions,
+    title,
+    setTitle,
+    setMethod,
+    setCycle,
+    stocks,
+    content,
+    setContent,
+    file,
+    fileInputRef,
+    submitErrorData,
+    noticeMessage,
+    handleCheckboxChange,
+    handleBrowseClick,
+    handleFileChange,
+    handleFileDelete,
+    handleSubmitButton,
+    roleCode,
+  } = useStrategyAdd();
+
   const navigate = useNavigate();
 
+  const CYCLE_OPTIONS = [
+    { label: '데이', value: 'D' },
+    { label: '포지션', value: 'P' },
+  ];
+
   const conditionalRender = {
+    trader: (
+      <div css={addContentBoxStyle}>
+        <div className='form-box'>
+          <div className='form-item'>
+            <span>전략명</span>
+            <TextInput
+              value={title}
+              handleChange={(e) => setTitle(e.target.value)}
+              width={700}
+              maxLength={30}
+            />
+          </div>
+          <div className='form-item'>
+            <span>매매방식</span>
+            <SelectBox
+              placeholder='매매방식 선택'
+              options={methodOptions}
+              handleChange={setMethod}
+            />
+          </div>
+          <div className='form-item'>
+            <span>주기</span>
+            <SelectBox
+              placeholder='주기 선택'
+              options={CYCLE_OPTIONS}
+              handleChange={setCycle}
+            />
+          </div>
+          <div className='form-item'>
+            <span>운용 종목</span>
+            {stockOptions.map((option: { label: string; value: string }) => (
+              <Checkbox
+                key={option.value}
+                checked={stocks.includes(option.value)}
+                label={option.label}
+                handleChange={() => handleCheckboxChange(option.value)}
+              />
+            ))}
+          </div>
+          <div className='form-item form-item-top'>
+            <span>
+              전략소개
+              <br />
+              <span className='explain-text'>(500자내외)</span>
+            </span>
+            <TextArea
+              value={content}
+              handleChange={(e) => setContent(e.target.value)}
+              maxLength={500}
+            />
+          </div>
+          <div className='form-item form-item-last'>
+            <span>제안서</span>
+            <div className='file-box'>
+              <div>
+                <TextInput
+                  value={file ? file.name : ''}
+                  iconNum='single'
+                  handleChange={() => {}}
+                  disabled={true}
+                />
+                {file && (
+                  <Close
+                    className='delete'
+                    onClick={handleFileDelete}
+                    sx={{ fontSize: 20, color: COLOR.POINT }}
+                  />
+                )}
+              </div>
+              <Button
+                label='찾아보기'
+                handleClick={handleBrowseClick}
+                width={80}
+              />
+              <input
+                type='file'
+                ref={fileInputRef}
+                accept='.pdf'
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+              />
+            </div>
+          </div>
+        </div>
+        <div className='button-box'>
+          <Button
+            label='이전'
+            handleClick={() => navigate(-1)}
+            border={true}
+            width={120}
+          />
+          <Button
+            label='전략등록'
+            handleClick={handleSubmitButton}
+            width={120}
+          />
+        </div>
+      </div>
+    ),
     none: (
       <div css={infoBoxStyle}>
-        <img className='add-image' src={tempImage} alt='add' />
+        <img className='add-image' src={addInfoImage} alt='add' />
         <div className='text-box'>
           <h6>트레이더가 되시면 투자전략을 등록하고 공유할 수 있습니다.</h6>
           <span>
@@ -41,98 +170,48 @@ const StrategyAdd = () => {
         </div>
       </div>
     ),
-    trader: (
-      <div css={addContentBoxStyle}>
-        <div className='form-box'>
-          <div className='form-item'>
-            <span>전략명</span>
-            <TextInput value='' handleChange={() => {}} width={700} />
-          </div>
-          <div className='form-item'>
-            <span>매매방식</span>
-            <SelectBox
-              placeholder='매매방식 선택'
-              options={[]}
-              handleChange={() => {}}
-            />
-          </div>
-          <div className='form-item'>
-            <span>주기</span>{' '}
-            <SelectBox
-              placeholder='주기 선택'
-              options={[
-                { label: '데이', value: 'day' },
-                { label: '포지션', value: 'position' },
-              ]}
-              handleChange={() => {}}
-            />
-          </div>
-          <div className='form-item'>
-            <span>운용 종목</span>
-            <Checkbox
-              checked={true}
-              handleChange={() => {}}
-              label='해외 주식'
-            />
-            <Checkbox
-              checked={true}
-              handleChange={() => {}}
-              label='해외 주식'
-            />
-            <Checkbox
-              checked={true}
-              handleChange={() => {}}
-              label='해외 주식'
-            />
-            <Checkbox
-              checked={true}
-              handleChange={() => {}}
-              label='해외 주식'
-            />
-          </div>
-          <div className='form-item form-item-top'>
-            <span>
-              전략소개
-              <br />
-              <span className='explain-text'>(500자내외)</span>
-            </span>
-            <TextArea value='' handleChange={() => {}} />
-          </div>
-          <div className='form-item form-item-last'>
-            <span>제안서</span>
-            <div className='file-box'>
-              <TextInput value='제안서.pdf' handleChange={() => {}} />
-              <Button label='찾아보기' handleClick={() => {}} width={80} />
-            </div>
-          </div>
-        </div>
-        <div className='button-box'>
-          <Button
-            label='이전'
-            handleClick={() => {}}
-            border={true}
-            width={120}
-          />
-          <Button label='전략등록' handleClick={() => {}} width={120} />
-        </div>
-      </div>
-    ),
   };
 
   return (
     <div css={wrapperStyle}>
       <div css={titleBoxStyle}>
-        <h5>전략등록</h5>
+        <h5>전략 등록</h5>
         <span>
           시스메틱에서 투자전략을 등록하고 공유해보세요.
           <br />
           트레이더라면 투자자들이 당신의 전략에 투자할 수 있습니다.
         </span>
       </div>
-      {conditionalRender.none}
+      {roleCode === 'TRADER'
+        ? conditionalRender.trader
+        : conditionalRender.none}
+      <Modal
+        id='submit'
+        content={
+          <div css={modalStyle}>
+            {submitErrorData.length > 0 ? (
+              <>
+                <span style={{ fontWeight: FONT_WEIGHT.BOLD }}>
+                  [ {submitErrorData.join(', ')} ]{' '}
+                </span>
+                <span>필수 입력 항목을 모두 입력한 후 다시 시도해주세요.</span>
+              </>
+            ) : null}
+          </div>
+        }
+      />
+      <Modal
+        id='notice'
+        content={
+          <div css={modalStyle}>
+            <span>{noticeMessage}</span>
+          </div>
+        }
+      />
     </div>
   );
 };
+
 const wrapperStyle = css`
   max-width: 1200px;
   height: 100%;
@@ -219,7 +298,20 @@ const addContentBoxStyle = css`
 
       .file-box {
         display: flex;
+
         gap: 16px;
+
+        div {
+          position: relative;
+
+          .delete {
+            position: absolute;
+            top: 50%;
+            right: 16px;
+            transform: translateY(-50%);
+            cursor: pointer;
+          }
+        }
       }
     }
 
@@ -237,6 +329,15 @@ const addContentBoxStyle = css`
     gap: 16px;
     padding-bottom: 168px;
   }
+`;
+
+const modalStyle = css`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 8px;
+  line-height: 24px;
 `;
 
 export default StrategyAdd;

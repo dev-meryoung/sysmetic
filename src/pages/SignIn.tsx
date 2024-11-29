@@ -3,14 +3,12 @@ import { css } from '@emotion/react';
 import CancelOutlined from '@mui/icons-material/CancelOutlined';
 import VisibilityOffOutlined from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlined from '@mui/icons-material/VisibilityOutlined';
-import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import Checkbox from '@/components/Checkbox';
 import IconButton from '@/components/IconButton';
 import TextInput from '@/components/TextInput';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
-import { PATH } from '@/constants/path';
 import { useLogin } from '@/hooks/useAuthApi';
 
 const SignIn = () => {
@@ -21,7 +19,6 @@ const SignIn = () => {
   const [passwordError, setPasswordError] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const loginMutation = useLogin();
-  const navigate = useNavigate();
 
   const emailRegEx =
     /^[A-Za-z0-9]([-_.]?[A-Za-z0-9])*@[A-Za-z0-9]([-_.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$/i;
@@ -55,9 +52,6 @@ const SignIn = () => {
       loginMutation.mutate(
         { email, password, rememberMe },
         {
-          onSuccess: () => {
-            navigate(PATH.ROOT);
-          },
           onError: () => {
             setEmailError(true);
             setPasswordError(true);
