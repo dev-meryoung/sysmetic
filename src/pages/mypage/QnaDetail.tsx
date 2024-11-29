@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { css } from '@emotion/react';
 import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight';
 import { useParams } from 'react-router-dom';

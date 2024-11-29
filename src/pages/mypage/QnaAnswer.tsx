@@ -16,17 +16,6 @@ import {
 } from '@/hooks/useCommonApi';
 import useModalStore from '@/stores/useModalStore';
 
-interface InquiryDataTypes {
-  inquiryId: number;
-  inquiryTitle: string;
-  inquiryContent: string;
-  inquiryStatus: string;
-  inquiryRegistrationDate: string;
-  inquirerNickname: string;
-  strategyName: string;
-  traderNickname: string;
-}
-
 type InputStateTypes = 'normal' | 'warn';
 
 const QnaAnswer = () => {
