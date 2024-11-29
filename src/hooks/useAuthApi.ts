@@ -11,6 +11,7 @@ import { PATH } from '@/constants/path';
 import useAuthStore from '@/stores/useAuthStore';
 
 export const useLogin = () => {
+  const navigate = useNavigate();
   const { setAuthState, resetAuthState } = useAuthStore();
 
   return useMutation({
@@ -19,6 +20,7 @@ export const useLogin = () => {
       try {
         const authData = await checkAuth();
         setAuthState(authData.data);
+        navigate(PATH.ROOT);
       } catch (err) {
         resetAuthState();
       }
