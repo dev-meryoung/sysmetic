@@ -1,21 +1,14 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState } from 'react';
 import { css } from '@emotion/react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
+import Modal from '@/components/Modal';
 import TextArea from '@/components/TextArea';
 import TextInput from '@/components/TextInput';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 import { useGetEditInquiry, useUpdateInquiry } from '@/hooks/useCommonApi';
-
-interface InquiryDataTypes {
-  inquiryId: number;
-  page: number;
-  sort: string;
-  closed: string;
-  inquiryTitle: string;
-  inquiryContent: string;
-}
+import useModalStore from '@/stores/useModalStore';
 
 type InputStateTypes = 'normal' | 'warn';
 
@@ -23,40 +16,24 @@ const MyQnaEdit = () => {
   const [status, setStatus] = useState<InputStateTypes>('normal');
   const [titleValue, setTitleValue] = useState('');
   const [contentValue, setContentValue] = useState('');
-  const [inquiryData, setInquiryData] = useState<InquiryDataTypes | null>(null);
+  const { openModal } = useModalStore();
 
   const navigate = useNavigate();
-
-  const getEditInquiry = useGetEditInquiry();
   const { inquiryId } = useParams<{ inquiryId: string }>();
-  const fetchData = useCallback(() => {
-    const params = { inquiryId: Number(inquiryId) };
 
-    getEditInquiry.mutate(params, {
-      onSuccess: (data) => {
-        if (!data) {
-          alert('문의내역 조회에 실패했습니다.');
-          return;
-        }
-        setInquiryData(data);
-        setTitleValue(data.inquiryTitle);
-        setContentValue(data.inquiryContent);
-      },
-      onError: () => {
-        alert('문의내역 조회에 실패했습니다.');
-      },
-    });
-  }, [getEditInquiry, inquiryId]);
+  const { data: inquiryData, isError } = useGetEditInquiry({
+    inquiryId: Number(inquiryId),
+  });
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  if (isError) {
+    openModal('get-inquiry-error');
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     setTitleValue(inputValue);
 
-    if (inputValue.length < 6) {
+    if (inputValue.length < 1) {
       setStatus('warn');
     } else {
       setStatus('normal');
@@ -70,6 +47,11 @@ const MyQnaEdit = () => {
   const updateMutation = useUpdateInquiry();
 
   const handleSubmit = () => {
+    if (!titleValue.trim() || !contentValue.trim()) {
+      openModal('create-confirm');
+      return;
+    }
+
     updateMutation.mutate(
       {
         inquiryId: Number(inquiryId),
@@ -81,7 +63,7 @@ const MyQnaEdit = () => {
           navigate(PATH.MYPAGE_QNA_DETAIL());
         },
         onError: () => {
-          alert('문의수정에 실패했습니다.');
+          openModal('create-confirm');
         },
       }
     );
@@ -100,7 +82,7 @@ const MyQnaEdit = () => {
             <>
               <div css={questionNameStyle}>
                 <TextInput
-                  value={titleValue}
+                  value={titleValue || inquiryData.inquiryTitle}
                   status={status}
                   placeholder='제목을 입력해주세요.'
                   fullWidth
@@ -109,7 +91,7 @@ const MyQnaEdit = () => {
               </div>
               <div css={questionStyle}>
                 <TextArea
-                  value={contentValue}
+                  value={contentValue || inquiryData.inquiryContent}
                   placeholder='내용을 입력해주세요.'
                   fullWidth
                   handleChange={handleTextChange}
@@ -138,6 +120,22 @@ const MyQnaEdit = () => {
           width={120}
         />
       </div>
+      <Modal
+        id='get-inquiry-error'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>문의 내역 조회에 실패했습니다.</p>
+          </div>
+        }
+      />
+      <Modal
+        id='create-confirm'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>문의 내용 수정에 실패했습니다.</p>
+          </div>
+        }
+      />
     </div>
   );
 };
@@ -180,4 +178,19 @@ const buttonStyle = css`
   display: flex;
   align-items: center;
   gap: 16px;
+`;
+
+const modalContentStyle = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+`;
+
+const modalTextStyle = css`
+  font-size: ${FONT_SIZE.TEXT_LG};
+  text-align: center;
+  margin-top: 32px;
+  margin-bottom: 24px;
 `;

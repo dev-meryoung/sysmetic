@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import {
   GetInquiryData,
   GetInquiryDetailData,
@@ -17,9 +17,46 @@ import {
   deleteInquiry,
 } from '@/api';
 
-export const useGetEditInquiry = () =>
-  useMutation({
-    mutationFn: (params: GetInquiryDetailData) => getEditInquiry(params),
+export const useGetEditInquiry = (params: GetInquiryDetailData) =>
+  useQuery({
+    queryKey: ['getEditInquiry', params],
+    queryFn: () => getEditInquiry(params),
+    enabled: !!params,
+  });
+
+export const useGetCreateInquiry = (strategyId: number) =>
+  useQuery({
+    queryKey: ['getCreateInquiry', strategyId],
+    queryFn: () => getCreateInquiry(strategyId),
+    enabled: !!strategyId,
+  });
+
+export const useGetInquiryListTrader = (params: GetInquiryData) =>
+  useQuery({
+    queryKey: ['getInquiryListTrader', params],
+    queryFn: () => getInquiryListTrader(params),
+    enabled: !!params,
+  });
+
+export const useGetInquiryDetailTrader = (params: GetInquiryDetailData) =>
+  useQuery({
+    queryKey: ['getInquiryDetailTrader', params],
+    queryFn: () => getInquiryDetailTrader(params),
+    enabled: !!params,
+  });
+
+export const useGetInquiryListUser = (params: GetInquiryData) =>
+  useQuery({
+    queryKey: ['getInquiryListUser', params],
+    queryFn: () => getInquiryListUser(params),
+    enabled: !!params,
+  });
+
+export const useGetInquiryDetailUser = (params: GetInquiryDetailData) =>
+  useQuery({
+    queryKey: ['getInquiryDetailUser', params],
+    queryFn: () => getInquiryDetailUser(params),
+    enabled: !!params,
   });
 
 export const useUpdateInquiry = () =>
@@ -32,35 +69,9 @@ export const useCreateAnswer = () =>
     mutationFn: (answerData: CreateAnswerData) => createAnswer(answerData),
   });
 
-export const useGetCreateInquiry = () =>
-  useMutation({
-    mutationFn: (strategyId: number) => getCreateInquiry(strategyId),
-  });
-
 export const useCreateInquiry = () =>
   useMutation({
     mutationFn: (inquiryData: CreaeteInquiryData) => createInquiry(inquiryData),
-  });
-
-export const useGetInquiryListTrader = () =>
-  useMutation({
-    mutationFn: (params: GetInquiryData) => getInquiryListTrader(params),
-  });
-
-export const useGetInquiryDetailTrader = () =>
-  useMutation({
-    mutationFn: (params: GetInquiryDetailData) =>
-      getInquiryDetailTrader(params),
-  });
-
-export const useGetInquiryListUser = () =>
-  useMutation({
-    mutationFn: (params: GetInquiryData) => getInquiryListUser(params),
-  });
-
-export const useGetInquiryDetailUser = () =>
-  useMutation({
-    mutationFn: (params: GetInquiryDetailData) => getInquiryDetailUser(params),
   });
 
 export const useDeleteInquiry = () =>

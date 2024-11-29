@@ -21,12 +21,13 @@ const ProfileEdit: React.FC = () => {
     memberId: userId,
     nickname: storeNickname,
     profileImage: storeProfileImage,
+    phoneNumber: storePhoneNumber,
   } = useAuthStore();
   const [nickname, setNickname] = useState(storeNickname || '');
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [nicknameStatus, setNicknameStatus] =
     useState<InputStateTypes>('normal');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState(storePhoneNumber || '');
   const [phoneStatus, setPhoneStatus] = useState<InputStateTypes>('normal');
   const [isNicknameChecked, setIsNicknameChecked] = useState(false);
   const navigate = useNavigate();

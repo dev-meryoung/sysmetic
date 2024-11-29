@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect } from 'react';
 import { css } from '@emotion/react';
 import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight';
 import { useParams } from 'react-router-dom';
@@ -18,37 +18,6 @@ import {
 import useAuthStore from '@/stores/useAuthStore';
 import useModalStore from '@/stores/useModalStore';
 
-interface QnaDataTypes {
-  page: number;
-  sort: string;
-  closed: string;
-  searchType: string;
-  searchText: string;
-  inquiryId: number;
-  inquiryAnswerId: number;
-  inquiryTitle: string;
-  inquiryRegistrationDate: string;
-  inquirerNickname: string;
-  inquiryStatus: 'unclosed' | 'closed';
-  strategyName: string;
-  traderNickname: string;
-  inquiryContent: string;
-  answerTitle: string;
-  answerRegistrationDate: string;
-  answerContent: string;
-  previousTitle: string;
-  previousWriteDate: string;
-  nextTitle: string;
-  nextWriteDate: string;
-}
-
-interface StrategyDataTypes {
-  name: string;
-  profileImage: string;
-  nickName: string;
-  tag: string;
-}
-
 interface AnswerDataTypes {
   id: number;
   title: string;
@@ -58,47 +27,28 @@ interface AnswerDataTypes {
   nickname: string;
 }
 
-interface ApiResponse {
-  qna: QnaDataTypes;
-  strategy: StrategyDataTypes;
-  answers: AnswerDataTypes[];
-}
-
 const QnaDetail = () => {
   const { roleCode } = useAuthStore();
-  const [qnaData, setQnaData] = useState<QnaDataTypes | null>(null);
-  const [strategyData, setStrategyData] = useState<StrategyDataTypes | null>(
-    null
-  );
-  const [answerData, setAnswerData] = useState<AnswerDataTypes[]>([]);
   const navigate = useNavigate();
   const { openModal, closeModal } = useModalStore();
   const { inquiryId } = useParams<{ inquiryId: string }>();
-  const userQuery = useGetInquiryDetailUser();
-  const traderQuery = useGetInquiryDetailTrader();
 
-  const fetchData = useCallback(() => {
-    const params = { inquiryId: Number(inquiryId) };
+  const userQuery = useGetInquiryDetailUser({ inquiryId: Number(inquiryId) });
+  const traderQuery = useGetInquiryDetailTrader({
+    inquiryId: Number(inquiryId),
+  });
 
-    const queryFn = roleCode === 'USER' ? userQuery : traderQuery;
-
-    queryFn.mutate(params, {
-      onSuccess: (data: ApiResponse) => {
-        setQnaData(data.qna);
-        setStrategyData(data.strategy);
-        setAnswerData(data.answers || []);
-      },
-      onError: (error: unknown) => {
-        console.error('Error fetching Q&A data:', error);
-      },
-    });
-  }, [inquiryId, roleCode, userQuery, traderQuery]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  const qnaData =
+    roleCode === 'USER' ? userQuery.data?.qna : traderQuery.data?.qna;
+  const strategyData =
+    roleCode === 'USER' ? userQuery.data?.strategy : traderQuery.data?.strategy;
+  const answerData =
+    roleCode === 'USER'
+      ? userQuery.data?.answers
+      : traderQuery.data?.answers || [];
 
   const deleteMutation = useDeleteInquiry();
+
   const isAnswerPresent = () => answerData.length > 0;
 
   const handleDeleteBtn = () => {
@@ -218,7 +168,7 @@ const QnaDetail = () => {
         </>
       )}
 
-      {answerData.map((answer) => (
+      {answerData.map((answer: AnswerDataTypes) => (
         <div key={answer.id} css={wrapperStyle}>
           <div className='comment-section' css={titleWrapperStyle}>
             <div css={titleStyle}>

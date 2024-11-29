@@ -25,7 +25,7 @@ export const useUpdateUser = () => {
         nickname: updatedData.nickName,
         roleCode: updatedData.roleCode,
         profileImage: updatedData.profileImage,
-        // phoneNumber: updatedData.phoneNumber 아직 값이 없어서 나중에 수정
+        phoneNumber: updatedData.phoneNumber,
       });
     },
   });

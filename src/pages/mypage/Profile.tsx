@@ -10,12 +10,18 @@ import useAuthStore from '@/stores/useAuthStore';
 
 const Profile: React.FC = () => {
   const navigate = useNavigate();
-  const { initializeAuth, isLoggedIn, email, nickname, profileImage } =
-    useAuthStore();
+  const {
+    initializeAuth,
+    isLoggedIn,
+    email,
+    nickname,
+    profileImage,
+    phoneNumber,
+  } = useAuthStore();
 
-  // function maskPhoneNumber(phone: string): string {
-  //   return phone.replace(/(\d{2})$/, '**');
-  // }
+  function maskPhoneNumber(phone: string): string {
+    return phone.replace(/(\d{2})$/, '**');
+  }
 
   useEffect(() => {
     initializeAuth();
@@ -65,9 +71,8 @@ const Profile: React.FC = () => {
                 <span>{nickname}</span>
               </div>
               <div css={useHpStyle}>
-                {/* 나중에 연동 */}
                 <span>전화번호</span>
-                <span>010-0000-0000</span>
+                <span>{maskPhoneNumber(phoneNumber || '')}</span>
               </div>
             </div>
           </div>

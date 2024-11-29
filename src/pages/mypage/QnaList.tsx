@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { css } from '@emotion/react';
 import { Link } from 'react-router-dom';
 import TagTest from '@/assets/images/test-tag.jpg';
@@ -25,7 +25,7 @@ interface QnaListDataProps {
 }
 
 const strategyOptions = [
-  { label: '최신순', value: ' registrationDate' },
+  { label: '최신순', value: 'registrationDate' },
   { label: '전략명', value: 'strategyName' },
 ];
 
@@ -40,26 +40,15 @@ const QnaList = () => {
   const [sortConfig, setSortConfig] = useState<string>('registrationDate');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const userQuery = useGetInquiryListUser();
-  const traderQuery = useGetInquiryListTrader();
 
-  const fetchData = useCallback(() => {
-    const params = {
-      sort: sortConfig,
-      closed: statusFilter === 'all' ? '' : statusFilter,
-      page: currentPage + 1,
-    };
+  const params = {
+    sort: sortConfig,
+    closed: statusFilter === 'all' ? '' : statusFilter,
+    page: currentPage + 1,
+  };
 
-    if (roleCode === 'USER') {
-      userQuery.mutate(params);
-    } else if (roleCode === 'TRADER') {
-      traderQuery.mutate(params);
-    }
-  }, [roleCode, sortConfig, statusFilter, currentPage, userQuery, traderQuery]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  const userQuery = useGetInquiryListUser(params);
+  const traderQuery = useGetInquiryListTrader(params);
 
   const data =
     roleCode === 'USER' ? userQuery.data?.data : traderQuery.data?.data;
@@ -96,7 +85,7 @@ const QnaList = () => {
       header: '전략일자',
     },
     {
-      key: 'inquiryStatu' as keyof QnaListDataProps,
+      key: 'inquiryStatus' as keyof QnaListDataProps,
       header: '진행상태',
       render: (value: string) => (
         <span css={value === 'unclosed' ? successStyle : waitingStyle}>

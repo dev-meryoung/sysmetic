@@ -1,7 +1,8 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState } from 'react';
 import { css } from '@emotion/react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Button from '@/components/Button';
+import Modal from '@/components/Modal';
 import ProfileImage from '@/components/ProfileImage';
 import Tag from '@/components/Tag';
 import TextArea from '@/components/TextArea';
@@ -13,6 +14,7 @@ import {
   useGetInquiryDetailTrader,
   useCreateAnswer,
 } from '@/hooks/useCommonApi';
+import useModalStore from '@/stores/useModalStore';
 
 interface InquiryDataTypes {
   inquiryId: number;
@@ -31,34 +33,17 @@ const QnaAnswer = () => {
   const [status, setStatus] = useState<InputStateTypes>('normal');
   const [titleValue, setTitleValue] = useState('');
   const [contentValue, setContentValue] = useState('');
-  const [inquiryData, setInquiryData] = useState<InquiryDataTypes | null>(null);
-
   const navigate = useNavigate();
   const { inquiryId } = useParams<{ inquiryId: string }>();
+  const { openModal } = useModalStore();
 
-  const getInquiryDetail = useGetInquiryDetailTrader();
-  const fetchData = useCallback(() => {
-    if (!inquiryId) return;
+  const { data: inquiryData, isError } = useGetInquiryDetailTrader({
+    inquiryId: Number(inquiryId),
+  });
 
-    const params = { inquiryId: Number(inquiryId) };
-    getInquiryDetail.mutate(params, {
-      onSuccess: (data) => {
-        if (!data) {
-          alert('문의내역 조회에 실패했습니다.');
-          return;
-        }
-        setInquiryData(data);
-        setTitleValue(data.inquiryTitle);
-      },
-      onError: () => {
-        alert('문의내역 조회에 실패했습니다.');
-      },
-    });
-  }, [getInquiryDetail, inquiryId]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  if (isError) {
+    openModal('get-inquiry-error');
+  }
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -88,7 +73,7 @@ const QnaAnswer = () => {
           navigate(PATH.MYPAGE_QNA_DETAIL());
         },
         onError: () => {
-          alert('답변등록에 실패했습니다.');
+          openModal('create-confirm');
         },
       }
     );
@@ -182,6 +167,22 @@ const QnaAnswer = () => {
           disabled={isSubmitDisabled}
         />
       </div>
+      <Modal
+        id='get-inquiry-error'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>문의 내역 조회에 실패했습니다.</p>
+          </div>
+        }
+      />
+      <Modal
+        id='create-confirm'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>답변 등록에 실패했습니다.</p>
+          </div>
+        }
+      />
     </div>
   );
 };
@@ -327,4 +328,19 @@ const goDetailBtnStyle = css`
   display: flex;
   align-items: center;
   gap: 16px;
+`;
+
+const modalContentStyle = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+`;
+
+const modalTextStyle = css`
+  font-size: ${FONT_SIZE.TEXT_LG};
+  text-align: center;
+  margin-top: 32px;
+  margin-bottom: 24px;
 `;
