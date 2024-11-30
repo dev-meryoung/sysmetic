@@ -13,7 +13,6 @@ import useAuthStore from '@/stores/useAuthStore';
 
 // 회원 정보 수정
 export const useUpdateUser = () => {
-  const navigate = useNavigate();
   const { initializeAuth } = useAuthStore();
 
   return useMutation({
