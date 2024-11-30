@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { css } from '@emotion/react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Button from '@/components/Button';
 import ProfileImage from '@/components/ProfileImage';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
@@ -10,28 +10,29 @@ import useAuthStore from '@/stores/useAuthStore';
 
 const Profile: React.FC = () => {
   const navigate = useNavigate();
+  const { userId: paramUserId } = useParams<{ userId: string }>();
   const {
-    initializeAuth,
     isLoggedIn,
     email,
     nickname,
     profileImage,
     phoneNumber,
+    memberId,
+    name,
   } = useAuthStore();
 
-  function maskPhoneNumber(phone: string): string {
-    return phone.replace(/(\d{2})$/, '**');
-  }
-
-  useEffect(() => {
-    initializeAuth();
-  }, [initializeAuth]);
+  const userId =
+    paramUserId && !isNaN(Number(paramUserId)) ? Number(paramUserId) : memberId;
 
   useEffect(() => {
     if (!isLoggedIn) {
       navigate(PATH.SIGN_IN, { replace: true });
     }
   }, [isLoggedIn, navigate]);
+
+  if (!userId) {
+    return null;
+  }
 
   return (
     <div css={wrapperStyle}>
@@ -41,7 +42,9 @@ const Profile: React.FC = () => {
             <span>계정 정보</span>
             <Button
               label='변경하기'
-              handleClick={() => navigate(PATH.MYPAGE_PROFILE_EDIT())}
+              handleClick={() =>
+                navigate(PATH.MYPAGE_PROFILE_EDIT(String(userId)))
+              }
               color='primary'
               size='md'
               width={80}
@@ -58,7 +61,7 @@ const Profile: React.FC = () => {
             </div>
             <div className='user-name-email'>
               <div css={userName}>
-                <span>{nickname}</span>
+                <span>{name}</span>
               </div>
               <div css={userEmailStyle}>
                 <span>계정(이메일)</span>
@@ -72,7 +75,7 @@ const Profile: React.FC = () => {
               </div>
               <div css={useHpStyle}>
                 <span>전화번호</span>
-                <span>{maskPhoneNumber(phoneNumber || '')}</span>
+                <span>{phoneNumber}</span>
               </div>
             </div>
           </div>
@@ -84,7 +87,7 @@ const Profile: React.FC = () => {
             <span>비밀번호</span>
             <Button
               label='변경하기'
-              handleClick={() => navigate(PATH.MYPAGE_PASSWORD())}
+              handleClick={() => navigate(PATH.MYPAGE_PASSWORD(String(userId)))}
               color='primary'
               size='md'
               width={80}
@@ -99,7 +102,7 @@ const Profile: React.FC = () => {
             <span>정보수신동의</span>
             <Button
               label='변경하기'
-              handleClick={() => navigate(PATH.MYPAGE_OPT())}
+              handleClick={() => navigate(PATH.MYPAGE_OPT(String(userId)))}
               color='primary'
               size='md'
               width={80}

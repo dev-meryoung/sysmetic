@@ -8,6 +8,7 @@ interface AuthConfig {
   memberId: number;
   email: string;
   phoneNumber: string;
+  name: string;
   nickname: string;
   roleCode: RoleCodeTypes;
   profileImage: string | null;
@@ -25,6 +26,7 @@ const resetState = (set: Function) => {
     memberId: 0,
     email: '',
     phoneNumber: '',
+    name: '',
     nickname: '',
     roleCode: '',
     profileImage: null,
@@ -38,6 +40,7 @@ const updateState = (set: Function, authData: AuthConfig) => {
     memberId: authData.memberId,
     email: authData.email,
     phoneNumber: authData.phoneNumber,
+    name: authData.name,
     nickname: authData.nickname,
     roleCode: authData.roleCode,
     profileImage: authData.profileImage,
@@ -49,6 +52,7 @@ const useAuthStore = create<AuthStateProps>((set) => ({
   memberId: 0,
   email: '',
   phoneNumber: '',
+  name: '',
   nickname: '',
   roleCode: '',
   profileImage: null,

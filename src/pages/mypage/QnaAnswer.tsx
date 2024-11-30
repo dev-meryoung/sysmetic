@@ -23,8 +23,9 @@ const QnaAnswer = () => {
   const [titleValue, setTitleValue] = useState('');
   const [contentValue, setContentValue] = useState('');
   const navigate = useNavigate();
-  const { inquiryId } = useParams<{ inquiryId: string }>();
   const { openModal } = useModalStore();
+  const { userId: paramUserId } = useParams<{ userId: string }>();
+  const inquiryId = paramUserId ? Number(paramUserId) : 0;
 
   const { data: inquiryData, isError } = useGetInquiryDetailTrader({
     inquiryId: Number(inquiryId),
@@ -59,7 +60,7 @@ const QnaAnswer = () => {
       },
       {
         onSuccess: () => {
-          navigate(PATH.MYPAGE_QNA_DETAIL());
+          navigate(PATH.MYPAGE_QNA_DETAIL(String(inquiryId)));
         },
         onError: () => {
           openModal('create-confirm');
@@ -69,7 +70,7 @@ const QnaAnswer = () => {
   };
 
   const handleBack = () => {
-    navigate(PATH.MYPAGE_QNA_DETAIL());
+    navigate(PATH.MYPAGE_QNA_DETAIL(String(inquiryId)));
   };
 
   const isSubmitDisabled = !titleValue.trim() || !contentValue.trim();

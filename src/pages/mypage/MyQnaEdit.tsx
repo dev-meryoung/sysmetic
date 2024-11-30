@@ -17,10 +17,9 @@ const MyQnaEdit = () => {
   const [titleValue, setTitleValue] = useState('');
   const [contentValue, setContentValue] = useState('');
   const { openModal } = useModalStore();
-
+  const { userId: paramUserId } = useParams<{ userId: string }>();
+  const inquiryId = paramUserId ? Number(paramUserId) : 0;
   const navigate = useNavigate();
-  const { inquiryId } = useParams<{ inquiryId: string }>();
-
   const { data: inquiryData, isError } = useGetEditInquiry({
     inquiryId: Number(inquiryId),
   });
@@ -33,7 +32,7 @@ const MyQnaEdit = () => {
     const inputValue = e.target.value;
     setTitleValue(inputValue);
 
-    if (inputValue.length < 1) {
+    if (inputValue.length < 0) {
       setStatus('warn');
     } else {
       setStatus('normal');
@@ -60,7 +59,7 @@ const MyQnaEdit = () => {
       },
       {
         onSuccess: () => {
-          navigate(PATH.MYPAGE_QNA_DETAIL());
+          navigate(PATH.MYPAGE_QNA_DETAIL(String(inquiryId)));
         },
         onError: () => {
           openModal('create-confirm');
@@ -70,7 +69,7 @@ const MyQnaEdit = () => {
   };
 
   const handleBtn = () => {
-    navigate(PATH.MYPAGE_QNA_DETAIL());
+    navigate(PATH.MYPAGE_QNA_DETAIL(String(inquiryId)));
   };
 
   return (

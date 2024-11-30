@@ -1,7 +1,6 @@
 import { css } from '@emotion/react';
 import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight';
-import { useParams } from 'react-router-dom';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
 import ProfileImage from '@/components/ProfileImage';
@@ -30,7 +29,8 @@ const QnaDetail = () => {
   const { roleCode } = useAuthStore();
   const navigate = useNavigate();
   const { openModal, closeModal } = useModalStore();
-  const { inquiryId } = useParams<{ inquiryId: string }>();
+  const { userId: paramUserId } = useParams<{ userId: string }>();
+  const inquiryId = paramUserId ? Number(paramUserId) : 0;
 
   const userQuery = useGetInquiryDetailUser({ inquiryId: Number(inquiryId) });
   const traderQuery = useGetInquiryDetailTrader({
@@ -63,7 +63,7 @@ const QnaDetail = () => {
       openModal('error-edit');
       return;
     }
-    navigate(PATH.MYPAGE_QNA_EDIT());
+    navigate(PATH.MYPAGE_QNA_EDIT(String(inquiryId)));
   };
 
   const confirmDelete = () => {
@@ -75,7 +75,7 @@ const QnaDetail = () => {
     deleteMutation.mutate(Number(inquiryId), {
       onSuccess: () => {
         closeModal('delete-confirm');
-        navigate(PATH.MYPAGE_QNA());
+        navigate(PATH.MYPAGE_QNA(String(inquiryId)));
       },
       onError: () => {
         closeModal('delete-confirm');
@@ -124,7 +124,7 @@ const QnaDetail = () => {
                     <Button
                       label='답변하기'
                       handleClick={() =>
-                        navigate(PATH.MYPAGE_QNA_ANSWER(), {
+                        navigate(PATH.MYPAGE_QNA_ANSWER(String(inquiryId)), {
                           state: { qnaId: qnaData.inquiryId },
                         })
                       }

@@ -10,7 +10,7 @@ import { PATH } from '@/constants/path';
 import { useUpdatePassword } from '@/hooks/useUserApi';
 import useModalStore from '@/stores/useModalStore';
 
-type InputStateTypes = 'normal' | 'warn' | 'success';
+type InputStateTypes = 'normal' | 'warn';
 
 const MypagePassword: React.FC = () => {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -24,16 +24,18 @@ const MypagePassword: React.FC = () => {
     useState<InputStateTypes>('normal');
   const { openModal } = useModalStore();
 
-  const updatePassword = useUpdatePassword();
-
   const navigate = useNavigate();
   const PASSWORD_REGEX =
     /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,20}$/;
 
+  const { userId: paramUserId } = useParams<{ userId: string }>();
+
+  const userId = paramUserId ? Number(paramUserId) : 0;
+
+  const updatePassword = useUpdatePassword();
+
   const isPasswordValid = (password: string) =>
     PASSWORD_REGEX.test(password.trim());
-
-  const { userId } = useParams<{ userId: string }>();
 
   const handleComplete = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -61,14 +63,14 @@ const MypagePassword: React.FC = () => {
 
     updatePassword.mutate(
       {
-        userId: Number(userId),
+        userId,
         currentPassword,
         newPassword,
         newPasswordConfirm: newPassword,
       },
       {
         onSuccess: () => {
-          navigate(PATH.MYPAGE_PROFILE());
+          navigate(PATH.MYPAGE_PROFILE(String(userId)));
         },
         onError: () => {
           openModal('update-confirm');
@@ -99,7 +101,9 @@ const MypagePassword: React.FC = () => {
               />
             </div>
             {currentPasswordStatus === 'warn' && (
-              <span className='message'>현재 비밀번호를 입력해주세요.</span>
+              <span className='message'>
+                현재 비밀번호를 정확히 입력해주세요.
+              </span>
             )}
           </div>
 
@@ -116,7 +120,9 @@ const MypagePassword: React.FC = () => {
               />
             </div>
             {newPasswordStatus === 'warn' && (
-              <span className='message'>새 비밀번호를 입력해주세요.</span>
+              <span className='message'>
+                새 비밀번호는 영문, 숫자, 특수문자를 포함한 6~20자여야 합니다.
+              </span>
             )}
           </div>
 
@@ -142,7 +148,7 @@ const MypagePassword: React.FC = () => {
       <div css={buttonStyle}>
         <Button
           label='이전'
-          handleClick={() => navigate(PATH.MYPAGE_PROFILE())}
+          handleClick={() => navigate(PATH.MYPAGE_PROFILE(String(userId)))}
           color='primaryOpacity10'
           size='md'
           shape='square'
@@ -180,6 +186,8 @@ const MypagePassword: React.FC = () => {
 };
 
 export default MypagePassword;
+
+// 스타일 정의는 기존 코드와 동일
 
 const wrapperStyle = css`
   padding-top: 96px;

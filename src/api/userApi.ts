@@ -3,9 +3,9 @@ import axiosInstance from '@/api/axiosInstance';
 export interface UpdateUserData {
   userId: number;
   phoneNumber: string;
-  profileImage: string | File;
-  nickName: String;
-  nickNameDuplCheck: boolean;
+  file: string | File;
+  nickname: string;
+  nicknameDuplCheck: boolean;
 }
 
 export interface UpdatePasswordData {
@@ -20,48 +20,53 @@ export interface UpdateOptData {
   receiveMarketingConsent: boolean;
 }
 
-// 회원 정보 조회 API
-// export const getUser = async () => {};
-
 // 회원 정보 수정 API
-export const updateUser = async (updateUserData: UpdateUserData | FormData) => {
-  const isFormData = updateUserData instanceof FormData;
-
+export const updateUser = async (updateUserData: FormData, userId: number) => {
   const response = await axiosInstance.patch(
-    `/v1/member/info/{id}`,
+    `/v1/member/info/${userId}`,
     updateUserData,
     {
-      headers: isFormData
-        ? { 'Content-Type': 'multipart/form-data' }
-        : undefined,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     }
   );
-
   return response.data;
 };
 
 // 회원 비밀번호 수정 API
-export const updatePassword = async (
-  updatePasswordData: UpdatePasswordData
-) => {
+export const updatePassword = async (PasswordData: UpdatePasswordData) => {
   const response = await axiosInstance.patch(
-    `/v1/member/info/password/{id}`,
-    updatePasswordData
+    `/v1/member/info/${PasswordData.userId}/password`,
+    PasswordData,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
   );
   return response.data;
 };
 
 // 회원 정보성 수신동의 변경 API
-export const updateOpt = async (updateOptData: UpdateOptData) => {
+export const updateOpt = async (
+  userId: number,
+  updateOptData: UpdateOptData
+) => {
   const response = await axiosInstance.patch(
-    `/v1/member/consent/{id}`,
-    updateOptData
+    `/v1/member/consent/${userId}`,
+    updateOptData,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
   );
   return response.data;
 };
 
 // 회원 탈퇴 API
-export const deleteUser = async () => {
-  const response = await axiosInstance.delete('/v1/member/{id}');
+export const deleteUser = async (userId: number) => {
+  const response = await axiosInstance.delete(`/v1/member/${userId}`);
   return response.data;
 };

@@ -69,7 +69,11 @@ const ProfileEdit: React.FC = () => {
   const handlePhoneChange = (value: string) => {
     const numbersOnly = value.replace(/[^0-9]/g, '');
     setPhoneNumber(numbersOnly);
-    setPhoneStatus(/^010\d{8}$/.test(numbersOnly) ? 'normal' : 'warn');
+    const isValid = /^010\d{8}$/.test(numbersOnly);
+    setPhoneStatus(isValid ? 'normal' : 'warn');
+    if (!isValid && value.length >= 11) {
+      openModal('error-message');
+    }
   };
 
   const handleComplete = () => {
@@ -79,25 +83,30 @@ const ProfileEdit: React.FC = () => {
       !isNicknameChecked
     ) {
       openModal('update-confirm');
+      return;
     }
 
     const formData = new FormData();
-    formData.append('userId', userId.toString());
-    formData.append('nickName', nickname);
-    formData.append('phoneNumber', phoneNumber);
-    formData.append('nickNameDuplCheck', String(true));
+
+    formData.append(
+      'memberPatchInfoRequestDto',
+      JSON.stringify({
+        userId,
+        phoneNumber,
+        nickname,
+        nicknameDuplCheck: true,
+      })
+    );
+
     if (profileImage) {
-      formData.append('profileImage', profileImage);
+      formData.append('file', profileImage);
     }
 
-    updateUser(formData, {
-      onSuccess: () => {
-        navigate(PATH.MYPAGE_PROFILE());
-      },
-      onError: () => {
-        openModal('update-confirm');
-      },
+    updateUser({
+      formData,
+      userId,
     });
+    navigate(PATH.MYPAGE_PROFILE(String(userId)));
   };
 
   return (
@@ -177,7 +186,7 @@ const ProfileEdit: React.FC = () => {
       <div css={buttonStyle}>
         <Button
           label='이전'
-          handleClick={() => navigate(PATH.MYPAGE_PROFILE())}
+          handleClick={() => navigate(PATH.MYPAGE_PROFILE(String(userId)))}
           color='primaryOpacity10'
           size='md'
           shape='square'

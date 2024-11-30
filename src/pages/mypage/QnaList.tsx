@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { css } from '@emotion/react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import TagTest from '@/assets/images/test-tag.jpg';
 import Pagination from '@/components/Pagination';
 import SelectBox from '@/components/SelectBox';
@@ -40,6 +40,8 @@ const QnaList = () => {
   const [sortConfig, setSortConfig] = useState<string>('registrationDate');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState<number>(0);
+  const { userId: paramUserId } = useParams<{ userId: string }>();
+  const userId = paramUserId ? Number(paramUserId) : 0;
 
   const params = {
     sort: sortConfig,
@@ -63,7 +65,7 @@ const QnaList = () => {
       render: (value: string) => (
         <div css={questionContainerStyle}>
           <div css={questionTitleStyle}>
-            <Link to={PATH.MYPAGE_QNA_DETAIL('user123')} css={linkStyle}>
+            <Link to={PATH.MYPAGE_QNA_DETAIL(String(userId))} css={linkStyle}>
               {value}
             </Link>
           </div>
