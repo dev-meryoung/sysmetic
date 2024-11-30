@@ -14,6 +14,7 @@ import TextInput, { InputStateTypes } from '@/components/TextInput';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+import { useCheckNickname } from '@/hooks/useAuthApi';
 import useModalStore from '@/stores/useModalStore';
 
 const RadioOption1 = [
@@ -121,8 +122,10 @@ const SignUpForm = () => {
   // 버튼 상태
   const [checkIdDisabled, setCheckIdDisabled] = useState(true);
   const [idAuthBtnDisabled, setIdAuthBtnDisabled] = useState(true);
+  const [nicknameBtnDisabled, setNicknameBtnDisabled] = useState(true);
   //계정 존재여부
   const [isExist, setIsExist] = useState(false);
+  const [isNicknameExist, setIsNicknameExist] = useState(false);
   //정보수신 동의
   const [isFirstChecked, setIsFirstChecked] = useState('false');
   const [isSecondChecked, setIsSecondChecked] = useState('false');
@@ -272,6 +275,23 @@ const SignUpForm = () => {
       }
     }
   };
+  //닉네임 중복확인
+  const { mutate: checkNicknameMutation } = useCheckNickname();
+
+  const handleCheckNickname = () => {
+    checkNicknameMutation(nickname, {
+      onSuccess: (data) => {
+        if (data.code === 200) {
+          setIsNicknameExist(false); // 중복 상태 업데이트
+        } else if (data.code === 400) {
+          setIsNicknameExist(true);
+        }
+      },
+      onError: (error) => {
+        console.error(error);
+      },
+    });
+  };
 
   useEffect(() => {
     setIsDisabled(
@@ -296,14 +316,23 @@ const SignUpForm = () => {
     nameStatus,
     phoneNumStatus,
   ]);
-  // 중복확인 on/off
+  //이메일 중복확인 on/off
   useEffect(() => {
-    if (id && selectedEmail) {
+    if (idStatus === 'pass' && selectedEmail) {
       setCheckIdDisabled(false);
     } else {
       setCheckIdDisabled(true);
     }
-  }, [id, selectedEmail]);
+  }, [idStatus, selectedEmail]);
+
+  //닉네임 중복확인 on/off
+  useEffect(() => {
+    if (nicknameStatus === 'pass') {
+      setNicknameBtnDisabled(false);
+    } else {
+      setNicknameBtnDisabled(true);
+    }
+  }, [nicknameStatus]);
 
   return (
     <div css={wrapperStyle}>
@@ -393,12 +422,16 @@ const SignUpForm = () => {
             <Button
               width={80}
               label='중복확인'
-              handleClick={() => console.log('click')}
+              handleClick={handleCheckNickname}
+              disabled={nicknameBtnDisabled}
             />
           </div>
-          {nicknameStatus === 'warn' && (
-            <p>3~10자의 한글, 숫자 중 1개 이상 조합하여 사용</p>
-          )}
+          <p>
+            {nicknameStatus === 'warn' &&
+              '3~10자의 한글, 숫자 중 1개 이상 조합하여 사용'}
+            {nicknameStatus === 'pass' &&
+              (isNicknameExist ? '중복된 닉네임입니다.' : null)}
+          </p>
         </div>
         <div className='input-form'>
           <p>

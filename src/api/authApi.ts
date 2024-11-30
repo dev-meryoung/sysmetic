@@ -43,7 +43,14 @@ export const resetPassword = async () => {};
 export const register = async () => {};
 
 // 닉네임 중복 확인 API
-export const checkNickname = async () => {};
+export const checkNickname = async (nickname: string) => {
+  const response = await axiosInstance.get('/v1/auth/check-nickname', {
+    params: { nickname },
+    validateStatus: (status) =>
+      (status >= 200 && status < 300) || status === 400,
+  });
+  return response.data;
+};
 
 // 이메일 중복 확인 API
 export const checkEmail = async (
