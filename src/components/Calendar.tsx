@@ -37,8 +37,7 @@ const Calendar: React.FC<CalendarProps> = ({
         const start = new Date(value);
         const end = new Date(endDate);
         if (start > end) {
-          // Modal 컴포넌트 구현 후 수정 예정
-          alert('시작 날짜는 종료 날짜보다 이전이어야 합니다.');
+          setStartDate(endDate);
           return;
         }
       }
@@ -53,8 +52,7 @@ const Calendar: React.FC<CalendarProps> = ({
         const start = new Date(startDate);
         const end = new Date(value);
         if (end < start) {
-          // Modal 컴포넌트 구현 후 수정 예정
-          alert('종료 날짜는 시작 날짜보다 이후여야 합니다.');
+          setEndDate(startDate);
           return;
         }
       }
