@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import withdrawImg1 from '@/assets/images/withdraw1.png';
 import withdrawImg2 from '@/assets/images/withdraw2.png';
 import withdrawImg3 from '@/assets/images/withdraw3.png';
@@ -17,7 +17,10 @@ import useModalStore from '@/stores/useModalStore';
 const Withdraw: React.FC = () => {
   const [isChecked, setIsChecked] = useState(false);
   const navigate = useNavigate();
-  const { initializeAuth, isLoggedIn, nickname } = useAuthStore();
+  const { initializeAuth, isLoggedIn, nickname, memberId } = useAuthStore();
+  const { userId: paramUserId } = useParams<{ userId: string }>();
+  const userId =
+    paramUserId && !isNaN(Number(paramUserId)) ? Number(paramUserId) : memberId;
   const { openModal } = useModalStore();
   const deleteUser = useDeleteUser();
 
@@ -42,7 +45,7 @@ const Withdraw: React.FC = () => {
   const images = [withdrawImg1, withdrawImg2, withdrawImg3];
 
   const handleComplete = () => {
-    deleteUser.mutate(undefined, {
+    deleteUser.mutate(userId, {
       onSuccess: () => {
         navigate(PATH.SIGN_IN);
       },
