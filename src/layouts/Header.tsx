@@ -1,38 +1,16 @@
-import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import logo from '@/assets/images/logo.png';
 import Breadcrumb from '@/components/Breadcrumb';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 import { useLogout } from '@/hooks/useAuthApi';
-import { parseUserToken } from '@/utils/authUtils';
+import useAuthStore from '@/stores/useAuthStore';
 
 const Header = () => {
-  const navigate = useNavigate();
+  const { isLoggedIn, nickname } = useAuthStore();
   const { mutate: logout } = useLogout();
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(!!parseUserToken());
-  const [nickname, setNickname] = useState<string>('');
-
-  useEffect(() => {
-    const token = parseUserToken();
-    setIsLoggedIn(!!token);
-
-    if (token) {
-      setNickname(token['nickname']);
-    }
-  }, []);
-
-  const handleLogout = () => {
-    logout(undefined, {
-      onSuccess: () => {
-        localStorage.removeItem('token');
-        setIsLoggedIn(false);
-        navigate(PATH.ROOT);
-      },
-    });
-  };
 
   return (
     <header css={wrapperStyle}>
@@ -47,7 +25,7 @@ const Header = () => {
                     님! 승승장구하는 하루 보내세요
                   </span>
                   <Link to={PATH.MYPAGE}>마이페이지</Link>
-                  <a onClick={handleLogout}>로그아웃</a>
+                  <a onClick={() => logout()}>로그아웃</a>
                 </>
               ) : (
                 <>
