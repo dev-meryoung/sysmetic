@@ -11,12 +11,12 @@ export interface FindEmailData {
   phoneNumber: string;
 }
 
-export interface EmailCodeData {
+export interface CheckEmailCodeForPasswordDataData {
   email: string;
   authCode: string;
 }
 
-export interface ResetPwData {
+export interface ResetPasswordData {
   emailAuthCode: string;
   email: string;
   password: string;
@@ -32,7 +32,6 @@ export const login = async (loginData: LoginRequestData) => {
 // Token 유효성 검증 및 회원 정보 조회 API
 export const checkAuth = async () => {
   const response = await axiosInstance.get('/v1/auth');
-
   return response.data;
 };
 
@@ -60,16 +59,16 @@ export const sendEmailCodeForPassword = async (email: string) => {
 };
 
 // 이메일 인증 코드 확인(비밀번호 찾기) API
-export const checkEmailCodeForPassword = async (codeData: EmailCodeData) => {
-  const response = await axiosInstance.post('/v1/auth/email-code', codeData);
+export const checkEmailCodeForPassword = async (checkEmailCodeForPasswordData: CheckEmailCodeForPasswordDataData) => {
+  const response = await axiosInstance.post('/v1/auth/email-code', checkEmailCodeForPasswordData);
   return response.data;
 };
 
 // 비밀번호 재설정 API
-export const resetPassword = async (passwordData: ResetPwData) => {
+export const resetPassword = async (resetPasswordData: ResetPasswordData) => {
   const response = await axiosInstance.post(
     '/v1/auth/reset-password',
-    passwordData
+    resetPasswordData
   );
   return response.data;
 };
@@ -78,7 +77,12 @@ export const resetPassword = async (passwordData: ResetPwData) => {
 export const register = async () => {};
 
 // 닉네임 중복 확인 API
-export const checkNickname = async () => {};
+export const checkNickname = async (nickname: string) => {
+  const response = await axiosInstance.get('/v1/auth/check-nickname', {
+    params: { nickname },
+  });
+  return response.data;
+};
 
 // 이메일 중복 확인 API
 export const checkEmail = async () => {};

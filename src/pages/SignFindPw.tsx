@@ -8,7 +8,11 @@ import TextInput from '@/components/TextInput';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
-import { useCheckEmailCodeForPassword, useReset } from '@/hooks/useAuthApi';
+import {
+  useSendEmailCodeForPassword,
+  useCheckEmailCodeForPassword,
+  useReset,
+} from '@/hooks/useAuthApi';
 
 type StatusTypes = 'normal' | 'warn';
 
@@ -39,7 +43,8 @@ const SignFindPw = () => {
   });
   const [showResetSection, setShowResetSection] = useState(false);
   const [showCheckBtn, setShowCheckBtn] = useState(false);
-  const emailCodeMutation = useCheckEmailCodeForPassword();
+  const sendEmailCodeForPassword = useSendEmailCodeForPassword();
+  const checkEmailCodeForPassword = useCheckEmailCodeForPassword();
   const resetMutation = useReset();
   const navigate = useNavigate();
 
@@ -69,28 +74,47 @@ const SignFindPw = () => {
     setStatuses({ ...statuses, email: 'normal' });
     setMessages({ ...messages, emailError: '' });
 
-    emailCodeMutation.mutate(
-      // 임시인증번호, {email: formData.email, authCode: formData.verificationCode} 나중에 변경
-      { email: formData.email, authCode: '123456' },
+    sendEmailCodeForPassword.mutate(formData.email, {
+      onSuccess: () => {
+        setShowCheckBtn(true);
+      },
+      onError: () => {
+        setMessages({
+          ...messages,
+          emailError: '해당 이메일로 가입된 계정이 존재하지 않습니다.',
+        });
+      },
+    });
+  };
+
+  const handleVerifyCode = () => {
+    checkEmailCodeForPassword.mutate(
+      { email: formData.email, authCode: formData.verificationCode },
       {
+        onSuccess: (response) => {
+          if (response?.isValid) {
+            setShowResetSection(true);
+            setMessages({ ...messages, verificationCodeError: '' });
+            setStatuses({ ...statuses, verificationCode: 'normal' });
+          } else {
+            setShowResetSection(false);
+            setMessages({
+              ...messages,
+              verificationCodeError: '잘못된 인증번호입니다.',
+            });
+            setStatuses({ ...statuses, verificationCode: 'warn' });
+          }
+        },
         onError: () => {
+          setShowResetSection(false);
           setMessages({
             ...messages,
-            emailError: '해당 이메일로 가입된 계정이 존재하지 않습니다.',
+            verificationCodeError: '잘못된 인증번호입니다.',
           });
+          setStatuses({ ...statuses, verificationCode: 'warn' });
         },
       }
     );
-  };
-
-  const handleVerifyCode = (serverCode: string) => {
-    const isValid = formData.verificationCode === serverCode;
-    setStatuses({ ...statuses, verificationCode: isValid ? 'normal' : 'warn' });
-    setMessages({
-      ...messages,
-      verificationCodeError: isValid ? '' : '잘못된 인증번호입니다.',
-    });
-    setShowResetSection(isValid);
   };
 
   const handleComplete = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -212,7 +236,7 @@ const SignFindPw = () => {
             <div css={buttonStyle}>
               <Button
                 label='인증확인'
-                handleClick={() => handleVerifyCode('123456')} // 나중에 수정
+                handleClick={handleVerifyCode}
                 color='primary'
                 size='md'
                 width={80}

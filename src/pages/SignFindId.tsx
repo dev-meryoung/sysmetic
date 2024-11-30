@@ -42,13 +42,18 @@ const SignFindId = () => {
     findMutation.mutate(
       { name, phoneNumber: phone },
       {
-        onSuccess: (data) => {
-          setEmail(data.email);
-          setShowMessage(false);
-          setShowEmail(true);
-          setNameStatus('normal');
-          setPhoneStatus('normal');
+        onSuccess: (response) => {
+          if (response && response.data) {
+            setEmail(response.data);
+            setShowMessage(false);
+            setShowEmail(true);
+            setNameStatus('normal');
+            setPhoneStatus('normal');
+          } else {
+            console.error('이메일 정보가 없습니다.');
+          }
         },
+
         onError: () => {
           setShowMessage(true);
           setShowEmail(false);
