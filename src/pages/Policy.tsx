@@ -328,7 +328,7 @@ const titleWrapperStyle = css`
 
     h6 {
       font-size: ${FONT_SIZE.TITLE_SM};
-      font-weight: bold;
+      font-weight: ${FONT_WEIGHT.BOLD};
       color: ${COLOR.TEXT_BLACK};
       margin-bottom: 40px;
     }
