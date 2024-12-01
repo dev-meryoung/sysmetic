@@ -8,7 +8,7 @@ import {
   findEmail,
   FindEmailData,
   checkEmailCodeForPassword,
-  CheckEmailCodeForPasswordDataData,
+  CheckEmailCodeForPasswordData,
   resetPassword,
   ResetPasswordData,
   sendEmailCodeForPassword,
@@ -60,7 +60,7 @@ export const useSendEmailCodeForPassword = () =>
 
 export const useCheckEmailCodeForPassword = () =>
   useMutation({
-    mutationFn: (checkEmailCodeForPasswordData: CheckEmailCodeForPasswordDataData) =>
+    mutationFn: (checkEmailCodeForPasswordData: CheckEmailCodeForPasswordData) =>
       checkEmailCodeForPassword(checkEmailCodeForPasswordData),
   });
 

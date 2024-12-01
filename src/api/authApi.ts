@@ -11,7 +11,7 @@ export interface FindEmailData {
   phoneNumber: string;
 }
 
-export interface CheckEmailCodeForPasswordDataData {
+export interface CheckEmailCodeForPasswordData {
   email: string;
   authCode: string;
 }
@@ -59,7 +59,7 @@ export const sendEmailCodeForPassword = async (email: string) => {
 };
 
 // 이메일 인증 코드 확인(비밀번호 찾기) API
-export const checkEmailCodeForPassword = async (checkEmailCodeForPasswordData: CheckEmailCodeForPasswordDataData) => {
+export const checkEmailCodeForPassword = async (checkEmailCodeForPasswordData: CheckEmailCodeForPasswordData) => {
   const response = await axiosInstance.post('/v1/auth/email-code', checkEmailCodeForPasswordData);
   return response.data;
 };
