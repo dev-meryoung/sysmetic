@@ -35,6 +35,11 @@ const statusOptions = [
   { label: '답변완료', value: 'unclosed' },
 ];
 
+const statusMap: { [key: string]: string } = {
+  closed: '답변완료',
+  unclosed: '답변대기',
+};
+
 const QnaList = () => {
   const { roleCode } = useAuthStore();
   const [sortConfig, setSortConfig] = useState<string>('registrationDate');
@@ -45,7 +50,7 @@ const QnaList = () => {
 
   const params = {
     sort: sortConfig,
-    closed: statusFilter === 'all' ? '' : statusFilter,
+    closed: statusFilter === 'all' ? undefined : statusFilter,
     page: currentPage + 1,
   };
 
@@ -53,10 +58,16 @@ const QnaList = () => {
   const traderQuery = useGetInquiryListTrader(params);
 
   const data =
-    roleCode === 'USER' ? userQuery.data?.data : traderQuery.data?.data;
+    roleCode === 'USER'
+      ? userQuery.data?.data?.content || []
+      : traderQuery.data?.data?.content || [];
+
   const total =
-    roleCode === 'USER' ? userQuery.data?.total : traderQuery.data?.total;
-  const totalPage = Math.ceil((total || 0) / POSTS_PER_PAGE);
+    roleCode === 'USER'
+      ? userQuery.data?.data?.totalElement || 0
+      : traderQuery.data?.data?.totalElement || 0;
+
+  const totalPage = Math.ceil(total / POSTS_PER_PAGE);
 
   const columns = [
     {
@@ -91,7 +102,7 @@ const QnaList = () => {
       header: '진행상태',
       render: (value: string) => (
         <span css={value === 'unclosed' ? successStyle : waitingStyle}>
-          {value}
+          {statusMap[value] || '알 수 없음'}
         </span>
       ),
     },
