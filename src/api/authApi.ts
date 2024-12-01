@@ -6,7 +6,10 @@ export interface LoginRequestData {
   password: string;
   rememberMe: boolean;
 }
-
+export interface CheckEmailCodeData {
+  email: string;
+  code: string;
+}
 // 로그인 API
 export const login = async (loginData: LoginRequestData) => {
   const response = await axiosInstance.post('/v1/auth/login', loginData);
@@ -80,7 +83,20 @@ export const checkEmail = async (
   }
 };
 // 이메일 인증 코드 전송(회원가입) API
-export const sendEmailCode = async () => {};
+export const sendEmailCode = async (email: string) => {
+  const response = await axiosInstance.get(
+    `/v1/auth/email-code?email=${email}`
+  );
+
+  return response.data;
+};
 
 // 이메일 인증 코드 확인(회원가입) API
-export const checkEmailCode = async () => {};
+export const checkEmailCode = async (emailData: CheckEmailCodeData) => {
+  const response = await axiosInstance.post(`/v1/auth/email-code`, {
+    email: emailData.email,
+    code: emailData.code,
+  });
+
+  return response.data;
+};

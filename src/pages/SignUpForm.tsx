@@ -1,4 +1,4 @@
-import { useEffect, useState, ChangeEvent } from 'react';
+import React, { useEffect, useState, ChangeEvent } from 'react';
 import { css } from '@emotion/react';
 import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -14,7 +14,12 @@ import TextInput, { InputStateTypes } from '@/components/TextInput';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
-import { useCheckNickname, useSignUp } from '@/hooks/useAuthApi';
+import {
+  useSendAuthCode,
+  useCheckNickname,
+  useSignUp,
+  useCheckEmailCode,
+} from '@/hooks/useAuthApi';
 import useModalStore from '@/stores/useModalStore';
 
 const RadioOption1 = [
@@ -47,16 +52,19 @@ const REGEX = {
   AUTHCODE_REGEX: /^[A-Z0-9]{6}$/,
 };
 
-const AuthModal = () => {
+interface AuthModalProps {
+  email: string;
+}
+const AuthModal: React.FC<AuthModalProps> = ({ email }) => {
   // 모달 내 변수
   const [authCode, setAuthCode] = useState('');
   const [authCodeStatus, setAuthCodeStatus] =
     useState<InputStateTypes>('normal');
   const authModal = useModalStore();
+  const [message, setMessage] = useState('');
 
   const handleAuthCodeChange = (e: ChangeEvent<HTMLInputElement>) => {
     setAuthCode(e.target.value);
-
     if (REGEX.AUTHCODE_REGEX.test(e.target.value)) {
       setAuthCodeStatus('pass');
     } else {
@@ -64,9 +72,22 @@ const AuthModal = () => {
     }
   };
 
+  const { mutate: checkEmailCodeMutation } = useCheckEmailCode();
+
   const handleAuthBtnClick = () => {
-    console.log('인증되었습니다.');
-    authModal.closeModal('auth');
+    const emailData = {
+      email,
+      code: authCode,
+    };
+    checkEmailCodeMutation(emailData, {
+      onSuccess: () => {
+        authModal.closeModal('auth');
+      },
+      onError: () => {
+        setAuthCodeStatus('warn');
+        setMessage('인증코드를 다시 확인해주세요.');
+      },
+    });
   };
 
   return (
@@ -88,11 +109,13 @@ const AuthModal = () => {
           value={authCode}
           handleChange={handleAuthCodeChange}
         />
-        {authCodeStatus !== 'pass' ? (
-          <p>6자리의 영문 대문자, 숫자만 조합하여 사용</p>
-        ) : (
-          <></>
-        )}
+        <p>
+          {authCodeStatus === 'warn'
+            ? message
+              ? '인증번호를 다시 확인해주세요.'
+              : '6자리의 영문 대문자, 숫자만 조합하여 사용'
+            : null}
+        </p>
       </div>
       <div className='auth-btn'>
         <Button
@@ -302,12 +325,22 @@ const SignUpForm = () => {
     const booleanSecondValue = value === 'true';
     setIsSecondChecked(booleanSecondValue);
   };
-  //이메일 인증 모달
+  //이메일 인증 코드 전송 및 모달 생성
+  const { mutate: AuthCodeMutation } = useSendAuthCode();
   const handleOpenAuthModal = () => {
-    if (idStatus === 'pass' && selectedEmail) {
-      authModal.openModal('auth', 360);
+    if (idStatus === 'pass' && selectedEmail && successId) {
+      const email = `${id}@${selectedEmail}.com`;
+      AuthCodeMutation(email, {
+        onSuccess: () => {
+          authModal.openModal('auth', 360);
+        },
+        onError: () => {
+          console.error('인증코드 전송 중 문제 발생');
+        },
+      });
     }
   };
+
   //이메일 중복확인
   const handleCheckId = async () => {
     if (id && selectedEmail) {
@@ -562,7 +595,10 @@ const SignUpForm = () => {
           disabled={isDisabled}
         />
       </div>
-      <Modal content={<AuthModal />} id='auth' />
+      <Modal
+        content={<AuthModal email={`${id}@${selectedEmail}.com`} />}
+        id='auth'
+      />
     </div>
   );
 };

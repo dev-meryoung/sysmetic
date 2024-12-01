@@ -1,7 +1,13 @@
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { checkAuth, login, LoginRequestData, logout } from '@/api';
-import { checkNickname, register } from '@/api/authApi';
+import {
+  checkEmailCode,
+  CheckEmailCodeData,
+  checkNickname,
+  register,
+  sendEmailCode,
+} from '@/api/authApi';
 import { PATH } from '@/constants/path';
 import useAuthStore from '@/stores/useAuthStore';
 
@@ -42,4 +48,17 @@ export const useCheckNickname = () =>
 export const useSignUp = () =>
   useMutation({
     mutationFn: register,
+  });
+
+export const useSendAuthCode = () =>
+  useMutation({
+    mutationFn: sendEmailCode,
+    onSuccess: () => {
+      console.log('인증코드 보냄~!');
+    },
+  });
+
+export const useCheckEmailCode = () =>
+  useMutation({
+    mutationFn: (emailData: CheckEmailCodeData) => checkEmailCode(emailData),
   });
