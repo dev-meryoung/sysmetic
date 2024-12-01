@@ -13,13 +13,15 @@ import { useTableStore } from '@/stores/useTableStore';
 
 interface NoticeDataProps {
   no: number;
-  grade: string;
+  grade: 'ALL' | 'USER' | 'TRADER' | 'MANAGER';
   email: string;
   name: string;
   nickname: string;
+  birth: string;
   tel: string;
 }
 const SearchOptions = [
+  { label: '전체', value: 'default' },
   { label: '이메일', value: 'email' },
   { label: '이름', value: 'name' },
   { label: '닉네임', value: 'nickname' },
@@ -27,9 +29,9 @@ const SearchOptions = [
 ];
 
 const GradeOptions = [
-  { label: '트레이더', value: 'trader' },
-  { label: '관리자', value: 'admin' },
-  { label: '일반회원', value: 'normal' },
+  { label: '관리자 임명', value: 'setAdmin' },
+  { label: '관리자 해임', value: 'getAdmin' },
+  { label: '탈퇴', value: 'resign' },
 ];
 
 const PAGE_SIZE = 10;
@@ -93,6 +95,10 @@ const AdminUsers = () => {
       key: 'no' as keyof NoticeDataProps,
       header: '순서',
     },
+    {
+      key: 'isManager' as keyof NoticeDataProps,
+      header: '권한',
+    },
     { key: 'grade' as keyof NoticeDataProps, header: '회원등급' },
     {
       key: 'email' as keyof NoticeDataProps,
@@ -105,6 +111,10 @@ const AdminUsers = () => {
     {
       key: 'nickname' as keyof NoticeDataProps,
       header: '닉네임',
+    },
+    {
+      key: 'birth' as keyof NoticeDataProps,
+      header: '생년월일',
     },
     { key: 'tel' as keyof NoticeDataProps, header: '전화번호' },
   ];
@@ -130,6 +140,7 @@ const AdminUsers = () => {
           handleChange={handleFilterChange}
         />
         <TextInput
+          placeholder='검색'
           color='skyblue'
           value={value}
           handleChange={(e) => setValue(e.target.value)}
@@ -153,7 +164,7 @@ const AdminUsers = () => {
         </p>
         <SelectBox
           color='skyblue'
-          placeholder='회원타입 선택'
+          placeholder='선택'
           options={GradeOptions}
           handleChange={handleGradeChange}
         />
@@ -163,13 +174,13 @@ const AdminUsers = () => {
           label='변경'
           handleClick={() => console.log('변경')}
         />
-        <Button
+        {/* <Button
           fontSize='14px'
           color='black'
           width={80}
           label='탈퇴'
           handleClick={() => console.log('탈퇴')}
-        />
+        /> */}
       </div>
       <div css={paginationDivStyle}>
         <Pagination
