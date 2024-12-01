@@ -33,12 +33,14 @@ const useCountMotion = ({
 
       const easedProgress = easingFunctions[easing](progress);
 
-      const currentValue = Math.floor(start + (end - start) * easedProgress);
+      const currentValue = Math.round(start + (end - start) * easedProgress);
 
       setCount(currentValue);
 
       if (progress < 1) {
         requestAnimationFrame(updateCount);
+      } else {
+        setCount(end);
       }
     };
 
