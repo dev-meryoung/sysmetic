@@ -1,5 +1,6 @@
 import axiosInstance from '@/api/axiosInstance';
 
+export type RoleCodeTypes = 'USER' | 'TRADER';
 export interface LoginRequestData {
   email: string;
   password: string;
@@ -40,14 +41,19 @@ export const checkEmailCodeForPassword = async () => {};
 export const resetPassword = async () => {};
 
 // 회원가입 API
-export const register = async () => {};
+export const register = async (registerFormData: FormData) => {
+  const response = await axiosInstance.post(
+    '/v1/auth/register',
+    registerFormData
+  );
+
+  return response.data;
+};
 
 // 닉네임 중복 확인 API
 export const checkNickname = async (nickname: string) => {
   const response = await axiosInstance.get('/v1/auth/check-nickname', {
     params: { nickname },
-    validateStatus: (status) =>
-      (status >= 200 && status < 300) || status === 400,
   });
   return response.data;
 };

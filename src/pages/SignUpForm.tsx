@@ -14,7 +14,7 @@ import TextInput, { InputStateTypes } from '@/components/TextInput';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
-import { useCheckNickname } from '@/hooks/useAuthApi';
+import { useCheckNickname, useSignUp } from '@/hooks/useAuthApi';
 import useModalStore from '@/stores/useModalStore';
 
 const RadioOption1 = [
@@ -39,7 +39,8 @@ const EmailOptions = [
 
 const REGEX = {
   ID_REGEX: /^[a-zA-Z\d_]+$/,
-  PW_REGEX: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,20}$/,
+  PW_REGEX:
+    /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,20}$/,
   NAME_REGEX: /^[가-힣]{1,10}$/,
   NICKNAME_REGEX: /^[가-힣\d]{3,10}$/,
   PHONE_REGEX: /^010\d{8}$/,
@@ -126,9 +127,12 @@ const SignUpForm = () => {
   //계정 존재여부
   const [isExist, setIsExist] = useState(false);
   const [isNicknameExist, setIsNicknameExist] = useState(false);
+  //중복확인 성공
+  const [successId, setSuccessId] = useState(false);
+  const [successNickname, setSuccessNickname] = useState(false);
   //정보수신 동의
-  const [isFirstChecked, setIsFirstChecked] = useState('false');
-  const [isSecondChecked, setIsSecondChecked] = useState('false');
+  const [isFirstChecked, setIsFirstChecked] = useState(false);
+  const [isSecondChecked, setIsSecondChecked] = useState(false);
   const [isDisabled, setIsDisabled] = useState(true);
   // 라우팅 관련
   const { type } = useParams();
@@ -193,8 +197,41 @@ const SignUpForm = () => {
     navigate(PATH.SIGN_UP_TYPE(type));
   };
 
+  const { mutate: signUpMutation } = useSignUp();
   const handleNextBtnClick = () => {
-    navigate(PATH.SIGN_UP_DONE(type));
+    const formData = new FormData();
+    if (profileImg) {
+      formData.append('file', profileImg);
+    }
+
+    const registerData = {
+      roleCode: type === 'investor' ? 'USER' : 'TRADER',
+      email: `${id}@${selectedEmail}.com`,
+      password: pw,
+      rewritePassword: checkPw,
+      name,
+      nickname,
+      birth: date,
+      phoneNumber: phoneNum,
+      receiveInfoConsent: isFirstChecked,
+      infoConsentDate: new Date().toISOString().slice(0, 19).replace('Z', ''),
+      receiveMarketingConsent: isSecondChecked,
+      marketingConsentDate: new Date()
+        .toISOString()
+        .slice(0, 19)
+        .replace('Z', ''),
+    };
+
+    formData.append('registerResponseDto', JSON.stringify(registerData));
+
+    signUpMutation(formData, {
+      onSuccess: () => {
+        navigate(PATH.SIGN_UP_DONE(type));
+      },
+      onError: () => {
+        console.log('회원가입 실패');
+      },
+    });
   };
 
   const handleIdInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -256,6 +293,15 @@ const SignUpForm = () => {
       setPhoneNumStatus('warn');
     }
   };
+
+  const handleFirstRadioChange = (value: string) => {
+    const booleanValue = value === 'true';
+    setIsFirstChecked(booleanValue);
+  };
+  const handleSecoundRadioChange = (value: string) => {
+    const booleanSecondValue = value === 'true';
+    setIsSecondChecked(booleanSecondValue);
+  };
   //이메일 인증 모달
   const handleOpenAuthModal = () => {
     if (idStatus === 'pass' && selectedEmail) {
@@ -269,9 +315,11 @@ const SignUpForm = () => {
       if (emailData === 200) {
         setIsExist(false); // 계정 중복 여부
         setIdAuthBtnDisabled(false); // 이메일 인증 버튼 상태
+        setSuccessId(true);
       } else {
         setIsExist(true);
         setIdAuthBtnDisabled(true);
+        setSuccessId(false);
       }
     }
   };
@@ -280,15 +328,13 @@ const SignUpForm = () => {
 
   const handleCheckNickname = () => {
     checkNicknameMutation(nickname, {
-      onSuccess: (data) => {
-        if (data.code === 200) {
-          setIsNicknameExist(false); // 중복 상태 업데이트
-        } else if (data.code === 400) {
-          setIsNicknameExist(true);
-        }
+      onSuccess: () => {
+        setIsNicknameExist(false); // 중복 상태 업데이트
+        setSuccessNickname(true);
       },
-      onError: (error) => {
-        console.error(error);
+      onError: () => {
+        setIsNicknameExist(true);
+        setSuccessNickname(false);
       },
     });
   };
@@ -296,14 +342,18 @@ const SignUpForm = () => {
   useEffect(() => {
     setIsDisabled(
       !(
-        isFirstChecked === 'true' &&
-        isSecondChecked === 'true' &&
+        isFirstChecked &&
+        isSecondChecked &&
         idStatus === 'pass' &&
         pwStatus === 'pass' &&
         checkPwStatus === 'pass' &&
         nicknameStatus === 'pass' &&
         nameStatus === 'pass' &&
-        phoneNumStatus === 'pass'
+        phoneNumStatus === 'pass' &&
+        !isNicknameExist &&
+        !isExist &&
+        successNickname &&
+        successId
       )
     );
   }, [
@@ -315,6 +365,10 @@ const SignUpForm = () => {
     nicknameStatus,
     nameStatus,
     phoneNumStatus,
+    isNicknameExist,
+    isExist,
+    successId,
+    successNickname,
   ]);
   //이메일 중복확인 on/off
   useEffect(() => {
@@ -484,14 +538,14 @@ const SignUpForm = () => {
         <RadioButton
           options={RadioOption1}
           name='interested'
-          selected={isFirstChecked}
-          handleChange={setIsFirstChecked}
+          selected={isFirstChecked ? 'true' : 'false'}
+          handleChange={handleFirstRadioChange}
         />
         <RadioButton
           options={RadioOption2}
           name='marketing'
-          selected={isSecondChecked}
-          handleChange={setIsSecondChecked}
+          selected={isSecondChecked ? 'true' : 'false'}
+          handleChange={handleSecoundRadioChange}
         />
       </div>
       <div css={buttonDivStyle}>
@@ -509,16 +563,6 @@ const SignUpForm = () => {
         />
       </div>
       <Modal content={<AuthModal />} id='auth' />
-      {/* <Modal
-        content={
-          <CheckIdModal
-            isExist={isExist}
-            setDisabled={setIdAuthBtnDisabled}
-          />
-        }
-        id='checkId'
-      /> */}
-      {/* <Modal content={<CheckNicknameModal />} id='checkNickname' /> */}
     </div>
   );
 };
