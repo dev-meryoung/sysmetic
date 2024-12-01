@@ -5,6 +5,13 @@ import {
   login,
   LoginRequestData,
   logout,
+  findEmail,
+  FindEmailData,
+  checkEmailCodeForPassword,
+  CheckEmailCodeForPasswordData,
+  resetPassword,
+  ResetPasswordData,
+  sendEmailCodeForPassword,
   checkNickname,
 } from '@/api';
 import { PATH } from '@/constants/path';
@@ -21,7 +28,7 @@ export const useLogin = () => {
         const authData = await checkAuth();
         setAuthState(authData.data);
         navigate(PATH.ROOT);
-      } catch (err) {
+      } catch {
         resetAuthState();
       }
     },
@@ -40,6 +47,27 @@ export const useLogout = () => {
     },
   });
 };
+
+export const useFindEmail = () =>
+  useMutation({
+    mutationFn: (findEmailData: FindEmailData) => findEmail(findEmailData),
+  });
+
+export const useSendEmailCodeForPassword = () =>
+  useMutation({
+    mutationFn: (email: string) => sendEmailCodeForPassword(email),
+  });
+
+export const useCheckEmailCodeForPassword = () =>
+  useMutation({
+    mutationFn: (checkEmailCodeForPasswordData: CheckEmailCodeForPasswordData) =>
+      checkEmailCodeForPassword(checkEmailCodeForPasswordData),
+  });
+
+export const useReset = () =>
+  useMutation({
+    mutationFn: (resetPasswordData: ResetPasswordData) => resetPassword(resetPasswordData),
+  });
 
 export const useCheckNickname = () =>
   useMutation({

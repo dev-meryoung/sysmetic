@@ -6,38 +6,72 @@ export interface LoginRequestData {
   rememberMe: boolean;
 }
 
+export interface FindEmailData {
+  name: string;
+  phoneNumber: string;
+}
+
+export interface CheckEmailCodeForPasswordData {
+  email: string;
+  authCode: string;
+}
+
+export interface ResetPasswordData {
+  emailAuthCode: string;
+  email: string;
+  password: string;
+  rewritePassword: string;
+}
+
 // 로그인 API
 export const login = async (loginData: LoginRequestData) => {
   const response = await axiosInstance.post('/v1/auth/login', loginData);
-
   return response.data;
 };
 
 // Token 유효성 검증 및 회원 정보 조회 API
 export const checkAuth = async () => {
   const response = await axiosInstance.get('/v1/auth');
-
   return response.data;
 };
 
 // 로그아웃 API
 export const logout = async () => {
   const response = await axiosInstance.post('/v1/auth/logout');
-
   return response.data;
 };
 
 // 이메일 찾기 API
-export const findEmail = async () => {};
+export const findEmail = async (findEmailData: FindEmailData) => {
+  const response = await axiosInstance.post(
+    '/v1/auth/find-email',
+    findEmailData
+  );
+  return response.data;
+};
 
 // 이메일 인증 코드 전송(비밀번호 찾기) API
-export const sendEmailCodeForPassword = async () => {};
+export const sendEmailCodeForPassword = async (email: string) => {
+  const response = await axiosInstance.get('/v1/auth/reset-password', {
+    params: { email },
+  });
+  return response.data;
+};
 
 // 이메일 인증 코드 확인(비밀번호 찾기) API
-export const checkEmailCodeForPassword = async () => {};
+export const checkEmailCodeForPassword = async (checkEmailCodeForPasswordData: CheckEmailCodeForPasswordData) => {
+  const response = await axiosInstance.post('/v1/auth/email-code', checkEmailCodeForPasswordData);
+  return response.data;
+};
 
 // 비밀번호 재설정 API
-export const resetPassword = async () => {};
+export const resetPassword = async (resetPasswordData: ResetPasswordData) => {
+  const response = await axiosInstance.post(
+    '/v1/auth/reset-password',
+    resetPasswordData
+  );
+  return response.data;
+};
 
 // 회원가입 API
 export const register = async () => {};
