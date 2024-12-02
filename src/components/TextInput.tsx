@@ -2,7 +2,7 @@ import { css } from '@emotion/react';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 
-type InputTypes = 'text' | 'password' | 'email' | 'tel';
+type InputTypes = 'text' | 'password' | 'email' | 'tel' | 'number';
 type InputColorTypes = 'default' | 'skyblue';
 type InputIconNumTypes = 'none' | 'single' | 'double';
 export type InputStateTypes = 'normal' | 'warn' | 'success';
