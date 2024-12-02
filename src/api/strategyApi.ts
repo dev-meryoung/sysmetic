@@ -1,5 +1,6 @@
 import axiosInstance from '@/api/axiosInstance';
 
+
 // 전략 목록 조회 API
 export const getStrategyList = async () => {};
 
@@ -21,6 +22,13 @@ export const getMethodAndStockList = async () => {
 // 전략 등록 API
 export const createStrategy = async (formData: FormData) => {
   const response = await axiosInstance.post('/v1/trader/strategy', formData);
+
+  return response.data;
+};
+
+// 전략 상세 정보 조회 API
+export const getStrategyInfo = async (strategyId: string) => {
+  const response = await axiosInstance.get(`/v1/strategy/detail/${strategyId}`);
 
   return response.data;
 };

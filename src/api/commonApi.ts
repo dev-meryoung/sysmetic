@@ -29,6 +29,12 @@ export interface UpdateInquiryData {
   inquiryContent: string;
 }
 
+export interface CreateUserInquiryData {
+  strategyId: number;
+  inquiryTitle: string;
+  inquiryContent: string;
+}
+
 // 공지사항 목록 조회 API
 export const getNoticeList = async () => {};
 
@@ -130,6 +136,17 @@ export const getInquiryDetailUser = async (params: GetInquiryDetailData) => {
 export const deleteInquiry = async (inquiryId: number) => {
   const response = await axiosInstance.delete(
     `/v1/member/inquiry/${inquiryId}/delete`
+  );
+  return response.data;
+};
+
+// 문의 등록 API
+export const createUserInquiry = async (
+  createUserInquiryData: CreateUserInquiryData
+) => {
+  const response = await axiosInstance.post(
+    `/v1/strategy/${createUserInquiryData.strategyId}/inquiry`,
+    createUserInquiryData
   );
   return response.data;
 };

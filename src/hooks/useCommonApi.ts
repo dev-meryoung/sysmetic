@@ -15,6 +15,8 @@ import {
   getInquiryListUser,
   getInquiryDetailUser,
   deleteInquiry,
+  createUserInquiry,
+  CreateUserInquiryData,
 } from '@/api';
 
 export const useGetEditInquiry = (params: GetInquiryDetailData) =>
@@ -78,3 +80,9 @@ export const useDeleteInquiry = () =>
   useMutation({
     mutationFn: (inquiryId: number) => deleteInquiry(inquiryId),
   });
+
+  export const useCreateUserInquiry = () =>
+    useMutation({
+      mutationFn: (createUserInquiryData: CreateUserInquiryData) => createUserInquiry(createUserInquiryData),
+    });
+  

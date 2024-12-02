@@ -31,6 +31,10 @@ const QnaDetail = () => {
   const { openModal, closeModal } = useModalStore();
   const { userId: paramUserId } = useParams<{ userId: string }>();
   const inquiryId = paramUserId ? Number(paramUserId) : 0;
+  const dateCustom = (isoDate: string): string => {
+    const dateObj = new Date(isoDate);
+    return `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, '0')}.${String(dateObj.getDate()).padStart(2, '0')}`;
+  };
 
   const userQuery = useGetInquiryDetailUser({ inquiryId: Number(inquiryId) });
   const traderQuery = useGetInquiryDetailTrader({
@@ -94,7 +98,7 @@ const QnaDetail = () => {
               <div css={dateAndWriterStyle}>
                 <div css={dateStyle}>
                   <span css={dateNameStyle}>작성일</span>
-                  <span>{qnaData.inquiryRegistrationDate}</span>
+                  <span>{dateCustom(qnaData.inquiryRegistrationDate)}</span>
                 </div>
                 <div css={writerStyle}>
                   <span css={writerNameStyle}>작성자</span>
@@ -179,7 +183,7 @@ const QnaDetail = () => {
             <div css={infoStyle}>
               <div css={dateStyle}>
                 <span>작성일</span>
-                <span>{answer.date}</span>
+                <span>{dateCustom(answer.date)}</span>
               </div>
               <div css={answerProfileStyle}>
                 <ProfileImage
@@ -202,7 +206,9 @@ const QnaDetail = () => {
             <Link to={`/qna/${qnaData.inquiryId - 1}`} css={listItemTilteStyle}>
               {qnaData.previousTitle}
             </Link>
-            <span css={listItemDateStyle}>{qnaData.previousWriteDate}</span>
+            <span css={listItemDateStyle}>
+              {dateCustom(qnaData.previousWriteDate)}
+            </span>
           </div>
         )}
         {qnaData?.nextTitle && qnaData?.nextWriteDate && (
@@ -211,7 +217,9 @@ const QnaDetail = () => {
             <Link to={`/qna/${qnaData.inquiryId + 1}`} css={listItemTilteStyle}>
               {qnaData.nextTitle}
             </Link>
-            <span css={listItemDateStyle}>{qnaData.nextWriteDate}</span>
+            <span css={listItemDateStyle}>
+              {dateCustom(qnaData.nextWriteDate)}
+            </span>
           </div>
         )}
       </div>

@@ -20,8 +20,8 @@ const POSTS_PER_PAGE = 10;
 interface QnaListDataProps {
   questionName: string;
   strategyName: string;
-  date: string;
-  status: string;
+  inquiryRegistrationDate: string; // 전략일자
+  inquiryStatus: string; // 진행상태
 }
 
 const strategyOptions = [
@@ -47,6 +47,10 @@ const QnaList = () => {
   const [currentPage, setCurrentPage] = useState<number>(0);
   const { userId: paramUserId } = useParams<{ userId: string }>();
   const userId = paramUserId ? Number(paramUserId) : 0;
+  const dateCustom = (isoDate: string): string => {
+    const dateObj = new Date(isoDate);
+    return `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, '0')}.${String(dateObj.getDate()).padStart(2, '0')}`;
+  };
 
   const params = {
     sort: sortConfig,
@@ -96,6 +100,7 @@ const QnaList = () => {
     {
       key: 'inquiryRegistrationDate' as keyof QnaListDataProps,
       header: '전략일자',
+      render: (value: string) => <span>{dateCustom(value)}</span>,
     },
     {
       key: 'inquiryStatus' as keyof QnaListDataProps,
