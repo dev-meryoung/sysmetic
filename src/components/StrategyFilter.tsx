@@ -60,18 +60,18 @@ export const TAB_FILTERS: Record<number, FilterProps[]> = {
       type: 'checkbox',
       options: [],
     },
-    // {
-    //   id: 'operationTerm',
-    //   label: '운용 기간',
-    //   type: 'radio',
-    //   options: [
-    //     { value: '1', label: '전체' },
-    //     { value: '2', label: '1년 이하' },
-    //     { value: '3', label: '1년 ~ 2년' },
-    //     { value: '4', label: '2년 ~ 3년' },
-    //     { value: '5', label: '3년 이상' },
-    //   ],
-    // },
+    {
+      id: 'period',
+      label: '운용 기간',
+      type: 'radio',
+      options: [
+        { value: 'ALL', label: '전체' },
+        { value: 'LESS_THAN_YEAR', label: '1년 이하' },
+        { value: 'ONE_TO_TWO_YEAR', label: '1년 ~ 2년' },
+        { value: 'TWO_TO_THREE_YEAR', label: '2년 ~ 3년' },
+        { value: 'THREE_YEAR_MORE', label: '3년 이상' },
+      ],
+    },
     {
       id: 'accumProfitLossRate',
       label: '누적손익률',
@@ -110,7 +110,6 @@ const FilterInput = ({ filter, currentValue, onChange }: FilterInputProps) => {
       const selectedValues: string[] =
         (currentValue as string[]) ||
         filter.options?.map((option) => option.value);
-
       return (
         <div css={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
           {filter.options?.map((option) => (
@@ -147,7 +146,7 @@ const FilterInput = ({ filter, currentValue, onChange }: FilterInputProps) => {
       const handleRangeChange =
         (type: 'start' | 'end') => (e: React.ChangeEvent<HTMLInputElement>) => {
           const { value } = e.target;
-          if (value !== '' && !/^[-]?\d*$/.test(value)) return; // 숫자 입력만 허용
+          if (value !== '' && !/^[-]?\d*$/.test(value)) return;
           type === 'start' ? setRangeStart(value) : setRangeEnd(value);
         };
 
@@ -180,7 +179,6 @@ const FilterInput = ({ filter, currentValue, onChange }: FilterInputProps) => {
           return;
         }
 
-        // 각각의 값을 문자열로 전송
         onChange('accumulatedProfitLossRateRangeStart', startValue);
         onChange('accumulatedProfitLossRateRangeEnd', endValue);
         setErrorMessage('');
@@ -242,28 +240,34 @@ const StrategyFilter = ({
   useEffect(() => {
     if (!methodAndStockData) return;
 
-    const { methodList, stockList } = methodAndStockData;
+    const { methodList, stockList } = methodAndStockData?.data;
 
-    if (!methodList || !stockList) return;
+    if (!methodList?.length || !stockList?.length) {
+      return;
+    }
 
     setFilters((prev) => {
       const updatedFilters = prev[0].map((filter) => {
         if (filter.id === 'methods') {
           return {
             ...filter,
-            options: methodList.map((method) => ({
-              value: method.name,
-              label: method.name,
-            })),
+            options: methodList.map(
+              (method: any): { value: string; label: string } => ({
+                value: method.name,
+                label: method.name,
+              })
+            ),
           };
         }
         if (filter.id === 'stockNames') {
           return {
             ...filter,
-            options: stockList.map((stock) => ({
-              value: stock.name,
-              label: stock.name,
-            })),
+            options: stockList.map(
+              (stock: any): { value: string; label: string } => ({
+                value: stock.name,
+                label: stock.name,
+              })
+            ),
           };
         }
         return filter;

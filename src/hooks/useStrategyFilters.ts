@@ -8,6 +8,7 @@ interface BaseFilters {
 export interface FiltersProps extends BaseFilters {
   methods: string[];
   cycle: string[];
+  period: string;
   stockNames: string[];
   accumulatedProfitLossRateRangeStart: string;
   accumulatedProfitLossRateRangeEnd: string;
@@ -17,6 +18,7 @@ export interface FiltersProps extends BaseFilters {
 export interface AlgorithmFilters extends BaseFilters {
   methods?: string[];
   cycle?: string[];
+  period?: string;
   stockNames?: string[];
   accumulatedProfitLossRateRangeStart?: string;
   accumulatedProfitLossRateRangeEnd?: string;
@@ -25,12 +27,25 @@ export interface AlgorithmFilters extends BaseFilters {
 
 type CombinedFilters = FiltersProps | AlgorithmFilters;
 
+interface MethodItemProps {
+  id: number;
+  name: string;
+  filePath: string | null;
+}
+
+interface StockItemProps {
+  id: number;
+  name: string;
+  filePath: string | null;
+}
+
 const createDefaultItemFilters = (
   methodList: string[] = [],
   stockList: string[] = []
 ): FiltersProps => ({
   methods: methodList,
   cycle: ['D', 'P'],
+  period: 'ALL',
   stockNames: stockList,
   accumulatedProfitLossRateRangeStart: '',
   accumulatedProfitLossRateRangeEnd: '',
@@ -48,7 +63,7 @@ const isEqual = (a: any, b: any): boolean => {
 };
 
 export const useStrategyFilters = () => {
-  const { data } = useGetMethodAndStock();
+  const { data: methodAndStockData } = useGetMethodAndStock();
   const [currentTab, setCurrentTab] = useState(0);
   const [itemFilters, setItemFilters] = useState<FiltersProps>(
     createDefaultItemFilters()
@@ -62,11 +77,16 @@ export const useStrategyFilters = () => {
   const [dynamicStockList, setDynamicStockList] = useState<string[]>([]);
 
   useEffect(() => {
-    if (!data?.methodList || !data?.stockList) return;
+    if (!methodAndStockData?.data) return;
 
     try {
-      const methods = data.methodList.map((method) => method.name);
-      const stocks = data.stockList.map((stock) => stock.name);
+      const methods = methodAndStockData?.data?.methodList.map(
+        (method: MethodItemProps): string => method.name
+      );
+
+      const stocks = methodAndStockData?.data?.stockList.map(
+        (stock: StockItemProps): string => stock.name
+      );
 
       setDynamicMethodList(methods);
       setDynamicStockList(stocks);
@@ -82,9 +102,8 @@ export const useStrategyFilters = () => {
       setDynamicMethodList([]);
       setDynamicStockList([]);
     }
-  }, [data, currentTab]);
+  }, [methodAndStockData, currentTab]);
 
-  // 필터 변경 감지
   useEffect(() => {
     const currentFilters = currentTab === 0 ? itemFilters : algorithmFilters;
     const defaultFilters =

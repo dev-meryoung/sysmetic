@@ -8,7 +8,6 @@ import {
 import { css } from '@emotion/react';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { useNavigate } from 'react-router-dom';
-import tempImage from '@/assets/images/test-profile.png';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
 import Pagination from '@/components/Pagination';
@@ -37,6 +36,7 @@ import {
 import useAuthStore from '@/stores/useAuthStore';
 import useModalStore from '@/stores/useModalStore';
 import { FilterValueTypes } from '@/types/strategyFilter';
+import { getColorStyleBasedOnValue } from '@/utils/tableUtils';
 
 export const TAB_NAME = ['항목별', '알고리즘별'];
 
@@ -53,6 +53,7 @@ interface StrategyTableProps {
   traderNickname: string;
   methodId: number;
   methodName: string;
+  traderProfileImage?: string;
   name: string;
   cycle: string;
   stockList: {
@@ -275,6 +276,7 @@ export const StrategyList = () => {
     useGetFilterdStrategy(searchValue, pageInfo.currentPage, isSearchEnabled);
 
   const [resultMessage, setResultMessage] = useState('');
+
   const fetchFilterdStrategies = useCallback(() => {
     if (currentTab === 0) {
       const requestBody = filters as {
@@ -319,14 +321,14 @@ export const StrategyList = () => {
         }
       }
 
-      algorithmDataRefetch();
+      // algorithmDataRefetch();
     }
   }, [
     currentTab,
     pageInfo.currentPage,
     filters,
     algorithmData,
-    algorithmDataRefetch,
+    // algorithmDataRefetch,
     createStrategyItemFilter,
     isSuccess,
   ]);
@@ -354,8 +356,8 @@ export const StrategyList = () => {
         ...prevPageInfo,
         currentPage: 0,
       }));
-      // 검색 상태 초기화
       setIsSearchEnabled(false);
+      setResultMessage('');
       setIsNotFound(false);
     },
     [currentTab, setCurrentTab, setPageInfo]
@@ -423,7 +425,7 @@ export const StrategyList = () => {
     }
   }, [
     currentTab,
-    filters.algorithm,
+    // filters.algorithm,
     isSearchEnabled,
     strategyNameData,
     fetchFilterdStrategies,
@@ -433,19 +435,25 @@ export const StrategyList = () => {
   useEffect(() => {
     if (searchValue) return;
     if (currentTab === 0 && hasFilterChanged && !searchValue) {
+      console.log(hasFilterChanged, 'hasFilterChanged2');
       fetchFilterdStrategies();
     }
   }, [
-    currentTab,
+    // currentTab,
     hasFilterChanged,
-    filters,
+    // filters,
     searchValue,
     fetchFilterdStrategies,
   ]);
 
   // 처음 로드시 전략 조회
   useEffect(() => {
-    if (currentTab === 0 && strategyListData && !searchValue) {
+    if (
+      currentTab === 0 &&
+      strategyListData &&
+      !searchValue &&
+      !hasFilterChanged
+    ) {
       setTableData(strategyListData?.data?.content);
       setPageInfo((prev) => ({
         ...prev,
@@ -476,7 +484,7 @@ export const StrategyList = () => {
       header: '트레이더',
       render: (_, item) => (
         <div css={traderStyle}>
-          <ProfileImage src={tempImage} />
+          <ProfileImage src={item.traderProfileImage || ''} />
           {item.traderNickname}
         </div>
       ),
@@ -502,14 +510,47 @@ export const StrategyList = () => {
     {
       key: 'accumulatedProfitLossRate',
       header: '누적 손익률',
+      render: (_, item) => {
+        const itemValue = item.accumulatedProfitLossRate;
+
+        const colorStyle = getColorStyleBasedOnValue(itemValue);
+
+        return (
+          <div css={fontStyle} style={colorStyle}>
+            {itemValue}%
+          </div>
+        );
+      },
     },
     {
       key: 'mdd',
       header: 'MDD',
+      render: (_, item) => {
+        const itemValue = item.mdd;
+
+        const colorStyle = getColorStyleBasedOnValue(itemValue);
+
+        return (
+          <div css={fontStyle} style={colorStyle}>
+            {itemValue}%
+          </div>
+        );
+      },
     },
     {
       key: 'smScore',
       header: 'SM Score',
+      render: (_, item) => {
+        const itemValue = item.smScore;
+
+        const colorStyle = getColorStyleBasedOnValue(itemValue);
+
+        return (
+          <div css={fontStyle} style={colorStyle}>
+            {itemValue}%
+          </div>
+        );
+      },
     },
     {
       key: 'strategy',
@@ -518,7 +559,7 @@ export const StrategyList = () => {
         <div css={buttonStyle}>
           <Button
             // label={interestStates[item.strategyId] ? '관심 취소' : '관심 등록'}
-            label='관심취소'
+            label='관심 등록'
             shape='round'
             size='xs'
             color='point'
@@ -537,7 +578,7 @@ export const StrategyList = () => {
             size='xs'
             width={80}
             handleClick={() => {
-              navigate(PATH.STRATEGIES_DETAIL(`${item.strategyId}`));
+              navigate(PATH.STRATEGIES_DETAIL(String(item.strategyId)));
             }}
           />
         </div>
@@ -781,6 +822,10 @@ const addInteresmodalStyle = css`
     color: ${COLOR.ERROR_RED};
     font-size: ${FONT_SIZE.TEXT_SM};
   }
+`;
+
+const fontStyle = css`
+  font-weight: ${FONT_WEIGHT.BOLD};
 `;
 
 export default StrategyList;
