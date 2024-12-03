@@ -1,5 +1,53 @@
+import axiosInstance from './axiosInstance';
+
+export type RoleCodeTypes = 'ALL' | 'USER' | 'TRADER' | 'MANAGER';
+export interface AdminUserData {
+  role?: RoleCodeTypes;
+  page?: number;
+  searchType?: string;
+  searchKeyword?: string;
+}
+
+export interface UserData {
+  id: number;
+  roleCode: RoleCodeTypes;
+  email: string;
+  name: string;
+  nickname: string;
+  birth: string;
+  phoneNumber: string;
+}
+
+export interface PaginatedResponse {
+  currentPage: number;
+  pageSize: number;
+  totalElement: number;
+  totalPages: number;
+  content: UserData[];
+}
+
 // 회원 목록 조회 API
-export const getAdminUserList = async () => {};
+export const getAdminUserList = async (userList: AdminUserData) => {
+  const queryParams = new URLSearchParams();
+
+  if (userList.role) {
+    queryParams.append('role', userList.role);
+  }
+  if (userList.page) {
+    queryParams.append('page', String(userList.page));
+  }
+  if (userList.searchType) {
+    queryParams.append('searchType', userList.searchType);
+  }
+  if (userList.searchKeyword) {
+    queryParams.append('searchKeyword', userList.searchKeyword);
+  }
+  const response = await axiosInstance.get(
+    `v1/admin/members?${queryParams.toString()}`
+  );
+
+  return response.data.data;
+};
 
 // 회원 등급 변경 API
 export const updateAdminUserRole = async () => {};
