@@ -113,7 +113,18 @@ const AdminUsers = () => {
       key: 'no' as keyof UsersTableProps,
       header: '순서',
     },
-    { key: 'grade' as keyof UsersTableProps, header: '회원등급' },
+    {
+      key: 'grade' as keyof UsersTableProps,
+      header: '권한',
+      render: (value: RoleCodeTypes | string | number) =>
+        value === 'USER_MANAGER' || value === 'TRADER_MANAGER' ? '관리자' : '-',
+    },
+    {
+      key: 'grade' as keyof UsersTableProps,
+      header: '회원등급',
+      render: (value: RoleCodeTypes | string | number) =>
+        value === 'USER' || value === 'USER_MANAGER' ? '일반회원' : '트레이더',
+    },
     {
       key: 'email' as keyof UsersTableProps,
       header: '계정(이메일)',

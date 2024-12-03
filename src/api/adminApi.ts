@@ -1,8 +1,14 @@
 import axiosInstance from './axiosInstance';
 
-export type RoleCodeTypes = 'ALL' | 'USER' | 'TRADER' | 'MANAGER';
+export type RoleCodeTypes =
+  | 'USER'
+  | 'TRADER'
+  | 'USER_MANAGER'
+  | 'TRADER_MANAGER'
+  | 'ADMIN';
+export type TabButtonTypes = 'ALL' | 'USER' | 'TRADER' | 'MANAGER';
 export interface AdminUserData {
-  role?: RoleCodeTypes;
+  role?: TabButtonTypes;
   page?: number;
   searchType?: string;
   searchKeyword?: string;
