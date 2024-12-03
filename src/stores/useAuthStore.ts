@@ -7,6 +7,8 @@ interface AuthConfig {
   isLoggedIn: boolean;
   memberId: number;
   email: string;
+  phoneNumber: string;
+  name: string;
   nickname: string;
   roleCode: RoleCodeTypes;
   profileImage: string | null;
@@ -23,8 +25,10 @@ const resetState = (set: Function) => {
     isLoggedIn: false,
     memberId: 0,
     email: '',
+    phoneNumber: '',
+    name: '',
     nickname: '',
-    role: '',
+    roleCode: '',
     profileImage: null,
   });
   localStorage.removeItem('token');
@@ -35,6 +39,8 @@ const updateState = (set: Function, authData: AuthConfig) => {
     isLoggedIn: true,
     memberId: authData.memberId,
     email: authData.email,
+    phoneNumber: authData.phoneNumber,
+    name: authData.name,
     nickname: authData.nickname,
     roleCode: authData.roleCode,
     profileImage: authData.profileImage,
@@ -45,6 +51,8 @@ const useAuthStore = create<AuthStateProps>((set) => ({
   isLoggedIn: false,
   memberId: 0,
   email: '',
+  phoneNumber: '',
+  name: '',
   nickname: '',
   roleCode: '',
   profileImage: null,

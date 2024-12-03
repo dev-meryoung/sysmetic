@@ -3,15 +3,15 @@ import { css } from '@emotion/react';
 import CancelOutlined from '@mui/icons-material/CancelOutlined';
 import VisibilityOffOutlined from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlined from '@mui/icons-material/VisibilityOutlined';
-import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import Checkbox from '@/components/Checkbox';
 import IconButton from '@/components/IconButton';
+import Modal from '@/components/Modal';
 import TextInput from '@/components/TextInput';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
-import { PATH } from '@/constants/path';
 import { useLogin } from '@/hooks/useAuthApi';
+import useModalStore from '@/stores/useModalStore';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -20,8 +20,8 @@ const SignIn = () => {
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const { openModal } = useModalStore();
   const loginMutation = useLogin();
-  const navigate = useNavigate();
 
   const emailRegEx =
     /^[A-Za-z0-9]([-_.]?[A-Za-z0-9])*@[A-Za-z0-9]([-_.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$/i;
@@ -55,15 +55,19 @@ const SignIn = () => {
       loginMutation.mutate(
         { email, password, rememberMe },
         {
-          onSuccess: () => {
-            navigate(PATH.ROOT);
-          },
           onError: () => {
             setEmailError(true);
             setPasswordError(true);
+            openModal('update-confirm');
           },
         }
       );
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSignIn();
     }
   };
 
@@ -83,6 +87,7 @@ const SignIn = () => {
               status={emailError ? 'warn' : 'normal'}
               placeholder='이메일 주소(test@example.com)'
               handleChange={(e) => validateEmail(e.target.value)}
+              handleKeyDown={handleKeyDown}
             />
             <IconButton
               IconComponent={CancelOutlined}
@@ -108,6 +113,7 @@ const SignIn = () => {
               status={passwordError ? 'warn' : 'normal'}
               placeholder='비밀번호'
               handleChange={(e) => validatePassword(e.target.value)}
+              handleKeyDown={handleKeyDown}
             />
             <IconButton
               IconComponent={
@@ -159,6 +165,14 @@ const SignIn = () => {
         <a href='/signin/find/id'>계정(이메일) 찾기</a>
         <a href='/signin/find/pw'>비밀번호 재설정</a>
       </div>
+      <Modal
+        id='update-confirm'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>로그인에 실패했습니다.</p>
+          </div>
+        }
+      />
     </div>
   );
 };
@@ -253,4 +267,19 @@ const messageStyle = css`
   font-size: ${FONT_SIZE.TEXT_SM};
   margin-top: 4px;
   display: block;
+`;
+
+const modalContentStyle = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+`;
+
+const modalTextStyle = css`
+  font-size: ${FONT_SIZE.TEXT_LG};
+  text-align: center;
+  margin-top: 32px;
+  margin-bottom: 24px;
 `;
