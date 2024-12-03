@@ -64,8 +64,10 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const [authCode, setAuthCode] = useState('');
   const [authCodeStatus, setAuthCodeStatus] =
     useState<InputStateTypes>('normal');
-  const authModal = useModalStore();
   const [message, setMessage] = useState('');
+  // 모달 생성 변수
+  const authModal = useModalStore();
+  const authSuccessModal = useModalStore();
 
   const handleAuthCodeChange = (e: ChangeEvent<HTMLInputElement>) => {
     setAuthCode(e.target.value);
@@ -89,6 +91,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
         if (data?.code === 200) {
           setSuccessEmailAuth(true);
           authModal.closeModal('auth');
+          authSuccessModal.openModal('success');
         }
       },
       onError: () => {
@@ -100,11 +103,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
   return (
     <div css={AuthModalStyle}>
-      <h6>
-        해당 이메일로 코드가 전송되었습니다.
-        <br />
-        3분 이내로 입력해 주시기 바랍니다.
-      </h6>
+      <h6>해당 이메일로 인증번호가 전송되었습니다.</h6>
+      <h6>전송된 인증번호를 정확히 입력해주세요.</h6>
       <div className='input-form'>
         <p>
           인증번호 입력
@@ -131,6 +131,12 @@ const AuthModal: React.FC<AuthModalProps> = ({
     </div>
   );
 };
+
+const AuthSuccessModal = () => (
+  <div css={AuthSuccessModalStyle}>
+    <p>인증되었습니다.</p>
+  </div>
+);
 
 const SignUpForm = () => {
   // 입력 폼
@@ -267,6 +273,7 @@ const SignUpForm = () => {
       setIdStatus('pass');
     } else {
       setIdStatus('warn');
+      setEmailMessage('');
     }
   };
 
@@ -297,6 +304,7 @@ const SignUpForm = () => {
       setNicknameStatus('pass');
     } else {
       setNicknameStatus('warn');
+      setNicknameMessage('');
     }
   };
 
@@ -345,6 +353,8 @@ const SignUpForm = () => {
   };
 
   //이메일 중복확인
+  const [emailMessage, setEmailMessage] = useState('');
+
   const handleCheckId = async () => {
     if (id && selectedEmail) {
       const emailData = await checkEmail(id, selectedEmail);
@@ -352,6 +362,7 @@ const SignUpForm = () => {
         setIsExist(false); // 계정 중복 여부
         setIdAuthBtnDisabled(false); // 이메일 인증 버튼 상태
         setSuccessId(true);
+        setEmailMessage('사용 가능한 이메일입니다.');
       } else {
         setIsExist(true);
         setIdAuthBtnDisabled(true);
@@ -361,12 +372,14 @@ const SignUpForm = () => {
   };
   //닉네임 중복확인
   const { mutate: checkNicknameMutation } = useCheckNickname();
+  const [nicknameMessage, setNicknameMessage] = useState('');
 
   const handleCheckNickname = () => {
     checkNicknameMutation(nickname, {
       onSuccess: () => {
         setIsNicknameExist(false); // 중복 상태 업데이트
         setSuccessNickname(true);
+        setNicknameMessage('사용 가능한 닉네임입니다.');
       },
       onError: () => {
         setIsNicknameExist(true);
@@ -427,6 +440,13 @@ const SignUpForm = () => {
     }
   }, [nicknameStatus]);
 
+  //도메인 변경 시, 실시간 이메일인증 on/off
+  useEffect(() => {
+    if (selectedEmail) {
+      setIdAuthBtnDisabled(true);
+    }
+  }, [selectedEmail]);
+
   return (
     <div css={wrapperStyle}>
       <div css={subTitleStyle}>정보입력</div>
@@ -470,7 +490,11 @@ const SignUpForm = () => {
             {idStatus === 'pass' && !selectedEmail && '이메일을 선택해주세요.'}
             {idStatus === 'pass' &&
               selectedEmail &&
-              (isExist ? '중복된 이메일입니다.' : null)}
+              (isExist ? (
+                '중복된 이메일입니다.'
+              ) : (
+                <span className='success-msg'>{emailMessage}</span>
+              ))}
           </p>
         </div>
         <div className='input-form'>
@@ -523,7 +547,11 @@ const SignUpForm = () => {
             {nicknameStatus === 'warn' &&
               '3~10자의 한글, 숫자 중 1개 이상 조합하여 사용'}
             {nicknameStatus === 'pass' &&
-              (isNicknameExist ? '중복된 닉네임입니다.' : null)}
+              (isNicknameExist ? (
+                '중복된 닉네임입니다.'
+              ) : (
+                <span className='success-msg'>{nicknameMessage}</span>
+              ))}
           </p>
         </div>
         <div className='input-form'>
@@ -610,6 +638,7 @@ const SignUpForm = () => {
         }
         id='auth'
       />
+      <Modal content={<AuthSuccessModal />} id='success' />
     </div>
   );
 };
@@ -651,12 +680,17 @@ const formDivStyle = css`
     gap: 8px;
     margin-bottom: 40px;
 
+    p > .success-msg {
+      color: ${COLOR.CHECK_GREEN};
+    }
+
     p:last-child {
       color: ${COLOR.POINT};
     }
 
     div {
       display: flex;
+
       span {
         display: flex;
         justify-content: center;
@@ -678,6 +712,9 @@ const formDivStyle = css`
     gap: 8px;
     margin-bottom: 40px;
 
+    p > .success-msg {
+      color: ${COLOR.CHECK_GREEN};
+    }
     p:last-child {
       color: ${COLOR.POINT};
     }
@@ -765,12 +802,11 @@ const AuthModalStyle = css`
     gap: 8px;
     padding: 32px 0 40px;
 
-    p::first-of-type {
+    p {
       font-size: ${FONT_SIZE.TEXT_SM};
     }
 
-    p:last-child {
-      font-size: ${FONT_SIZE.TEXT_SM};
+    p:last-of-type {
       color: ${COLOR.POINT};
     }
   }
@@ -779,6 +815,15 @@ const AuthModalStyle = css`
     display: flex;
     gap: 16px;
   }
+`;
+
+const AuthSuccessModalStyle = css`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 8px 16px;
+  font-size: ${FONT_SIZE.TEXT_MD};
 `;
 
 export default SignUpForm;
