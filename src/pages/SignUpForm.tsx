@@ -149,6 +149,7 @@ const SignUpForm = () => {
   const [profileImg, setProfileImg] = useState('');
   const [date, setDate] = useState('');
   const [selectedEmail, setSelectedEmail] = useState('');
+  const age = new Date().getFullYear() - new Date(date).getFullYear() < 14;
   // 모달 변수
   const authModal = useModalStore();
   // 버튼 상태
@@ -403,7 +404,8 @@ const SignUpForm = () => {
         !isExist &&
         successNickname &&
         successId &&
-        succeessEmailAuth
+        succeessEmailAuth &&
+        !age
       )
     );
   }, [
@@ -420,6 +422,7 @@ const SignUpForm = () => {
     successId,
     successNickname,
     succeessEmailAuth,
+    age,
   ]);
 
   //이메일 중복확인 on/off
@@ -572,7 +575,7 @@ const SignUpForm = () => {
             <Dot />
           </p>
           <Calendar type='date' dateProps={{ date, setDate }} />
-          {!date && <p>생년월일을 선택해 주세요.</p>}
+          {age && <p>14세 미만은 가입할 수 없습니다.</p>}
         </div>
         <div className='input-form'>
           <p>
