@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
@@ -7,73 +6,69 @@ import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 
 const NoticesDetail = () => {
-  const a = 1;
-
-  return (
-    <div css={noticesDetailWrapperStyle}>
-      <div css={noticesDetailHeaderStyle}>
-        <h1>공지사항</h1>
-        <p>시스메틱 서비스의 신규 및 업데이트 소식을 알려드립니다.</p>
+  <div css={noticesDetailWrapperStyle}>
+    <div css={noticesDetailHeaderStyle}>
+      <h1>공지사항</h1>
+      <p>시스메틱 서비스의 신규 및 업데이트 소식을 알려드립니다.</p>
+    </div>
+    <div css={noticesDetailMainStyle}>
+      <div css={noticesTitleStyle}>
+        <h6>시스메틱 내 오늘의투자판이 출시됩니다!</h6>
+        <div>
+          <p>작성일</p>
+          <p>2024. 11. 28.</p>
+        </div>
       </div>
-      <div css={noticesDetailMainStyle}>
-        <div css={noticesTitleStyle}>
-          <h6>시스메틱 내 오늘의투자판이 출시됩니다!</h6>
-          <div>
-            <p>작성일</p>
-            <p>2024. 11. 28.</p>
-          </div>
+      <div css={noticesContentStyle}>
+        <p>공지내용 공지내용</p>
+      </div>
+      <div css={noticesFileStyle}>
+        <div className='file-title'>
+          <AttachFileIcon css={iconStyle} />
+          <p>
+            첨부파일 <span>2</span>개
+          </p>
+          <Button
+            width={72}
+            size='xxs'
+            shape='none'
+            label='모두 저장'
+            handleClick={() => console.log('click')}
+          />
         </div>
-        <div css={noticesContentStyle}>
-          <p>공지내용 공지내용</p>
-        </div>
-        <div css={noticesFileStyle}>
-          <div className='file-title'>
-            <AttachFileIcon css={iconStyle} />
+        <div css={noticesFileDivStyle}>
+          <div className='file-content'>
             <p>
-              첨부파일 <span>2</span>개
+              시스메틱 특약 변경 대비표1.pdf<span>(1.2MB)</span>
             </p>
-            <Button
-              width={72}
-              size='xxs'
-              shape='none'
-              label='모두 저장'
-              handleClick={() => console.log('click')}
-            />
+            <FileDownloadOutlinedIcon css={iconStyle} />
           </div>
-          <div css={noticesFileDivStyle}>
-            <div className='file-content'>
-              <p>
-                시스메틱 특약 변경 대비표1.pdf<span>(1.2MB)</span>
-              </p>
-              <FileDownloadOutlinedIcon css={iconStyle} />
-            </div>
-            <div className='file-content'>
-              <p>
-                시스메틱 특약 변경 대비표2.pdf<span>(1.2MB)</span>
-              </p>
-              <FileDownloadOutlinedIcon css={iconStyle} />
-            </div>
+          <div className='file-content'>
+            <p>
+              시스메틱 특약 변경 대비표2.pdf<span>(1.2MB)</span>
+            </p>
+            <FileDownloadOutlinedIcon css={iconStyle} />
           </div>
-        </div>
-      </div>
-      <div css={noticesDetailNavStyle}>
-        <div className='page-nav'>
-          <div>
-            <p>이전</p>
-            <p>이전 공지사항</p>
-          </div>
-          <p>2024. 11. 11.</p>
-        </div>
-        <div className='page-nav'>
-          <div>
-            <p>다음</p>
-            <p>다음 공지사항</p>
-          </div>
-          <p>2024. 12. 1.</p>
         </div>
       </div>
     </div>
-  );
+    <div css={noticesDetailNavStyle}>
+      <div className='page-nav'>
+        <div>
+          <p>이전</p>
+          <p>이전 공지사항</p>
+        </div>
+        <p>2024. 11. 11.</p>
+      </div>
+      <div className='page-nav'>
+        <div>
+          <p>다음</p>
+          <p>다음 공지사항</p>
+        </div>
+        <p>2024. 12. 1.</p>
+      </div>
+    </div>
+  </div>;
 };
 
 const noticesDetailWrapperStyle = css`

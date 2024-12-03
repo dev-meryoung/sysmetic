@@ -4,7 +4,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import Pagination from '@/components/Pagination';
 import Table from '@/components/Table';
 import TextInput from '@/components/TextInput';
-import { COLOR, COLOR_OPACITY } from '@/constants/color';
+import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import notices from '@/mocks/notices.json';
 
