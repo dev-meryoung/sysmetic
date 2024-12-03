@@ -11,7 +11,7 @@ export interface ColumnProps<T> {
   key: keyof T;
   header: string;
   sortable?: boolean;
-  render?: (value: T[keyof T], item: T, rowIndex: number) => React.ReactNode;
+  render?: (value: T[keyof T], item: T, rowIndex: number) => ReactNode;
 }
 
 interface TableProps<T> {

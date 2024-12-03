@@ -55,6 +55,9 @@ const AdminNotices = () => {
     );
   };
 
+  const handleWrite = () => {
+    navigate(PATH.ADMIN_NOTICES_ADD);
+  };
   const columns: ColumnProps<NoticesAdminDataProps>[] = [
     {
       key: 'noticeId',
@@ -172,7 +175,7 @@ const AdminNotices = () => {
           shape='square'
           width={80}
           size='md'
-          handleClick={() => navigate(PATH.ADMIN_NOTICES_ADD)}
+          handleClick={handleWrite}
         />
         <Button
           label='삭제'
