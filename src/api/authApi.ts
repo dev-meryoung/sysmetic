@@ -8,7 +8,7 @@ export interface LoginRequestData {
 }
 export interface CheckEmailCodeData {
   email: string;
-  code: string;
+  authCode: string;
 }
 // 로그인 API
 export const login = async (loginData: LoginRequestData) => {
@@ -95,7 +95,7 @@ export const sendEmailCode = async (email: string) => {
 export const checkEmailCode = async (emailData: CheckEmailCodeData) => {
   const response = await axiosInstance.post(`/v1/auth/email-code`, {
     email: emailData.email,
-    code: emailData.code,
+    authCode: emailData.authCode,
   });
 
   return response.data;

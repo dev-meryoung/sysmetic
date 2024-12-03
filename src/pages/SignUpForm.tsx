@@ -1,4 +1,4 @@
-import React, { useEffect, useState, ChangeEvent } from 'react';
+import React, { useEffect, useState, ChangeEvent, Dispatch } from 'react';
 import { css } from '@emotion/react';
 import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -54,8 +54,12 @@ const REGEX = {
 
 interface AuthModalProps {
   email: string;
+  setSuccessEmailAuth: Dispatch<React.SetStateAction<boolean>>;
 }
-const AuthModal: React.FC<AuthModalProps> = ({ email }) => {
+const AuthModal: React.FC<AuthModalProps> = ({
+  email,
+  setSuccessEmailAuth,
+}) => {
   // 모달 내 변수
   const [authCode, setAuthCode] = useState('');
   const [authCodeStatus, setAuthCodeStatus] =
@@ -69,6 +73,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ email }) => {
       setAuthCodeStatus('pass');
     } else {
       setAuthCodeStatus('warn');
+      setMessage('6자리의 영문 대문자, 숫자만 조합하여 사용');
     }
   };
 
@@ -77,15 +82,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ email }) => {
   const handleAuthBtnClick = () => {
     const emailData = {
       email,
-      code: authCode,
+      authCode,
     };
     checkEmailCodeMutation(emailData, {
-      onSuccess: () => {
-        authModal.closeModal('auth');
+      onSuccess: (data) => {
+        if (data?.code === 200) {
+          setSuccessEmailAuth(true);
+          authModal.closeModal('auth');
+        }
       },
       onError: () => {
         setAuthCodeStatus('warn');
-        setMessage('인증코드를 다시 확인해주세요.');
+        setMessage('인증번호를 다시 확인해주세요.');
       },
     });
   };
@@ -109,13 +117,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ email }) => {
           value={authCode}
           handleChange={handleAuthCodeChange}
         />
-        <p>
-          {authCodeStatus === 'warn'
-            ? message
-              ? '인증번호를 다시 확인해주세요.'
-              : '6자리의 영문 대문자, 숫자만 조합하여 사용'
-            : null}
-        </p>
+        <p>{authCodeStatus === 'warn' && message}</p>
       </div>
       <div className='auth-btn'>
         <Button
@@ -150,9 +152,10 @@ const SignUpForm = () => {
   //계정 존재여부
   const [isExist, setIsExist] = useState(false);
   const [isNicknameExist, setIsNicknameExist] = useState(false);
-  //중복확인 성공
+  //중복확인 및 인증 성공여부
   const [successId, setSuccessId] = useState(false);
   const [successNickname, setSuccessNickname] = useState(false);
+  const [succeessEmailAuth, setSuccessEmailAuth] = useState(false);
   //정보수신 동의
   const [isFirstChecked, setIsFirstChecked] = useState(false);
   const [isSecondChecked, setIsSecondChecked] = useState(false);
@@ -386,7 +389,8 @@ const SignUpForm = () => {
         !isNicknameExist &&
         !isExist &&
         successNickname &&
-        successId
+        successId &&
+        succeessEmailAuth
       )
     );
   }, [
@@ -402,7 +406,9 @@ const SignUpForm = () => {
     isExist,
     successId,
     successNickname,
+    succeessEmailAuth,
   ]);
+
   //이메일 중복확인 on/off
   useEffect(() => {
     if (idStatus === 'pass' && selectedEmail) {
@@ -596,7 +602,12 @@ const SignUpForm = () => {
         />
       </div>
       <Modal
-        content={<AuthModal email={`${id}@${selectedEmail}.com`} />}
+        content={
+          <AuthModal
+            email={`${id}@${selectedEmail}.com`}
+            setSuccessEmailAuth={setSuccessEmailAuth}
+          />
+        }
         id='auth'
       />
     </div>
@@ -765,18 +776,6 @@ const AuthModalStyle = css`
   }
 
   .auth-btn {
-    display: flex;
-    gap: 16px;
-  }
-`;
-
-const defaultModalStyle = css`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-  padding-top: 8px;
-  div {
     display: flex;
     gap: 16px;
   }
