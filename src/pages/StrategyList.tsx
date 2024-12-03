@@ -14,7 +14,7 @@ import Modal from '@/components/Modal';
 import Pagination from '@/components/Pagination';
 import ProfileImage from '@/components/ProfileImage';
 import RadioButton from '@/components/RadioButton';
-import { StrategyFilter } from '@/components/StrategyFilter';
+import StrategyFilter from '@/components/StrategyFilter';
 import TabButton from '@/components/TabButton';
 import Table, { ColumnProps } from '@/components/Table';
 import Tag from '@/components/Tag';
