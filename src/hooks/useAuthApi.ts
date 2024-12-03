@@ -13,6 +13,10 @@ import {
   ResetPasswordData,
   sendEmailCodeForPassword,
   checkNickname,
+  checkEmailCode,
+  CheckEmailCodeData,
+  register,
+  sendEmailCode,
 } from '@/api';
 import { PATH } from '@/constants/path';
 import useAuthStore from '@/stores/useAuthStore';
@@ -48,6 +52,26 @@ export const useLogout = () => {
   });
 };
 
+export const useCheckNickname = () =>
+  useMutation({
+    mutationFn: checkNickname,
+  });
+
+export const useSignUp = () =>
+  useMutation({
+    mutationFn: register,
+  });
+
+export const useSendAuthCode = () =>
+  useMutation({
+    mutationFn: sendEmailCode,
+  });
+
+export const useCheckEmailCode = () =>
+  useMutation({
+    mutationFn: (emailData: CheckEmailCodeData) => checkEmailCode(emailData),
+  });
+
 export const useFindEmail = () =>
   useMutation({
     mutationFn: (findEmailData: FindEmailData) => findEmail(findEmailData),
@@ -69,7 +93,3 @@ export const useReset = () =>
     mutationFn: (resetPasswordData: ResetPasswordData) => resetPassword(resetPasswordData),
   });
 
-export const useCheckNickname = () =>
-  useMutation({
-    mutationFn: checkNickname,
-  });

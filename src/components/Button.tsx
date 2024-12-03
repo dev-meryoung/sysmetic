@@ -15,7 +15,8 @@ type ButtonColorTypes =
   | 'white'
   | 'transparent'
   | 'primaryOpacity10'
-  | 'pointOpacity10';
+  | 'pointOpacity10'
+  | 'primary700';
 type ButtonActionTypes = 'submit' | 'button';
 
 interface ButtonProps {
@@ -58,7 +59,7 @@ const buttonColors: Record<ButtonColorTypes, ButtonColors> = {
   },
   textBlack: {
     color: COLOR.TEXT_BLACK,
-    hoverColor: COLOR.PRIMARY800,
+    hoverColor: COLOR.GRAY800,
     disabledColor: COLOR.GRAY600,
   },
   //nav 텍스트
@@ -96,6 +97,11 @@ const buttonColors: Record<ButtonColorTypes, ButtonColors> = {
   pointOpacity10: {
     color: COLOR.POINT,
     hoverColor: COLOR_OPACITY.POINT_OPACITY10,
+    disabledColor: COLOR.GRAY600,
+  },
+  primary700: {
+    color: COLOR.PRIMARY700,
+    hoverColor: COLOR.PRIMARY800,
     disabledColor: COLOR.GRAY600,
   },
 };
