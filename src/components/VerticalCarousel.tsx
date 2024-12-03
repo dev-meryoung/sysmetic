@@ -10,6 +10,8 @@ interface VerticalCarouselProps {
   children: React.ReactNode;
 }
 
+const HEADER_HEIGHT = 144;
+
 const VerticalCarousel: React.FC<VerticalCarouselProps> = ({ children }) => {
   const totalSlides = React.Children.count(children);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -56,7 +58,9 @@ const VerticalCarousel: React.FC<VerticalCarouselProps> = ({ children }) => {
           </div>
         ))}
       </div>
-      <div className='carousel-indicators'>
+      <div
+        className={`carousel-indicators ${currentSlide === totalSlides - 1 ? 'bottom-position' : ''}`}
+      >
         {React.Children.map(children, (_, index) => (
           <button
             key={index}
@@ -90,12 +94,10 @@ const VerticalCarousel: React.FC<VerticalCarouselProps> = ({ children }) => {
   );
 };
 
-const headerHeight = '144px';
-
 const carouselWrapperStyle = css`
   position: relative;
   overflow: hidden;
-  height: calc(100% - ${headerHeight});
+  height: calc(100% - ${HEADER_HEIGHT}px);
 
   .carousel {
     height: 100%;
@@ -109,6 +111,10 @@ const carouselWrapperStyle = css`
       width: 100%;
       scroll-snap-align: start;
       scroll-snap-stop: always;
+
+      :nth-last-of-type(1) {
+        background-color: ${COLOR.GRAY100};
+      }
     }
   }
 
@@ -124,6 +130,14 @@ const carouselWrapperStyle = css`
     top: 50%;
     transform: translateY(-50%);
     gap: 32px;
+    z-index: 1000;
+
+    &.bottom-position {
+      position: absolute;
+      top: auto;
+      bottom: 320px;
+      transform: none;
+    }
 
     .carousel-indicator {
       width: 16px;

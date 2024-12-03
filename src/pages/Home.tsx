@@ -9,6 +9,8 @@ import VerticalCarousel from '@/components/VerticalCarousel';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+import { useGetMainPage } from '@/hooks/useCommonApi';
+import useCountMotion from '@/hooks/useCountMotion';
 import Footer from '@/layouts/Footer';
 import Header from '@/layouts/Header';
 import chartData from '@/mocks/chart.json';
@@ -16,93 +18,20 @@ import chartData from '@/mocks/chart.json';
 const Home = () => {
   const navigate = useNavigate();
 
+  const { data: mainData } = useGetMainPage();
+
   const parsedChartData = chartData as {
     data1: [number, number][];
     data2: [number, number][];
   };
 
-  // 시스메틱 인기 트레이더 랭킹 정보
-  const mock = [
-    {
-      rangking: 1,
-      name: '부자아빠',
-      image: { tempImage },
-      rateOfReturn: '293,485,280',
-      likes: 100,
-    },
-    {
-      rangking: 2,
-      name: '시스메틱',
-      image: { tempImage },
-      rateOfReturn: '293,485,280',
-      likes: 1002,
-    },
-    {
-      rangking: 3,
-      name: '냠냠',
-      image: { tempImage },
-      rateOfReturn: '293,485,280',
-      likes: 10020,
-    },
-  ];
+  const animatedValue1 = useCountMotion({
+    end: mainData?.data?.totalTraderCount ?? 0,
+  });
 
-  // 시스메틱 현황 정보
-  const mock2 = [
-    {
-      count: '4,986',
-      title: '트레이더 수',
-      unit: '명',
-    },
-    {
-      count: '3,986',
-      title: '투자 전략 공유',
-      unit: '개',
-    },
-  ];
-
-  // SM SCORE 랭킹 TOP 5정보
-  const mock3 = [
-    {
-      rangking: 1,
-      name: '부자아빠',
-      strategyName: 'ETF레버리지/인버스',
-      image: { tempImage },
-      comparedPreviousDay: '+250%',
-      cumulativeReturn: '+24%',
-    },
-    {
-      rangking: 2,
-      name: '시스메틱',
-      strategyName: 'ETF레버리지/인버스',
-      image: { tempImage },
-      comparedPreviousDay: '+250%',
-      cumulativeReturn: '+24%',
-    },
-    {
-      rangking: 3,
-      name: '냠냠',
-      strategyName: 'ETF레버리지/인버스',
-      image: { tempImage },
-      comparedPreviousDay: '+278%',
-      cumulativeReturn: '+24%',
-    },
-    {
-      rangking: 4,
-      name: '시루',
-      strategyName: 'ETF레버리지/인버스',
-      image: { tempImage },
-      comparedPreviousDay: '+25%',
-      cumulativeReturn: '+23%',
-    },
-    {
-      rangking: 5,
-      name: '햄버거',
-      strategyName: 'ETF레버리지/인버스',
-      image: { tempImage },
-      comparedPreviousDay: '+222%',
-      cumulativeReturn: '+14%',
-    },
-  ];
+  const animatedValue2 = useCountMotion({
+    end: mainData?.data?.totalStrategyCount ?? 0,
+  });
 
   return (
     <section css={wrapperStyle}>
@@ -128,24 +57,25 @@ const Home = () => {
           <section css={cardStyle}>
             <h6 className='line-text'>시스메틱 인기 트레이더 랭킹</h6>
             <div className='card-wrapper'>
-              {mock.map((item, index) => (
-                <div className='ranking-card' key={index}>
+              {mainData?.data?.rankedTrader.map((trader, index) => (
+                <div className='ranking-card' key={trader.id}>
                   <span className='ranking-num'>{index + 1}</span>
                   <div className='ranking-card-top'>
+                    {/* TODO: 이미지 경로 변경 */}
                     <ProfileImage
                       size='lg'
                       alt='트레이더 이미지'
                       src={tempImage}
                     />
-                    <span>{item.name}</span>
+                    <span>{trader.nickname}</span>
                   </div>
                   <div className='ranking-card-btm'>
                     <div className='likes-area'>
                       <FavoriteBorderIcon />
-                      {item.likes}
+                      {trader.followerCount}
                     </div>
                     <div className='price-area'>
-                      <h3>{item.rateOfReturn}</h3>
+                      <h3>{trader.accumProfitLossRate}</h3>
                       <h6>원</h6>
                     </div>
                   </div>
@@ -190,15 +120,20 @@ const Home = () => {
           <section css={cardStyle}>
             <h6 className='line-text'>시스메틱 현황</h6>
             <div className='card-wrapper'>
-              {mock2.map((item, index) => (
-                <div className='ranking-card' key={index}>
-                  <div className='current-situation'>
-                    <span>{item.count}</span>
-                    <h5>{item.unit}</h5>
-                  </div>
-                  <h6 className='situation-title'>{item.title}</h6>
+              <section className='ranking-card'>
+                <div className='current-situation'>
+                  <span>{animatedValue1}</span>
+                  <h5>명</h5>
                 </div>
-              ))}
+                <h6 className='situation-title'>트레이더 수</h6>
+              </section>
+              <section className='ranking-card'>
+                <div className='current-situation'>
+                  <span>{animatedValue2}</span>
+                  <h5>개</h5>
+                </div>
+                <h6 className='situation-title'>투자 전략 공유</h6>
+              </section>
             </div>
           </section>
           <div css={btnStyle}>
@@ -262,28 +197,31 @@ const Home = () => {
             </span>
           </div>
           <section css={smScoreCardStyle}>
-            {mock3.map((item, index) => (
-              <div className='sm-score-card' key={index}>
+            {mainData?.data?.smScoreTopFives.map((strategy, index) => (
+              <div className='sm-score-card' key={strategy.id}>
                 <div className='card-top'>
                   <h5 className='num'>{index + 1}</h5>
                   <div>
+                    {/* TODO: 수정 */}
+
                     <ProfileImage
                       size='lg'
                       alt='트레이더 이미지'
                       src={tempImage}
                     />
-                    <span>{item.name}</span>
+                    <span>{strategy.nickname}</span>
                   </div>
-                  <h5>{item.strategyName}</h5>
+                  <h5>{strategy.name}</h5>
                 </div>
                 <div className='card-btm'>
                   <div className='card-btm-option'>
-                    <h6>전일대비</h6>
-                    <h5>{item.comparedPreviousDay}</h5>
+                    <h6>SM Score</h6>
+                    <h5>{strategy.smScore}</h5>
                   </div>
                   <div className='card-btm-option'>
-                    <h6>누적 수익률</h6>
-                    <h5>{item.cumulativeReturn}</h5>
+                    {/* TODO: 수정 */}
+                    <h6>누적 손익률</h6>
+                    <h5>{strategy.name}</h5>
                   </div>
                 </div>
               </div>
@@ -496,6 +434,15 @@ const smScoreCardStyle = css`
         gap: 16px;
       }
     }
+
+    .card-top:nth-last-of-type(1) {
+      padding: 32px 64px;
+    }
+
+    .card-top:nth-last-of-type(2) {
+      padding: 32px 64px;
+    }
+
     .card-btm {
       padding: 40px 32px;
       display: flex;
