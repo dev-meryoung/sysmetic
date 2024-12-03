@@ -12,3 +12,6 @@ export const getMainPage = async () => {
 
   return response.data;
 };
+
+// 메인페이지 차트 정보 조회 API
+export const getMainPageChart = async () => {};
