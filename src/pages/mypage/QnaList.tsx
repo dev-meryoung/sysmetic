@@ -4,24 +4,25 @@ import { Link, useParams } from 'react-router-dom';
 import TagTest from '@/assets/images/test-tag.jpg';
 import Pagination from '@/components/Pagination';
 import SelectBox from '@/components/SelectBox';
-import Table from '@/components/Table';
+import Table, { ColumnProps } from '@/components/Table';
 import Tag from '@/components/Tag';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 import {
-  useGetInquiryListTrader,
   useGetInquiryListUser,
+  useGetInquiryListTrader,
 } from '@/hooks/useCommonApi';
 import useAuthStore from '@/stores/useAuthStore';
 
 const POSTS_PER_PAGE = 10;
 
 interface QnaListDataProps {
-  questionName: string;
+  inquiryId: number;
+  inquiryTitle: string;
   strategyName: string;
-  inquiryRegistrationDate: string; // 전략일자
-  inquiryStatus: string; // 진행상태
+  inquiryRegistrationDate: string;
+  inquiryStatus: string;
 }
 
 const strategyOptions = [
@@ -45,17 +46,24 @@ const QnaList = () => {
   const [sortConfig, setSortConfig] = useState<string>('registrationDate');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const { userId: paramUserId } = useParams<{ userId: string }>();
-  const userId = paramUserId ? Number(paramUserId) : 0;
   const dateCustom = (isoDate: string): string => {
     const dateObj = new Date(isoDate);
     return `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, '0')}.${String(dateObj.getDate()).padStart(2, '0')}`;
   };
 
+  const { userId, inquiryId } = useParams<{
+    userId: string;
+    inquiryId: string;
+  }>();
+
+  const parsedInquiryId = inquiryId ? Number(inquiryId) : 0;
+
   const params = {
+    userId,
     sort: sortConfig,
     closed: statusFilter === 'all' ? undefined : statusFilter,
     page: currentPage + 1,
+    qnaId: parsedInquiryId,
   };
 
   const userQuery = useGetInquiryListUser(params);
@@ -73,14 +81,21 @@ const QnaList = () => {
 
   const totalPage = Math.ceil(total / POSTS_PER_PAGE);
 
-  const columns = [
+
+  const columns: ColumnProps<QnaListDataProps>[] = [
     {
-      key: 'inquiryTitle' as keyof QnaListDataProps,
+      key: 'inquiryTitle',
       header: '제목',
-      render: (value: string) => (
+      render: (value, item) => (
         <div css={questionContainerStyle}>
           <div css={questionTitleStyle}>
-            <Link to={PATH.MYPAGE_QNA_DETAIL(String(userId))} css={linkStyle}>
+            <Link
+              to={PATH.MYPAGE_QNA_DETAIL(
+                String(userId),
+                String(item.inquiryId)
+              )}
+              css={linkStyle}
+            >
               {value}
             </Link>
           </div>
@@ -88,9 +103,9 @@ const QnaList = () => {
       ),
     },
     {
-      key: 'strategyName' as keyof QnaListDataProps,
+      key: 'strategyName',
       header: '전략명',
-      render: (value: string | number | undefined) => (
+      render: (value) => (
         <div css={strategyStyle}>
           <Tag src={TagTest} alt='tag' />
           <span>{value}</span>
@@ -98,16 +113,16 @@ const QnaList = () => {
       ),
     },
     {
-      key: 'inquiryRegistrationDate' as keyof QnaListDataProps,
+      key: 'inquiryRegistrationDate',
       header: '전략일자',
-      render: (value: string) => <span>{dateCustom(value)}</span>,
+      render: (value) => <span>{dateCustom(String(value))}</span>,
     },
     {
-      key: 'inquiryStatus' as keyof QnaListDataProps,
+      key: 'inquiryStatus',
       header: '진행상태',
-      render: (value: string) => (
+      render: (value) => (
         <span css={value === 'unclosed' ? successStyle : waitingStyle}>
-          {statusMap[value] || '알 수 없음'}
+          {statusMap[value] || ''}
         </span>
       ),
     },

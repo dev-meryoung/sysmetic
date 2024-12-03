@@ -9,53 +9,48 @@ import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 import {
-  useGetInquiryDetailTrader,
   useGetInquiryDetailUser,
+  useGetInquiryDetailTrader,
   useDeleteInquiry,
 } from '@/hooks/useCommonApi';
 import useAuthStore from '@/stores/useAuthStore';
 import useModalStore from '@/stores/useModalStore';
 
-interface AnswerDataTypes {
-  id: number;
-  title: string;
-  date: string;
-  content: string;
-  profileImage: string;
-  nickname: string;
-}
+const statusMap: { [key: string]: string } = {
+  closed: '답변완료',
+  unclosed: '답변대기',
+};
 
 const QnaDetail = () => {
   const { roleCode } = useAuthStore();
   const navigate = useNavigate();
   const { openModal, closeModal } = useModalStore();
   const { userId: paramUserId } = useParams<{ userId: string }>();
-  const inquiryId = paramUserId ? Number(paramUserId) : 0;
+  const userInquiryId = paramUserId ? Number(paramUserId) : 0;
+  const { qnaId: paramQnaId } = useParams<{ qnaId: string }>();
+  const qnaInquiryId = paramQnaId ? Number(paramQnaId) : 0;
+
   const dateCustom = (isoDate: string): string => {
     const dateObj = new Date(isoDate);
     return `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, '0')}.${String(dateObj.getDate()).padStart(2, '0')}`;
   };
 
-  const userQuery = useGetInquiryDetailUser({ inquiryId: Number(inquiryId) });
+  const userQuery = useGetInquiryDetailUser({ qnaId: Number(qnaInquiryId) });
   const traderQuery = useGetInquiryDetailTrader({
-    inquiryId: Number(inquiryId),
+    qnaId: Number(qnaInquiryId),
   });
 
   const qnaData =
-    roleCode === 'USER' ? userQuery.data?.qna : traderQuery.data?.qna;
-  const strategyData =
-    roleCode === 'USER' ? userQuery.data?.strategy : traderQuery.data?.strategy;
-  const answerData =
-    roleCode === 'USER'
-      ? userQuery.data?.answers
-      : traderQuery.data?.answers || [];
+    roleCode === 'USER' ? userQuery.data?.data : traderQuery.data?.data;
+
+  console.log('userQuery:', userQuery.data?.data); // userQuery 결과 확인
+  console.log('traderQuery:', traderQuery.data?.data); // traderQuery 결과 확인
+  console.log('roleCode 값:', roleCode);
 
   const deleteMutation = useDeleteInquiry();
 
-  const isAnswerPresent = () => answerData.length > 0;
-
   const handleDeleteBtn = () => {
-    if (isAnswerPresent()) {
+    if (qnaData?.answerTitle) {
       openModal('error-delete');
       return;
     }
@@ -63,23 +58,28 @@ const QnaDetail = () => {
   };
 
   const handleEditBtn = () => {
-    if (isAnswerPresent()) {
+    if (qnaData?.answerTitle) {
       openModal('error-edit');
       return;
     }
-    navigate(PATH.MYPAGE_QNA_EDIT(String(inquiryId)));
+    navigate(PATH.MYPAGE_QNA_EDIT(String(qnaInquiryId)));
+  };
+
+  const handleAnswerBtn = () => {
+    if (qnaData?.answerTitle) {
+      openModal('error-edit');
+      return;
+    }
+    navigate(
+      PATH.MYPAGE_QNA_ANSWER(String(userInquiryId), String(qnaInquiryId))
+    );
   };
 
   const confirmDelete = () => {
-    if (isAnswerPresent()) {
-      openModal('error-delete');
-      return;
-    }
-
-    deleteMutation.mutate(Number(inquiryId), {
+    deleteMutation.mutate(Number(qnaInquiryId), {
       onSuccess: () => {
         closeModal('delete-confirm');
-        navigate(PATH.MYPAGE_QNA(String(inquiryId)));
+        navigate(PATH.MYPAGE_QNA(String(userInquiryId)));
       },
       onError: () => {
         closeModal('delete-confirm');
@@ -87,13 +87,19 @@ const QnaDetail = () => {
     });
   };
 
+  const handleBackBtn = () => {
+    navigate(PATH.MYPAGE_QNA(String(userInquiryId)));
+  };
+
   return (
     <div css={wrapperStyle}>
       {qnaData && (
         <>
-          <div className='question-section' css={titleWrapperStyle}>
+          <div css={titleWrapperStyle}>
             <span css={titleStyle}>{qnaData.inquiryTitle}</span>
-            <span css={statusStyle}>{qnaData.inquiryStatus}</span>
+            <span css={statusStyle}>
+              {statusMap[qnaData?.inquiryStatus || '']}
+            </span>
             <div css={infoStyle}>
               <div css={dateAndWriterStyle}>
                 <div css={dateStyle}>
@@ -104,174 +110,177 @@ const QnaDetail = () => {
                   <span css={writerNameStyle}>작성자</span>
                   <span>{qnaData.inquirerNickname}</span>
                 </div>
-                <div css={buttonStyle}>
-                  {roleCode === 'USER' && (
-                    <>
-                      <Button
-                        label='수정'
-                        handleClick={handleEditBtn}
-                        color='primary'
-                        size='xs'
-                        shape='none'
-                      />
-                      <span css={dividerStyle}>|</span>
-                      <Button
-                        label='삭제'
-                        handleClick={handleDeleteBtn}
-                        color='primary'
-                        size='xs'
-                        shape='none'
-                      />
-                    </>
-                  )}
-                  {roleCode === 'TRADER' && (
+                {roleCode === 'USER' && (
+                  <div css={buttonStyle}>
                     <Button
-                      label='답변하기'
-                      handleClick={() =>
-                        navigate(PATH.MYPAGE_QNA_ANSWER(String(inquiryId)), {
-                          state: { qnaId: qnaData.inquiryId },
-                        })
-                      }
+                      label='수정'
+                      handleClick={handleEditBtn}
                       color='primary'
                       size='xs'
                       shape='none'
                     />
-                  )}
-                </div>
+                    <span css={dividerStyle}>|</span>
+                    <Button
+                      label='삭제'
+                      handleClick={handleDeleteBtn}
+                      color='primary'
+                      size='xs'
+                      shape='none'
+                    />
+                  </div>
+                )}
+                {roleCode === 'TRADER' && (
+                  <div css={buttonStyle}>
+                    <Button
+                      label='답변하기'
+                      handleClick={handleAnswerBtn}
+                      color='primary'
+                      size='xs'
+                      shape='none'
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>
 
           <div css={strategyWrapperStyle}>
-            {strategyData?.name === 'null' ? (
-              <div css={deletedStrategyStyle}>해당 전략이 삭제되었습니다.</div>
-            ) : (
+            {qnaData.strategyName ? (
               <>
                 <div css={tagsAndTitleStyle}>
-                  <div css={tagStyle}>
-                    <Tag
-                      src={strategyData?.tag || 'default-tag.png'}
-                      alt='tag'
-                    />
-                  </div>
-                  <div css={strategyTextStyle}>{strategyData?.name}</div>
+                  <Tag src='default-tag.png' alt='tag' />
+                  <div css={strategyTextStyle}>{qnaData.strategyName}</div>
                 </div>
                 <div css={profileStyle}>
                   <ProfileImage
-                    src={strategyData?.profileImage}
+                    src='default-profile.png'
                     alt='profileImg'
                     size='md'
                   />
-                  <span css={nicknameStyle}>{strategyData?.nickName}</span>
+                  <span css={nicknameStyle}>{qnaData.traderNickname}</span>
                 </div>
               </>
+            ) : (
+              <div css={deletedStrategyStyle}>해당 전략이 삭제되었습니다.</div>
             )}
           </div>
+
           <div css={inputStyle}>{qnaData.inquiryContent}</div>
+
+          {qnaData.answerTitle && (
+            <div css={wrapperStyle}>
+              <div className='comment-section' css={titleWrapperStyle}>
+                <div css={titleStyle}>
+                  <SubdirectoryArrowRightIcon css={commentIconStyle} />
+                  {qnaData.answerTitle.startsWith('RE:')
+                    ? qnaData.answerTitle
+                    : `RE: ${qnaData.answerTitle}`}
+                </div>
+                <div css={infoStyle}>
+                  <div css={dateStyle}>
+                    <span>작성일</span>
+                    <span>{dateCustom(qnaData.answerRegistrationDate)}</span>
+                  </div>
+                  {roleCode !== 'TRADER' && (
+                    <div css={answerProfileStyle}>
+                      <ProfileImage
+                        src='default-profile.png'
+                        alt='profileImg'
+                        size='md'
+                      />
+                      <span css={nicknameStyle}>{qnaData.traderNickname}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div css={answerInputStyle}>{qnaData.answerContent}</div>
+            </div>
+          )}
+
+          <div css={listWrapperStyle}>
+            {qnaData.previousTitle && (
+              <div css={listItemStyle}>
+                <span css={stepperStyle}>이전</span>
+                <Link
+                  to={PATH.MYPAGE_QNA_DETAIL(
+                    String(userInquiryId),
+                    String(qnaInquiryId - 1)
+                  )}
+                  css={listItemTilteStyle}
+                >
+                  {qnaData.previousTitle}
+                </Link>
+              </div>
+            )}
+            {qnaData.nextTitle && (
+              <div css={listItemStyle}>
+                <span css={stepperStyle}>다음</span>
+                <Link
+                  to={PATH.MYPAGE_QNA_DETAIL(
+                    String(userInquiryId),
+                    String(qnaInquiryId + 1)
+                  )}
+                  css={listItemTilteStyle}
+                >
+                  {qnaData.nextTitle}
+                </Link>
+              </div>
+            )}
+          </div>
+
+          <div css={backBtnStyle}>
+            <Button
+              label='목록보기'
+              color='black'
+              size='md'
+              width={80}
+              shape='square'
+              handleClick={handleBackBtn}
+            />
+          </div>
+          <Modal
+            id='error-edit'
+            content={
+              <div css={modalContentStyle}>
+                <p css={modalTextStyle}>
+                  답변이 존재할 시 새로운 답변을 달 수 없습니다.
+                </p>
+              </div>
+            }
+          />
+          <Modal
+            id='error-delete'
+            content={
+              <div css={modalContentStyle}>
+                <p css={modalTextStyle}>
+                  답변이 존재할 시 문의를 삭제할 수 없습니다.
+                </p>
+              </div>
+            }
+          />
+          <Modal
+            id='delete-confirm'
+            content={
+              <div css={modalContentStyle}>
+                <p css={modalTextStyle}>문의를 삭제하시겠습니까?</p>
+                <div css={modalButtonWrapperStyle}>
+                  <Button
+                    label='아니오'
+                    handleClick={() => closeModal('delete-confirm')}
+                    color='primaryOpacity10'
+                    border
+                  />
+                  <Button
+                    label='예'
+                    handleClick={confirmDelete}
+                    color='primary'
+                  />
+                </div>
+              </div>
+            }
+          />
         </>
       )}
-
-      {answerData.map((answer: AnswerDataTypes) => (
-        <div key={answer.id} css={wrapperStyle}>
-          <div className='comment-section' css={titleWrapperStyle}>
-            <div css={titleStyle}>
-              <SubdirectoryArrowRightIcon css={commentIconStyle} />
-              {answer.title.startsWith('RE:')
-                ? answer.title
-                : `RE: ${answer.title}`}
-            </div>
-            <div css={infoStyle}>
-              <div css={dateStyle}>
-                <span>작성일</span>
-                <span>{dateCustom(answer.date)}</span>
-              </div>
-              <div css={answerProfileStyle}>
-                <ProfileImage
-                  src={answer.profileImage}
-                  alt='profileImg'
-                  size='md'
-                />
-                <span css={nicknameStyle}>{answer.nickname}</span>
-              </div>
-            </div>
-          </div>
-          <div css={answerInputStyle}>{answer.content}</div>
-        </div>
-      ))}
-
-      <div css={listWrapperStyle}>
-        {qnaData?.previousTitle && qnaData?.previousWriteDate && (
-          <div css={listItemStyle}>
-            <span css={stepperStyle}>이전</span>
-            <Link to={`/qna/${qnaData.inquiryId - 1}`} css={listItemTilteStyle}>
-              {qnaData.previousTitle}
-            </Link>
-            <span css={listItemDateStyle}>
-              {dateCustom(qnaData.previousWriteDate)}
-            </span>
-          </div>
-        )}
-        {qnaData?.nextTitle && qnaData?.nextWriteDate && (
-          <div css={listItemStyle}>
-            <span css={stepperStyle}>다음</span>
-            <Link to={`/qna/${qnaData.inquiryId + 1}`} css={listItemTilteStyle}>
-              {qnaData.nextTitle}
-            </Link>
-            <span css={listItemDateStyle}>
-              {dateCustom(qnaData.nextWriteDate)}
-            </span>
-          </div>
-        )}
-      </div>
-
-      <div css={goListBtnStyle}>
-        <Button
-          label='목록보기'
-          handleClick={() => navigate(PATH.MYPAGE_QNA())}
-          color='black'
-          size='md'
-          width={80}
-          shape='square'
-        />
-      </div>
-
-      <Modal
-        id='error-edit'
-        content={
-          <div css={modalContentStyle}>
-            <p css={modalTextStyle}>
-              답변이 존재할 시 문의를 수정할 수 없습니다.
-            </p>
-          </div>
-        }
-      />
-      <Modal
-        id='error-delete'
-        content={
-          <div css={modalContentStyle}>
-            <p css={modalTextStyle}>
-              답변이 존재할 시 문의를 삭제할 수 없습니다.
-            </p>
-          </div>
-        }
-      />
-      <Modal
-        id='delete-confirm'
-        content={
-          <div css={modalContentStyle}>
-            <p css={modalTextStyle}>문의를 삭제하시겠습니까?</p>
-            <div css={modalButtonWrapperStyle}>
-              <Button
-                label='아니오'
-                handleClick={() => closeModal('delete-confirm')}
-                color='primaryOpacity10'
-                border
-              />
-              <Button label='예' handleClick={confirmDelete} color='primary' />
-            </div>
-          </div>
-        }
-      />
     </div>
   );
 };
@@ -371,10 +380,10 @@ const tagsAndTitleStyle = css`
   flex-direction: column;
 `;
 
-const tagStyle = css`
-  display: flex;
-  gap: 8px;
-`;
+// const tagStyle = css`
+//   display: flex;
+//   gap: 8px;
+// `;
 
 const strategyTextStyle = css`
   margin-top: 16px;
@@ -445,12 +454,7 @@ const listItemTilteStyle = css`
   color: ${COLOR.TEXT_BLACK};
 `;
 
-const listItemDateStyle = css`
-  flex: 1;
-  text-align: center;
-`;
-
-const goListBtnStyle = css`
+const backBtnStyle = css`
   display: flex;
   justify-content: flex-end;
   width: 100%;
@@ -484,7 +488,7 @@ const modalContentStyle = css`
 `;
 
 const modalTextStyle = css`
-  font-size: ${FONT_SIZE.TEXT_LG};
+  font-size: ${FONT_SIZE.TEXT_MD};
   text-align: center;
   margin-top: 32px;
   margin-bottom: 24px;

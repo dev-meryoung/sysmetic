@@ -17,12 +17,19 @@ const MyQnaEdit = () => {
   const [titleValue, setTitleValue] = useState('');
   const [contentValue, setContentValue] = useState('');
   const { openModal } = useModalStore();
+
   const { userId: paramUserId } = useParams<{ userId: string }>();
-  const inquiryId = paramUserId ? Number(paramUserId) : 0;
+  const userInquiryId = paramUserId ? Number(paramUserId) : 0;
+  const { qnaId: paramQnaId } = useParams<{ qnaId: string }>();
+  const qnaInquiryId = paramQnaId ? Number(paramQnaId) : 0;
+
   const navigate = useNavigate();
-  const { data: inquiryData, isError } = useGetEditInquiry({
-    inquiryId: Number(inquiryId),
+
+  const { data: inquiryResponse, isError } = useGetEditInquiry({
+    qnaId: Number(qnaInquiryId),
   });
+
+  const inquiryData = inquiryResponse?.data || {};
 
   if (isError) {
     openModal('get-inquiry-error');
@@ -53,13 +60,15 @@ const MyQnaEdit = () => {
 
     updateMutation.mutate(
       {
-        inquiryId: Number(inquiryId),
+        qnaId: Number(qnaInquiryId),
         inquiryTitle: titleValue,
         inquiryContent: contentValue,
       },
       {
         onSuccess: () => {
-          navigate(PATH.MYPAGE_QNA_DETAIL(String(inquiryId)));
+          navigate(
+            PATH.MYPAGE_QNA_DETAIL(String(userInquiryId), String(qnaInquiryId))
+          );
         },
         onError: () => {
           openModal('create-confirm');
@@ -69,7 +78,9 @@ const MyQnaEdit = () => {
   };
 
   const handleBtn = () => {
-    navigate(PATH.MYPAGE_QNA_DETAIL(String(inquiryId)));
+    navigate(
+      PATH.MYPAGE_QNA_DETAIL(String(userInquiryId), String(qnaInquiryId))
+    );
   };
 
   return (

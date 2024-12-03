@@ -17,6 +17,10 @@ import {
 import useModalStore from '@/stores/useModalStore';
 
 type InputStateTypes = 'normal' | 'warn';
+const statusMap: { [key: string]: string } = {
+  closed: '답변완료',
+  unclosed: '답변대기',
+};
 
 const QnaAnswer = () => {
   const [status, setStatus] = useState<InputStateTypes>('normal');
@@ -24,12 +28,17 @@ const QnaAnswer = () => {
   const [contentValue, setContentValue] = useState('');
   const navigate = useNavigate();
   const { openModal } = useModalStore();
-  const { userId: paramUserId } = useParams<{ userId: string }>();
-  const inquiryId = paramUserId ? Number(paramUserId) : 0;
 
-  const { data: inquiryData, isError } = useGetInquiryDetailTrader({
-    inquiryId: Number(inquiryId),
+  const { userId: paramUserId } = useParams<{ userId: string }>();
+  const userInquiryId = paramUserId ? Number(paramUserId) : 0;
+  const { qnaId: paramQnaId } = useParams<{ qnaId: string }>();
+  const qnaInquiryId = paramQnaId ? Number(paramQnaId) : 0;
+
+  const { data: inquiryResponse, isError } = useGetInquiryDetailTrader({
+    qnaId: Number(qnaInquiryId),
   });
+
+  const inquiryData = inquiryResponse?.data || {};
 
   if (isError) {
     openModal('get-inquiry-error');
@@ -54,13 +63,15 @@ const QnaAnswer = () => {
 
     createAnswer.mutate(
       {
-        inquiryId: Number(inquiryId),
+        qnaId: Number(qnaInquiryId),
         answerTitle: titleValue,
         answerContent: contentValue,
       },
       {
         onSuccess: () => {
-          navigate(PATH.MYPAGE_QNA_DETAIL(String(inquiryId)));
+          navigate(
+            PATH.MYPAGE_QNA_DETAIL(String(userInquiryId), String(qnaInquiryId)) // qndId NaN
+          );
         },
         onError: () => {
           openModal('create-confirm');
@@ -70,7 +81,9 @@ const QnaAnswer = () => {
   };
 
   const handleBack = () => {
-    navigate(PATH.MYPAGE_QNA_DETAIL(String(inquiryId)));
+    navigate(
+      PATH.MYPAGE_QNA_DETAIL(String(userInquiryId), String(qnaInquiryId))
+    );
   };
 
   const isSubmitDisabled = !titleValue.trim() || !contentValue.trim();
@@ -82,7 +95,9 @@ const QnaAnswer = () => {
       {inquiryData && (
         <div className='question-section' css={titleWrapperStyle}>
           <span css={titleStyle}>{inquiryData.inquiryTitle}</span>
-          <span css={statusStyle}>{inquiryData.inquiryStatus}</span>
+          <span css={statusStyle}>
+            {statusMap[inquiryData?.inquiryStatus || '']}
+          </span>
           <div css={infoStyle}>
             <div css={dateAndWriterStyle}>
               <div css={dateStyle}>
@@ -199,7 +214,6 @@ const titleWrapperStyle = css`
   margin-top: 40px;
   width: 100%;
   padding: 16px;
-  background-color: ${COLOR.GRAY100};
   position: relative;
 `;
 
@@ -209,10 +223,10 @@ const titleStyle = css`
 `;
 
 const statusStyle = css`
-  position: absolute;
-  right: 16px;
+  display: flex;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(-100%);
+  transform: translateX(94%);
   font-size: ${FONT_SIZE.TEXT_MD};
   font-weight: ${FONT_WEIGHT.BOLD};
 `;

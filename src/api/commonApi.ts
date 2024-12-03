@@ -1,152 +1,118 @@
 import axiosInstance from '@/api/axiosInstance';
 
+// 공통 타입 정의
 export interface GetInquiryData {
   sort?: string;
   closed?: string;
   page?: number;
 }
 
-export interface GetInquiryDetailData extends GetInquiryData {
-  inquiryId: number;
+export interface GetInquiryDetailData {
+  qnaId: number;
+  sort?: string;
+  closed?: string;
+  page?: number;
 }
 
 export interface CreateAnswerData {
-  inquiryId: number;
+  qnaId: number;
   answerTitle: string;
   answerContent: string;
 }
 
-export interface CreaeteInquiryData {
-  memberId: number;
+export interface CreateInquiryData {
   strategyId: number;
   inquiryTitle: string;
   inquiryContent: string;
 }
 
 export interface UpdateInquiryData {
-  inquiryId: number;
+  qnaId: number;
   inquiryTitle: string;
   inquiryContent: string;
 }
 
-export interface CreateUserInquiryData {
-  strategyId: number;
-  inquiryTitle: string;
-  inquiryContent: string;
-}
-
-// 공지사항 목록 조회 API
-export const getNoticeList = async () => {};
-
-// 공지사항 상세 정보 조회 API
-export const getNotice = async () => {};
-
-// 질문자 문의 수정 화면 조회 API
-export const getEditInquiry = async (params: GetInquiryDetailData) => {
-  const { inquiryId, sort, closed, page } = params;
-
-  const response = await axiosInstance.get(
-    `/v1/member/inquiry/${inquiryId}/modify`,
-    {
-      params: { sort, closed, page },
-    }
-  );
-
+// 질문자 문의 상세 조회 API
+export const getInquiryDetailUser = async (params: GetInquiryDetailData) => {
+  const { qnaId, ...queryParams } = params;
+  const response = await axiosInstance.get(`/v1/member/qna/${qnaId}`, {
+    params: queryParams,
+  });
   return response.data;
 };
 
 // 질문자 문의 수정 API
-export const updateInquiry = async (editInquiryUserData: UpdateInquiryData) => {
-  const response = await axiosInstance.put(
-    `/v1/member/inquiry/${editInquiryUserData.inquiryId}/modify`,
-    editInquiryUserData
-  );
+export const updateInquiry = async (editInquiryData: UpdateInquiryData) => {
+  const { qnaId, ...payload } = editInquiryData;
+
+  const response = await axiosInstance.put(`/v1/member/qna/${qnaId}`, payload);
+  return response.data;
+};
+
+// 질문자 문의 삭제 API
+export const deleteInquiry = async (qnaId: number) => {
+  const response = await axiosInstance.delete(`/v1/member/qna/${qnaId}`);
+  return response.data;
+};
+
+// 트레이더 문의 상세 조회 API
+export const getInquiryDetailTrader = async (params: GetInquiryDetailData) => {
+  const { qnaId, ...queryParams } = params;
+
+  const response = await axiosInstance.get(`/v1/trader/qna/${qnaId}`, {
+    params: queryParams,
+  });
   return response.data;
 };
 
 // 트레이더 문의 답변 등록 API
 export const createAnswer = async (answerData: CreateAnswerData) => {
+  const { qnaId, ...payload } = answerData;
+
+  const response = await axiosInstance.post(`/v1/trader/qna/${qnaId}`, payload);
+  return response.data;
+};
+
+// 질문자 문의 등록 API
+export const createUserInquiry = async (inquiryData: CreateInquiryData) => {
+  const { strategyId, ...payload } = inquiryData;
+
   const response = await axiosInstance.post(
-    `/v1/trader/inquiry/${answerData.inquiryId}/write`,
-    answerData
+    `/v1/strategy/${strategyId}/qna`,
+    payload
   );
+  return response.data;
+};
+
+// 트레이더 문의 목록 조회 API
+export const getInquiryListTrader = async (params: GetInquiryData) => {
+  const response = await axiosInstance.get('/v1/trader/qna', { params });
   return response.data;
 };
 
 // 질문자 문의 등록 화면 조회 API
 export const getCreateInquiry = async (strategyId: number) => {
   const response = await axiosInstance.get(
-    `/v1/strategy/${strategyId}/inquiry`
+    `/v1/strategy/${strategyId}/qna-page`
   );
   return response.data;
 };
 
-// 질문자 문의 등록 API
-export const createInquiry = async (inquiryData: CreaeteInquiryData) => {
-  const response = await axiosInstance.post(
-    `/v1/strategy/${inquiryData.strategyId}/inquiry`,
-    inquiryData
-  );
-  return response.data;
-};
-
-// 트레이더 문의 조회 API
-export const getInquiryListTrader = async (params: GetInquiryData) => {
-  const response = await axiosInstance.get(`/v1/trader/inquiry`, {
-    params,
-  });
-  return response.data;
-};
-
-// 트레이더 문의 상세 조회 API
-export const getInquiryDetailTrader = async (params: GetInquiryDetailData) => {
-  const { inquiryId, sort, closed, page } = params;
-
-  const response = await axiosInstance.get(
-    `/v1/trader/inquiry/${inquiryId}/view`,
-    {
-      params: { sort, closed, page },
-    }
-  );
-  return response.data;
-};
-
-// 질문자 문의 조회 및 검색 API
+// 질문자 문의 목록 조회 및 검색 API
 export const getInquiryListUser = async (params: GetInquiryData) => {
-  const response = await axiosInstance.get(`/v1/member/inquiry`, {
-    params,
-  });
+  const response = await axiosInstance.get('/v1/member/qna', { params });
   return response.data;
 };
 
-// 질문자 문의 상세 조회 API
-export const getInquiryDetailUser = async (params: GetInquiryDetailData) => {
-  const { inquiryId, sort, closed, page } = params;
+// 질문자 문의 수정 화면 조회 API
+export const getEditInquiry = async (params: GetInquiryDetailData) => {
+  const { qnaId, ...queryParams } = params;
 
   const response = await axiosInstance.get(
-    `/v1/member/inquiry/${inquiryId}/view`,
+    `/v1/member/qna/${qnaId}/modify-page`,
     {
-      params: { sort, closed, page },
+      params: queryParams,
     }
-  );
-  return response.data;
-};
-
-// 질문자 문의 삭제 API
-export const deleteInquiry = async (inquiryId: number) => {
-  const response = await axiosInstance.delete(
-    `/v1/member/inquiry/${inquiryId}/delete`
-  );
-  return response.data;
-};
-
-// 문의 등록 API
-export const createUserInquiry = async (
-  createUserInquiryData: CreateUserInquiryData
-) => {
-  const response = await axiosInstance.post(
-    `/v1/strategy/${createUserInquiryData.strategyId}/inquiry`,
-    createUserInquiryData
   );
   return response.data;
 };
