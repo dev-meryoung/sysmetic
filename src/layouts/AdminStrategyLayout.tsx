@@ -1,28 +1,52 @@
-import { useState } from 'react';
+import { SetStateAction, useEffect, useState } from 'react';
 import { css } from '@emotion/react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import TabButton from '@/components/TabButton';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
+import { PATH } from '@/constants/path';
 
 const AdminStrategyLayout = () => {
   const [tab, setTab] = useState(0);
+  const [explanation, setExplanation] = useState('');
+  const path = useLocation().pathname;
+  const navigate = useNavigate();
+
+  const handleTabChange = (value: SetStateAction<number>) => {
+    setTab(value);
+    if (value === 0) {
+      navigate(PATH.ADMIN_STRATEGIES);
+    } else if (value === 1) {
+      navigate(PATH.ADMIN_METHODS);
+    } else {
+      navigate(PATH.ADMIN_STOCKS);
+    }
+  };
+  //각 페이지 별 설명 업데이트
+  useEffect(() => {
+    switch (path) {
+      case PATH.ADMIN_STRATEGIES:
+        setExplanation('트레이더의 전략을 승인, 반려, 수정하는 페이지입니다.');
+        break;
+      case PATH.ADMIN_METHODS:
+        setExplanation('매매방식을 관리하는 페이지입니다.');
+        break;
+      default:
+        setExplanation('종목을 관리하는 페이지입니다.');
+    }
+  }, [path]);
 
   return (
     <>
       <div css={adminStrategyWrapperStyle}>
         <div css={adminStrategyHeaderStyle}>
           <h1>전략관리</h1>
-          <p>
-            트레이더 회원들의 전략 상태를 관리하는 페이지입니다.
-            <br />
-            승인 요청된 전략을 승인/반려할 수 있습니다.
-          </p>
+          <p>{explanation}</p>
         </div>
         <div css={adminStrategyCategoryDivStyle}>
           <TabButton
             tabs={['전략목록', '매매방식 관리', '종목 관리']}
-            handleTabChange={setTab}
+            handleTabChange={handleTabChange}
             currentTab={tab}
             shape='round'
           />
