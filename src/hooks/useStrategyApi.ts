@@ -1,32 +1,25 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import {
-  CreateFolderRequest,
   getUserFolderList,
   createFolder,
-  UpdateFolderNameRequest,
   deleteFolder,
   getAvailabilityFolder,
   getInterestStrategy,
-  UpdateMoveFolderRequest,
   updateMoveFolder,
-  CreateFollowFolderRequest,
   createFollowFolder,
   deleteSingleInterestStrategy,
   updateFolderName,
   getMethodAndStockList,
   getStrategyList,
   createStrategyItemFilter,
-  CreateStrategyItemFilterRequest,
   getFilterdTrader,
   getTradersStrategyList,
   createStrategy,
   getFilterdStrategy,
   getStrategyAlgorithm,
   deleteInterestStrategy,
-  DeleteFollowFolderRequest,
   getTraderAddStrategyList,
-  DeleteTraderAddStrategyListRequest,
   deleteTraderAddStrategyList,
 } from '@/api/strategyApi';
 
@@ -93,6 +86,43 @@ export type CreateStrategyItemFilterResponse = BaseResponse<{
   ];
 }>;
 
+export interface CreateStrategyItemFilterRequest {
+  methods: string[];
+  cycle: string[];
+  stockNames: string[];
+  accumulatedProfitLossRateRangeStart: string;
+  accumulatedProfitLossRateRangeEnd: string;
+}
+
+export interface UpdateFolderNameRequest {
+  folderId: number;
+  folderName: string;
+  checkDupl: boolean;
+}
+
+export interface UpdateMoveFolderRequest {
+  originFolderId: number;
+  toFolderId: number;
+  strategyId: number;
+}
+
+export interface CreateFollowFolderRequest {
+  folderId: number;
+  strategyId: number;
+}
+
+export interface DeleteTraderAddStrategyListRequest {
+  idList: number[];
+}
+
+export interface CreateFolderRequest {
+  name: string;
+  checkDupl: boolean;
+}
+
+export interface DeleteFollowFolderRequest {
+  strategyId: number[];
+}
 // 전략 목록 조회
 export const useGetStrategyList = (pageNum: number) =>
   useQuery({

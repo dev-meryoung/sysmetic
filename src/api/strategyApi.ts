@@ -1,12 +1,13 @@
 import axiosInstance from '@/api/axiosInstance';
-
-export interface CreateStrategyItemFilterRequest {
-  methods: string[];
-  cycle: string[];
-  stockNames: string[];
-  accumulatedProfitLossRateRangeStart: string;
-  accumulatedProfitLossRateRangeEnd: string;
-}
+import {
+  CreateFolderRequest,
+  CreateFollowFolderRequest,
+  CreateStrategyItemFilterRequest,
+  DeleteFollowFolderRequest,
+  DeleteTraderAddStrategyListRequest,
+  UpdateFolderNameRequest,
+  UpdateMoveFolderRequest,
+} from '@/hooks/useStrategyApi';
 
 // 전략 목록 조회 API
 export const getStrategyList = async (pageNum: number) => {
@@ -114,11 +115,6 @@ export const getUserFolderList = async () => {
   return response.data;
 };
 
-export interface CreateFolderRequest {
-  name: string;
-  checkDupl: boolean;
-}
-
 // 폴더 생성 API
 export const createFolder = async (requestData: CreateFolderRequest) => {
   const response = await axiosInstance.post('/v1/member/folder', requestData);
@@ -136,12 +132,6 @@ export const getAvailabilityFolder = async (folderName: string) => {
 
   return response.data;
 };
-
-export interface UpdateFolderNameRequest {
-  folderId: number;
-  folderName: string;
-  checkDupl: boolean;
-}
 
 // 폴더명 수정 API
 export const updateFolderName = async (
@@ -170,12 +160,6 @@ export const getInterestStrategy = async (folderId: number, page: number) => {
   return response.data;
 };
 
-export interface UpdateMoveFolderRequest {
-  originFolderId: number;
-  toFolderId: number;
-  strategyId: number;
-}
-
 // 관심전략 폴더 이동 API
 export const updateMoveFolder = async (
   requestData: UpdateMoveFolderRequest
@@ -185,11 +169,6 @@ export const updateMoveFolder = async (
   return response.data;
 };
 
-export interface CreateFollowFolderRequest {
-  folderId: number;
-  strategyId: number;
-}
-
 // 관심전략 등록 API
 export const createFollowFolder = async (
   requestData: CreateFollowFolderRequest
@@ -198,10 +177,6 @@ export const createFollowFolder = async (
 
   return response.data;
 };
-
-export interface DeleteFollowFolderRequest {
-  strategyId: number[];
-}
 
 // 관심전략 단일 삭제 API
 export const deleteSingleInterestStrategy = async (strategyId: number) => {
@@ -231,10 +206,6 @@ export const getTraderAddStrategyList = async (page: number) => {
 
   return response.data;
 };
-
-export interface DeleteTraderAddStrategyListRequest {
-  idList: number[];
-}
 
 // 트레이더가 올린 전략 삭제 API
 export const deleteTraderAddStrategyList = async (
