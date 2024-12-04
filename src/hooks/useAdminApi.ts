@@ -1,10 +1,28 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { AdminUserData } from '@/api';
-import { getAdminUserList, PaginatedResponse } from '@/api/adminApi';
+import {
+  deleteAdminUser,
+  getAdminUserList,
+  PaginatedResponse,
+  updateAdminUserRole,
+  UpDateUserRole,
+  UserData,
+} from '@/api/adminApi';
 
 export const useGetAdminUserList = (params: AdminUserData, enabled: boolean) =>
   useQuery<PaginatedResponse, Error>({
     queryKey: ['adminUserList', params],
     queryFn: () => getAdminUserList(params),
     enabled: !!enabled,
+  });
+
+export const useUpdateAdminUserRole = () =>
+  useMutation({
+    mutationFn: (params: UpDateUserRole) => updateAdminUserRole(params),
+  });
+
+//회원 강제 탈퇴
+export const useDeleteAdminUser = () =>
+  useMutation({
+    mutationFn: async (membersId: number[]) => deleteAdminUser(membersId),
   });

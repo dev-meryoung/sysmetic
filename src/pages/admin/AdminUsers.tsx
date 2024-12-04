@@ -1,8 +1,9 @@
-import { useState, useEffect, SetStateAction } from 'react';
+import { useState, useEffect, SetStateAction, Dispatch } from 'react';
 import { css } from '@emotion/react';
 import SearchIcon from '@mui/icons-material/Search';
 import { AdminUserData, RoleCodeTypes } from '@/api';
 import Button from '@/components/Button';
+import Modal from '@/components/Modal';
 import Pagination from '@/components/Pagination';
 import SelectBox from '@/components/SelectBox';
 import TabButton from '@/components/TabButton';
@@ -10,11 +11,13 @@ import Table from '@/components/Table';
 import TextInput from '@/components/TextInput';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
-import { useGetAdminUserList } from '@/hooks/useAdminApi';
+import { useDeleteAdminUser, useGetAdminUserList } from '@/hooks/useAdminApi';
+import useModalStore from '@/stores/useModalStore';
 import { useTableStore } from '@/stores/useTableStore';
 
 interface UsersTableProps {
   no: number;
+  isManager: RoleCodeTypes;
   grade: RoleCodeTypes;
   email: string;
   name: string;
@@ -22,6 +25,11 @@ interface UsersTableProps {
   birth: string;
   tel: string;
 }
+
+interface DelConfirmModalProps {
+  setIsConfirm: Dispatch<React.SetStateAction<boolean>>;
+}
+
 const SearchOptions = [
   { label: '전체', value: 'ALL' },
   { label: '이메일', value: 'EMAIL' },
@@ -36,6 +44,30 @@ const GradeOptions = [
   { label: '탈퇴', value: 'resign' },
 ];
 
+const DelConfirmModal: React.FC<DelConfirmModalProps> = ({ setIsConfirm }) => {
+  const delConfirmModal = useModalStore();
+
+  const handleModalDelClick = () => {
+    setIsConfirm(true);
+    delConfirmModal.closeModal('del-confirm');
+  };
+
+  return (
+    <div css={ModalStyle}>
+      <p>정말 해당 회원을 탈퇴시키겠습니까?</p>
+      <div className='del-confirm-btn'>
+        <Button
+          width={120}
+          border={true}
+          label='아니오'
+          handleClick={() => delConfirmModal.closeModal('del-confirm')}
+        />
+        <Button width={120} label='예' handleClick={handleModalDelClick} />
+      </div>
+    </div>
+  );
+};
+
 const AdminUsers = () => {
   const [tab, setTab] = useState(0);
   const [value, setValue] = useState('');
@@ -44,7 +76,11 @@ const AdminUsers = () => {
   const [selectedGrade, setSelectedGrade] = useState('');
   const [curPage, setCurPage] = useState(0);
   const [fetch, setFetch] = useState(true);
-
+  const [isDisabled, setIsDisabled] = useState(true);
+  //모달
+  const delConfirmModal = useModalStore();
+  const [isDelConfirm, setIsDelConfirm] = useState(false);
+  //체크박스
   const checkedItems = useTableStore((state) => state.checkedItems);
   const toggleCheckbox = useTableStore((state) => state.toggleCheckbox);
   const toggleAllCheckboxes = useTableStore(
@@ -66,6 +102,7 @@ const AdminUsers = () => {
   const users: UsersTableProps[] =
     data?.content?.map((user) => ({
       no: user.id,
+      isManager: user.roleCode,
       grade: user.roleCode,
       email: user.email,
       name: user.name,
@@ -76,13 +113,11 @@ const AdminUsers = () => {
 
   const handleFilterChange = (value: string) => {
     setSelectedFilter(value);
-    // setFetch(false);
     // 필터관련 함수 작성 예정
   };
 
   const handleGradeChange = (value: string) => {
     setSelectedGrade(value);
-    // setFetch(false);
     setCurPage(0);
     // 등급관련 함수 작성 예정
   };
@@ -91,6 +126,7 @@ const AdminUsers = () => {
     setSearchKeyword(value);
     setFetch(true);
     setCurPage(0); // 검색 시 페이지를 초기화
+    toggleAllCheckboxes(0);
   };
 
   useEffect(() => {
@@ -114,7 +150,7 @@ const AdminUsers = () => {
       header: '순서',
     },
     {
-      key: 'grade' as keyof UsersTableProps,
+      key: 'isManager' as keyof UsersTableProps,
       header: '권한',
       render: (value: RoleCodeTypes | string | number) =>
         value === 'USER_MANAGER' || value === 'TRADER_MANAGER' ? '관리자' : '-',
@@ -151,12 +187,45 @@ const AdminUsers = () => {
     setValue('');
     setSearchKeyword('');
     setCurPage(0);
+    toggleAllCheckboxes(0);
   };
 
   const handlePaginationClick = (value: SetStateAction<number>) => {
     setCurPage(value);
     setFetch(true);
+    toggleAllCheckboxes(0);
   };
+
+  // const { mutate: updateAdminUserRoleMutation } = useUpdateAdminUserRole();
+  const { mutate: deleteAdminUser } = useDeleteAdminUser();
+  const handleBtnClick = () => {
+    setIsDelConfirm(false);
+    delConfirmModal.openModal('del-confirm');
+    //페이지 내 순번과 실제 유저의 no 순번을 일치
+    const selectedUserIds = checkedItems.map((index) => users[index].no);
+    if (selectedGrade === 'resign' && isDelConfirm === true) {
+      deleteAdminUser(selectedUserIds, {
+        onSuccess: (data) => {
+          if (data?.code === 200) {
+            setFetch(true);
+            toggleAllCheckboxes(0);
+          }
+        },
+        onError: (error) => {
+          console.error('회원 탈퇴 중 오류 발생', error);
+        },
+      });
+    }
+  };
+
+  // 변경버튼 on/off
+  useEffect(() => {
+    if (checkedItems.length > 0 && selectedGrade) {
+      setIsDisabled(false);
+    } else {
+      setIsDisabled(true);
+    }
+  }, [checkedItems, selectedGrade]);
 
   return (
     <div css={adminWrapperStyle}>
@@ -219,7 +288,8 @@ const AdminUsers = () => {
           fontSize='14px'
           width={80}
           label='변경'
-          handleClick={() => console.log('변경')}
+          handleClick={handleBtnClick}
+          disabled={isDisabled}
         />
       </div>
       <div css={paginationDivStyle}>
@@ -229,6 +299,10 @@ const AdminUsers = () => {
           handlePageChange={handlePaginationClick}
         />
       </div>
+      <Modal
+        content={<DelConfirmModal setIsConfirm={setIsDelConfirm} />}
+        id='del-confirm'
+      />
     </div>
   );
 };
@@ -326,4 +400,18 @@ const searchNoneStyle = css`
   font-size: ${FONT_SIZE.TEXT_LG};
 `;
 
+const ModalStyle = css`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 8px 16px 0;
+  font-size: ${FONT_SIZE.TEXT_MD};
+
+  .del-confirm-btn {
+    display: flex;
+    gap: 16px;
+  }
+`;
 export default AdminUsers;

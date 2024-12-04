@@ -32,6 +32,11 @@ export interface PaginatedResponse {
   content: UserData[];
 }
 
+export interface UpDateUserRole {
+  memberId: number[];
+  hasManagerRights: boolean | undefined;
+}
+
 // 회원 목록 조회 API
 export const getAdminUserList = async (userList: AdminUserData) => {
   const queryParams = new URLSearchParams();
@@ -56,10 +61,21 @@ export const getAdminUserList = async (userList: AdminUserData) => {
 };
 
 // 회원 등급 변경 API
-export const updateAdminUserRole = async () => {};
+export const updateAdminUserRole = async (params: UpDateUserRole) => {
+  const response = await axiosInstance.patch('/v1/admin/members', {
+    memberId: params.memberId,
+    hasManagerRights: params.hasManagerRights,
+  });
+
+  return response.data;
+};
 
 // 회원 강제 탈퇴 API
-export const deleteAdminUser = async () => {};
+export const deleteAdminUser = async (memberId: number[]) => {
+  const membersId = memberId.join(',');
+  const response = await axiosInstance.delete(`/v1/admin/members/${membersId}`);
+  return response.data;
+};
 
 // 공지사항 등록 API
 export const createAdminNotice = async () => {};
