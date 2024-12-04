@@ -3,8 +3,6 @@ import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRig
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
-import ProfileImage from '@/components/ProfileImage';
-import ProfileImageDefault from '@/components/ProfileImage';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
