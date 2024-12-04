@@ -1,33 +1,144 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import {
+  cancelApproveStrategy,
+  changePrivateStrategy,
+  createMyStrategyAccount,
+  createMyStrategyDaily,
+  deleteMyStrategyAccount,
+  deleteMyStrategyDaily,
+  getExampleExcelLink,
+  getStrategyAccount,
+  getStrategyDaily,
+  getStrategyInfo,
+  getStrategyMonthly,
+  requestApproveStrategy,
+  updateMyStrategyDaily,
+  updateStrategy,
+  uploadDailyExcel,
+  getMethodAndStockList,
+  getStrategyList,
+  createStrategy,
+  deleteTraderAddStrategyList,
+  getFilterdTrader,
+  getTradersStrategyList,
+  createStrategyItemFilter,
+  getStrategyAlgorithm,
+  getFilterdStrategy,
   getUserFolderList,
   createFolder,
-  deleteFolder,
   getAvailabilityFolder,
+  updateFolderName,
+  deleteFolder,
   getInterestStrategy,
   updateMoveFolder,
   createFollowFolder,
   deleteSingleInterestStrategy,
-  updateFolderName,
-  getMethodAndStockList,
-  getStrategyList,
-  createStrategyItemFilter,
-  getFilterdTrader,
-  getTradersStrategyList,
-  createStrategy,
-  getFilterdStrategy,
-  getStrategyAlgorithm,
   deleteInterestStrategy,
   getTraderAddStrategyList,
-  deleteTraderAddStrategyList,
-} from '@/api/strategyApi';
+} from '@/api';
 
 export interface BaseResponse<T> {
   code: number;
   message: string;
   data: T;
 }
+
+export type GetMethodAndStockResponse = BaseResponse<{
+  methodList: {
+    id: number;
+    name: string;
+    filePath: string;
+  }[];
+  stockList: {
+    id: number;
+    name: string;
+    filePath: string;
+  }[];
+}>;
+
+export type GetStrategyInfoResponse = BaseResponse<{
+  id: number;
+  traderId: number;
+  traderNickname: string;
+  traderProfileImage: string;
+  methodId: number;
+  methodName: string;
+  methodIconPath: string;
+  stockList: {
+    stockIds: number[];
+    stockNames: string[];
+    stockIconPath: string[];
+  };
+  isFollow: boolean;
+  name: string;
+  statusCode: string;
+  cycle: string;
+  content: string;
+  followerCount: number;
+  mdd: number;
+  kpRatio: number;
+  smScore: number;
+  accumulatedProfitLossRate: number;
+  maximumCapitalReductionAmount: number;
+  averageProfitLossRate: number;
+  profitFactor: number;
+  winningRate: number;
+  monthlyRecord: number[];
+  analysis: null;
+  fileWithInfoResponse: {
+    id: number;
+    url: string;
+    originalName: string;
+    fileSize: number;
+  };
+}>;
+
+export type GetStrategyDailyResponse = BaseResponse<{
+  currentPage: number;
+  pageSize: number;
+  totalElement: number;
+  totalPages: number;
+  content: {
+    dailyId: number;
+    date: string;
+    principal: number;
+    depositWithdrawalAmount: number;
+    profitLossAmount: number;
+    profitLossRate: number;
+    accumulatedProfitLossAmount: number;
+    accumulatedProfitLossRate: number;
+  }[];
+}>;
+
+export type GetStrategyMonthlyResponse = BaseResponse<{
+  currentPage: number;
+  pageSize: number;
+  totalElement: number;
+  totalPages: number;
+  content: {
+    monthId: number;
+    yearMonth: string;
+    averagePrincipal: number;
+    depositWithdrawalAmount: number;
+    profitLossAmount: number;
+    profitLossRate: number;
+    accumulatedProfitLossAmount: number;
+    accumulatedProfitLossRate: number;
+  }[];
+}>;
+
+export type GetStrategyAccountResponse = BaseResponse<{
+  currentPage: number;
+  pageSize: number;
+  totalElement: number;
+  totalPages: number;
+  content: {
+    accountImageId: number;
+    title: string;
+    imageUrl: string;
+  }[];
+}>;
 
 export type GetFolderListResponse = BaseResponse<
   {
@@ -47,19 +158,6 @@ export type CreateFolderListResponse = BaseResponse<
     data: null;
   }[]
 >;
-
-export type GetMethodAndStockResponse = BaseResponse<{
-  methodList: {
-    id: number;
-    name: string;
-    filePath: string;
-  }[];
-  stockList: {
-    id: number;
-    name: string;
-    filePath: string;
-  }[];
-}>;
 
 export type CreateStrategyItemFilterResponse = BaseResponse<{
   currentPage: number;
@@ -85,6 +183,26 @@ export type CreateStrategyItemFilterResponse = BaseResponse<{
     },
   ];
 }>;
+
+export type CreateMyStrategyDailyRequest = {
+  date: string;
+  depositWithdrawalAmount: number;
+  dailyProfitLossAmount: number;
+};
+
+export type DeleteMyStrategyAccountRequest = {
+  accountImageId: number[];
+};
+
+export interface DeleteTraderAddStrategyListRequest {
+  idList: number[];
+}
+
+export interface BaseResponse<T> {
+  code: number;
+  message: string;
+  data: T;
+}
 
 export interface CreateStrategyItemFilterRequest {
   methods: string[];
@@ -123,14 +241,13 @@ export interface CreateFolderRequest {
 export interface DeleteFollowFolderRequest {
   strategyId: number[];
 }
-// 전략 목록 조회
+
 export const useGetStrategyList = (pageNum: number) =>
   useQuery({
     queryKey: ['strategies', pageNum],
     queryFn: () => getStrategyList(pageNum),
   });
 
-// 매매방식, 종목 조회
 export const useGetMethodAndStock = () => {
   const { data, isSuccess } = useQuery<GetMethodAndStockResponse, Error>({
     queryKey: ['methodAndStock'],
@@ -144,34 +261,40 @@ export const useGetMethodAndStock = () => {
   return { data: undefined };
 };
 
-// 전략 등록
 export const useCreateStrategy = () =>
   useMutation({
     mutationFn: (formData: FormData) => createStrategy(formData),
   });
 
-// 트레이더명 검색결과 조회
+export const useUpdateStrategy = () =>
+  useMutation({
+    mutationFn: ({
+      strategyId,
+      formData,
+    }: {
+      strategyId: string;
+      formData: FormData;
+    }) => updateStrategy(strategyId, formData),
+  });
+
 export const useGetFilterdTrader = (nickname: string, pageNum: number) =>
   useQuery({
     queryKey: ['filterdTrader', nickname, pageNum],
     queryFn: () => getFilterdTrader(nickname, pageNum),
   });
 
-// 특정 트레이더 전략 조회
 export const useGetTradersStrategyList = (traderId: number, pageNum: number) =>
   useQuery({
     queryKey: ['tradersStrategyList', traderId, pageNum],
     queryFn: () => getTradersStrategyList(traderId, pageNum),
   });
 
-// 전략 상세 조건 필터링
 export const useCreateStrategyItemFilter = () => {
   const mutation = useMutation<
     CreateStrategyItemFilterResponse,
     Error,
     { pageNum: number; requestBody: CreateStrategyItemFilterRequest }
   >({
-    // API 호출 함수 연결
     mutationFn: ({ pageNum, requestBody }) =>
       createStrategyItemFilter(pageNum, requestBody),
   });
@@ -179,7 +302,6 @@ export const useCreateStrategyItemFilter = () => {
   return mutation;
 };
 
-// 알고리즘별 전략 필터링
 export const useGetStrategyAlgorithmFilter = (
   pageNum: number,
   algorithm: string
@@ -189,7 +311,6 @@ export const useGetStrategyAlgorithmFilter = (
     queryFn: () => getStrategyAlgorithm(pageNum, algorithm),
   });
 
-// 전략명 검색
 export const useGetFilterdStrategy = (
   keyword: string,
   pageNum: number,
@@ -201,14 +322,12 @@ export const useGetFilterdStrategy = (
     enabled,
   });
 
-// 폴더 목록 조회
 export const useGetUserFolderList = () =>
   useQuery({
     queryKey: ['folderList'],
     queryFn: () => getUserFolderList(),
   });
 
-// 폴더 생성
 export const useCreatFolder = () => {
   const mutation = useMutation<
     CreateFolderListResponse[],
@@ -221,14 +340,12 @@ export const useCreatFolder = () => {
   return mutation;
 };
 
-// 폴더명 중복 검사
 export const useCheckFolderAvailability = (folderName: string) =>
   useMutation<any, Error, string>({
     mutationKey: ['checkFolderAvailability', folderName],
     mutationFn: (name: string) => getAvailabilityFolder(name),
   });
 
-// 폴더명 수정
 export const useUpdateFolderName = () => {
   const mutation = useMutation<
     UpdateFolderListResponse,
@@ -242,7 +359,6 @@ export const useUpdateFolderName = () => {
   return mutation;
 };
 
-// 폴더 삭제
 export const useDeleteFolder = () => {
   const mutation = useMutation<any, Error, number>({
     mutationFn: (id: number) => deleteFolder(id),
@@ -251,7 +367,6 @@ export const useDeleteFolder = () => {
   return mutation;
 };
 
-// 폴더 내 관심전략 조회
 export const useInterestStrategy = (folderId: number, page: number) =>
   useQuery({
     queryKey: ['interestStrategy', folderId, page],
@@ -277,9 +392,6 @@ export const useInterestStrategy = (folderId: number, page: number) =>
     },
   });
 
-// 관심전략 조회 훅
-
-// 관심전략 폴더 이동
 export const useUpdateMoveFolder = () => {
   const mutation = useMutation<
     GetFolderListResponse[],
@@ -293,7 +405,6 @@ export const useUpdateMoveFolder = () => {
   return mutation;
 };
 
-// 관심전략 등록
 export const useCreateFollowFolder = () => {
   const mutation = useMutation<any, Error, CreateFollowFolderRequest>({
     mutationFn: (requestData: CreateFollowFolderRequest) =>
@@ -303,7 +414,6 @@ export const useCreateFollowFolder = () => {
   return mutation;
 };
 
-// 관심전략 단일 삭제
 export const useDeleteSingleInterestStrategy = () => {
   const mutation = useMutation<any[], Error, number>({
     mutationFn: (strategyId: number) =>
@@ -313,7 +423,6 @@ export const useDeleteSingleInterestStrategy = () => {
   return mutation;
 };
 
-// 관심전략 선택 삭제 API
 export const useDeleteInterestStrategy = () => {
   const mutation = useMutation<any, Error, DeleteFollowFolderRequest>({
     mutationFn: (requestData: DeleteFollowFolderRequest) =>
@@ -323,14 +432,12 @@ export const useDeleteInterestStrategy = () => {
   return mutation;
 };
 
-// 트레이더 전략 목록 조회
 export const useGetTraderAddStrategyList = (page: number) =>
   useQuery({
     queryKey: ['traderAddStrategyList', page],
     queryFn: () => getTraderAddStrategyList(page),
   });
 
-// 트레이더가 올린 전략 삭제
 export const useDeleteTraderAddStrategyList = () => {
   const mutation = useMutation<any, Error, DeleteTraderAddStrategyListRequest>({
     mutationFn: (requestData: DeleteTraderAddStrategyListRequest) =>
@@ -339,3 +446,194 @@ export const useDeleteTraderAddStrategyList = () => {
 
   return mutation;
 };
+
+export const useGetStrategyInfo = (strategyId: string) => {
+  const { data, isSuccess, refetch } = useQuery<GetStrategyInfoResponse, Error>(
+    {
+      queryKey: ['strategyInfo'],
+      queryFn: () => getStrategyInfo(strategyId),
+      refetchOnWindowFocus: false,
+    }
+  );
+
+  return {
+    data: isSuccess && data?.code === 200 ? data.data : undefined,
+    isError: isSuccess && data?.code !== 200,
+    refetch,
+  };
+};
+
+export const useGetStrategyDaily = (
+  strategyId: string,
+  page: number,
+  startDate?: string,
+  endDate?: string
+) => {
+  const { data, isSuccess, refetch } = useQuery<GetStrategyDailyResponse>({
+    queryKey: ['strategyDaily', strategyId, page, startDate, endDate],
+    queryFn: () => getStrategyDaily(strategyId, page, startDate, endDate),
+    placeholderData: keepPreviousData,
+    retry: 0,
+  });
+
+  const processedData =
+    isSuccess && data?.code === 200
+      ? data.data
+      : {
+          currentPage: 0,
+          pageSize: 0,
+          totalElement: 0,
+          totalPages: 0,
+          content: [],
+        };
+
+  return {
+    data: processedData,
+    refetch,
+  };
+};
+
+export const useGetStrategyMonthly = (
+  strategyId: string,
+  page: number,
+  startYearMonth?: string,
+  endYearMonth?: string
+) => {
+  const { data, isSuccess, refetch } = useQuery<GetStrategyMonthlyResponse>({
+    queryKey: [
+      'strategyMonthly',
+      strategyId,
+      page,
+      startYearMonth,
+      endYearMonth,
+    ],
+    queryFn: () =>
+      getStrategyMonthly(strategyId, page, startYearMonth, endYearMonth),
+    placeholderData: keepPreviousData,
+    retry: 0,
+  });
+
+  const processedData =
+    isSuccess && data?.code === 200
+      ? data.data
+      : {
+          currentPage: 0,
+          pageSize: 0,
+          totalElement: 0,
+          totalPages: 0,
+          content: [],
+        };
+
+  return {
+    data: processedData,
+    refetch,
+  };
+};
+
+export const useGetStrategyAccount = (strategyId: string, page: number) => {
+  const { data, isSuccess, refetch } = useQuery<GetStrategyAccountResponse>({
+    queryKey: ['strategyAccount', strategyId, page],
+    queryFn: () => getStrategyAccount(strategyId, page),
+    placeholderData: keepPreviousData,
+    retry: 0,
+  });
+
+  const processedData =
+    isSuccess && data?.code === 200
+      ? data.data
+      : {
+          currentPage: 0,
+          pageSize: 0,
+          totalElement: 0,
+          totalPages: 0,
+          content: [],
+        };
+
+  return {
+    data: processedData,
+    refetch,
+  };
+};
+
+export const useRequestApproveStrategy = () =>
+  useMutation({
+    mutationFn: (strategyId: string) => requestApproveStrategy(strategyId),
+  });
+
+export const useCancelApproveStrategy = () =>
+  useMutation({
+    mutationFn: (strategyId: string) => cancelApproveStrategy(strategyId),
+  });
+
+export const useChangePrivateStrategy = () =>
+  useMutation({
+    mutationFn: (strategyId: string) => changePrivateStrategy(strategyId),
+  });
+
+export const useGetExampleExcelLink = () => {
+  const { data, isSuccess } = useQuery<BaseResponse<string>>({
+    queryKey: ['exampleExcelLink'],
+    queryFn: getExampleExcelLink,
+  });
+
+  if (isSuccess && data) {
+    return { data };
+  }
+
+  return { data: undefined };
+};
+
+export const useUploadDailyExcel = () =>
+  useMutation({
+    mutationFn: ({
+      strategyId,
+      formData,
+    }: {
+      strategyId: number;
+      formData: FormData;
+    }) => uploadDailyExcel(strategyId, formData),
+  });
+
+export const useCreateMyStrategyDaily = () =>
+  useMutation({
+    mutationFn: ({
+      strategyId,
+      dailyData,
+    }: {
+      strategyId: number;
+      dailyData: CreateMyStrategyDailyRequest[];
+    }) => createMyStrategyDaily(strategyId, dailyData),
+  });
+
+export const useUpdateMyStrategyDaily = () =>
+  useMutation({
+    mutationFn: ({
+      dailyId,
+      updatedData,
+    }: {
+      dailyId: number;
+      updatedData: CreateMyStrategyDailyRequest;
+    }) => updateMyStrategyDaily(dailyId, updatedData),
+  });
+
+export const useDeleteMyStrateDaily = () =>
+  useMutation({
+    mutationFn: (dailyId: number) => deleteMyStrategyDaily(dailyId),
+  });
+
+export const useCreateMyStrategyAccount = () =>
+  useMutation({
+    mutationFn: ({
+      strategyId,
+      formData,
+    }: {
+      strategyId: string;
+      formData: FormData;
+    }) => createMyStrategyAccount(strategyId, formData),
+  });
+
+export const useDeleteMyStrateAccount = () =>
+  useMutation({
+    mutationFn: (deletedData: DeleteMyStrategyAccountRequest) =>
+      deleteMyStrategyAccount(deletedData),
+  });
