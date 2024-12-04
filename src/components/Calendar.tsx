@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import { CalendarTodayOutlined } from '@mui/icons-material';
-import { COLOR } from '@/constants/color';
+import { COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE } from '@/constants/font';
 
 type CalendarActionTypes = 'date' | 'month' | 'periodDate' | 'periodMonth';
@@ -122,7 +122,7 @@ const calendarWrapperStyle = (size: CalendarSizeTypes) => css`
   position: relative;
   width: ${size === 'mini' ? '112px' : '146px'};
   height: 48px;
-  border: 1px solid ${COLOR.GRAY};
+  border: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
   border-radius: 4px;
   overflow: hidden;
   box-sizing: border-box;

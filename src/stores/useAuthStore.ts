@@ -8,9 +8,12 @@ interface AuthConfig {
   memberId: number;
   email: string;
   phoneNumber: string;
+  name: string;
   nickname: string;
   roleCode: RoleCodeTypes;
   profileImage: string | null;
+  totalFollowerCount: number;
+  totalStrategyCount: number;
 }
 
 interface AuthStateProps extends AuthConfig {
@@ -25,9 +28,12 @@ const resetState = (set: Function) => {
     memberId: 0,
     email: '',
     phoneNumber: '',
+    name: '',
     nickname: '',
     roleCode: '',
     profileImage: null,
+    totalFollowerCount: 0,
+    totalStrategyCount: 0,
   });
   localStorage.removeItem('token');
 };
@@ -38,9 +44,12 @@ const updateState = (set: Function, authData: AuthConfig) => {
     memberId: authData.memberId,
     email: authData.email,
     phoneNumber: authData.phoneNumber,
+    name: authData.name,
     nickname: authData.nickname,
     roleCode: authData.roleCode,
     profileImage: authData.profileImage,
+    totalFollowerCount: authData.totalFollowerCount,
+    totalStrategyCount: authData.totalStrategyCount,
   });
 };
 
@@ -49,9 +58,12 @@ const useAuthStore = create<AuthStateProps>((set) => ({
   memberId: 0,
   email: '',
   phoneNumber: '',
+  name: '',
   nickname: '',
   roleCode: '',
   profileImage: null,
+  totalFollowerCount: 0,
+  totalStrategyCount: 0,
 
   setAuthState: (authData) => updateState(set, authData),
 

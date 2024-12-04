@@ -10,6 +10,7 @@ type IconButtonColorTypes =
   | 'point'
   | 'white'
   | 'gray'
+  | 'realGray'
   | 'black';
 
 interface IconProps {
@@ -34,6 +35,7 @@ const iconButtonColors = {
   white: { color: COLOR.WHITE, hoverColor: COLOR.GRAY100 },
   black: { color: COLOR.BLACK, hoverColor: COLOR.GRAY800 },
   gray: { color: COLOR.GRAY600, hoverColor: COLOR.GRAY800 },
+  realGray: { color: COLOR.GRAY, hoverColor: COLOR.GRAY700 },
 };
 
 const iconSizes = {

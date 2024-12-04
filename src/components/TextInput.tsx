@@ -5,7 +5,7 @@ import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 type InputTypes = 'text' | 'password' | 'email' | 'tel' | 'number';
 type InputColorTypes = 'default' | 'skyblue';
 type InputIconNumTypes = 'none' | 'single' | 'double';
-export type InputStateTypes = 'normal' | 'warn' | 'success';
+export type InputStateTypes = 'normal' | 'pass' | 'warn' | 'success';
 
 interface InputProps {
   type?: InputTypes;
