@@ -1,9 +1,15 @@
 import axiosInstance from '@/api/axiosInstance';
 
+export type RoleCodeTypes = 'USER' | 'TRADER';
 export interface LoginRequestData {
   email: string;
   password: string;
   rememberMe: boolean;
+}
+
+export interface CheckEmailCodeData {
+  email: string;
+  authCode: string;
 }
 
 export interface FindEmailData {
@@ -74,7 +80,14 @@ export const resetPassword = async (resetPasswordData: ResetPasswordData) => {
 };
 
 // 회원가입 API
-export const register = async () => {};
+export const register = async (registerFormData: FormData) => {
+  const response = await axiosInstance.post(
+    '/v1/auth/register',
+    registerFormData
+  );
+
+  return response.data;
+};
 
 // 닉네임 중복 확인 API
 export const checkNickname = async (nickname: string) => {
@@ -85,10 +98,41 @@ export const checkNickname = async (nickname: string) => {
 };
 
 // 이메일 중복 확인 API
-export const checkEmail = async () => {};
+export const checkEmail = async (
+  id: string,
+  selectedEmail: string
+): Promise<number> => {
+  try {
+    const email = `${id}@${selectedEmail}.com`;
+    const response = await axiosInstance.get(
+      `v1/auth/check-duplicate-email?email=${email}`,
+      {
+        validateStatus: (status) =>
+          (status >= 200 && status < 300) || status === 400,
+      }
+    );
 
+    return response.data.code;
+  } catch (error) {
+    console.error('이메일 중복확인 이멀전씨', error);
+    throw new Error('이메일 중복확인 임어준씨');
+  }
+};
 // 이메일 인증 코드 전송(회원가입) API
-export const sendEmailCode = async () => {};
+export const sendEmailCode = async (email: string) => {
+  const response = await axiosInstance.get(
+    `/v1/auth/email-code?email=${email}`
+  );
+
+  return response.data;
+};
 
 // 이메일 인증 코드 확인(회원가입) API
-export const checkEmailCode = async () => {};
+export const checkEmailCode = async (emailData: CheckEmailCodeData) => {
+  const response = await axiosInstance.post(`/v1/auth/email-code`, {
+    email: emailData.email,
+    authCode: emailData.authCode,
+  });
+
+  return response.data;
+};
