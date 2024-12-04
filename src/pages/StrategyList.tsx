@@ -24,6 +24,7 @@ import { PATH } from '@/constants/path';
 import {
   useCreateFollowFolder,
   useCreateStrategyItemFilter,
+  useDeleteSingleInterestStrategy,
   useGetFilterdStrategy,
   useGetStrategyAlgorithmFilter,
   useGetStrategyList,
@@ -36,7 +37,7 @@ import {
 import useAuthStore from '@/stores/useAuthStore';
 import useModalStore from '@/stores/useModalStore';
 import { FilterValueTypes } from '@/types/strategyFilter';
-import { getColorStyleBasedOnValue } from '@/utils/tableUtils';
+import getColorStyleBasedOnValue from '@/utils/tableUtils';
 
 export const TAB_NAME = ['항목별', '알고리즘별'];
 
@@ -70,11 +71,26 @@ interface StrategyTableProps {
   accumulatedProfitLossRateRangeEnd?: string;
   strategy?: string;
   stockIconPath?: string[];
+  isFollow?: boolean;
 }
 
 interface AddInterestModalProps {
   strategyId: number;
+  strategyListRefetch: () => void;
 }
+
+interface DeleteInterestModalProps {
+  deleteStrategyId: number;
+  strategyListRefetch: () => void;
+}
+
+const SignupnModalContent = () => (
+  <div css={modalStyle}>
+    투자자 회원가입이 필요한 서비스 입니다.
+    <br />
+    회원가입을 진행해주세요.
+  </div>
+);
 
 const CheckLoginModalContent = () => {
   const { closeModal } = useModalStore();
@@ -108,8 +124,12 @@ const CheckLoginModalContent = () => {
   );
 };
 
-const AddInterestModalContent = ({ strategyId }: AddInterestModalProps) => {
+const AddInterestModalContent = ({
+  strategyId,
+  strategyListRefetch,
+}: AddInterestModalProps) => {
   const { closeModal } = useModalStore();
+  const addCompleteModal = useModalStore();
 
   const { data: folderListData } = useGetUserFolderList();
   const { mutate: createFollowFolder } = useCreateFollowFolder();
@@ -127,8 +147,6 @@ const AddInterestModalContent = ({ strategyId }: AddInterestModalProps) => {
     if (!isNaN(numericValue)) {
       setSelectedOption(value);
       setErrorMessage('');
-    } else {
-      console.error('Invalid value:', value);
     }
   };
 
@@ -142,7 +160,6 @@ const AddInterestModalContent = ({ strategyId }: AddInterestModalProps) => {
     }
 
     if (!Number.isInteger(strategyId) || strategyId <= 0) {
-      console.error('Invalid strategyId:', strategyId);
       setErrorMessage('유효하지 않은 전략 ID입니다.');
       return false;
     }
@@ -158,14 +175,15 @@ const AddInterestModalContent = ({ strategyId }: AddInterestModalProps) => {
     }
 
     const requestBody = {
-      folderId: Number(selectedOption),
+      folderId: selectedOptionNumber,
       strategyId: Number(strategyId),
     };
 
     createFollowFolder(requestBody, {
       onSuccess: () => {
         closeModal('add-interest-modal');
-        // addCompleteModal.openModal('add-complete-modal');
+        strategyListRefetch();
+        addCompleteModal.openModal('add-complete-modal');
         setErrorMessage('');
         setSelectedOption('');
       },
@@ -208,7 +226,7 @@ const AddCompleteModalContent = () => {
           width={120}
           handleClick={() => {
             navigate(PATH.MYPAGE);
-            closeModal('check-login-modal');
+            closeModal('add-complete-modal');
           }}
         />
         <Button
@@ -223,15 +241,89 @@ const AddCompleteModalContent = () => {
   );
 };
 
+const DeleteInterestModalContent = ({
+  deleteStrategyId,
+  strategyListRefetch,
+}: DeleteInterestModalProps) => {
+  const { closeModal } = useModalStore();
+  const deleteCompleteModal = useModalStore();
+
+  const { mutate: deleteInteresMutate } = useDeleteSingleInterestStrategy();
+
+  const handleDeleteInteres = () => {
+    deleteInteresMutate(deleteStrategyId, {
+      onSuccess: () => {
+        closeModal('delete-modal');
+        strategyListRefetch();
+        deleteCompleteModal.openModal('delete-complete-modal');
+      },
+    });
+  };
+
+  return (
+    <div css={modalStyle}>
+      해당전략을 관심취소하시겠습니까?
+      <div className='btn-area'>
+        <Button
+          label='아니오'
+          border={true}
+          width={120}
+          handleClick={() => {
+            closeModal('delete-modal');
+          }}
+        />
+        <Button
+          label='예'
+          width={120}
+          handleClick={() => {
+            handleDeleteInteres();
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
+const DeleteCompleteModalContent = () => {
+  const { closeModal } = useModalStore();
+  const navigate = useNavigate();
+
+  return (
+    <div css={modalStyle}>
+      해당전략을 관심취소했습니다.
+      <div className='btn-area'>
+        <Button
+          label='마이페이지 가기'
+          border={true}
+          width={120}
+          handleClick={() => {
+            navigate(PATH.MYPAGE);
+            closeModal('delete-complete-modal');
+          }}
+        />
+        <Button
+          label='계속하기'
+          width={120}
+          handleClick={() => {
+            closeModal('delete-complete-modal');
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
 export const StrategyList = () => {
   const navigate = useNavigate();
-  const { isLoggedIn } = useAuthStore();
+  const { isLoggedIn, roleCode } = useAuthStore();
 
   const checkLoginModal = useModalStore();
   const addInterestModal = useModalStore();
-  // const addCompleteModal = useModalStore();
+  const signUpModal = useModalStore();
+  const deleteInterestModal = useModalStore();
 
   const [strategyId, setStrategyId] = useState(0);
+  const [deleteStrategyId, setDeleteStrategyId] = useState(0);
   const [searchValue, setSearchValue] = useState('');
   const [isNotFound, setIsNotFound] = useState(false);
 
@@ -254,12 +346,8 @@ export const StrategyList = () => {
   const [tableData, setTableData] = useState<StrategyTableProps[]>([]);
   const [isSearchEnabled, setIsSearchEnabled] = useState(false);
 
-  // 각 전략별 관심 등록 상태 관리
-  // const [interestStates, setInterestStates] = useState<{
-  //   [strategyId: number]: boolean;
-  // }>({});
-
-  const { data: strategyListData } = useGetStrategyList(pageInfo.currentPage);
+  const { data: strategyListData, refetch: strategyListRefetch } =
+    useGetStrategyList(pageInfo.currentPage);
 
   const { mutate: createStrategyItemFilter } = useCreateStrategyItemFilter();
 
@@ -436,9 +524,14 @@ export const StrategyList = () => {
     }
   }, [strategyListData, currentTab, searchValue, hasFilterChanged]);
 
-  const handleButtonClick = (id: number) => {
+  const handleAddButtonClick = (id: number) => {
     setStrategyId(id);
     addInterestModal.openModal('add-interest-modal', 216);
+  };
+
+  const handleDeleteButtonClick = (id: number) => {
+    setDeleteStrategyId(id);
+    deleteInterestModal.openModal('delete-modal');
   };
 
   const columns: ColumnProps<StrategyTableProps>[] = [
@@ -529,21 +622,47 @@ export const StrategyList = () => {
       header: '전략',
       render: (_, item) => (
         <div css={buttonStyle}>
-          <Button
-            // label={interestStates[item.strategyId] ? '관심 취소' : '관심 등록'}
-            label='관심 등록'
-            shape='round'
-            size='xs'
-            color='point'
-            width={80}
-            handleClick={() => {
-              if (isLoggedIn) {
-                handleButtonClick(item.strategyId);
-              } else {
-                checkLoginModal.openModal('check-login-modal', 360);
-              }
-            }}
-          />
+          {item.isFollow && (
+            <Button
+              label={'관심 취소'}
+              shape='round'
+              size='xs'
+              color='point'
+              width={80}
+              handleClick={() => {
+                if (roleCode === 'USER') {
+                  if (isLoggedIn) {
+                    handleDeleteButtonClick(item.strategyId);
+                  } else {
+                    checkLoginModal.openModal('check-login-modal', 360);
+                  }
+                } else {
+                  signUpModal.openModal('sign-up-modal', 360);
+                }
+              }}
+            />
+          )}
+          {!item.isFollow && (
+            <Button
+              label={'관심 등록'}
+              shape='round'
+              size='xs'
+              color='point'
+              width={80}
+              handleClick={() => {
+                if (roleCode === 'USER') {
+                  if (isLoggedIn) {
+                    handleAddButtonClick(item.strategyId);
+                  } else {
+                    checkLoginModal.openModal('check-login-modal', 360);
+                  }
+                } else {
+                  signUpModal.openModal('sign-up-modal', 360);
+                }
+              }}
+            />
+          )}
+
           <Button
             label='상세보기'
             shape='round'
@@ -562,10 +681,29 @@ export const StrategyList = () => {
     <div css={strategyWrapperStyle}>
       <Modal content={<CheckLoginModalContent />} id='check-login-modal' />
       <Modal
-        content={<AddInterestModalContent strategyId={strategyId} />}
+        content={
+          <AddInterestModalContent
+            strategyId={strategyId}
+            strategyListRefetch={strategyListRefetch}
+          />
+        }
         id='add-interest-modal'
       />
       <Modal content={<AddCompleteModalContent />} id='add-complete-modal' />
+      <Modal content={<SignupnModalContent />} id='sign-up-modal' />
+      <Modal
+        content={
+          <DeleteInterestModalContent
+            deleteStrategyId={deleteStrategyId}
+            strategyListRefetch={strategyListRefetch}
+          />
+        }
+        id='delete-modal'
+      />
+      <Modal
+        content={<DeleteCompleteModalContent />}
+        id='delete-complete-modal'
+      />
 
       <section className='search-box-bg'>
         <div className='search-box'>
@@ -607,8 +745,6 @@ export const StrategyList = () => {
           />
         </div>
       </section>
-      <div>현재 필터: {JSON.stringify(filters, null, 2)}</div>
-
       <section css={tableStyle}>
         <Table data={tableData} columns={columns} />
         {isNotFound ? (
