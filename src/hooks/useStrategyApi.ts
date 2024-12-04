@@ -86,8 +86,6 @@ export type GetStrategyInfoResponse = BaseResponse<{
   winningRate: number;
   monthlyRecord: number[];
   analysis: null;
-}
-
   fileWithInfoResponse: {
     id: number;
     url: string;
