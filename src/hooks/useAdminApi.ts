@@ -1,13 +1,12 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { AdminUserData } from '@/api';
 import {
+  AdminUserData,
   deleteAdminUser,
   getAdminUserList,
   PaginatedResponse,
   updateAdminUserRole,
   UpDateUserRole,
-  UserData,
-} from '@/api/adminApi';
+} from '@/api';
 
 export const useGetAdminUserList = (params: AdminUserData, enabled: boolean) =>
   useQuery<PaginatedResponse, Error>({
