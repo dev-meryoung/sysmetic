@@ -15,6 +15,7 @@ export const useGetAdminUserList = (params: AdminUserData, enabled: boolean) =>
     enabled: !!enabled,
   });
 
+//회원 등급 변경
 export const useUpdateAdminUserRole = () =>
   useMutation({
     mutationFn: (params: UpDateUserRole) => updateAdminUserRole(params),

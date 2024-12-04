@@ -34,7 +34,7 @@ export interface PaginatedResponse {
 
 export interface UpDateUserRole {
   memberId: number[];
-  hasManagerRights: boolean | undefined;
+  hasManagerRights: boolean;
 }
 
 // 회원 목록 조회 API

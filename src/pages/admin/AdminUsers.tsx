@@ -11,7 +11,11 @@ import Table from '@/components/Table';
 import TextInput from '@/components/TextInput';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
-import { useDeleteAdminUser, useGetAdminUserList } from '@/hooks/useAdminApi';
+import {
+  useDeleteAdminUser,
+  useGetAdminUserList,
+  useUpdateAdminUserRole,
+} from '@/hooks/useAdminApi';
 import useModalStore from '@/stores/useModalStore';
 import { useTableStore } from '@/stores/useTableStore';
 
@@ -39,8 +43,8 @@ const SearchOptions = [
 ];
 
 const GradeOptions = [
-  { label: '관리자 임명', value: 'setAdmin' },
-  { label: '관리자 해임', value: 'getAdmin' },
+  { label: '관리자 임명', value: 'setManager' },
+  { label: '관리자 해임', value: 'getManager' },
   { label: '탈퇴', value: 'resign' },
 ];
 
@@ -77,6 +81,7 @@ const AdminUsers = () => {
   const [curPage, setCurPage] = useState(0);
   const [fetch, setFetch] = useState(true);
   const [isDisabled, setIsDisabled] = useState(true);
+  const [hasManagerRights, setHasManagerRights] = useState(false);
   //모달
   const delConfirmModal = useModalStore();
   const [isDelConfirm, setIsDelConfirm] = useState(false);
@@ -118,7 +123,7 @@ const AdminUsers = () => {
 
   const handleGradeChange = (value: string) => {
     setSelectedGrade(value);
-    setCurPage(0);
+    // setCurPage(0);
     // 등급관련 함수 작성 예정
   };
 
@@ -139,10 +144,6 @@ const AdminUsers = () => {
   useEffect(() => {
     console.log(selectedFilter);
   }, [selectedFilter]);
-
-  useEffect(() => {
-    console.log(selectedGrade);
-  }, [selectedGrade]);
 
   const columns = [
     {
@@ -196,27 +197,54 @@ const AdminUsers = () => {
     toggleAllCheckboxes(0);
   };
 
-  // const { mutate: updateAdminUserRoleMutation } = useUpdateAdminUserRole();
+  // 회원 강제 탈퇴
   const { mutate: deleteAdminUser } = useDeleteAdminUser();
+  // 회원 등급 변경
+  const { mutate: updateAdminUserRoleMutation } = useUpdateAdminUserRole();
+
   const handleBtnClick = () => {
-    setIsDelConfirm(false);
-    delConfirmModal.openModal('del-confirm');
     //페이지 내 순번과 실제 유저의 no 순번을 일치
     const selectedUserIds = checkedItems.map((index) => users[index].no);
-    if (selectedGrade === 'resign' && isDelConfirm === true) {
-      deleteAdminUser(selectedUserIds, {
-        onSuccess: (data) => {
-          if (data?.code === 200) {
-            setFetch(true);
-            toggleAllCheckboxes(0);
-          }
-        },
-        onError: (error) => {
-          console.error('회원 탈퇴 중 오류 발생', error);
-        },
-      });
+
+    if (selectedGrade === 'resign') {
+      delConfirmModal.openModal('del-confirm');
+      if (isDelConfirm) {
+        deleteAdminUser(selectedUserIds, {
+          onSuccess: (data) => {
+            if (data?.code === 200) {
+              setFetch(true);
+              toggleAllCheckboxes(0);
+              setIsDelConfirm(false);
+            }
+          },
+          onError: (error) => {
+            console.error('회원 탈퇴 중 오류 발생', error);
+          },
+        });
+      }
     }
+    const params = {
+      memberId: selectedUserIds,
+      hasManagerRights,
+    };
+
+    updateAdminUserRoleMutation(params, {
+      onSuccess: (data) => {
+        if (data?.code === 200) {
+          setHasManagerRights(selectedGrade === 'setManager');
+        }
+        setFetch(true);
+        toggleAllCheckboxes(0);
+      },
+      onError: (error) => {
+        console.error('회원 등급 변경 중 오류 발생!', error);
+      },
+    });
   };
+
+  useEffect(() => {
+    console.log(selectedGrade);
+  }, [selectedGrade]);
 
   // 변경버튼 on/off
   useEffect(() => {
