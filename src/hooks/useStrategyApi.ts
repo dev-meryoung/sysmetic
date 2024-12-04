@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import {
   CreateFolderRequest,
   getUserFolderList,
@@ -109,7 +110,6 @@ export const useGetMethodAndStock = () => {
 
   return { data: undefined };
 };
-
 // 전략 등록
 export const useCreateStrategy = () =>
   useMutation({
@@ -189,9 +189,9 @@ export const useCreatFolder = () => {
 
 // 폴더명 중복 검사
 export const useCheckFolderAvailability = (folderName: string) =>
-  useMutation({
+  useMutation<any, Error, string>({
     mutationKey: ['checkFolderAvailability', folderName],
-    mutationFn: () => getAvailabilityFolder(folderName),
+    mutationFn: (name: string) => getAvailabilityFolder(name),
   });
 
 // 폴더명 수정
@@ -221,7 +221,26 @@ export const useDeleteFolder = () => {
 export const useInterestStrategy = (folderId: number, page: number) =>
   useQuery({
     queryKey: ['interestStrategy', folderId, page],
-    queryFn: () => getInterestStrategy(folderId, page),
+    queryFn: async () => {
+      try {
+        const response = await getInterestStrategy(folderId, page);
+        return response;
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          switch (error.response?.status) {
+            case 404:
+              throw new Error('해당 페이지에 관심 전략이 존재하지 않습니다.');
+            case 500:
+              throw new Error(
+                '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+              );
+            default:
+              throw new Error('알 수 없는 오류가 발생했습니다.');
+          }
+        }
+        throw error;
+      }
+    },
   });
 
 // 관심전략 조회 훅

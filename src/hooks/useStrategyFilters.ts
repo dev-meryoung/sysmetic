@@ -104,7 +104,6 @@ export const useStrategyFilters = () => {
 
   useEffect(
     () => () => {
-      setCurrentTab(0);
       resetFilters();
     },
     [resetFilters]

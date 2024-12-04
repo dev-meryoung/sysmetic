@@ -241,7 +241,7 @@ const StrategyFilter = ({
   useEffect(() => {
     if (!methodAndStockData) return;
 
-    const { methodList, stockList } = methodAndStockData?.data;
+    const { methodList, stockList } = methodAndStockData;
 
     if (!methodList?.length || !stockList?.length) {
       return;
