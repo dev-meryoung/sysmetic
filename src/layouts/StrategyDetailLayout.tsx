@@ -42,7 +42,7 @@ const StrategyDetailLayout = () => {
     ];
 
     navigate(pathArr[currentTab]);
-  }, [currentTab]);
+  }, [currentTab, navigate]);
 
   return (
     <div css={wrapperStyle}>

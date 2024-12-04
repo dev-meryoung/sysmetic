@@ -1,90 +1,136 @@
 import { useState } from 'react';
 import { css } from '@emotion/react';
-import { Link } from 'react-router-dom';
-import TagTest from '@/assets/images/test-tag.jpg';
+import { Link, useParams } from 'react-router-dom';
 import Pagination from '@/components/Pagination';
 import SelectBox from '@/components/SelectBox';
-import Table from '@/components/Table';
-import Tag from '@/components/Tag';
+import Table, { ColumnProps } from '@/components/Table';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
-import { FONT_WEIGHT } from '@/constants/font';
+import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
+import { PATH } from '@/constants/path';
+import {
+  useGetInquiryListUser,
+  useGetInquiryListTrader,
+} from '@/hooks/useCommonApi';
+import useAuthStore from '@/stores/useAuthStore';
 
 const POSTS_PER_PAGE = 10;
 
 interface QnaListDataProps {
-  questionName: string;
+  inquiryId: number;
+  inquiryTitle: string;
   strategyName: string;
-  date: string;
-  status: string;
+  inquiryRegistrationDate: string;
+  inquiryStatus: string;
+  methodIconPath: string;
 }
 
+const strategyOptions = [
+  { label: '최신순', value: 'registrationDate' },
+  { label: '전략명', value: 'strategyName' },
+];
+
+const statusOptions = [
+  { label: '전체', value: 'all' },
+  { label: '답변대기', value: 'unclosed' },
+  { label: '답변완료', value: 'closed' },
+];
+
+const statusMap: { [key: string]: string } = {
+  unclosed: '답변대기',
+  closed: '답변완료',
+};
+
 const QnaList = () => {
-  const [data] = useState<QnaListDataProps[]>([
-    {
-      questionName: '첫 번째 질문입니다.',
-      strategyName: '주식 성공하는 방법',
-      date: '2024.12.24',
-      status: '답변완료',
-    },
-  ]);
-
+  const { roleCode } = useAuthStore();
+  const [sortConfig, setSortConfig] = useState<string>('registrationDate');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState<number>(0);
+  const dateCustom = (isoDate: string): string => {
+    const dateObj = new Date(isoDate);
+    return `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, '0')}.${String(dateObj.getDate()).padStart(2, '0')}`;
+  };
 
-  const strategyOptions = [
-    { label: '최신순', value: '최신순' },
-    { label: '전략순', value: '전략순' },
-  ];
+  const { userId, inquiryId } = useParams<{
+    userId: string;
+    inquiryId: string;
+  }>();
 
-  const statusOptions = [
-    { label: '전체', value: '전체' },
-    { label: '답변대기', value: '답변대기' },
-    { label: '답변완료', value: '답변완료' },
-  ];
+  const parsedInquiryId = inquiryId ? Number(inquiryId) : 0;
 
-  const handleStrategyChange = () => {};
+  const params = {
+    userId,
+    sort: sortConfig,
+    closed: statusFilter === 'all' ? undefined : statusFilter,
+    page: currentPage,
+    qnaId: parsedInquiryId,
+  };
 
-  const handleStatusChange = () => {};
+  const userQuery = useGetInquiryListUser(params);
+  const traderQuery = useGetInquiryListTrader(params);
 
-  const totalPage = Math.ceil(data.length / POSTS_PER_PAGE);
+  const data =
+    roleCode === 'USER'
+      ? userQuery.data?.data?.content || []
+      : traderQuery.data?.data?.content || [];
 
-  const paginatedData = data.slice(
-    currentPage * POSTS_PER_PAGE,
-    (currentPage + 1) * POSTS_PER_PAGE
-  );
+  const total =
+    roleCode === 'USER'
+      ? userQuery.data?.data?.totalElement || 0
+      : traderQuery.data?.data?.totalElement || 0;
 
-  const columns = [
+  const totalPage = Math.ceil(total / POSTS_PER_PAGE);
+
+  const columns: ColumnProps<QnaListDataProps>[] = [
     {
-      key: 'questionName' as keyof QnaListDataProps,
+      key: 'inquiryTitle',
       header: '제목',
-      render: (value: string) => (
-        <div css={questionNameStyle}>
-          <Link to='/mypage/${userId}/qna/${qnaId}'>{value}</Link>
+      render: (value, item) => (
+        <div css={questionContainerStyle}>
+          <div css={questionTitleStyle}>
+            <Link
+              to={PATH.MYPAGE_QNA_DETAIL(
+                String(userId),
+                String(item.inquiryId)
+              )}
+              css={linkStyle}
+            >
+              {value}
+            </Link>
+          </div>
         </div>
       ),
     },
     {
-      key: 'strategyName' as keyof QnaListDataProps,
+      key: 'strategyName',
       header: '전략명',
-      render: (value: string) => (
+      render: (value, item) => (
         <div css={strategyStyle}>
-          <div>
-            <Tag src={TagTest} alt='tag' />
-            <Tag src={TagTest} alt='tag' />
-          </div>
+          {item.methodIconPath !== null &&
+            item.methodIconPath !== undefined && (
+              <span>
+                <img
+                  src={item.methodIconPath}
+                  alt='method icon'
+                  css={iconStyle}
+                />
+              </span>
+            )}
           <span>{value}</span>
         </div>
       ),
     },
+
     {
-      key: 'date' as keyof QnaListDataProps,
+      key: 'inquiryRegistrationDate',
       header: '전략일자',
+      render: (value) => <span>{dateCustom(String(value))}</span>,
     },
     {
-      key: 'status' as keyof QnaListDataProps,
+      key: 'inquiryStatus',
       header: '진행상태',
-      render: (value: string) => (
-        <span css={value === '답변완료' ? successStyle : waitingStyle}>
-          {value}
+      render: (value) => (
+        <span css={value === 'closed' ? successStyle : waitingStyle}>
+          {statusMap[value] || ''}
         </span>
       ),
     },
@@ -93,30 +139,39 @@ const QnaList = () => {
   return (
     <div css={wrapperStyle}>
       <div css={filterStyle}>
-        <div css={filerWrapperStyle}>
+        <div css={countStyle}>
+          <span>총</span>
+          <span>{total || 0}개</span>
+        </div>
+        <div css={filterWrapperStyle}>
           <SelectBox
             options={strategyOptions}
-            placeholder='정렬 기준'
-            handleChange={handleStrategyChange}
+            placeholder='정렬기준'
+            handleChange={(value) => setSortConfig(value)}
           />
-        </div>
-        <div css={filerWrapperStyle}>
           <SelectBox
             options={statusOptions}
-            placeholder='답변 상태'
-            handleChange={handleStatusChange}
+            placeholder='답변상태'
+            handleChange={(value) => setStatusFilter(value)}
           />
         </div>
       </div>
+
       <div css={tableWrapperStyle}>
-        <div css={tableStyle}>
-          <Table data={paginatedData} columns={columns} />
-        </div>
-        <Pagination
-          totalPage={totalPage}
-          currentPage={currentPage}
-          handlePageChange={(page) => setCurrentPage(page)}
-        />
+        {data && data.length > 0 ? (
+          <>
+            <div css={tableStyle}>
+              <Table data={data} columns={columns} />
+            </div>
+            <Pagination
+              totalPage={totalPage}
+              currentPage={currentPage}
+              handlePageChange={setCurrentPage}
+            />
+          </>
+        ) : (
+          <div css={noDataStyle}>문의가 없습니다.</div>
+        )}
       </div>
     </div>
   );
@@ -137,15 +192,15 @@ const wrapperStyle = css`
 
 const filterStyle = css`
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: flex-end;
   width: 100%;
   margin-bottom: 24px;
-  gap: 16px;
 `;
 
-const filerWrapperStyle = css`
-  position: relative;
+const filterWrapperStyle = css`
+  display: flex;
+  gap: 16px;
   align-items: center;
 `;
 
@@ -155,28 +210,60 @@ const successStyle = css`
 `;
 
 const waitingStyle = css`
-  color: ${COLOR.ERROR_RED};
+  color: ${COLOR.TEXT_BLACK};
   font-weight: ${FONT_WEIGHT.BOLD};
 `;
-const questionNameStyle = css`
-  a {
-    text-decoration: none;
-    font-weight: ${FONT_WEIGHT.BOLD};
-  }
-  a:active {
-    color: ${COLOR.TEXT_BLACK};
-  }
+
+const questionContainerStyle = css`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+`;
+
+const questionTitleStyle = css`
+  text-align: left;
+  width: 100%;
+`;
+
+const linkStyle = css`
+  margin-left: 24px;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: ${FONT_WEIGHT.BOLD};
+  color: ${COLOR.TEXT_BLACK};
 `;
 
 const strategyStyle = css`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 
-  > div {
+  div {
     display: flex;
     gap: 4px;
+  }
+`;
+
+const iconStyle = css`
+  width: 16px;
+  height: 16px;
+  object-fit: cover;
+`;
+
+const countStyle = css`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  font-size: ${FONT_SIZE.TITLE_XS};
+  gap: 4px;
+
+  span:first-child {
+    font-weight: ${FONT_WEIGHT.REGULAR};
+  }
+  span:last-child {
+    font-weight: ${FONT_WEIGHT.BOLD};
   }
 `;
 
@@ -188,14 +275,28 @@ const tableWrapperStyle = css`
 `;
 
 const tableStyle = css`
-  thead {
+  thead,
+  thead tr,
+  thead th {
     background-color: ${COLOR_OPACITY.PRIMARY100_OPACITY30};
     border-top: 1px solid ${COLOR.PRIMARY700};
     font-weight: ${FONT_WEIGHT.BOLD};
   }
+
+  td:first-child {
+    text-align: left;
+  }
+
   td {
-    padding: 40px 0;
+    padding: 20px 0;
     vertical-align: middle;
     text-align: center;
   }
+`;
+
+const noDataStyle = css`
+  text-align: center;
+  margin-top: 80px;
+  font-size: ${FONT_SIZE.TEXT_LG};
+  color: ${COLOR_OPACITY.BLACK_OPACITY50};
 `;

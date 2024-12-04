@@ -1,9 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
-import { useNavigate } from 'react-router-dom';
-import ProfileImageTest from '@/assets/images/test-profile.png';
-import TagTest from '@/assets/images/test-tag.jpg';
+import { useNavigate, useParams } from 'react-router-dom';
 import Button from '@/components/Button';
+import Modal from '@/components/Modal';
 import ProfileImage from '@/components/ProfileImage';
 import Tag from '@/components/Tag';
 import TextArea from '@/components/TextArea';
@@ -11,88 +10,151 @@ import TextInput from '@/components/TextInput';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+import {
+  useGetInquiryDetailTrader,
+  useCreateAnswer,
+} from '@/hooks/useCommonApi';
+import useAuthStore from '@/stores/useAuthStore';
+import useModalStore from '@/stores/useModalStore';
 
-type InputStateTypes = 'normal' | 'warn';
+const statusMap: { [key: string]: string } = {
+  closed: '답변완료',
+  unclosed: '답변대기',
+};
 
 const QnaAnswer = () => {
-  const [status, setStatus] = useState<InputStateTypes>('normal');
-  const [value, setValue] = useState('');
-  const [textValue, setTextValue] = useState('');
-
+  const [titleValue, setTitleValue] = useState('');
+  const [contentValue, setContentValue] = useState('');
+  const [status, setStatus] = useState<'normal' | 'warn'>('normal');
   const navigate = useNavigate();
+  const { openModal } = useModalStore();
+  const { roleCode } = useAuthStore();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    setValue(inputValue);
+  const { userId, qnaId } = useParams<{ userId: string; qnaId: string }>();
 
-    if (inputValue.length < 6) {
-      setStatus('warn');
-    } else {
-      setStatus('normal');
+  useEffect(() => {
+    if (roleCode !== 'TRADER') {
+      openModal('access-denied');
+      navigate(PATH.ROOT);
+    }
+  }, [roleCode, navigate, openModal]);
+
+  const { data: inquiryResponse, isError } = useGetInquiryDetailTrader({
+    qnaId: Number(qnaId),
+  });
+
+  if (isError) {
+    openModal('get-inquiry-error');
+  }
+
+  const inquiryData = inquiryResponse?.data || {};
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setTitleValue(value);
+    setStatus(value.trim() === '' ? 'warn' : 'normal');
+    if (e.target.value.length <= 100) {
+      setTitleValue(e.target.value);
     }
   };
 
-  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setTextValue(e.target.value);
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setContentValue(e.target.value);
+    if (e.target.value.length <= 1000) {
+      setContentValue(e.target.value);
+    }
   };
 
-  const handleBtn = () => {
-    navigate(PATH.MYPAGE_QNA_DETAIL());
+  const createAnswer = useCreateAnswer();
+  const handleSubmit = () => {
+    if (!titleValue.trim() || !contentValue.trim()) {
+      alert('제목과 내용을 입력해주세요.');
+      return;
+    }
+
+    createAnswer.mutate(
+      {
+        qnaId: Number(qnaId),
+        answerTitle: titleValue,
+        answerContent: contentValue,
+      },
+      {
+        onSuccess: () => {
+          navigate(PATH.MYPAGE_QNA_DETAIL(String(userId), String(qnaId)));
+        },
+        onError: () => {
+          openModal('create-confirm');
+        },
+      }
+    );
   };
+
+  const handleBack = () => {
+    navigate(PATH.MYPAGE_QNA_DETAIL(String(userId), String(qnaId)));
+  };
+
+  const isSubmitDisabled = !titleValue.trim() || !contentValue.trim();
 
   return (
     <div css={wrapperStyle}>
       <span css={pageInfoStyle}>답변하기</span>
-      <div className='question-section' css={titleWrapperStyle}>
-        <span css={titleStyle}>
-          미국발 경제악화가 한국 증시에 미치는 영향은 뭘까?
-        </span>
-        <span css={statusStyle}>답변대기</span>
-        <div css={infoStyle}>
-          <div css={dateAndWriterStyle}>
-            <div css={dateStyle}>
-              <span css={dateNameStyle}>작성일</span>
-              <span>2024.11.18</span>
-            </div>
-            <div css={writerStyle}>
-              <span css={writerNameStyle}>작성자</span>
-              <span>질문자이름</span>
+
+      {inquiryData && (
+        <div className='question-section' css={titleWrapperStyle}>
+          <span css={titleStyle}>{inquiryData.inquiryTitle}</span>
+          <span css={statusStyle}>
+            {statusMap[inquiryData?.inquiryStatus || '']}
+          </span>
+          <div css={infoStyle}>
+            <div css={dateAndWriterStyle}>
+              <div css={dateStyle}>
+                <span css={dateNameStyle}>작성일</span>
+                <span>{inquiryData.inquiryRegistrationDate}</span>
+              </div>
+              <div css={writerStyle}>
+                <span css={writerNameStyle}>작성자</span>
+                <span>{inquiryData.inquirerNickname}</span>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div css={strategyWrapperStyle}>
-        <div css={tagsAndTitleStyle}>
-          <div css={tagStyle}>
-            <Tag src={TagTest} alt='tag' />
+          <div css={strategyWrapperStyle}>
+            <div css={tagsAndTitleStyle}>
+              <div css={tagStyle}>
+                <Tag src='default-tag.png' alt='tag' />
+              </div>
+              <div css={strategyTextStyle}>{inquiryData.strategyName}</div>
+            </div>
+            <div css={profileStyle}>
+              <ProfileImage
+                src='default-profile.png'
+                alt='profileImg'
+                size='md'
+              />
+              <span css={nicknameStyle}>{inquiryData.traderNickname}</span>
+            </div>
           </div>
-          <div css={strategyTextStyle}>해당 전략명</div>
-        </div>
-        <div css={profileStyle}>
-          <ProfileImage src={ProfileImageTest} alt='profileImg' size='md' />
-          <span css={nicknameStyle}>닉네임</span>
-        </div>
-      </div>
 
-      <div css={inputStyle}>뭔가요?</div>
+          <div css={inputStyle}>{inquiryData.inquiryContent}</div>
+        </div>
+      )}
 
       <div className='comment-section' css={answerWrapperStyle}>
         <div css={answerNameStyle}>
           <TextInput
-            value={value}
+            value={titleValue}
             status={status}
             placeholder='제목을 입력해주세요.'
             fullWidth
-            handleChange={handleChange}
+            handleChange={handleTitleChange}
           />
         </div>
         <div css={answerStyle}>
           <TextArea
-            value={textValue}
+            value={contentValue}
             placeholder='내용을 입력해주세요.'
             fullWidth
-            handleChange={handleTextChange}
+            handleChange={handleContentChange}
           />
         </div>
       </div>
@@ -100,7 +162,7 @@ const QnaAnswer = () => {
       <div css={goDetailBtnStyle}>
         <Button
           label='이전'
-          handleClick={handleBtn}
+          handleClick={handleBack}
           color='primaryOpacity10'
           size='md'
           shape='square'
@@ -109,16 +171,44 @@ const QnaAnswer = () => {
         />
         <Button
           label='답변완료'
-          handleClick={handleBtn}
+          handleClick={handleSubmit}
           color='primary'
           size='md'
           shape='square'
           width={120}
+          disabled={isSubmitDisabled}
         />
       </div>
+
+      <Modal
+        id='get-inquiry-error'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>문의 내역 조회에 실패했습니다.</p>
+          </div>
+        }
+      />
+      <Modal
+        id='create-confirm'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>답변 등록에 실패했습니다.</p>
+          </div>
+        }
+      />
+      <Modal
+        id='access-denied'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>접근 권한이 없습니다.</p>
+          </div>
+        }
+      />
     </div>
   );
 };
+
+export default QnaAnswer;
 
 const wrapperStyle = css`
   padding-top: 96px;
@@ -140,7 +230,6 @@ const titleWrapperStyle = css`
   margin-top: 40px;
   width: 100%;
   padding: 16px;
-  background-color: ${COLOR.GRAY100};
   position: relative;
 `;
 
@@ -150,10 +239,10 @@ const titleStyle = css`
 `;
 
 const statusStyle = css`
-  position: absolute;
-  right: 16px;
+  display: flex;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(-100%);
+  transform: translateX(94%);
   font-size: ${FONT_SIZE.TEXT_MD};
   font-weight: ${FONT_WEIGHT.BOLD};
 `;
@@ -261,4 +350,17 @@ const goDetailBtnStyle = css`
   gap: 16px;
 `;
 
-export default QnaAnswer;
+const modalContentStyle = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+`;
+
+const modalTextStyle = css`
+  font-size: ${FONT_SIZE.TEXT_LG};
+  text-align: center;
+  margin-top: 32px;
+  margin-bottom: 24px;
+`;

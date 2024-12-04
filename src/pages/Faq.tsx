@@ -7,57 +7,27 @@ import TabButton from '@/components/TabButton';
 import TextInput from '@/components/TextInput';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
+import FaqList from '@/mocks/faq-list.json';
 
 const POSTS_PER_PAGE = 10;
 const tabs = ['회원가입', '투자자', '트레이더'];
-const data = [
-  {
-    id: 1,
-    question: 'Q1',
-    title: '회원가입은 어떻게 진행하나요?',
-    answer: '회원가입 페이지에서 진행하시면 됩니다.',
-    category: '회원가입',
-  },
-  {
-    id: 2,
-    question: 'Q2',
-    title: '비밀번호를 잊었어요.',
-    answer:
-      '1. 로그인 페이지로 이동하세요.\n2. "비밀번호 재설정"을 클릭하세요.\n3. 이메일을 확인 후 비밀번호를 재설정하세요.',
-    category: '회원가입',
-  },
-  {
-    id: 3,
-    question: 'Q1',
-    title: '투자자 질문',
-    answer: '답변',
-    category: '투자자',
-  },
-  {
-    id: 4,
-    question: 'Q1',
-    title: '트레이더 질문',
-    answer: '답변',
-    category: '트레이더',
-  },
-];
 
 const Faq: React.FC = () => {
   const [search, setSearch] = useState('');
-  const [openAnswer, setOpenAnswer] = useState<number | null>(null);
+  const [openAnswer, setOpenAnswer] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [currentTab, setCurrentTab] = useState(0);
-  const [filteredData, setFilteredData] = useState(data);
+  const [filteredData, setFilteredData] = useState(FaqList);
 
   const handleSearch = () => {
     const trimmedSearch = search.trim().toLowerCase();
     const result = trimmedSearch
-      ? data.filter(
+      ? FaqList.filter(
           (item) =>
             item.title.toLowerCase().includes(trimmedSearch) ||
             item.question.toLowerCase().includes(trimmedSearch)
         )
-      : data;
+      : FaqList;
 
     if (result.length > 0) {
       const firstCategory = result[0].category;
@@ -85,12 +55,14 @@ const Faq: React.FC = () => {
   useEffect(() => {
     if (!search.trim()) {
       setCurrentTab(0);
-      setFilteredData(data.filter((item) => item.category === tabs[0]));
+      setFilteredData(FaqList.filter((item) => item.category === tabs[0]));
     }
   }, [search]);
 
   useEffect(() => {
-    setFilteredData(data.filter((item) => item.category === tabs[currentTab]));
+    setFilteredData(
+      FaqList.filter((item) => item.category === tabs[currentTab])
+    );
   }, [currentTab]);
 
   const totalPage = Math.ceil(tabFilteredData.length / POSTS_PER_PAGE);
@@ -99,7 +71,7 @@ const Faq: React.FC = () => {
     (currentPage + 1) * POSTS_PER_PAGE
   );
 
-  const toggleOpen = (id: number) =>
+  const toggleOpen = (id: string) =>
     setOpenAnswer((prev) => (prev === id ? null : id));
 
   return (
