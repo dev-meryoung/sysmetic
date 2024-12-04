@@ -343,7 +343,7 @@ const MyInterestList = () => {
           });
         }
       },
-      onError: (error: Error, variables: string, context: unknown) => {
+      onError: (error: Error, _, __) => {
         if (axios.isAxiosError(error)) {
           if (error.response?.status === 409) {
             setFolderErrors({
