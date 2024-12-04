@@ -23,7 +23,7 @@ interface ChartDataProps {
   type?: ChartTypes[];
 }
 
-const dateFilter = ['1개월', '3개월', '6개월', '1년', 'YTD', 'ALL'];
+const dateFilter = ['1개월', '3개월', '6개월', '1년', 'ALL'];
 
 const Chart: React.FC<ChartDataProps> = ({
   chartData,
@@ -52,10 +52,6 @@ const Chart: React.FC<ChartDataProps> = ({
         break;
       case '1년':
         filterDate.setFullYear(today.getFullYear() - 1);
-        break;
-      case 'YTD': //올해의 1월 1일을 기준 날짜
-        filterDate.setMonth(0);
-        filterDate.setDate(1);
         break;
       default:
         return data;
@@ -130,15 +126,12 @@ const Chart: React.FC<ChartDataProps> = ({
       margin: 48,
     },
     xAxis: {
-      type: 'datetime',
-      allowDecimals: false,
-      labels: {
-        //TODO:현재는 년 단위 표시인데, 추후 월단위로 표시할수도 있음
-        format: '{value:%Y}',
+      type: 'datetime', // x축을 날짜/시간 기반으로 설정
+      title: {
+        text: 'Date',
       },
-      tickInterval: 365 * 24 * 3600 * 1000,
-      accessibility: {
-        rangeDescription: 'Range: 1940 to 2024.',
+      labels: {
+        format: '{value:%Y-%m-%d}', // 레이블을 '연도-월-일' 형식으로 표시
       },
     },
     yAxis: [
@@ -173,7 +166,7 @@ const Chart: React.FC<ChartDataProps> = ({
         name: name[0],
         type: type[0],
         data: filteredData.data1,
-        yAxis: 0, // 첫 번째 Y축 사용
+        yAxis: 0,
         color:
           type === 'line'
             ? `${COLOR.POINT400}`

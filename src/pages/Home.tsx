@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { css } from '@emotion/react';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { useNavigate } from 'react-router-dom';
@@ -9,20 +10,47 @@ import VerticalCarousel from '@/components/VerticalCarousel';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
-import { useGetMainPage } from '@/hooks/useCommonApi';
+import { useGetMainPage, useGetMainPageChart } from '@/hooks/useCommonApi';
 import useCountMotion from '@/hooks/useCountMotion';
 import Footer from '@/layouts/Footer';
 import Header from '@/layouts/Header';
-import chartData from '@/mocks/chart.json';
+
+interface ChartData {
+  chartData: {
+    data1: [number, number][];
+    data2: [number, number][];
+  };
+  xAxisData: string[];
+}
 
 const Home = () => {
   const navigate = useNavigate();
+  const period = 'ALL'; // 원하는 기간
 
   const { data: mainData } = useGetMainPage();
+  const { data: mainPageChartData } = useGetMainPageChart(period);
 
-  const parsedChartData = chartData as {
-    data1: [number, number][];
-    data2: [number, number][];
+  const averageStandardAmount = mainPageChartData?.data?.averageStandardAmount;
+  const accumProfitLossRate = mainPageChartData?.data?.accumProfitLossRate;
+  const test = mainPageChartData?.data?.xaxis;
+  console.log(averageStandardAmount?.length, 'averageStandardAmount 길이');
+  console.log(accumProfitLossRate?.length, 'accumProfitLossRate 길이');
+  console.log(test?.length, 'x축 길이');
+
+  const timestampXaxis = mainPageChartData?.data?.xaxis?.map((dateStr) => {
+    const date = new Date(dateStr);
+    return date.getTime(); // 밀리초 단위의 타임스탬프 반환
+  });
+
+  const chartData = {
+    data1: averageStandardAmount?.map((value, index) => [
+      timestampXaxis?.[index],
+      value,
+    ]),
+    data2: accumProfitLossRate?.map((value, index) => [
+      timestampXaxis?.[index],
+      value,
+    ]),
   };
 
   const animatedValue1 = useCountMotion({
@@ -171,7 +199,7 @@ const Home = () => {
                 평균을 확인할 수 있습니다.
               </span>
               <Chart
-                chartData={parsedChartData}
+                chartData={chartData} // 기본값 처리
                 name={[
                   'Sysmetic Traders 통합기준가',
                   'SM Score 1위: ETF레버리지/인버스',

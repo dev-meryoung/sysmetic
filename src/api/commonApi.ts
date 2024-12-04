@@ -14,4 +14,8 @@ export const getMainPage = async () => {
 };
 
 // 메인페이지 차트 정보 조회 API
-export const getMainPageChart = async () => {};
+export const getMainPageChart = async () => {
+  const response = await axiosInstance.get('/v1/main/analysis');
+
+  return response.data;
+};

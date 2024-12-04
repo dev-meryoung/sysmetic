@@ -34,4 +34,9 @@ export const useGetMainPage = () =>
     queryFn: () => getMainPage(),
   });
 
-export const useGetMainPageChart = () => {};
+// 메인페이지 차트 정보 조회
+export const useGetMainPageChart = (period: string) =>
+  useQuery({
+    queryKey: ['mainChart', period],
+    queryFn: () => getMainPageChart(),
+  });
