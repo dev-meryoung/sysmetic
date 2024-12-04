@@ -1,5 +1,23 @@
 import axiosInstance from '@/api/axiosInstance';
 
+export interface StocksPaginatedResponse {
+  currentPage: number;
+  pageSize: number;
+  totalElement: number;
+  totalPages: number;
+  content: StocksData[];
+}
+
+export interface StocksData {
+  id: number;
+  name: string;
+  filePath: string;
+}
+
+export interface StocksParameterProps {
+  page: number;
+}
+
 // 회원 목록 조회 API
 export const getAdminUserList = async () => {};
 
@@ -54,4 +72,13 @@ export const rejectAdminStrategy = async (rejectData: {
   );
 
   return response.data;
+};
+
+// 종목 목록 API
+export const getAdminStocks = async (params: StocksParameterProps) => {
+  const response = await axiosInstance.get(
+    `/v1/admin/stocklist/${params.page}`
+  );
+
+  return response.data.data;
 };

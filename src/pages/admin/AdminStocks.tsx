@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { SetStateAction, useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
-import TagTest from '@/assets/images/test-tag.jpg';
+import { StocksParameterProps } from '@/api';
 import Button from '@/components/Button';
 import IconButton from '@/components/IconButton';
 import Modal from '@/components/Modal';
@@ -11,20 +11,21 @@ import Tag from '@/components/Tag';
 import TextInput from '@/components/TextInput';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
-import adminStocks from '@/mocks/adminStocks.json';
+import { useGetAdminStocks } from '@/hooks/useAdminApi';
 import useModalStore from '@/stores/useModalStore';
 import { useTableStore } from '@/stores/useTableStore';
 
 interface AdminStocksDataProps {
   no: number;
   stocksName: string;
+  filePath: string;
 }
 
 interface DelModalProps {
   toggleAllCheckBoxes: (value: number) => void;
 }
 
-const PAGE_SIZE = 10;
+// const PAGE_SIZE = 10;
 
 const DelModal: React.FC<DelModalProps> = ({ toggleAllCheckBoxes }) => {
   const delModal = useModalStore();
@@ -185,7 +186,6 @@ const ModModal = () => {
 const AdminStocks = () => {
   //테이블 관련
   const [curPage, setCurPage] = useState(0);
-  const [data, setData] = useState<AdminStocksDataProps[]>([]);
   const columns = [
     {
       key: 'no' as keyof AdminStocksDataProps,
@@ -196,14 +196,13 @@ const AdminStocks = () => {
       header: '종목명',
     },
     {
-      key: 'icon' as keyof AdminStocksDataProps,
+      key: 'filePath' as keyof AdminStocksDataProps,
       header: '아이콘',
       render: (value: string | number) => (
         <div css={tagStyle}>
           <div>
-            <Tag src={TagTest} alt='tag' />
+            <Tag src={value as string} alt='tag' />
           </div>
-          {value}
         </div>
       ),
     },
@@ -223,14 +222,6 @@ const AdminStocks = () => {
       ),
     },
   ];
-  //페이지네이션 관련
-  const [totalPage, setTotalPage] = useState(0);
-  const getPaginatedData = (page: number) => {
-    const startIndex = page * PAGE_SIZE;
-    const endIndex = startIndex + PAGE_SIZE;
-    return data.slice(startIndex, endIndex);
-  };
-  const paginatedData = getPaginatedData(curPage);
 
   //체크박스 관련
   const checkedItems = useTableStore((state) => state.checkedItems);
@@ -243,6 +234,23 @@ const AdminStocks = () => {
   const delModal = useModalStore();
   const addModal = useModalStore();
   const modModal = useModalStore();
+
+  //데이터 관련
+  const [fetch, setFetch] = useState(true);
+  const params: StocksParameterProps = {
+    page: curPage,
+  };
+
+  const { data, refetch } = useGetAdminStocks(params, fetch);
+  const totalPage = data?.totalPages || 0;
+  const totalElement = data?.totalElement || 0;
+
+  const stocks: AdminStocksDataProps[] =
+    data?.content?.map((stock) => ({
+      no: stock.id,
+      stocksName: stock.name,
+      filePath: stock.filePath,
+    })) || [];
 
   const openDeleteModal = () => {
     if (checkedItems.length > 0) {
@@ -258,24 +266,23 @@ const AdminStocks = () => {
     modModal.openModal('modify', 648);
   };
 
-  useEffect(() => {
-    // 순서를 기준으로
-    const sortedData = [...adminStocks].sort((a, b) => b.no - a.no);
-    const arrangedData = sortedData.map((item, index) => ({
-      ...item,
-      no: index + 1,
-    }));
-    setData(arrangedData);
+  const handlePaginationClick = (value: SetStateAction<number>) => {
+    setCurPage(value);
+    setFetch(true);
+  };
 
-    const pages = Math.ceil(arrangedData.length / PAGE_SIZE);
-    setTotalPage(pages);
-  }, []);
+  useEffect(() => {
+    if (fetch) {
+      refetch();
+      setFetch(false);
+    }
+  }, [fetch, refetch]);
 
   return (
     <div css={stocksWrapperStyle}>
       <div css={stocksInfoStyle}>
         <p>
-          총 <span>5개</span>의 종목이 있습니다.
+          총 <span>{totalElement}개</span>의 종목이 있습니다.
         </p>
         <div className='manage-btn'>
           <Button width={80} label='등록' handleClick={openAddModal} />
@@ -289,21 +296,19 @@ const AdminStocks = () => {
       </div>
       <div css={stocksTableStyle}>
         <Table
-          data={paginatedData}
+          data={stocks}
           columns={columns}
           hasCheckbox={true}
           checkedItems={checkedItems}
           handleCheckboxChange={toggleCheckbox}
-          handleHeaderCheckboxChange={() =>
-            toggleAllCheckboxes(paginatedData.length)
-          }
+          handleHeaderCheckboxChange={() => toggleAllCheckboxes(stocks.length)}
         />
       </div>
       <div css={stocksPaginationStyle}>
         <Pagination
           totalPage={totalPage}
           currentPage={curPage}
-          handlePageChange={setCurPage}
+          handlePageChange={handlePaginationClick}
         />
       </div>
       <Modal

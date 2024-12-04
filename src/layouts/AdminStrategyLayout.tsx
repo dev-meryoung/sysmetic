@@ -31,8 +31,11 @@ const AdminStrategyLayout = () => {
       case PATH.ADMIN_METHODS:
         setExplanation('매매방식을 관리하는 페이지입니다.');
         break;
-      default:
+      case PATH.ADMIN_STOCKS:
         setExplanation('종목을 관리하는 페이지입니다.');
+        break;
+      default:
+        setExplanation('');
     }
   }, [path]);
 
