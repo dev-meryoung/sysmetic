@@ -13,6 +13,7 @@ interface SelectBoxProps {
   width?: number;
   placeholder?: string;
   color?: SelectColorTypes;
+  value?: string;
   options: SelectOptionProps[];
   handleChange: (value: string) => void;
 }
@@ -22,6 +23,7 @@ const SelectBox: React.FC<SelectBoxProps> = ({
   options,
   color,
   placeholder = '선택하세요.',
+  value,
   handleChange,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -50,6 +52,13 @@ const SelectBox: React.FC<SelectBoxProps> = ({
     setIsOpen(false);
     handleChange?.(option.value);
   };
+
+  useEffect(() => {
+    const selectedOption = options.find((option) => option.value === value);
+    if (selectedOption) {
+      setIsSelected(selectedOption.label);
+    }
+  }, [value, options]);
 
   return (
     <div
