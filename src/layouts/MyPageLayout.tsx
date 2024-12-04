@@ -1,24 +1,31 @@
 import { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation, useParams } from 'react-router-dom';
 import TabButton from '@/components/TabButton';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+import useAuthStore from '@/stores/useAuthStore';
 
 const MyPageLayout = () => {
   const [tab, setTab] = useState<number>(0);
   const navigate = useNavigate();
   const location = useLocation();
+  const { userId: paramUserId } = useParams<{ userId: string }>();
+  const { memberId } = useAuthStore();
+  const userId =
+    paramUserId && !isNaN(Number(paramUserId)) ? Number(paramUserId) : memberId;
 
   useEffect(() => {
     if (location.pathname === PATH.MYPAGE) {
       setTab(0);
-    } else if (location.pathname.startsWith(PATH.MYPAGE_PROFILE())) {
+    } else if (
+      location.pathname.startsWith(PATH.MYPAGE_PROFILE(String(userId)))
+    ) {
       setTab(1);
-    } else if (location.pathname.startsWith(PATH.MYPAGE_QNA())) {
+    } else if (location.pathname.startsWith(PATH.MYPAGE_QNA(String(userId)))) {
       setTab(2);
     }
-  }, [location.pathname]);
+  }, [location.pathname, userId]);
 
   const handleTabChange: React.Dispatch<React.SetStateAction<number>> = (
     index
@@ -30,10 +37,10 @@ const MyPageLayout = () => {
         navigate(PATH.MYPAGE);
         break;
       case 1:
-        navigate(PATH.MYPAGE_PROFILE());
+        navigate(PATH.MYPAGE_PROFILE(String(userId)));
         break;
       case 2:
-        navigate(PATH.MYPAGE_QNA());
+        navigate(PATH.MYPAGE_QNA(String(userId)));
         break;
       default:
         break;
@@ -43,11 +50,11 @@ const MyPageLayout = () => {
   const discriptionTab = () => {
     switch (tab) {
       case 0:
-        return '내 투자 전략 목록 확인!';
+        return '내 관심전략 목록입니다.';
       case 1:
-        return '내 정보 확인!';
+        return '내 정보페이지입니다.';
       case 2:
-        return '상담문의 목록 확인!';
+        return '내 상담문의 목록입니다.';
       default:
         return '';
     }

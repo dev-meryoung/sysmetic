@@ -1,202 +1,683 @@
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { css } from '@emotion/react';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  useQueryClient,
+} from '@tanstack/react-query';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
+import Loading from '@/components/Loading';
+import Modal from '@/components/Modal';
 import Pagination from '@/components/Pagination';
-import Table from '@/components/Table';
+import ProfileImage from '@/components/ProfileImage';
+import Table, { ColumnProps } from '@/components/Table';
+import Tag from '@/components/Tag';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
-import { FONT_WEIGHT } from '@/constants/font';
+import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
-import strategyData from '@/mocks/strategies.json';
+import {
+  useCheckFolderAvailability,
+  useCreatFolder,
+  useDeleteFolder,
+  useDeleteInterestStrategy,
+  useGetUserFolderList,
+  useInterestStrategy,
+  useUpdateFolderName,
+} from '@/hooks/useStrategyApi';
+import useModalStore from '@/stores/useModalStore';
 import { useTableStore } from '@/stores/useTableStore';
-
-const PAGE_SIZE = 5;
 
 interface MyInterestListDataProps {
   ranking?: number;
-  traderNickname: string;
-  strategyId: number;
-  methodId: number;
-  cycle: string;
+  id: number;
   strategyName: string;
-  mdd: number;
-  smScore: number;
-  accumProfitLossRate: number;
+  traderId: number;
+  traderName: string;
+  traderProfileImage: string;
+  methodId: number;
+  methodIconPath: string;
+  stockIconPath: string | null;
+  cycle: string;
+  stockList: {
+    stockIds: number[];
+    stockNames: string[];
+    stockIconPath?: string[];
+  };
   followerCount: number;
+  accumulatedProfitRatio: number;
+  smscore: number;
+  mdd: number;
+  actions?: ReactNode;
 }
 
 interface FolderProps {
-  id: number;
+  id: number | string;
   name: string;
-  items: MyInterestListDataProps[];
+  isEmpty: boolean;
+  strategies: MyInterestListDataProps[];
 }
+
+const PAGE_SIZE = 10;
+
+const CheckModalContent = () => (
+  <div css={checkModalStyle}>내관심전략에서 삭제할 전략을 선택해주세요.</div>
+);
+
+const DeleteFolderModalContent = ({ folderId }: { folderId: number }) => {
+  const { closeModal } = useModalStore();
+  const [errorMessage, setErrorMessage] = useState<string | null>('');
+
+  const deleteFolderMutation = useDeleteFolder();
+  const { refetch: refetchFolders } = useGetUserFolderList();
+
+  const handleFolderDelete = () => {
+    deleteFolderMutation.mutate(folderId, {
+      onSuccess: () => {
+        setErrorMessage('');
+        refetchFolders();
+        closeModal('folder-delete-modal');
+      },
+      onError: (error) => {
+        setErrorMessage(`${error.message}`);
+      },
+    });
+  };
+
+  return (
+    <div css={modalStyle}>
+      폴더를 삭제하면 <br />
+      해당 관심전략도 모두 삭제됩니다.
+      <br /> 삭제하시겠습니까?
+      {errorMessage && <span className='delete-error-msg'>{errorMessage}</span>}
+      <div className='btn-area'>
+        <Button
+          label='취소'
+          border={true}
+          width={120}
+          handleClick={() => closeModal('folder-delete-modal')}
+        />
+        <Button label='삭제하기' width={120} handleClick={handleFolderDelete} />
+      </div>
+    </div>
+  );
+};
+
+const DeleteSingleStrategyModalContent = ({
+  singleStrategy,
+  refetchStrategies,
+}: {
+  singleStrategy: number;
+  refetchStrategies: (
+    options?: RefetchOptions
+  ) => Promise<QueryObserverResult<any, Error>>;
+}) => {
+  const { closeModal } = useModalStore();
+  const deleteSingleStrategyMutation = useDeleteInterestStrategy();
+
+  const handleSingleStrategyDelete = () => {
+    deleteSingleStrategyMutation.mutate(
+      { strategyId: [singleStrategy] },
+      {
+        onSuccess: () => {
+          closeModal('delete-single-strategy-modal');
+          refetchStrategies();
+        },
+        onError: (error) => {
+          alert(`삭제에 실패했습니다: ${error.message}`);
+        },
+      }
+    );
+  };
+
+  return (
+    <div css={modalStyle}>
+      해당전략을 삭제하시겠습니까?
+      <div className='btn-area'>
+        <Button
+          label='아니오'
+          border={true}
+          width={120}
+          handleClick={() => closeModal('delete-single-strategy-modal')}
+        />
+        <Button
+          label='예'
+          width={120}
+          handleClick={handleSingleStrategyDelete}
+        />
+      </div>
+    </div>
+  );
+};
+
+const DeleteStrategyModalContent = ({
+  strategyIds,
+  refetchStrategies,
+}: {
+  strategyIds: number[];
+  refetchStrategies: (
+    options?: RefetchOptions
+  ) => Promise<QueryObserverResult<any, Error>>;
+}) => {
+  const { closeModal } = useModalStore();
+  const { toggleAllCheckboxes } = useTableStore();
+
+  const { mutate: deleteStrategyMutation } = useDeleteInterestStrategy();
+
+  const handleStrategyDelete = () => {
+    deleteStrategyMutation(
+      { strategyId: strategyIds },
+      {
+        onSuccess: async () => {
+          refetchStrategies();
+          toggleAllCheckboxes(0);
+          closeModal('delete-strategy-modal');
+        },
+        onError: (error) => {
+          console.error('Strategy deletion failed:', error);
+          alert(`삭제에 실패했습니다: ${error.message}`);
+        },
+      }
+    );
+  };
+
+  return (
+    <div css={modalStyle}>
+      {strategyIds?.length}개의 전략을 삭제하시겠습니까?
+      <div className='btn-area'>
+        <Button
+          label='아니오'
+          border={true}
+          width={120}
+          handleClick={() => closeModal('delete-strategy-modal')}
+        />
+        <Button label='예' width={120} handleClick={handleStrategyDelete} />
+      </div>
+    </div>
+  );
+};
 
 const MyInterestList = () => {
   const navigate = useNavigate();
-  const [data, setData] = useState<MyInterestListDataProps[]>([]);
+  const queryClient = useQueryClient();
+  const deleteModal = useModalStore();
+  const deleteSingleInterestModal = useModalStore();
+  const deleteInterestModal = useModalStore();
+  const checkModal = useModalStore();
+
+  const [folders, setFolders] = useState<FolderProps[]>([]);
+  const [isEditingMode, setIsEditingMode] = useState(false);
+  const [deletingFolderId, setDeletingFolderId] = useState<number | string>(0);
+  const [tempFolderName, setTempFolderName] = useState<string>('');
+  const [folderErrors, setFolderErrors] = useState<Record<string, string>>({});
+  const [editingFolderId, setEditingFolderId] = useState<
+    string | number | null
+  >(null);
+
+  const [tableData, setTableData] = useState<MyInterestListDataProps[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPage, setTotalPage] = useState(0);
-
-  const [folders, setFolders] = useState<FolderProps[]>([
-    { id: 1, name: '기본폴더 삭제 X', items: [] },
-    { id: 2, name: '폴더 1', items: [] },
-    { id: 2, name: '폴더 2', items: [] },
-    { id: 2, name: '폴더 3', items: [] },
-    { id: 2, name: '폴더 4', items: [] },
-  ]);
-
-  const [selectedFolderName, setSelectedFolderName] = useState<string>(
-    `${folders[0].name}`
-  );
-
+  const [totalElement, setTotalElement] = useState(0);
   const checkedItems = useTableStore((state) => state.checkedItems);
   const toggleCheckbox = useTableStore((state) => state.toggleCheckbox);
   const toggleAllCheckboxes = useTableStore(
     (state) => state.toggleAllCheckboxes
   );
 
-  const getPaginatedData = (page: number) => {
-    const startIndex = page * PAGE_SIZE;
-    const endIndex = startIndex + PAGE_SIZE;
-    return data.slice(startIndex, endIndex);
+  const [isSelectedFolder, setIsSelectedFolder] = useState<{
+    folderName: string;
+    folderId: string | number;
+    isEmpty: boolean;
+  }>({
+    folderName: '',
+    folderId: 1,
+    isEmpty: false,
+  });
+
+  const { data: folderListData } = useGetUserFolderList();
+  const { mutate: createFolderMutation } = useCreatFolder();
+  const { mutate: updateFolderNameMutation } = useUpdateFolderName();
+  const { mutate: checkFolderMutation } =
+    useCheckFolderAvailability(tempFolderName);
+
+  const {
+    data: strategyData,
+    refetch: refetchStrategies,
+    isLoading: strategyisLoading,
+  } = useInterestStrategy(
+    typeof isSelectedFolder.folderId === 'string'
+      ? parseInt(isSelectedFolder.folderId, 10)
+      : isSelectedFolder.folderId,
+    currentPage
+  );
+
+  const handleFolderClick = (folder: FolderProps) => {
+    if (!isEditingMode && folder.name !== '') {
+      setIsSelectedFolder({
+        folderName: folder.name,
+        folderId: folder.id,
+        isEmpty: folder.isEmpty,
+      });
+    }
   };
 
-  const paginatedData = getPaginatedData(currentPage);
+  const handleStartEditing = (folder: FolderProps) => {
+    if (!isEditingMode) return;
+
+    setEditingFolderId(folder.id);
+    setTempFolderName(folder.name);
+  };
+
+  const handleSaveFolder = () => {
+    const errorKey = String(editingFolderId);
+    setFolderErrors({});
+
+    if (tempFolderName.length < 3 || tempFolderName.length > 20) {
+      setFolderErrors({
+        [errorKey]: '폴더명은 3-20자로 입력해주세요',
+      });
+      return;
+    }
+
+    checkFolderMutation(tempFolderName, {
+      onSuccess: (data) => {
+        if (data?.code === 200) {
+          const isNewFolder = String(editingFolderId).startsWith('empty-');
+
+          if (isNewFolder) {
+            createFolderMutation(
+              { name: tempFolderName, checkDupl: true },
+              {
+                onSuccess: () => {
+                  queryClient
+                    .invalidateQueries({ queryKey: ['userFolderList'] })
+                    .then(() => {
+                      setFolders((prev) =>
+                        prev.map((folder) =>
+                          folder.id === editingFolderId
+                            ? { ...folder, isEmpty: false }
+                            : folder
+                        )
+                      );
+                      setEditingFolderId(null);
+                      setTempFolderName('');
+                    });
+                },
+                onError: (error) => {
+                  setFolderErrors({
+                    [errorKey]: `${error.message}`,
+                  });
+                },
+              }
+            );
+          } else {
+            updateFolderNameMutation(
+              {
+                folderId: editingFolderId as number,
+                folderName: tempFolderName,
+                checkDupl: true,
+              },
+              {
+                onSuccess: () => {
+                  queryClient
+                    .invalidateQueries({ queryKey: ['folderList'] })
+                    .then(() => {
+                      queryClient.refetchQueries({ queryKey: ['folderList'] });
+                      setEditingFolderId(null);
+                      setTempFolderName('');
+                    });
+                },
+                onError: () => {
+                  setFolderErrors({
+                    [errorKey]: '폴더 수정에 실패했습니다',
+                  });
+                },
+              }
+            );
+          }
+        } else if (data?.code === 409) {
+          setFolderErrors({
+            [errorKey]: '이미 존재하는 폴더명입니다',
+          });
+        }
+      },
+      onError: (error: Error, variables: string, context: unknown) => {
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 409) {
+            setFolderErrors({
+              [errorKey]: '이미 존재하는 폴더명입니다',
+            });
+          } else {
+            setFolderErrors({
+              [errorKey]: '폴더 중복 검사 중 오류가 발생했습니다',
+            });
+          }
+        } else {
+          setFolderErrors({
+            [errorKey]: '알 수 없는 오류가 발생했습니다',
+          });
+        }
+      },
+    });
+  };
+
+  const getSelectedStrategyIds = () => {
+    const selectedStrategyIds = checkedItems
+      .map((index) => tableData[index]?.id)
+      .filter((id) => id !== undefined);
+
+    return selectedStrategyIds;
+  };
+
+  const strategyIds = getSelectedStrategyIds();
+
+  const handleDeleteInterestStrategy = () => {
+    if (checkedItems?.length > 0) {
+      deleteInterestModal.openModal('delete-strategy-modal', 336);
+    } else {
+      checkModal.openModal('check-modal', 336);
+    }
+  };
+
+  const [singleStrategy, setSingleStrategy] = useState(0);
+
+  const handleDeleteSingleInterestStrategy = (id: number) => {
+    setSingleStrategy(id);
+    deleteSingleInterestModal.openModal('delete-single-strategy-modal', 336);
+  };
+
+  const handleDeleteButtonClick = (folderId: number | string) => {
+    setDeletingFolderId(folderId);
+    deleteModal.openModal('folder-delete-modal', 360);
+  };
 
   useEffect(() => {
-    const sortedData = [...strategyData].sort(
-      (a, b) => b.accumProfitLossRate - a.accumProfitLossRate
-    );
-    const rankedData = sortedData.map((item, index) => ({
-      ...item,
-      ranking: index + 1,
-    }));
-    setData(rankedData);
+    if (!isEditingMode) {
+      setFolderErrors({});
+      setTempFolderName('');
+    }
+  }, [isEditingMode]);
 
-    const pages = Math.ceil(rankedData.length / PAGE_SIZE);
-    setTotalPage(pages);
-    setFolders([
-      { id: 1, name: '기본폴더 삭제 X', items: [] },
-      { id: 2, name: '폴더 1', items: [] },
-      { id: 2, name: '폴더 2', items: [] },
-      { id: 2, name: '폴더 3', items: [] },
-      { id: 2, name: '폴더 4', items: [] },
-    ]);
-  }, []);
+  useEffect(() => {
+    if (folderListData?.data) {
+      const fetchedFolders = folderListData.data;
+      const emptyFolders = Array.from(
+        { length: 5 - fetchedFolders.length },
+        (_, i) => ({
+          id: `empty-${fetchedFolders.length + i}`,
+          name: '',
+          isEmpty: true,
+          strategies: [],
+        })
+      );
 
-  const columns = [
+      const allFolders = [...fetchedFolders, ...emptyFolders];
+      setFolders(allFolders);
+    }
+  }, [folderListData]);
+
+  useEffect(() => {
+    if (strategyData?.data) {
+      setTableData(strategyData.data.content || []);
+      setTotalPage(strategyData.data.totalPages || 0);
+      setTotalElement(strategyData.data.totalElement || 0);
+    } else {
+      setTableData([]);
+      refetchStrategies();
+    }
+  }, [strategyData, isSelectedFolder, refetchStrategies]);
+
+  const columns: ColumnProps<MyInterestListDataProps>[] = [
     {
-      //기본: 누적수익율순 정력
-      key: 'index' as keyof MyInterestListDataProps,
+      key: 'ranking',
       header: '순서',
-      render: (_: unknown, item: MyInterestListDataProps) => item.ranking,
+      render: (_, __, rowIndex: number) =>
+        rowIndex + 1 + currentPage * PAGE_SIZE,
     },
     {
-      key: 'traderNickname' as keyof MyInterestListDataProps,
+      key: 'traderName',
       header: '트레이더',
+      render: (_, item) => (
+        <div css={traderStyle}>
+          <ProfileImage src={item.traderProfileImage} />
+          {item.traderName}
+        </div>
+      ),
     },
     {
-      key: 'strategyName' as keyof MyInterestListDataProps,
+      key: 'strategyName',
       header: '전략명',
+      render: (_, item) => (
+        <div css={tagStyle}>
+          <div className='tag'>
+            <Tag src={item?.methodIconPath || ''} alt='tag' />
+            {item?.stockList?.stockIconPath &&
+              item?.stockList?.stockIconPath.map(
+                (stock: string, index: number) => (
+                  <Tag key={index} src={stock} alt='tag' />
+                )
+              )}
+          </div>
+          <span>{item.strategyName}</span>
+        </div>
+      ),
     },
     {
-      key: 'accumProfitLossRate' as keyof MyInterestListDataProps,
-      header: '누적 수익률 (%)',
-      sortable: true,
+      key: 'accumulatedProfitRatio',
+      header: '누적 손익률',
+      render: (_, item) => <span>{item.accumulatedProfitRatio}</span>,
     },
     {
-      key: 'mdd' as keyof MyInterestListDataProps,
+      key: 'mdd',
       header: 'MDD',
-      sortable: true,
     },
     {
-      key: 'smScore' as keyof MyInterestListDataProps,
+      key: 'smscore',
       header: 'SM Score',
-      sortable: true,
     },
     {
-      key: 'strategy' as keyof MyInterestListDataProps,
+      key: 'actions',
       header: '상태',
-      render: () => (
+      render: (_, item) => (
         <div css={buttonStyle}>
           <Button
-            label='관심 등록'
+            label='관심 취소'
             shape='round'
             size='xs'
             color='point'
             width={80}
-            handleClick={() => {}}
+            handleClick={() => handleDeleteSingleInterestStrategy(item.id)}
           />
           <Button
             label='상세보기'
             shape='round'
             size='xs'
             width={80}
-            handleClick={() => {
-              navigate(PATH.STRATEGIES_DETAIL());
-            }}
+            handleClick={() =>
+              navigate(PATH.STRATEGIES_DETAIL(String(item.id)))
+            }
           />
         </div>
       ),
     },
   ];
 
-  const handleFolderClick = (folderName: string) => {
-    setSelectedFolderName(folderName);
-  };
-
   return (
     <div css={interestListWrapperStyle}>
       <section className='folder'>
-        <Button label='폴더편집' width={80} handleClick={() => {}} />
+        <Button
+          label={isEditingMode ? ' 편집완료' : '폴더편집'}
+          width={80}
+          handleClick={() => {
+            setIsEditingMode((prev) => !prev);
+          }}
+        />
         <section css={folderWrapper}>
           {folders.map((folder) => (
-            <button
-              key={folder.id}
-              className='folder'
-              onClick={() => {
-                handleFolderClick(folder.name);
-              }}
-            >
-              <span>{folder.name}</span>
-            </button>
+            <section css={folderBtnWrapperStyle} key={folder.id}>
+              {isEditingMode && (
+                <div css={buttonWrapperStyle}>
+                  {editingFolderId === folder.id ? (
+                    <Button
+                      label='완료'
+                      shape='none'
+                      size='xxs'
+                      handleClick={() => {
+                        handleSaveFolder();
+                      }}
+                    />
+                  ) : folder.name === '' ? (
+                    <></>
+                  ) : (
+                    <>
+                      <Button
+                        label='수정'
+                        shape='none'
+                        size='xxs'
+                        handleClick={() => handleStartEditing(folder)}
+                      />
+                      <span></span>
+                      <Button
+                        label='삭제'
+                        shape='none'
+                        size='xxs'
+                        handleClick={() => handleDeleteButtonClick(folder.id)}
+                      />
+                    </>
+                  )}
+                </div>
+              )}
+              <div
+                css={folderBtnStyle(
+                  folder.isEmpty,
+                  isSelectedFolder.folderId === folder.id,
+                  isEditingMode
+                )}
+                onClick={() => handleFolderClick(folder)}
+              >
+                {editingFolderId === folder.id ? (
+                  <textarea
+                    value={tempFolderName}
+                    onChange={(e) => setTempFolderName(e.target.value)}
+                    placeholder='폴더명 3 ~ 20자'
+                    minLength={3}
+                    maxLength={20}
+                    autoFocus
+                  />
+                ) : folder.name === '' ? (
+                  isEditingMode ? (
+                    <AddCircleOutlineIcon
+                      onClick={() => {
+                        handleStartEditing(folder);
+                      }}
+                    />
+                  ) : (
+                    ''
+                  )
+                ) : (
+                  <span>{folder.name}</span>
+                )}
+              </div>
+              {folder.id === editingFolderId &&
+                folderErrors[editingFolderId] && (
+                  <span className='error-message'>
+                    {folderErrors[editingFolderId] ||
+                      '알 수 없는 오류가 발생했습니다.'}
+                  </span>
+                )}
+            </section>
           ))}
         </section>
       </section>
-      <section className='folder-name'>
-        <h5>{selectedFolderName}</h5>
-      </section>
-      <section css={tableStyle}>
-        <div className='table-info'>
-          <h6 className='info-text'>
-            총 <strong>{data.length}개</strong>의 리스트
-          </h6>
-          <div className='btn-area'>
-            <Button label='등록' width={80} handleClick={() => {}} />
-            <Button
-              label='삭제'
-              width={80}
-              color='black'
-              handleClick={() => {}}
+
+      {!isEditingMode && (
+        <>
+          <section className='folder-name'>
+            <h5>{isSelectedFolder.folderName}</h5>
+          </section>
+          <section css={tableStyle}>
+            {tableData?.length > 0 && (
+              <div className='table-info'>
+                <h6 className='info-text'>
+                  총 <strong>{totalElement}</strong>개의 리스트
+                </h6>
+                <Button
+                  label='삭제'
+                  width={80}
+                  color='black'
+                  handleClick={handleDeleteInterestStrategy}
+                />
+              </div>
+            )}
+            <Table
+              data={tableData || []}
+              columns={columns}
+              hasCheckbox={tableData?.length > 0}
+              checkedItems={checkedItems}
+              handleCheckboxChange={toggleCheckbox}
+              handleHeaderCheckboxChange={() =>
+                toggleAllCheckboxes(tableData?.length || 0)
+              }
             />
-          </div>
-        </div>
-        <Table
-          data={paginatedData}
-          columns={columns}
-          hasCheckbox={true}
-          checkedItems={checkedItems}
-          handleCheckboxChange={toggleCheckbox}
-          handleHeaderCheckboxChange={() =>
-            toggleAllCheckboxes(paginatedData.length)
-          }
-        />
-        <Pagination
-          totalPage={totalPage}
-          currentPage={currentPage}
-          handlePageChange={setCurrentPage}
-        />
-      </section>
+            {strategyisLoading && (
+              <div css={loadingStyle}>
+                <Loading />
+              </div>
+            )}
+            {!strategyisLoading &&
+              (tableData?.length > 0 ? (
+                <Pagination
+                  totalPage={totalPage}
+                  currentPage={currentPage}
+                  handlePageChange={setCurrentPage}
+                />
+              ) : (
+                <div css={emptyContents}>
+                  <span>
+                    해당 폴더에 등록된 전략이 없습니다. 새로운 전략을
+                    탐색해보세요!
+                  </span>
+                  <Button
+                    label='전략 탐색하기'
+                    border={true}
+                    width={100}
+                    size='sm'
+                    handleClick={() => {
+                      navigate(PATH.STRATEGIES_LIST);
+                    }}
+                  />
+                </div>
+              ))}
+          </section>
+        </>
+      )}
+      <Modal
+        content={
+          <DeleteFolderModalContent folderId={deletingFolderId as number} />
+        }
+        id='folder-delete-modal'
+      />
+      <Modal
+        content={
+          <DeleteStrategyModalContent
+            strategyIds={strategyIds as number[]}
+            refetchStrategies={refetchStrategies}
+          />
+        }
+        id='delete-strategy-modal'
+      />
+      <Modal
+        content={
+          <DeleteSingleStrategyModalContent
+            singleStrategy={singleStrategy as number}
+            refetchStrategies={refetchStrategies}
+          />
+        }
+        id='delete-single-strategy-modal'
+      />
+      <Modal content={<CheckModalContent />} id='check-modal' />
     </div>
   );
 };
@@ -230,10 +711,154 @@ const interestListWrapperStyle = css`
   }
 `;
 
+const loadingStyle = css`
+  width: 100%;
+  height: 100vh;
+  padding: 100px;
+`;
+
+const folderWrapper = css`
+  display: flex;
+  gap: 20px;
+  width: 100%;
+`;
+
+const folderBtnWrapperStyle = css`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  align-items: flex-end;
+  justify-content: flex-end;
+  position: relative;
+
+  .error-message {
+    color: ${COLOR.ERROR_RED};
+    font-size: ${FONT_SIZE.TEXT_SM};
+    margin-top: 4px;
+    width: 100%;
+    text-align: start;
+    position: absolute;
+    top: 126px;
+  }
+`;
+
+const folderBtnStyle = (
+  isEmpty: boolean,
+  isSelected: boolean,
+  isEditingMode: boolean
+) => css`
+  display: flex;
+  background: transparent;
+  border-width: 1px;
+  border-style: ${isEmpty ? 'dashed' : 'solid'};
+  border-color: ${!isEditingMode && isSelected
+    ? COLOR.PRIMARY
+    : COLOR.PRIMARY100};
+  border-radius: 4px;
+  padding: 24px;
+  min-height: 94px;
+  max-height: 94px;
+  width: 100%;
+
+  textarea {
+    border: none;
+    outline: none;
+    font-weight: ${FONT_WEIGHT.MEDIUM};
+    font-size: ${FONT_SIZE.TEXT_MD};
+    color: ${COLOR.PRIMARY};
+    background-color: ${COLOR.GRAY100};
+    width: 100%;
+    height: 40px;
+    resize: none;
+    overflow-y: hidden;
+  }
+
+  span {
+    font-weight: ${FONT_WEIGHT.BOLD};
+    color: ${COLOR.PRIMARY};
+    line-height: 160%;
+  }
+
+  svg {
+    font-size: ${FONT_SIZE.TITLE_XL};
+    color: ${COLOR.PRIMARY100};
+    width: 100%;
+  }
+
+  :hover {
+    cursor: pointer;
+    background: ${isEmpty ? '' : COLOR_OPACITY.PRIMARY_OPACITY10};
+    transition: 0.2s;
+
+    svg {
+      color: ${isEmpty ? COLOR.PRIMARY : ''};
+    }
+  }
+`;
+
+const buttonWrapperStyle = css`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  span {
+    width: 1px;
+    height: 14px;
+    background: ${COLOR.GRAY600};
+  }
+`;
+
 const tableStyle = css`
   display: flex;
   flex-direction: column;
   gap: 32px;
+
+  table > thead > tr > th {
+    &:nth-of-type(1) {
+      width: 80px;
+      display: flex;
+      justify-content: center;
+    }
+    &:nth-of-type(2) {
+      width: 80px;
+    }
+    &:nth-of-type(3) {
+      width: 202px;
+    }
+    &:nth-of-type(4) {
+      width: 280px;
+    }
+    &:nth-of-type(5) {
+      width: 196px;
+    }
+    &:nth-of-type(6) {
+      width: 120px;
+    }
+    &:nth-of-type(7) {
+      width: 120px;
+    }
+    &:nth-of-type(8) {
+      width: 120px;
+    }
+  }
+
+  table > tbody > tr > td {
+    &:nth-of-type(1) div {
+      display: flex;
+      justify-content: center;
+    }
+    &:nth-of-type(3) div {
+      justify-content: center;
+    }
+    &:nth-of-type(4) {
+      text-align: left;
+      img {
+        width: ${FONT_SIZE.TEXT_MD};
+        height: ${FONT_SIZE.TEXT_MD};
+      }
+    }
+  }
 
   .table-info {
     display: flex;
@@ -246,11 +871,6 @@ const tableStyle = css`
       strong {
         font-weight: ${FONT_WEIGHT.BOLD};
       }
-    }
-
-    .btn-area {
-      display: flex;
-      gap: 16px;
     }
   }
 `;
@@ -284,32 +904,59 @@ const buttonStyle = css`
   }
 `;
 
-const folderWrapper = css`
+const traderStyle = css`
   display: flex;
-  gap: 20px;
-  width: 100%;
+  align-items: center;
+  gap: 16px;
+`;
 
-  .folder {
-    border: 1px solid ${COLOR.PRIMARY100};
-    border-radius: 4px;
-    padding: 24px;
-    min-height: 94px;
-    width: 100%;
+const modalStyle = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  line-height: 160%;
+  text-align: center;
+  margin-top: 8px;
+
+  .btn-area {
     display: flex;
-    align-items: flex-start;
-    background: transparent;
+    gap: 16px;
+  }
 
-    span {
-      font-weight: ${FONT_WEIGHT.BOLD};
-      color: ${COLOR.PRIMARY};
-      line-height: 160%;
-    }
+  .delete-error-msg {
+    color: ${COLOR.ERROR_RED};
+    font-size: ${FONT_SIZE.TEXT_SM};
+  }
+`;
 
-    :hover {
-      cursor: pointer;
-      background: ${COLOR_OPACITY.PRIMARY_OPACITY10};
-      transition: 0.2s;
-    }
+const checkModalStyle = css`
+  display: flex;
+  margin-top: 8px;
+  gap: 24px;
+  padding: 24px 0;
+`;
+
+const emptyContents = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px;
+  border-radius: 4px;
+  line-height: 160%;
+  text-align: center;
+`;
+
+const tagStyle = css`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .tag {
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 `;
 
