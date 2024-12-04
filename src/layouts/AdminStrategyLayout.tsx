@@ -13,7 +13,6 @@ const AdminStrategyLayout = () => {
   const navigate = useNavigate();
 
   const handleTabChange = (value: SetStateAction<number>) => {
-    setTab(value);
     if (value === 0) {
       navigate(PATH.ADMIN_STRATEGIES);
     } else if (value === 1) {
@@ -26,15 +25,19 @@ const AdminStrategyLayout = () => {
   useEffect(() => {
     switch (path) {
       case PATH.ADMIN_STRATEGIES:
+        setTab(0);
         setExplanation('트레이더의 전략을 승인, 반려, 수정하는 페이지입니다.');
         break;
       case PATH.ADMIN_METHODS:
+        setTab(1);
         setExplanation('매매방식을 관리하는 페이지입니다.');
         break;
       case PATH.ADMIN_STOCKS:
+        setTab(2);
         setExplanation('종목을 관리하는 페이지입니다.');
         break;
       default:
+        setTab(0);
         setExplanation('');
     }
   }, [path]);
