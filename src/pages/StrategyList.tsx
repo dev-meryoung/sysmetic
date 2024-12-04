@@ -263,11 +263,7 @@ export const StrategyList = () => {
 
   const { mutate: createStrategyItemFilter } = useCreateStrategyItemFilter();
 
-  const {
-    data: algorithmData,
-    refetch: algorithmDataRefetch,
-    isSuccess,
-  } = useGetStrategyAlgorithmFilter(
+  const { data: algorithmData, isSuccess } = useGetStrategyAlgorithmFilter(
     pageInfo.currentPage,
     getAlgorithmFilter(filters)
   );
@@ -320,20 +316,16 @@ export const StrategyList = () => {
           setResultMessage('상세 조건에 해당하는 검색 결과가 없습니다.');
         }
       }
-
-      // algorithmDataRefetch();
     }
   }, [
     currentTab,
     pageInfo.currentPage,
     filters,
     algorithmData,
-    // algorithmDataRefetch,
     createStrategyItemFilter,
     isSuccess,
   ]);
 
-  // 검색어 입력 처리 함수
   const handleSearch = useCallback(() => {
     if (searchValue !== '') {
       setIsSearchEnabled(true);
@@ -347,7 +339,6 @@ export const StrategyList = () => {
     }
   }, [searchValue, resetFilters, setCurrentTab]);
 
-  // 탭 변경 시 검색어 및 쿼리 파라미터 초기화
   const handleTabChange: Dispatch<SetStateAction<number>> = useCallback(
     (value) => {
       const newTab = typeof value === 'function' ? value(currentTab) : value;
@@ -363,7 +354,6 @@ export const StrategyList = () => {
     [currentTab, setCurrentTab, setPageInfo]
   );
 
-  // 필터 변경 시 검색어 초기화
   const handleFilterChange = useCallback(
     (id: string, value: FilterValueTypes) => {
       setLocalFilters(id, value);
@@ -381,7 +371,6 @@ export const StrategyList = () => {
       currentPage: newPage,
     }));
 
-    // 검색 중일 때는 검색 API 재호출
     if (isSearchEnabled) {
       setIsSearchEnabled(true);
     }
@@ -409,7 +398,6 @@ export const StrategyList = () => {
     }
   }, [strategyNameData, isSearchEnabled, strategyNameIsLoading]);
 
-  //검색초기화
   useEffect(() => {
     if (currentTab !== 0) {
       setSearchValue('');
@@ -417,36 +405,20 @@ export const StrategyList = () => {
     }
   }, [setSearchValue, currentTab, filters]);
 
-  // 알고리즘 탭 필터링
   useEffect(() => {
     if (isSearchEnabled || strategyNameData?.data) return;
     if (currentTab === 1) {
       fetchFilterdStrategies();
     }
-  }, [
-    currentTab,
-    // filters.algorithm,
-    isSearchEnabled,
-    strategyNameData,
-    fetchFilterdStrategies,
-  ]);
+  }, [currentTab, isSearchEnabled, strategyNameData, fetchFilterdStrategies]);
 
-  // 항목별 탭 필터링
   useEffect(() => {
     if (searchValue) return;
     if (currentTab === 0 && hasFilterChanged && !searchValue) {
-      console.log(hasFilterChanged, 'hasFilterChanged2');
       fetchFilterdStrategies();
     }
-  }, [
-    // currentTab,
-    hasFilterChanged,
-    // filters,
-    searchValue,
-    fetchFilterdStrategies,
-  ]);
+  }, [hasFilterChanged, searchValue, currentTab, fetchFilterdStrategies]);
 
-  // 처음 로드시 전략 조회
   useEffect(() => {
     if (
       currentTab === 0 &&
@@ -462,7 +434,7 @@ export const StrategyList = () => {
       }));
       setIsNotFound(false);
     }
-  }, [strategyListData, currentTab, searchValue]);
+  }, [strategyListData, currentTab, searchValue, hasFilterChanged]);
 
   const handleButtonClick = (id: number) => {
     setStrategyId(id);

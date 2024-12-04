@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { useGetMethodAndStock } from '@/hooks/useStrategyApi';
+import { useCallback, useEffect, useState } from 'react';
 
 interface BaseFilters {
   [key: string]: string | string[] | undefined;
@@ -27,26 +26,14 @@ export interface AlgorithmFilters extends BaseFilters {
 
 type CombinedFilters = FiltersProps | AlgorithmFilters;
 
-interface MethodItemProps {
-  id: number;
-  name: string;
-  filePath: string | null;
-}
-
-interface StockItemProps {
-  id: number;
-  name: string;
-  filePath: string | null;
-}
-
 const createDefaultItemFilters = (
-  methodList: string[] = [],
-  stockList: string[] = []
+  _methodList: string[] = [],
+  _stockList: string[] = []
 ): FiltersProps => ({
-  methods: methodList,
-  cycle: ['D', 'P'],
+  methods: [],
+  cycle: [],
   period: 'ALL',
-  stockNames: stockList,
+  stockNames: [],
   accumulatedProfitLossRateRangeStart: '',
   accumulatedProfitLossRateRangeEnd: '',
 });
@@ -63,7 +50,6 @@ const isEqual = (a: any, b: any): boolean => {
 };
 
 export const useStrategyFilters = () => {
-  const { data: methodAndStockData } = useGetMethodAndStock();
   const [currentTab, setCurrentTab] = useState(0);
   const [itemFilters, setItemFilters] = useState<FiltersProps>(
     createDefaultItemFilters()
@@ -73,42 +59,12 @@ export const useStrategyFilters = () => {
   );
   const [hasFilterChanged, setHasFilterChanged] = useState(false);
   const [shouldShowDefaultList, setShouldShowDefaultList] = useState(true);
-  const [dynamicMethodList, setDynamicMethodList] = useState<string[]>([]);
-  const [dynamicStockList, setDynamicStockList] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (!methodAndStockData?.data) return;
-
-    try {
-      const methods = methodAndStockData?.data?.methodList.map(
-        (method: MethodItemProps): string => method.name
-      );
-
-      const stocks = methodAndStockData?.data?.stockList.map(
-        (stock: StockItemProps): string => stock.name
-      );
-
-      setDynamicMethodList(methods);
-      setDynamicStockList(stocks);
-
-      if (currentTab === 0) {
-        setItemFilters((prev) => ({
-          ...prev,
-          methods,
-          stockNames: stocks,
-        }));
-      }
-    } catch (error) {
-      setDynamicMethodList([]);
-      setDynamicStockList([]);
-    }
-  }, [methodAndStockData, currentTab]);
 
   useEffect(() => {
     const currentFilters = currentTab === 0 ? itemFilters : algorithmFilters;
     const defaultFilters =
       currentTab === 0
-        ? createDefaultItemFilters(dynamicMethodList, dynamicStockList)
+        ? createDefaultItemFilters([], [])
         : ALGORITHM_DEFAULT_FILTERS;
 
     const filterKeys = Object.keys(currentFilters);
@@ -119,13 +75,7 @@ export const useStrategyFilters = () => {
     });
 
     setHasFilterChanged(isChanged);
-  }, [
-    currentTab,
-    itemFilters,
-    algorithmFilters,
-    dynamicMethodList,
-    dynamicStockList,
-  ]);
+  }, [currentTab, itemFilters, algorithmFilters]);
 
   const setLocalFilters = (id: string, value: any) => {
     setShouldShowDefaultList(false);
@@ -137,29 +87,27 @@ export const useStrategyFilters = () => {
     }
   };
 
-  const resetFilters = () => {
+  const resetFilters = useCallback(() => {
     setShouldShowDefaultList(currentTab === 0);
     setHasFilterChanged(false);
 
     if (currentTab === 0) {
-      setItemFilters(
-        createDefaultItemFilters(dynamicMethodList, dynamicStockList)
-      );
+      setItemFilters(createDefaultItemFilters([], []));
     } else {
       setAlgorithmFilters(ALGORITHM_DEFAULT_FILTERS);
     }
-  };
+  }, [currentTab]);
 
   useEffect(() => {
     resetFilters();
-  }, [currentTab]);
+  }, [currentTab, resetFilters]);
 
   useEffect(
     () => () => {
       setCurrentTab(0);
       resetFilters();
     },
-    []
+    [resetFilters]
   );
 
   return {

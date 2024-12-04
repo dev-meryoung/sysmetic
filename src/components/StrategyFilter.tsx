@@ -107,9 +107,10 @@ const FilterInput = ({ filter, currentValue, onChange }: FilterInputProps) => {
 
   switch (filter.type) {
     case 'checkbox': {
-      const selectedValues: string[] =
-        (currentValue as string[]) ||
-        filter.options?.map((option) => option.value);
+      const selectedValues: string[] = currentValue
+        ? (currentValue as string[])
+        : [];
+
       return (
         <div css={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
           {filter.options?.map((option) => (
