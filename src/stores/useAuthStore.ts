@@ -12,6 +12,8 @@ interface AuthConfig {
   nickname: string;
   roleCode: RoleCodeTypes;
   profileImage: string | null;
+  totalFollowerCount: number;
+  totalStrategyCount: number;
 }
 
 interface AuthStateProps extends AuthConfig {
@@ -30,6 +32,8 @@ const resetState = (set: Function) => {
     nickname: '',
     roleCode: '',
     profileImage: null,
+    totalFollowerCount: 0,
+    totalStrategyCount: 0,
   });
   localStorage.removeItem('token');
 };
@@ -44,6 +48,8 @@ const updateState = (set: Function, authData: AuthConfig) => {
     nickname: authData.nickname,
     roleCode: authData.roleCode,
     profileImage: authData.profileImage,
+    totalFollowerCount: authData.totalFollowerCount,
+    totalStrategyCount: authData.totalStrategyCount,
   });
 };
 
@@ -56,6 +62,8 @@ const useAuthStore = create<AuthStateProps>((set) => ({
   nickname: '',
   roleCode: '',
   profileImage: null,
+  totalFollowerCount: 0,
+  totalStrategyCount: 0,
 
   setAuthState: (authData) => updateState(set, authData),
 

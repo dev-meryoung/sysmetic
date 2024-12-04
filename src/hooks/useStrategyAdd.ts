@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
+import { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { getMethodAndStockList } from '@/api';
 import { PATH } from '@/constants/path';
-import { useCreateStrategy } from '@/hooks/useStrategyApi';
+import {
+  useCreateStrategy,
+  useGetMethodAndStock,
+} from '@/hooks/useStrategyApi';
 import useAuthStore from '@/stores/useAuthStore';
 import useModalStore from '@/stores/useModalStore';
 
@@ -11,8 +14,12 @@ const useStrategyAdd = () => {
   const { roleCode } = useAuthStore();
   const { openModal } = useModalStore();
 
-  const [methodOptions, setMethodOptions] = useState([]);
-  const [stockOptions, setStockOptions] = useState([]);
+  const [methodOptions, setMethodOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
+  const [stockOptions, setStockOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
   const [title, setTitle] = useState<string>('');
   const [method, setMethod] = useState<string>('');
   const [cycle, setCycle] = useState<string>('');
@@ -24,35 +31,27 @@ const useStrategyAdd = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const { data: methodsAndStocks } = useGetMethodAndStock();
   const { mutate: submitMutate } = useCreateStrategy();
 
   useEffect(() => {
-    const methodsAndStocks = async () => {
-      try {
-        const methodsAndStocks = await getMethodAndStockList();
-        setMethodOptions(
-          methodsAndStocks.data.methodList.map(
-            (method: { id: string; name: string }) => ({
-              label: method.name,
-              value: method.id,
-            })
-          )
-        );
-        setStockOptions(
-          methodsAndStocks.data.stockList.map(
-            (stock: { id: string; name: string }) => ({
-              label: stock.name,
-              value: stock.id,
-            })
-          )
-        );
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    if (roleCode === 'TRADER') {
-      methodsAndStocks();
+    if (roleCode === 'TRADER' && methodsAndStocks) {
+      setMethodOptions(
+        methodsAndStocks.methodList.map(
+          (method: { id: number; name: string }) => ({
+            label: method.name,
+            value: method.id.toString(),
+          })
+        )
+      );
+      setStockOptions(
+        methodsAndStocks.stockList.map(
+          (stock: { id: number; name: string }) => ({
+            label: stock.name,
+            value: stock.id.toString(),
+          })
+        )
+      );
     }
   }, [roleCode]);
 
@@ -158,9 +157,14 @@ const useStrategyAdd = () => {
       onSuccess: (res) => {
         if (res.code === 200) {
           navigate(PATH.MYPAGE_STRATEGIES_EDIT(res.data.strategyId));
-        } else if (res.code === 409) {
+        }
+      },
+      onError: (err) => {
+        if (err instanceof AxiosError && err.response?.status === 409) {
           setNoticeMessage('입력하신 전략명은 이미 사용 중입니다.');
           openModal('notice', 400);
+        } else {
+          console.error(err);
         }
       },
     });

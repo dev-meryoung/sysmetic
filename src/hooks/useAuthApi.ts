@@ -84,12 +84,13 @@ export const useSendEmailCodeForPassword = () =>
 
 export const useCheckEmailCodeForPassword = () =>
   useMutation({
-    mutationFn: (checkEmailCodeForPasswordData: CheckEmailCodeForPasswordData) =>
-      checkEmailCodeForPassword(checkEmailCodeForPasswordData),
+    mutationFn: (
+      checkEmailCodeForPasswordData: CheckEmailCodeForPasswordData
+    ) => checkEmailCodeForPassword(checkEmailCodeForPasswordData),
   });
 
 export const useReset = () =>
   useMutation({
-    mutationFn: (resetPasswordData: ResetPasswordData) => resetPassword(resetPasswordData),
+    mutationFn: (resetPasswordData: ResetPasswordData) =>
+      resetPassword(resetPasswordData),
   });
-

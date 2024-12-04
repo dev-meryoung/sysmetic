@@ -1,3 +1,5 @@
+import axiosInstance from '@/api/axiosInstance';
+
 // 회원 목록 조회 API
 export const getAdminUserList = async () => {};
 
@@ -18,3 +20,38 @@ export const getAdminNotice = async () => {};
 
 // 전략 목록 조회 API
 export const getAdminStrategyList = async () => {};
+
+// 전략 승인 API
+export const approveAdminStrategy = async (approveData: {
+  strategyId: number[];
+}) => {
+  const response = await axiosInstance.patch(
+    `/v1/admin/strategy/allow`,
+    JSON.stringify(approveData),
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+
+  return response.data;
+};
+
+// 전략 반려 API
+export const rejectAdminStrategy = async (rejectData: {
+  strategyId: number;
+  rejectReason: string;
+}) => {
+  const response = await axiosInstance.patch(
+    `/v1/admin/strategy/reject`,
+    JSON.stringify(rejectData),
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+
+  return response.data;
+};

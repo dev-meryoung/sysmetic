@@ -1,45 +1,61 @@
 import { css } from '@emotion/react';
-import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
-import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
-import tempImage from '@/assets/images/test-profile.png';
+import {
+  ContentCopyOutlined,
+  FavoriteBorderOutlined,
+} from '@mui/icons-material';
 import ProfileImage from '@/components/ProfileImage';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE } from '@/constants/font';
 import MyInterestList from '@/pages/mypage/MyInterestList';
-// import MyStrategyList from '@/pages/mypage/MyStrategyList';
+import MyStrategyList from '@/pages/mypage/MyStrategyList';
+import useAuthStore from '@/stores/useAuthStore';
 
-const MyPage = () => (
-  <div css={mypageWrapperStyle}>
-    <section css={userInfoStyle}>
-      <section className='profile-box'>
+const MyPage = () => {
+  const {
+    nickname,
+    roleCode,
+    profileImage,
+    totalFollowerCount,
+    totalStrategyCount,
+  } = useAuthStore((state) => state);
+
+  return (
+    <div css={mypageWrapperStyle}>
+      <section css={infoStyle}>
         <div className='info-area'>
-          <ProfileImage src={tempImage} alt='profile' />
-          <span>ABC가나다라883</span>
-        </div>
-        <div className='button-area'>
-          <span>관심수</span>
-          <div className='icon-btn'>
-            <FavoriteBorderOutlinedIcon />
-            10,000
+          <ProfileImage src={profileImage || ''} alt='profile' />
+          <div className='info'>
+            {roleCode === 'TRADER' ? <span>트레이더</span> : ''}
+            <h6>{nickname}</h6>
           </div>
         </div>
         <div className='button-area'>
-          <span>전략수</span>
-          <div className='icon-btn'>
-            <ContentCopyOutlinedIcon />
-            8,000
+          <div className='button'>
+            <span>관심수</span>
+            <div className='icon-btn'>
+              <FavoriteBorderOutlined />
+              {totalFollowerCount}
+            </div>
+          </div>
+          <div className='button'>
+            <span>전략수</span>
+            <div className='icon-btn'>
+              <ContentCopyOutlined />
+              {totalStrategyCount}
+            </div>
           </div>
         </div>
       </section>
-      <div className='btn-box'></div>
-    </section>
-    <section className='contents'>
-      {/* TODO:권한에 따른 조건부 랜더링 */}
-      <MyInterestList />
-      {/* <MyStrategyList /> */}
-    </section>
-  </div>
-);
+      <section className='contents'>
+        {roleCode === 'USER' ? (
+          <MyInterestList />
+        ) : roleCode === 'TRADER' ? (
+          <MyStrategyList />
+        ) : null}
+      </section>
+    </div>
+  );
+};
 
 const mypageWrapperStyle = css`
   display: flex;
@@ -47,45 +63,52 @@ const mypageWrapperStyle = css`
   gap: 40px;
 `;
 
-const userInfoStyle = css`
+const infoStyle = css`
   display: flex;
+  align-items: center;
   justify-content: space-between;
   padding: 35px 24px;
-  border: 1px solid ${COLOR.GRAY};
   border-radius: 4px;
+  border: 1px solid ${COLOR.GRAY};
 
-  .profile-box {
+  .info-area {
     display: flex;
-    gap: 32px;
+    align-items: center;
+    gap: 16px;
 
-    .info-area {
+    .info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      span {
+        color: ${COLOR.PRIMARY};
+        font-size: ${FONT_SIZE.TEXT_XS};
+      }
+    }
+  }
+
+  .button-area {
+    display: flex;
+    gap: 40px;
+
+    .button {
       display: flex;
       align-items: center;
       gap: 16px;
     }
 
-    .button-area {
+    .icon-btn {
       display: flex;
-      flex-direction: column;
-      gap: 16px;
+      align-items: center;
+      gap: 8px;
+      color: ${COLOR.POINT};
 
-      .icon-btn {
-        display: flex;
-        align-items: center;
-        gap: 8px;
+      svg {
         color: ${COLOR.POINT};
-
-        svg {
-          color: ${COLOR.POINT};
-          font-size: ${FONT_SIZE.TITLE_XS};
-        }
+        font-size: ${FONT_SIZE.TITLE_XS};
       }
     }
-  }
-
-  .btn-box {
-    display: flex;
-    gap: 16px;
   }
 `;
 
