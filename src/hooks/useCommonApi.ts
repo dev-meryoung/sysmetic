@@ -18,45 +18,69 @@ import {
 } from '@/api';
 
 // 질문자 문의 수정 화면 조회
-export const useGetEditInquiry = (params: GetInquiryDetailData) =>
+export const useGetEditInquiry = (
+  params: GetInquiryDetailData,
+  enabled: boolean = true
+) =>
   useQuery({
     queryKey: ['getEditInquiry', params],
     queryFn: () => getEditInquiry(params),
-  });
-
-// 질문자 문의 등록 화면 조회
-export const useGetCreateInquiry = (strategyId: number) =>
-  useQuery({
-    queryKey: ['getCreateInquiry', strategyId],
-    queryFn: () => getCreateInquiry(strategyId),
-  });
-
-// 트레이더 문의 목록 조회
-export const useGetInquiryListTrader = (params: GetInquiryData) =>
-  useQuery({
-    queryKey: ['getInquiryListTrader', params],
-    queryFn: () => getInquiryListTrader(params),
+    enabled,
   });
 
 // 트레이더 문의 상세 조회
-export const useGetInquiryDetailTrader = (params: GetInquiryDetailData) =>
-  useQuery({
-    queryKey: ['getInquiryDetailTrader', params],
-    queryFn: () => getInquiryDetailTrader(params),
-  });
-
-// 질문자 문의 상세 조회
-export const useGetInquiryDetailUser = (params: GetInquiryDetailData) =>
+export const useGetInquiryDetailUser = (
+  params: GetInquiryDetailData,
+  enabled: boolean = true
+) =>
   useQuery({
     queryKey: ['getInquiryDetailUser', params],
     queryFn: () => getInquiryDetailUser(params),
+    enabled,
+  });
+
+// 질문자 문의 상세 조회
+export const useGetInquiryDetailTrader = (
+  params: GetInquiryDetailData,
+  enabled: boolean = true
+) =>
+  useQuery({
+    queryKey: ['getInquiryDetailTrader', params],
+    queryFn: () => getInquiryDetailTrader(params),
+    enabled,
+  });
+
+// 질문자 문의 등록 화면 조회
+export const useGetCreateInquiry = (
+  strategyId: number,
+  enabled: boolean = true
+) =>
+  useQuery({
+    queryKey: ['getCreateInquiry', strategyId],
+    queryFn: () => getCreateInquiry(strategyId),
+    enabled,
+  });
+
+// 트레이더 문의 목록 조회
+export const useGetInquiryListTrader = (
+  params: GetInquiryData,
+  enabled: boolean = true
+) =>
+  useQuery({
+    queryKey: ['getInquiryListTrader', params],
+    queryFn: () => getInquiryListTrader(params),
+    enabled,
   });
 
 // 질문자 문의 목록 조회
-export const useGetInquiryListUser = (params: GetInquiryData) =>
+export const useGetInquiryListUser = (
+  params: GetInquiryData,
+  enabled: boolean = true
+) =>
   useQuery({
     queryKey: ['getInquiryListUser', params],
     queryFn: () => getInquiryListUser(params),
+    enabled,
   });
 
 // 질문자 문의 수정

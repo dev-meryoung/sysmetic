@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
@@ -8,6 +8,7 @@ import TextInput from '@/components/TextInput';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 import { useGetEditInquiry, useUpdateInquiry } from '@/hooks/useCommonApi';
+import useAuthStore from '@/stores/useAuthStore';
 import useModalStore from '@/stores/useModalStore';
 
 type InputStateTypes = 'normal' | 'warn';
@@ -17,6 +18,7 @@ const MyQnaEdit = () => {
   const [titleValue, setTitleValue] = useState('');
   const [contentValue, setContentValue] = useState('');
   const { openModal } = useModalStore();
+  const { roleCode } = useAuthStore();
 
   const { userId: paramUserId } = useParams<{ userId: string }>();
   const userInquiryId = paramUserId ? Number(paramUserId) : 0;
@@ -24,6 +26,13 @@ const MyQnaEdit = () => {
   const qnaInquiryId = paramQnaId ? Number(paramQnaId) : 0;
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (roleCode !== 'USER') {
+      openModal('access-denied');
+      navigate(PATH.ROOT);
+    }
+  }, [roleCode, navigate, openModal]);
 
   const { data: inquiryResponse, isError } = useGetEditInquiry({
     qnaId: Number(qnaInquiryId),
@@ -39,15 +48,22 @@ const MyQnaEdit = () => {
     const inputValue = e.target.value;
     setTitleValue(inputValue);
 
-    if (inputValue.length < 0) {
+    if (inputValue.length <= 0) {
       setStatus('warn');
     } else {
       setStatus('normal');
+    }
+
+    if (e.target.value.length <= 100) {
+      setTitleValue(e.target.value);
     }
   };
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContentValue(e.target.value);
+    if (e.target.value.length <= 1000) {
+      setContentValue(e.target.value);
+    }
   };
 
   const updateMutation = useUpdateInquiry();
@@ -143,6 +159,14 @@ const MyQnaEdit = () => {
         content={
           <div css={modalContentStyle}>
             <p css={modalTextStyle}>문의 내용 수정에 실패했습니다.</p>
+          </div>
+        }
+      />
+      <Modal
+        id='access-denied'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>접근 권한이 없습니다.</p>
           </div>
         }
       />

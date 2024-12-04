@@ -30,24 +30,25 @@ const QnaDetail = () => {
   const { qnaId: paramQnaId } = useParams<{ qnaId: string }>();
   const qnaInquiryId = paramQnaId ? Number(paramQnaId) : 0;
 
-  const dateCustom = (isoDate: string): string => {
-    const dateObj = new Date(isoDate);
-    return `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, '0')}.${String(dateObj.getDate()).padStart(2, '0')}`;
-  };
+  const deleteMutation = useDeleteInquiry();
 
-  const userQuery = useGetInquiryDetailUser({ qnaId: Number(qnaInquiryId) });
-  const traderQuery = useGetInquiryDetailTrader({
-    qnaId: Number(qnaInquiryId),
-  });
+  const userQuery = useGetInquiryDetailUser(
+    { qnaId: qnaInquiryId },
+    roleCode === 'USER'
+  );
+
+  const traderQuery = useGetInquiryDetailTrader(
+    { qnaId: qnaInquiryId },
+    roleCode === 'TRADER'
+  );
 
   const qnaData =
     roleCode === 'USER' ? userQuery.data?.data : traderQuery.data?.data;
 
-  console.log('userQuery:', userQuery.data?.data); // userQuery 결과 확인
-  console.log('traderQuery:', traderQuery.data?.data); // traderQuery 결과 확인
-  console.log('roleCode 값:', roleCode);
-
-  const deleteMutation = useDeleteInquiry();
+  const dateCustom = (isoDate: string): string => {
+    const dateObj = new Date(isoDate);
+    return `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, '0')}.${String(dateObj.getDate()).padStart(2, '0')}`;
+  };
 
   const handleDeleteBtn = () => {
     if (qnaData?.answerTitle) {

@@ -41,6 +41,15 @@ export const getInquiryDetailUser = async (params: GetInquiryDetailData) => {
   return response.data;
 };
 
+// 트레이더 문의 상세 조회 API
+export const getInquiryDetailTrader = async (params: GetInquiryDetailData) => {
+  const { qnaId, ...queryParams } = params;
+
+  const response = await axiosInstance.get(`/v1/trader/qna/${qnaId}`, {
+    params: queryParams,
+  });
+  return response.data;
+};
 // 질문자 문의 수정 API
 export const updateInquiry = async (editInquiryData: UpdateInquiryData) => {
   const { qnaId, ...payload } = editInquiryData;
@@ -52,16 +61,6 @@ export const updateInquiry = async (editInquiryData: UpdateInquiryData) => {
 // 질문자 문의 삭제 API
 export const deleteInquiry = async (qnaId: number) => {
   const response = await axiosInstance.delete(`/v1/member/qna/${qnaId}`);
-  return response.data;
-};
-
-// 트레이더 문의 상세 조회 API
-export const getInquiryDetailTrader = async (params: GetInquiryDetailData) => {
-  const { qnaId, ...queryParams } = params;
-
-  const response = await axiosInstance.get(`/v1/trader/qna/${qnaId}`, {
-    params: queryParams,
-  });
   return response.data;
 };
 

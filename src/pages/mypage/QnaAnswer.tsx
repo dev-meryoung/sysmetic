@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Button from '@/components/Button';
@@ -14,44 +14,55 @@ import {
   useGetInquiryDetailTrader,
   useCreateAnswer,
 } from '@/hooks/useCommonApi';
+import useAuthStore from '@/stores/useAuthStore';
 import useModalStore from '@/stores/useModalStore';
 
-type InputStateTypes = 'normal' | 'warn';
 const statusMap: { [key: string]: string } = {
   closed: '답변완료',
   unclosed: '답변대기',
 };
 
 const QnaAnswer = () => {
-  const [status, setStatus] = useState<InputStateTypes>('normal');
   const [titleValue, setTitleValue] = useState('');
   const [contentValue, setContentValue] = useState('');
+  const [status, setStatus] = useState<'normal' | 'warn'>('normal');
   const navigate = useNavigate();
   const { openModal } = useModalStore();
+  const { roleCode } = useAuthStore();
 
-  const { userId: paramUserId } = useParams<{ userId: string }>();
-  const userInquiryId = paramUserId ? Number(paramUserId) : 0;
-  const { qnaId: paramQnaId } = useParams<{ qnaId: string }>();
-  const qnaInquiryId = paramQnaId ? Number(paramQnaId) : 0;
+  const { userId, qnaId } = useParams<{ userId: string; qnaId: string }>();
+
+  useEffect(() => {
+    if (roleCode !== 'TRADER') {
+      openModal('access-denied');
+      navigate(PATH.ROOT);
+    }
+  }, [roleCode, navigate, openModal]);
 
   const { data: inquiryResponse, isError } = useGetInquiryDetailTrader({
-    qnaId: Number(qnaInquiryId),
+    qnaId: Number(qnaId),
   });
-
-  const inquiryData = inquiryResponse?.data || {};
 
   if (isError) {
     openModal('get-inquiry-error');
   }
 
+  const inquiryData = inquiryResponse?.data || {};
+
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    setStatus(value.trim() === '' ? 'warn' : 'normal');
     setTitleValue(value);
+    setStatus(value.trim() === '' ? 'warn' : 'normal');
+    if (e.target.value.length <= 100) {
+      setTitleValue(e.target.value);
+    }
   };
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContentValue(e.target.value);
+    if (e.target.value.length <= 1000) {
+      setContentValue(e.target.value);
+    }
   };
 
   const createAnswer = useCreateAnswer();
@@ -63,15 +74,13 @@ const QnaAnswer = () => {
 
     createAnswer.mutate(
       {
-        qnaId: Number(qnaInquiryId),
+        qnaId: Number(qnaId),
         answerTitle: titleValue,
         answerContent: contentValue,
       },
       {
         onSuccess: () => {
-          navigate(
-            PATH.MYPAGE_QNA_DETAIL(String(userInquiryId), String(qnaInquiryId)) // qndId NaN
-          );
+          navigate(PATH.MYPAGE_QNA_DETAIL(String(userId), String(qnaId)));
         },
         onError: () => {
           openModal('create-confirm');
@@ -81,9 +90,7 @@ const QnaAnswer = () => {
   };
 
   const handleBack = () => {
-    navigate(
-      PATH.MYPAGE_QNA_DETAIL(String(userInquiryId), String(qnaInquiryId))
-    );
+    navigate(PATH.MYPAGE_QNA_DETAIL(String(userId), String(qnaId)));
   };
 
   const isSubmitDisabled = !titleValue.trim() || !contentValue.trim();
@@ -172,6 +179,7 @@ const QnaAnswer = () => {
           disabled={isSubmitDisabled}
         />
       </div>
+
       <Modal
         id='get-inquiry-error'
         content={
@@ -185,6 +193,14 @@ const QnaAnswer = () => {
         content={
           <div css={modalContentStyle}>
             <p css={modalTextStyle}>답변 등록에 실패했습니다.</p>
+          </div>
+        }
+      />
+      <Modal
+        id='access-denied'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>접근 권한이 없습니다.</p>
           </div>
         }
       />

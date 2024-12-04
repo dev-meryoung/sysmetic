@@ -32,13 +32,13 @@ const strategyOptions = [
 
 const statusOptions = [
   { label: '전체', value: 'all' },
-  { label: '답변대기', value: 'closed' },
-  { label: '답변완료', value: 'unclosed' },
+  { label: '답변대기', value: 'unclosed' },
+  { label: '답변완료', value: 'closed' },
 ];
 
 const statusMap: { [key: string]: string } = {
-  closed: '답변완료',
   unclosed: '답변대기',
+  closed: '답변완료',
 };
 
 const QnaList = () => {
@@ -81,7 +81,6 @@ const QnaList = () => {
 
   const totalPage = Math.ceil(total / POSTS_PER_PAGE);
 
-
   const columns: ColumnProps<QnaListDataProps>[] = [
     {
       key: 'inquiryTitle',
@@ -121,7 +120,7 @@ const QnaList = () => {
       key: 'inquiryStatus',
       header: '진행상태',
       render: (value) => (
-        <span css={value === 'unclosed' ? successStyle : waitingStyle}>
+        <span css={value === 'closed' ? successStyle : waitingStyle}>
           {statusMap[value] || ''}
         </span>
       ),

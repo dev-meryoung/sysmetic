@@ -34,7 +34,7 @@ const QnaQuestion = () => {
   const [inquiryTitle, setInquiryTitle] = useState('');
   const [inquiryContent, setInquiryContent] = useState('');
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value.length <= 40) {
+    if (e.target.value.length <= 100) {
       setInquiryTitle(e.target.value);
     }
   };
@@ -95,7 +95,7 @@ const QnaQuestion = () => {
           value={inquiryTitle}
           height={64}
           fullWidth={true}
-          placeholder='제목을 입력하세요 (최대 40자)'
+          placeholder='제목을 입력하세요 (최대 100자)'
           handleChange={handleTitleChange}
         />
         <TextArea
