@@ -11,8 +11,10 @@ import TextInput from '@/components/TextInput';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE } from '@/constants/font';
 import { PATH } from '@/constants/path';
-import { useCreateUserInquiry } from '@/hooks/useCommonApi';
-import { useGetStrategyInfo } from '@/hooks/useStrategyApi';
+import {
+  useCreateUserInquiry,
+  useGetCreateInquiry,
+} from '@/hooks/useCommonApi';
 import useModalStore from '@/stores/useModalStore';
 
 const QnaQuestion = () => {
@@ -29,7 +31,7 @@ const QnaQuestion = () => {
       ? Number(paramStrategyId)
       : 0;
 
-  const { data: strategyInfo } = useGetStrategyInfo(String(strategyId));
+  const { data: strategyInfo } = useGetCreateInquiry(strategyId);
   const createUserInquiry = useCreateUserInquiry();
   const [inquiryTitle, setInquiryTitle] = useState('');
   const [inquiryContent, setInquiryContent] = useState('');
@@ -38,17 +40,20 @@ const QnaQuestion = () => {
       setInquiryTitle(e.target.value);
     }
   };
+
+  const strategyData = strategyInfo?.data || {};
+
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (e.target.value.length <= 1000) {
       setInquiryContent(e.target.value);
     }
   };
   const handleSubmitBtn = () => {
-    if (!inquiryTitle.trim() || inquiryTitle.length > 40) {
+    if (!inquiryTitle.trim() || inquiryTitle.length > 100) {
       openModal('error-input');
       return;
     }
-    if (!inquiryContent.trim() || inquiryContent.length < 10) {
+    if (!inquiryContent.trim() || inquiryContent.length < 0) {
       openModal('error-input');
       return;
     }
@@ -79,15 +84,25 @@ const QnaQuestion = () => {
       <div css={strategyBoxStyle}>
         <div className='strategy-box'>
           <div className='tags'>
-            <Tag src={tempTag} />
+            <span>
+              <img
+                src={strategyData?.methodIconPath}
+                alt='method icon'
+                css={iconStyle}
+              />
+            </span>
           </div>
-          <span>{strategyInfo?.name || '전략명이 존재하지않습니다.'}</span>
+          <span>{strategyData?.strategyName}</span>
         </div>
         <div className='trader-box'>
-          <ProfileImage />
           <span>
-            {strategyInfo?.traderNickname || '트레이더명이 존재하지않습니다.'}
+            <img
+              src={strategyData?.traderProfileImagePath}
+              alt='profile-image'
+              css={profileImgStyle}
+            />
           </span>
+          <span>{strategyData?.traderNickname}</span>
         </div>
       </div>
       <div css={inputBoxStyle}>
@@ -204,6 +219,19 @@ const modalTextStyle = css`
   text-align: center;
   margin-top: 32px;
   margin-bottom: 24px;
+`;
+
+const iconStyle = css`
+  width: 16px;
+  height: 16px;
+  object-fit: cover;
+`;
+
+const profileImgStyle = css`
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
 `;
 
 export default QnaQuestion;

@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import { css } from '@emotion/react';
 import { Link, useParams } from 'react-router-dom';
-import TagTest from '@/assets/images/test-tag.jpg';
 import Pagination from '@/components/Pagination';
 import SelectBox from '@/components/SelectBox';
 import Table, { ColumnProps } from '@/components/Table';
-import Tag from '@/components/Tag';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
@@ -23,6 +21,7 @@ interface QnaListDataProps {
   strategyName: string;
   inquiryRegistrationDate: string;
   inquiryStatus: string;
+  methodIconPath: string;
 }
 
 const strategyOptions = [
@@ -62,7 +61,7 @@ const QnaList = () => {
     userId,
     sort: sortConfig,
     closed: statusFilter === 'all' ? undefined : statusFilter,
-    page: currentPage + 1,
+    page: currentPage,
     qnaId: parsedInquiryId,
   };
 
@@ -104,13 +103,23 @@ const QnaList = () => {
     {
       key: 'strategyName',
       header: '전략명',
-      render: (value) => (
+      render: (value, item) => (
         <div css={strategyStyle}>
-          <Tag src={TagTest} alt='tag' />
+          {item.methodIconPath !== null &&
+            item.methodIconPath !== undefined && (
+              <span>
+                <img
+                  src={item.methodIconPath}
+                  alt='method icon'
+                  css={iconStyle}
+                />
+              </span>
+            )}
           <span>{value}</span>
         </div>
       ),
     },
+
     {
       key: 'inquiryRegistrationDate',
       header: '전략일자',
@@ -235,6 +244,12 @@ const strategyStyle = css`
     display: flex;
     gap: 4px;
   }
+`;
+
+const iconStyle = css`
+  width: 16px;
+  height: 16px;
+  object-fit: cover;
 `;
 
 const countStyle = css`

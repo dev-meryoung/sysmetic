@@ -92,7 +92,7 @@ export const getInquiryListTrader = async (params: GetInquiryData) => {
 // 질문자 문의 등록 화면 조회 API
 export const getCreateInquiry = async (strategyId: number) => {
   const response = await axiosInstance.get(
-    `/v1/strategy/${strategyId}/qna-page`
+    `/v1/strategy/${strategyId}/qna`
   );
   return response.data;
 };
@@ -108,7 +108,7 @@ export const getEditInquiry = async (params: GetInquiryDetailData) => {
   const { qnaId, ...queryParams } = params;
 
   const response = await axiosInstance.get(
-    `/v1/member/qna/${qnaId}/modify-page`,
+    `/v1/member/qna/${qnaId}/modify`,
     {
       params: queryParams,
     }

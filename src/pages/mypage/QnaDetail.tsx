@@ -4,7 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
 import ProfileImage from '@/components/ProfileImage';
-import Tag from '@/components/Tag';
+import ProfileImageDefault from '@/components/ProfileImage';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
@@ -149,15 +149,18 @@ const QnaDetail = () => {
             {qnaData.strategyName ? (
               <>
                 <div css={tagsAndTitleStyle}>
-                  <Tag src='default-tag.png' alt='tag' />
+                  <span>
+                    <img src={qnaData.methodIconPath} alt='' css={iconStyle} />
+                  </span>
                   <div css={strategyTextStyle}>{qnaData.strategyName}</div>
                 </div>
                 <div css={profileStyle}>
-                  <ProfileImage
-                    src='default-profile.png'
-                    alt='profileImg'
-                    size='md'
+                  <img
+                    src={qnaData.traderProfileImagePath}
+                    alt='method icon'
+                    css={profileImgStyle}
                   />
+
                   <span css={nicknameStyle}>{qnaData.traderNickname}</span>
                 </div>
               </>
@@ -184,11 +187,13 @@ const QnaDetail = () => {
                   </div>
                   {roleCode !== 'TRADER' && (
                     <div css={answerProfileStyle}>
-                      <ProfileImage
-                        src='default-profile.png'
-                        alt='profileImg'
-                        size='md'
-                      />
+                      <span>
+                        <img
+                          src={qnaData.methodIconPath}
+                          alt=''
+                          css={iconStyle}
+                        />
+                      </span>
                       <span css={nicknameStyle}>{qnaData.traderNickname}</span>
                     </div>
                   )}
@@ -500,4 +505,17 @@ const modalButtonWrapperStyle = css`
   justify-content: space-between;
   width: 100%;
   gap: 16px;
+`;
+
+const iconStyle = css`
+  width: 16px;
+  height: 16px;
+  object-fit: cover;
+`;
+
+const profileImgStyle = css`
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
 `;
