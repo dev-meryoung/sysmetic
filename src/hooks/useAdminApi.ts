@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   approveAdminStrategy,
+  createAdminStocks,
   getAdminStocks,
   rejectAdminStrategy,
   StocksPaginatedResponse,
@@ -27,4 +28,9 @@ export const useGetAdminStocks = (
     queryKey: ['adminStocks', params],
     queryFn: () => getAdminStocks(params),
     enabled: !!enabled,
+  });
+
+export const useCreateAdminStocks = () =>
+  useMutation({
+    mutationFn: createAdminStocks,
   });

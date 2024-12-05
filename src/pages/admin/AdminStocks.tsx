@@ -1,4 +1,10 @@
-import { SetStateAction, useEffect, useState } from 'react';
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
 import { css } from '@emotion/react';
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 import { StocksParameterProps } from '@/api';
@@ -11,7 +17,7 @@ import Tag from '@/components/Tag';
 import TextInput from '@/components/TextInput';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
-import { useGetAdminStocks } from '@/hooks/useAdminApi';
+import { useCreateAdminStocks, useGetAdminStocks } from '@/hooks/useAdminApi';
 import useModalStore from '@/stores/useModalStore';
 import { useTableStore } from '@/stores/useTableStore';
 
@@ -23,6 +29,11 @@ interface AdminStocksDataProps {
 
 interface DelModalProps {
   toggleAllCheckBoxes: (value: number) => void;
+}
+
+interface AddModalProps {
+  setFetch: Dispatch<SetStateAction<boolean>>;
+  stocks: AdminStocksDataProps[];
 }
 
 // const PAGE_SIZE = 10;
@@ -57,10 +68,69 @@ const DelModal: React.FC<DelModalProps> = ({ toggleAllCheckBoxes }) => {
   );
 };
 
-const AddModal = () => {
+const AddModal: React.FC<AddModalProps> = ({ setFetch, stocks }) => {
   const addModal = useModalStore();
   const [stocksValue, setStocksValue] = useState('');
   const [iconValue, setIconValue] = useState('');
+  const [profileImg, setProfileImg] = useState('');
+  const [isDuplicated, setIsDuplicated] = useState(false);
+  const handleOpenFileExplorer = () => {
+    const fileInput = document.getElementById('file-input');
+    fileInput?.click();
+  };
+
+  const checkDuplicate = (value: string) => {
+    const isDuplicate = stocks.some((stock) => stock.stocksName === value);
+    setIsDuplicated(isDuplicate);
+  };
+
+  const handleStocksChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setStocksValue(e.target.value);
+    checkDuplicate(e.target.value);
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const imageUrl = reader.result as string;
+        setProfileImg(imageUrl);
+        setIconValue(imageUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const { mutate: createAdminStocksMutation } = useCreateAdminStocks();
+
+  const handleCreateClick = () => {
+    const fileInput = document.getElementById('file-input') as HTMLInputElement;
+    const file = fileInput?.files?.[0];
+
+    if (!file) {
+      alert('파일을 첨부해주세요.');
+      return;
+    }
+
+    const formData = {
+      stockPostRequestDto: {
+        name: stocksValue,
+        checkDuplicate: !isDuplicated,
+      },
+      file,
+    };
+
+    createAdminStocksMutation(formData, {
+      onSuccess: () => {
+        addModal.closeModal('add');
+        setFetch(true);
+      },
+      onError: (error) => {
+        console.error('등록 실패', error);
+      },
+    });
+  };
 
   return (
     <div css={addModalStyle}>
@@ -78,12 +148,15 @@ const AddModal = () => {
               <TextInput
                 width={224}
                 value={stocksValue}
-                handleChange={(e) => setStocksValue(e.target.value)}
+                handleChange={handleStocksChange}
               />
-              <p>1글자 이상 입력하세요.</p>
+              {/* <p>1글자 이상 입력하세요.</p> */}
             </td>
             <td>
-              <p>등록아이콘</p>
+              <div css={thumbnailStyle}>
+                <p>등록아이콘</p>
+                {profileImg && <img src={profileImg} alt='미리보기' />}
+              </div>
               <div>
                 <TextInput
                   width={302}
@@ -95,10 +168,17 @@ const AddModal = () => {
                   iconBgSize='lg'
                   iconSize='md'
                   IconComponent={AddPhotoAlternateOutlinedIcon}
-                  handleClick={() => console.log('클릭')}
+                  handleClick={handleOpenFileExplorer}
                 />
               </div>
-              <p>jp(e)g, png 형식의 파일만 첨부 가능합니다.</p>
+              <input
+                id='file-input'
+                type='file'
+                accept='image/jpg,image/jpeg,image/png'
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+              />
+              {/* <p>jp(e)g, png 형식의 파일만 첨부 가능합니다.</p> */}
             </td>
           </tr>
         </tbody>
@@ -110,11 +190,7 @@ const AddModal = () => {
           label='취소'
           handleClick={() => addModal.closeModal('add')}
         />
-        <Button
-          width={120}
-          label='등록하기'
-          handleClick={() => console.log('click')}
-        />
+        <Button width={120} label='등록하기' handleClick={handleCreateClick} />
       </div>
     </div>
   );
@@ -184,6 +260,8 @@ const ModModal = () => {
 };
 
 const AdminStocks = () => {
+  //버튼 on/off
+  const [delDisabled, setDelDisabled] = useState(true);
   //테이블 관련
   const [curPage, setCurPage] = useState(0);
   const columns = [
@@ -269,6 +347,7 @@ const AdminStocks = () => {
   const handlePaginationClick = (value: SetStateAction<number>) => {
     setCurPage(value);
     setFetch(true);
+    toggleAllCheckboxes(0);
   };
 
   useEffect(() => {
@@ -277,6 +356,13 @@ const AdminStocks = () => {
       setFetch(false);
     }
   }, [fetch, refetch]);
+
+  //삭제버튼 on/off
+  useEffect(() => {
+    if (checkedItems.length > 0) {
+      setDelDisabled(false);
+    }
+  }, [checkedItems]);
 
   return (
     <div css={stocksWrapperStyle}>
@@ -291,6 +377,7 @@ const AdminStocks = () => {
             color='black'
             label='삭제'
             handleClick={openDeleteModal}
+            disabled={delDisabled}
           />
         </div>
       </div>
@@ -315,7 +402,10 @@ const AdminStocks = () => {
         content={<DelModal toggleAllCheckBoxes={toggleAllCheckboxes} />}
         id='delete'
       />
-      <Modal content={<AddModal />} id='add' />
+      <Modal
+        content={<AddModal setFetch={setFetch} stocks={stocks} />}
+        id='add'
+      />
       <Modal content={<ModModal />} id='modify' />
     </div>
   );
@@ -458,7 +548,7 @@ const addModalStyle = css`
 
       &:nth-of-type(1) {
         width: 240px;
-        margin-top: 30px;
+        margin-top: 32px;
       }
 
       &:nth-of-type(2) {
@@ -467,16 +557,16 @@ const addModalStyle = css`
 
       div {
         display: flex;
+
+        p {
+          color: ${COLOR.TEXT_BLACK};
+          height: 24px;
+          margin: 0;
+        }
       }
 
       p {
-        &:nth-of-type(1) {
-          margin-bottom: 8px;
-        }
-        &:last-child {
-          margin-bottom: 24px;
-          color: ${COLOR.POINT};
-        }
+        color: ${COLOR.POINT};
       }
     }
   }
@@ -487,6 +577,17 @@ const addModalStyle = css`
     gap: 16px;
     padding-top: 32px;
     border-top: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
+  }
+`;
+
+const thumbnailStyle = css`
+  display: flex;
+  align-itmes: center;
+  gap: 8px;
+
+  img {
+    width: 48px;
+    height: 20px;
   }
 `;
 

@@ -18,6 +18,16 @@ export interface StocksParameterProps {
   page: number;
 }
 
+export interface StocksPostRequestDtoProps {
+  name: string;
+  checkDuplicate: boolean;
+}
+
+export interface StocksPostRequestProps {
+  stockPostRequestDto: StocksPostRequestDtoProps;
+  file: File;
+}
+
 // 회원 목록 조회 API
 export const getAdminUserList = async () => {};
 
@@ -81,4 +91,23 @@ export const getAdminStocks = async (params: StocksParameterProps) => {
   );
 
   return response.data.data;
+};
+
+// 종목 저장 API
+export const createAdminStocks = async (params: StocksPostRequestProps) => {
+  const formData = new FormData();
+
+  formData.append(
+    'stockPostRequestDto',
+    JSON.stringify(params.stockPostRequestDto)
+  );
+  formData.append('file', params.file);
+
+  const response = await axiosInstance.post(`/v1/admin/stock`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  return response.data;
 };
