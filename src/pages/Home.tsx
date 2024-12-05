@@ -34,8 +34,8 @@ const Home = () => {
 
   const chartData = {
     data1: responseData.xaxisAverageStandardAmount.map(
-      (date: string, index: number) => [
-        date,
+      (date: number, index: number) => [
+        new Date(date).getTime(),
         responseData.averageStandardAmount[index] !== null &&
         responseData.averageStandardAmount[index] !== undefined
           ? Math.round(responseData.averageStandardAmount[index])
@@ -43,8 +43,8 @@ const Home = () => {
       ]
     ),
     data2: responseData.xaxisAccumulatedProfitLossRate.map(
-      (date: string, index: number) => [
-        date,
+      (date: number, index: number) => [
+        new Date(date).getTime(),
         responseData.accumulatedProfitLossRate[index] !== null &&
         responseData.accumulatedProfitLossRate[index] !== undefined
           ? Number(responseData.accumulatedProfitLossRate[index].toFixed(2))

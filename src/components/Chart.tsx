@@ -15,8 +15,8 @@ type ChartTypes = 'line' | 'area';
 
 interface ChartDataProps {
   chartData: {
-    data1: [string, number][];
-    data2: [string, number][];
+    data1: [number, number][];
+    data2: [number, number][];
   };
   name: string[];
   unit: string[];
@@ -33,9 +33,9 @@ const Chart: React.FC<ChartDataProps> = ({
   const dateFilter = ['1개월', '3개월', '6개월', '1년', 'ALL'];
 
   const getFilteredData = (
-    data: [string, number][],
+    data: [number, number][],
     selectedPeriod: string
-  ): [string, number][] => {
+  ): [number, number][] => {
     if (selectedPeriod === 'ALL') return data;
 
     const today = new Date();
@@ -75,7 +75,9 @@ const Chart: React.FC<ChartDataProps> = ({
       type: 'line',
       width: null,
       spacingTop: 40,
-      zoomType: 'xy',
+      zoomType: 'x',
+      panning: true,
+      panKey: 'shift',
       zooming: {
         mouseWheel: {
           enabled: true,
@@ -126,9 +128,18 @@ const Chart: React.FC<ChartDataProps> = ({
       title: {
         text: '',
       },
-      labels: {
-        format: '{value:%Y-%m-%d}',
+      dateTimeLabelFormats: {
+        year: '%Y-%m',
+        month: '%Y-%m',
+        week: '%Y-%m',
+        day: '%Y-%m',
       },
+      labels: {
+        style: {
+          fontSize: '12px',
+        },
+      },
+      tickInterval: 2 * 365 * 24 * 3600 * 1000,
     },
     yAxis: [
       {
@@ -184,6 +195,12 @@ const Chart: React.FC<ChartDataProps> = ({
         },
         tooltip: {
           valueSuffix: unit[0],
+        },
+        plotOptions: {
+          series: {
+            findNearestPointBy: 'xy',
+            stickyTracking: true,
+          },
         },
       },
       {
