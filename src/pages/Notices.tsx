@@ -190,8 +190,10 @@ const noticesListStyle = css`
       font-weight: ${FONT_WEIGHT.BOLD};
     }
     &:last-of-type {
-      transform: translateX(30%);
-  }
+      display: flex;
+      justify-content: flex-end; 
+      align-items: center;
+    }
 `;
 
 const noticesPaginationStyle = css`
