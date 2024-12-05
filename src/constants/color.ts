@@ -32,6 +32,8 @@ export const COLOR = {
   WARN_YELLOW: '#f9a825',
   ERROR_RED: '#b41c11',
   INFO_BLUE: '#0082d3',
+  CARD_BLUE: '#f1f7fe',
+  CARD_BLUE_BORDER: '#aecaed',
 };
 
 export const COLOR_OPACITY = {
@@ -43,4 +45,8 @@ export const COLOR_OPACITY = {
   POINT_OPACITY30: 'rgba(200, 74, 49, 0.3)',
   POINT_OPACITY10: 'rgba(200, 74, 49, 0.1)',
   POINT100_OPACITY70: 'rgba(250, 244, 242, 0.7)',
+  CARD_GREEN_OPACITY10: 'rgba(165, 200, 95, 0.1)',
+  CARD_GREEN_OPACITY30: 'rgba(165, 200, 95, 0.3)',
+  CARD_RED_OPACITY20: 'rgba(247, 217, 214, 0.2)',
+  CARD_RED_OPACITY30: 'rgba(181, 51, 35, 0.3)',
 };
