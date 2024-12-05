@@ -232,6 +232,7 @@ const linkStyle = css`
   font-size: 16px;
   font-weight: ${FONT_WEIGHT.BOLD};
   color: ${COLOR.TEXT_BLACK};
+  line-height: 50px;
 `;
 
 const strategyStyle = css`
@@ -282,11 +283,11 @@ const tableStyle = css`
     border-top: 1px solid ${COLOR.PRIMARY700};
     font-weight: ${FONT_WEIGHT.BOLD};
   }
-
+  
   td:first-child {
     text-align: left;
   }
-
+  
   td {
     padding: 20px 0;
     vertical-align: middle;

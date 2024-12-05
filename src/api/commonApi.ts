@@ -1,6 +1,5 @@
 import axiosInstance from '@/api/axiosInstance';
 
-// 공통 타입 정의
 export interface GetInquiryData {
   sort?: string;
   closed?: string;
@@ -30,6 +29,18 @@ export interface UpdateInquiryData {
   qnaId: number;
   inquiryTitle: string;
   inquiryContent: string;
+}
+
+export interface GetNoticeListData {
+  noticeId?: string | undefined;
+  page?: number;
+  searchText?: string;
+}
+
+export interface GetNoticeDetailData {
+  noticeId: string;
+  page?: number;
+  searchText?: string;
 }
 
 // 질문자 문의 상세 조회 API
@@ -113,5 +124,23 @@ export const getEditInquiry = async (params: GetInquiryDetailData) => {
       params: queryParams,
     }
   );
+  return response.data;
+};
+
+// 공지사항 조회 및 검색 API
+export const getNoticeList = async (getNoticeListData: GetNoticeListData) => {
+  const response = await axiosInstance.get(`/v1/notice`, {
+    params: getNoticeListData,
+  });
+
+  return response.data;
+};
+
+// 공지사항 상세 조회 API
+export const getNoticeDetail = async (getNoticeDetailData: GetNoticeDetailData) => {
+  const { noticeId, ...params } = getNoticeDetailData;
+  const response = await axiosInstance.get(`/v1/notice/${noticeId}`, {
+    params,
+  });
   return response.data;
 };

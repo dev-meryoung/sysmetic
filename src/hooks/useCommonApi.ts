@@ -15,6 +15,10 @@ import {
   getInquiryDetailUser,
   deleteInquiry,
   createUserInquiry,
+  getNoticeList,
+  GetNoticeListData,
+  getNoticeDetail,
+  GetNoticeDetailData,
 } from '@/api';
 
 // 질문자 문의 수정 화면 조회
@@ -106,4 +110,18 @@ export const useCreateUserInquiry = () =>
   useMutation({
     mutationFn: (createData: CreateInquiryData) =>
       createUserInquiry(createData),
+  });
+
+  // 사용자 공지 목록 조회
+export const useGetNoticeList = (params: GetNoticeListData) =>
+  useQuery({
+    queryKey: ['getNoticeList', params],
+    queryFn: () => getNoticeList(params),
+  });
+
+// 사용자 공지 상세 조회
+export const useGetNoticeDetail = (params: GetNoticeDetailData) =>
+  useQuery({
+    queryKey: ['getNoticeDetail', params],
+    queryFn: () => getNoticeDetail(params),
   });
