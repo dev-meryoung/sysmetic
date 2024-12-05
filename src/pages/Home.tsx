@@ -16,31 +16,41 @@ import getColorStyleBasedOnValue from '@/utils/tableUtils';
 
 const Home = () => {
   const navigate = useNavigate();
-  const period = 'ALL'; // 원하는 기간
 
   const { data: mainData } = useGetMainPage();
-  const { data: mainPageChartData } = useGetMainPageChart(period);
+  const { data: mainPageChartData } = useGetMainPageChart();
 
-  const averageStandardAmount = mainPageChartData?.data?.averageStandardAmount;
-  const accumProfitLossRate = mainPageChartData?.data?.accumProfitLossRate;
-  // console.log(averageStandardAmount?.length, 'averageStandardAmount 길이');
-  // console.log(accumProfitLossRate?.length, 'accumProfitLossRate 길이');
-  // console.log(test?.length, 'x축 길이');
-
-  const timestampXaxis = mainPageChartData?.data?.xaxis?.map((dateStr) => {
-    const date = new Date(dateStr);
-    return date.getTime(); // 밀리초 단위의 타임스탬프 반환
-  });
+  const responseData = {
+    smScoreTopStrategyName:
+      mainPageChartData?.data?.smScoreTopStrategyName || '',
+    averageStandardAmount: mainPageChartData?.data?.averageStandardAmount || [],
+    accumulatedProfitLossRate:
+      mainPageChartData?.data?.accumulatedProfitLossRate || [],
+    xaxisAverageStandardAmount:
+      mainPageChartData?.data?.xaxisAverageStandardAmount || [],
+    xaxisAccumulatedProfitLossRate:
+      mainPageChartData?.data?.xaxisAccumulatedProfitLossRate || [],
+  };
 
   const chartData = {
-    data1: averageStandardAmount?.map((value, index) => [
-      timestampXaxis?.[index],
-      value,
-    ]),
-    data2: accumProfitLossRate?.map((value, index) => [
-      timestampXaxis?.[index],
-      value,
-    ]),
+    data1: responseData.xaxisAverageStandardAmount.map(
+      (date: string, index: number) => [
+        date,
+        responseData.averageStandardAmount[index] !== null &&
+        responseData.averageStandardAmount[index] !== undefined
+          ? Math.round(responseData.averageStandardAmount[index])
+          : null,
+      ]
+    ),
+    data2: responseData.xaxisAccumulatedProfitLossRate.map(
+      (date: string, index: number) => [
+        date,
+        responseData.accumulatedProfitLossRate[index] !== null &&
+        responseData.accumulatedProfitLossRate[index] !== undefined
+          ? Number(responseData.accumulatedProfitLossRate[index].toFixed(2))
+          : null,
+      ]
+    ),
   };
 
   const animatedValue1 = useCountMotion({
@@ -190,7 +200,7 @@ const Home = () => {
                 평균을 확인할 수 있습니다.
               </span>
               <Chart
-                chartData={chartData} // 기본값 처리
+                chartData={chartData}
                 name={[
                   'Sysmetic Traders 통합기준가',
                   'SM Score 1위: ETF레버리지/인버스',

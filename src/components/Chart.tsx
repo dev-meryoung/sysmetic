@@ -15,15 +15,13 @@ type ChartTypes = 'line' | 'area';
 
 interface ChartDataProps {
   chartData: {
-    data1: [number, number][];
-    data2: [number, number][];
+    data1: [string, number][];
+    data2: [string, number][];
   };
   name: string[];
   unit: string[];
   type?: ChartTypes[];
 }
-
-const dateFilter = ['1개월', '3개월', '6개월', '1년', 'ALL'];
 
 const Chart: React.FC<ChartDataProps> = ({
   chartData,
@@ -31,12 +29,15 @@ const Chart: React.FC<ChartDataProps> = ({
   type = 'line',
   unit,
 }) => {
-  const [selectedPeriod, setSelectedPeriod] = useState('ALL');
+  const [selectedFilter, setSelectedFilter] = useState('ALL');
+  const dateFilter = ['1개월', '3개월', '6개월', '1년', 'ALL'];
 
   const getFilteredData = (
-    data: [number, number][],
+    data: [string, number][],
     selectedPeriod: string
-  ): [number, number][] => {
+  ): [string, number][] => {
+    if (selectedPeriod === 'ALL') return data;
+
     const today = new Date();
     const filterDate = new Date();
 
@@ -53,18 +54,14 @@ const Chart: React.FC<ChartDataProps> = ({
       case '1년':
         filterDate.setFullYear(today.getFullYear() - 1);
         break;
-      default:
-        return data;
     }
 
-    return data.filter(
-      (item): item is [number, number] => item[0] >= filterDate.getTime()
-    );
+    return data.filter(([dateStr]) => new Date(dateStr) >= filterDate);
   };
 
   const filteredData = {
-    data1: getFilteredData(chartData.data1, selectedPeriod),
-    data2: getFilteredData(chartData.data2, selectedPeriod),
+    data1: getFilteredData(chartData.data1, selectedFilter),
+    data2: getFilteredData(chartData.data2, selectedFilter),
   };
 
   const options = {
@@ -88,7 +85,6 @@ const Chart: React.FC<ChartDataProps> = ({
         fontFamily: 'Pretendard, sans-serif',
       },
     },
-    // 화면 크기가 1400px(13인치 노트북) 이하일 경우 높이 500
     responsive: {
       rules: [
         {
@@ -126,12 +122,12 @@ const Chart: React.FC<ChartDataProps> = ({
       margin: 48,
     },
     xAxis: {
-      type: 'datetime', // x축을 날짜/시간 기반으로 설정
+      type: 'datetime',
       title: {
-        text: 'Date',
+        text: '',
       },
       labels: {
-        format: '{value:%Y-%m-%d}', // 레이블을 '연도-월-일' 형식으로 표시
+        format: '{value:%Y-%m-%d}',
       },
     },
     yAxis: [
@@ -194,7 +190,7 @@ const Chart: React.FC<ChartDataProps> = ({
         name: name[1],
         type: type[1],
         data: filteredData.data2,
-        yAxis: 1, // 두 번째 Y축 사용
+        yAxis: 1,
         color:
           type === 'line'
             ? `${COLOR.PRIMARY}`
@@ -229,14 +225,13 @@ const Chart: React.FC<ChartDataProps> = ({
         containerProps={{ style: { width: '100%', height: 'auto' } }}
       />
       <section css={buttonWrapperStyle}>
-        {dateFilter.map((period) => (
+        {dateFilter.map((filter) => (
           <Button
-            label={period}
-            key={period}
+            label={filter}
+            key={filter}
             size='sm'
-            shape='round'
-            color={selectedPeriod === period ? 'primary' : 'transparent'}
-            handleClick={() => setSelectedPeriod(period)}
+            shape={selectedFilter === filter ? 'round' : 'none'}
+            handleClick={() => setSelectedFilter(filter)}
           />
         ))}
       </section>
