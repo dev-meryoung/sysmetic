@@ -1,8 +1,6 @@
-import { useMemo } from 'react';
 import { css } from '@emotion/react';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { useNavigate } from 'react-router-dom';
-import tempImage from '@/assets/images/test-profile.png';
 import Button from '@/components/Button';
 import Chart from '@/components/Chart';
 import ProfileImage from '@/components/ProfileImage';
@@ -14,14 +12,7 @@ import { useGetMainPage, useGetMainPageChart } from '@/hooks/useCommonApi';
 import useCountMotion from '@/hooks/useCountMotion';
 import Footer from '@/layouts/Footer';
 import Header from '@/layouts/Header';
-
-interface ChartData {
-  chartData: {
-    data1: [number, number][];
-    data2: [number, number][];
-  };
-  xAxisData: string[];
-}
+import getColorStyleBasedOnValue from '@/utils/tableUtils';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -32,10 +23,9 @@ const Home = () => {
 
   const averageStandardAmount = mainPageChartData?.data?.averageStandardAmount;
   const accumProfitLossRate = mainPageChartData?.data?.accumProfitLossRate;
-  const test = mainPageChartData?.data?.xaxis;
-  console.log(averageStandardAmount?.length, 'averageStandardAmount 길이');
-  console.log(accumProfitLossRate?.length, 'accumProfitLossRate 길이');
-  console.log(test?.length, 'x축 길이');
+  // console.log(averageStandardAmount?.length, 'averageStandardAmount 길이');
+  // console.log(accumProfitLossRate?.length, 'accumProfitLossRate 길이');
+  // console.log(test?.length, 'x축 길이');
 
   const timestampXaxis = mainPageChartData?.data?.xaxis?.map((dateStr) => {
     const date = new Date(dateStr);
@@ -89,11 +79,10 @@ const Home = () => {
                 <div className='ranking-card' key={trader.id}>
                   <span className='ranking-num'>{index + 1}</span>
                   <div className='ranking-card-top'>
-                    {/* TODO: 이미지 경로 변경 */}
                     <ProfileImage
                       size='lg'
                       alt='트레이더 이미지'
-                      src={tempImage}
+                      src={trader.traderProfileImage}
                     />
                     <span>{trader.nickname}</span>
                   </div>
@@ -116,11 +105,12 @@ const Home = () => {
               label='투자자 가입하기'
               width={160}
               handleClick={() => {
-                navigate(PATH.SIGN_UP_TYPE());
+                navigate(PATH.SIGN_UP);
               }}
             />
             <Button
               label='전략목록 보기'
+              color='primaryOpacity10'
               border={true}
               width={160}
               handleClick={() => {
@@ -169,12 +159,13 @@ const Home = () => {
               label='트레이더 가입하기'
               width={160}
               handleClick={() => {
-                navigate(PATH.SIGN_UP_TYPE());
+                navigate(PATH.SIGN_UP);
               }}
             />
             <Button
               label='트레이더 목록보기'
               border={true}
+              color='primaryOpacity10'
               width={160}
               handleClick={() => {
                 navigate(PATH.TRADERS);
@@ -230,12 +221,10 @@ const Home = () => {
                 <div className='card-top'>
                   <h5 className='num'>{index + 1}</h5>
                   <div>
-                    {/* TODO: 수정 */}
-
                     <ProfileImage
                       size='lg'
                       alt='트레이더 이미지'
-                      src={tempImage}
+                      src={strategy.traderProfileImage}
                     />
                     <span>{strategy.nickname}</span>
                   </div>
@@ -244,12 +233,19 @@ const Home = () => {
                 <div className='card-btm'>
                   <div className='card-btm-option'>
                     <h6>SM Score</h6>
-                    <h5>{strategy.smScore}</h5>
+                    <h5 style={getColorStyleBasedOnValue(strategy.smScore)}>
+                      {strategy.smScore}%
+                    </h5>
                   </div>
                   <div className='card-btm-option'>
-                    {/* TODO: 수정 */}
                     <h6>누적 손익률</h6>
-                    <h5>{strategy.name}</h5>
+                    <h5
+                      style={getColorStyleBasedOnValue(
+                        strategy.accumulatedProfitLossRate
+                      )}
+                    >
+                      {strategy.accumulatedProfitLossRate}%
+                    </h5>
                   </div>
                 </div>
               </div>
@@ -438,6 +434,7 @@ const smScoreCardStyle = css`
     position: relative;
     flex: 1 1 calc(33.33% - 20px);
     box-sizing: border-box;
+    background-color: ${COLOR.WHITE};
     border: 1px solid ${COLOR_OPACITY.POINT_OPACITY30};
     border-radius: 20px;
     overflow: hidden;
@@ -485,10 +482,6 @@ const smScoreCardStyle = css`
         h6 {
           font-weight: ${FONT_WEIGHT.REGULAR};
         }
-
-        h5 {
-          color: ${COLOR.ERROR_RED};
-        }
       }
     }
   }
@@ -499,7 +492,7 @@ const smScoreCardStyle = css`
     justify-content: space-between;
 
     .card-btm-option {
-      width: 200px;
+      gap: 64px;
     }
   }
 

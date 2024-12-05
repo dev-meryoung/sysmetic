@@ -24,6 +24,7 @@ interface MainPageDataProps {
       nickname: string;
       followerCount: number;
       accumProfitLossRate: number;
+      traderProfileImage: string;
     }[];
 
     totalTraderCount: number;
@@ -31,14 +32,16 @@ interface MainPageDataProps {
 
     smScoreTopFives: {
       id: number;
+      traderProfileImage: string;
       traderId: number;
       nickname: string;
       name: string;
+      accumulatedProfitLossRate: number;
+      smScore: number;
       stocks: {
         stockIds: number[];
         stockNames: string[];
       }[];
-      smScore: number;
     }[];
   };
 }

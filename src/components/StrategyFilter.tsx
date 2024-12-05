@@ -74,7 +74,7 @@ export const TAB_FILTERS: Record<number, FilterProps[]> = {
     },
     {
       id: 'accumProfitLossRate',
-      label: '누적손익률',
+      label: '누적 손익률',
       type: 'range',
       options: [],
     },
@@ -188,35 +188,38 @@ const FilterInput = ({ filter, currentValue, onChange }: FilterInputProps) => {
       return (
         <div css={rangeStyle}>
           <div className='wrapper'>
-            <TextInput
-              type='text'
-              value={rangeStart}
-              placeholder='-100'
-              width={118}
-              handleChange={handleRangeChange('start')}
-              handleKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleSubmit();
-                }
-              }}
-            />
-            ~
-            <TextInput
-              type='text'
-              value={rangeEnd}
-              placeholder='100'
-              width={118}
-              handleChange={handleRangeChange('end')}
-              handleKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleSubmit();
-                }
-              }}
-            />
-            %
+            <div className='input-area'>
+              <TextInput
+                type='text'
+                value={rangeStart}
+                placeholder='-100'
+                width={118}
+                handleChange={handleRangeChange('start')}
+                handleKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSubmit();
+                  }
+                }}
+              />
+              ~
+              <TextInput
+                type='text'
+                value={rangeEnd}
+                placeholder='100'
+                width={118}
+                handleChange={handleRangeChange('end')}
+                handleKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSubmit();
+                  }
+                }}
+              />
+              %
+            </div>
             <IconButton
               IconComponent={SearchIcon}
-              shape='none'
+              iconSize='sm'
+              color='primary'
               handleClick={handleSubmit}
             />
           </div>
@@ -349,12 +352,18 @@ const filterContentStyle = css`
 const rangeStyle = css`
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 
   .wrapper {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 16px;
+
+    .input-area {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
   }
 
   .error-msg {
