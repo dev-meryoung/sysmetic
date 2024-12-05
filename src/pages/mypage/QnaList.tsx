@@ -283,11 +283,11 @@ const tableStyle = css`
     border-top: 1px solid ${COLOR.PRIMARY700};
     font-weight: ${FONT_WEIGHT.BOLD};
   }
-  
+
   td:first-child {
     text-align: left;
   }
-  
+
   td {
     padding: 20px 0;
     vertical-align: middle;

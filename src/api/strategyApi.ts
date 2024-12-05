@@ -20,7 +20,6 @@ export const getMethodAndStockList = async () => {
   return response.data;
 };
 
-
 // 전략 목록 조회 API
 export const getStrategyList = async (pageNum: number) => {
   const response = await axiosInstance.get('/v1/strategy/list', {
@@ -209,7 +208,6 @@ export const createStrategy = async (formData: FormData) => {
 
   return response.data;
 };
-
 
 // 전략 수정 API
 export const updateStrategy = async (
