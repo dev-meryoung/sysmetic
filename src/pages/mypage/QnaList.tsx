@@ -232,6 +232,7 @@ const linkStyle = css`
   font-size: 16px;
   font-weight: ${FONT_WEIGHT.BOLD};
   color: ${COLOR.TEXT_BLACK};
+  line-height: 50px;
 `;
 
 const strategyStyle = css`
