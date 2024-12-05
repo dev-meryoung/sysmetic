@@ -104,8 +104,31 @@ const Chart: React.FC<ChartDataProps> = ({
     tooltip: {
       style: {
         fontSize: `${FONT_SIZE.TEXT_MD}`,
-        fontWeight: `${FONT_WEIGHT.BOLD}`,
       },
+      formatter(this: Highcharts.TooltipFormatterContextObject) {
+        const date = new Date(this.x as number);
+        const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+        return `
+        <table style="margin: 0; padding: 16px; z-index:10000;">
+          <tr>
+            <td style="padding-bottom: 4px;">
+              ${formattedDate}
+            </td>
+          </tr>
+          <tr>
+            <td style="white-space: nowrap; text-align: left;">
+              <span style="color: ${COLOR.BLACK}; font-weight: ${FONT_WEIGHT.BOLD};">${this.series.name}</span>: 
+              <span style="color: ${COLOR.BLACK}; font-weight: ${FONT_WEIGHT.BOLD};">${this.y?.toLocaleString()}${(this.series as any).userOptions.tooltip.valueSuffix}</span>
+            </td>
+          </tr>
+        </table>`;
+      },
+      useHTML: true,
+      backgroundColor: `${COLOR.WHITE}`,
+      borderWidth: 1,
+      borderColor: `${COLOR.GRAY300}`,
+      borderRadius: 8,
     },
     plotOptions: {
       series: {
