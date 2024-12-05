@@ -145,6 +145,10 @@ const AdminUsers = () => {
     console.log(selectedFilter);
   }, [selectedFilter]);
 
+  useEffect(() => {
+    setHasManagerRights(selectedGrade === 'setManager');
+  }, [selectedGrade]);
+
   const columns = [
     {
       key: 'no' as keyof UsersTableProps,
@@ -221,8 +225,11 @@ const AdminUsers = () => {
             console.error('회원 탈퇴 중 오류 발생', error);
           },
         });
+
+        return;
       }
     }
+
     const params = {
       memberId: selectedUserIds,
       hasManagerRights,
@@ -231,7 +238,7 @@ const AdminUsers = () => {
     updateAdminUserRoleMutation(params, {
       onSuccess: (data) => {
         if (data?.code === 200) {
-          setHasManagerRights(selectedGrade === 'setManager');
+          console.log('성공');
         }
         setFetch(true);
         toggleAllCheckboxes(0);
