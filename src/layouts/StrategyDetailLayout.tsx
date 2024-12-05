@@ -68,8 +68,8 @@ const ANALYSIS_OPTIONS = [
   { label: '평균 손익 금액', value: 'averageProfitLossAmount', unit: '원' },
   { label: '평균 손익률', value: 'averageProfitLossRate', unit: '%' },
   { label: '승률', value: 'winningRate', unit: '%' },
-  { label: 'Profit Factor', value: 'profitFactor', unit: '' },
-  { label: 'ROA', value: 'roa', unit: '' },
+  { label: 'Profit Factor', value: 'profitFactor', unit: '%' },
+  { label: 'ROA', value: 'roa', unit: '%' },
 ];
 
 const StrategyDetailLayout = () => {
@@ -119,15 +119,32 @@ const StrategyDetailLayout = () => {
 
   useEffect(() => {
     if (strategyAnalysis) {
+      const formatValue = (value: number, optionValue: string) => {
+        const unit = ANALYSIS_OPTIONS.find(
+          (option) => option.value === optionValue
+        )?.unit;
+
+        if (unit === '원') {
+          return Math.round(value);
+        }
+
+        if (unit === '%') {
+          return parseFloat(value.toFixed(2));
+        }
+
+        return value;
+      };
+
       const data1 =
         strategyAnalysis[graphOption1]?.map((value: number, idx: number) => [
           new Date(strategyAnalysis.xaxis[idx]).getTime(),
-          value,
+          formatValue(value, graphOption1),
         ]) || [];
+
       const data2 =
         strategyAnalysis[graphOption2]?.map((value: number, idx: number) => [
           new Date(strategyAnalysis.xaxis[idx]).getTime(),
-          value,
+          formatValue(value, graphOption2),
         ]) || [];
 
       setChartData({ data1, data2 });
