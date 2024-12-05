@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { useNavigate } from 'react-router-dom';
-import tempImage from '@/assets/images/test-profile.png';
 import Button from '@/components/Button';
 import Pagination from '@/components/Pagination';
 import ProfileImage from '@/components/ProfileImage';
@@ -10,63 +9,68 @@ import TextInput from '@/components/TextInput';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
-import traderData from '@/mocks/traders.json';
-
-const PAGE_SIZE = 10;
+import { useGetFilterdTrader } from '@/hooks/useStrategyApi';
 
 interface TraderProps {
-  profileImage: string;
-  nickname: string;
-  interestCount: number;
-  strategyCount: number;
+  nicknameListDto: {
+    id: number;
+    nickname: string;
+    roleCode: string;
+    totalFollow: number;
+    publicStrategyCount: number;
+  };
+  traderProfileImage: string;
 }
 
 const TraderList = () => {
   const navigate = useNavigate();
-  const [traderInfo, setTraderInfo] = useState<TraderProps[]>([]);
-  const [filteredTraderInfo, setFilteredTraderInfo] = useState<TraderProps[]>(
-    []
-  );
+
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPage, setTotalPage] = useState(0);
-  const [searchValue, setSearchValue] = useState('');
-  const [searchedValue, setSearchedValue] = useState('');
+  const [totalElement, setTotalElement] = useState(0);
 
-  useEffect(() => {
-    setTraderInfo(traderData);
-    setFilteredTraderInfo(traderData);
-    setTotalPage(Math.ceil(traderData.length / PAGE_SIZE));
-  }, []);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [inputValue, setInputValue] = useState('');
 
-  const handleSearch = () => {
-    setSearchedValue(searchValue);
+  const { data: traderData, isLoading } = useGetFilterdTrader(
+    searchQuery,
+    currentPage
+  );
 
-    let filtered;
+  const traderList = traderData?.data?.content;
 
-    if (searchValue === '') {
-      filtered = traderInfo;
-    } else {
-      const searchTerms = searchValue
-        .split(' ')
-        .map((term) => term.trim().toLowerCase());
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
 
-      filtered = traderInfo.filter((trader) =>
-        searchTerms.every((term) =>
-          trader.nickname.toLowerCase().includes(term)
-        )
-      );
+  const handleSearchClick = () => {
+    const trimmedSearch = inputValue.replace(/\s+/g, '');
+
+    if (trimmedSearch === '') {
+      return;
     }
 
-    setFilteredTraderInfo(filtered);
-    setTotalPage(Math.ceil(filtered.length / PAGE_SIZE));
-    setCurrentPage(0);
+    if (trimmedSearch !== searchQuery) {
+      setSearchQuery(trimmedSearch);
+      setCurrentPage(0);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      handleSearch();
+      handleSearchClick();
     }
   };
+
+  useEffect(() => {
+    if (traderData?.data) {
+      setTotalPage(traderData.data.totalPages);
+      setTotalElement(traderData.data.totalElement);
+      if (currentPage >= traderData.data.totalPages) {
+        setCurrentPage(Math.max(0, traderData.data.totalPages - 1));
+      }
+    }
+  }, [traderData, currentPage]);
 
   return (
     <div css={traderyWrapperStyle}>
@@ -77,33 +81,39 @@ const TraderList = () => {
             iconNum='single'
             placeholder='닉네임'
             color='skyblue'
-            value={searchValue}
+            value={inputValue}
             width={360}
-            handleChange={(e) => setSearchValue(e.target.value)}
+            handleChange={handleInputChange}
             handleKeyDown={handleKeyDown}
           />
-          <div className='searchIcon' onClick={handleSearch}>
+          <div className='searchIcon' onClick={handleSearchClick}>
             <SearchOutlinedIcon />
           </div>
         </div>
       </section>
+
       <section css={contentsWrapper}>
         <h6 className='info-text'>
-          총 <strong>{filteredTraderInfo.length}명</strong>의 트레이더를 보실 수
+          총 <strong>{totalElement ?? 0}명</strong>의 트레이더를 보실 수
           있습니다
         </h6>
-        {filteredTraderInfo.length > 0 ? (
+        {traderData?.data?.content.length > 0 && !isLoading ? (
           <div css={cardWrapper}>
-            {filteredTraderInfo
-              .slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE)
-              .map((profile, index) => (
+            {traderData?.data?.content.map(
+              (profile: TraderProps, index: number) => (
                 <div
                   key={index}
                   className='card'
-                  onClick={() => navigate(PATH.TRADER_STRATEGIES())}
+                  onClick={() =>
+                    navigate(
+                      PATH.TRADER_STRATEGIES(
+                        String(profile?.nicknameListDto?.id)
+                      )
+                    )
+                  }
                 >
                   <ProfileImage
-                    src={tempImage}
+                    src={profile?.traderProfileImage || ''}
                     size='xl'
                     alt='트레이더 이미지'
                   />
@@ -111,33 +121,42 @@ const TraderList = () => {
                     <div className='card-info-top'>
                       <div className='nickname-area'>
                         <span>트레이더</span>
-                        <h6>{profile.nickname}</h6>
+                        <h6>{profile?.nicknameListDto?.nickname}</h6>
                       </div>
                       <Button
                         size='xs'
                         shape='round'
                         label='전략정보'
                         width={80}
-                        handleClick={() => navigate(PATH.TRADER_STRATEGIES())}
+                        handleClick={() =>
+                          navigate(
+                            PATH.TRADER_STRATEGIES(
+                              String(profile?.nicknameListDto?.id)
+                            )
+                          )
+                        }
                       />
                     </div>
                     <div className='card-info-btm'>
                       <span className='option'>관심 수</span>
-                      <span>{profile.interestCount}</span>
+                      <span>{profile?.nicknameListDto?.totalFollow}</span>
                       <span className='line'></span>
                       <span className='option'>전략 수</span>
-                      <span>{profile.strategyCount}</span>
+                      <span>
+                        {profile?.nicknameListDto?.publicStrategyCount}
+                      </span>
                     </div>
                   </div>
                 </div>
-              ))}
+              )
+            )}
           </div>
+        ) : searchQuery ? (
+          <span css={emptyContents}>검색결과가 없습니다.</span>
         ) : (
-          <span css={emptyContents}>
-            <strong>‘{searchedValue}’</strong> 검색결과는 없습니다.
-          </span>
+          <span css={emptyContents}>트레이더가 없습니다.</span>
         )}
-        {filteredTraderInfo.length > 0 && (
+        {traderList?.length > 0 && (
           <Pagination
             totalPage={totalPage}
             currentPage={currentPage}
@@ -274,11 +293,6 @@ const emptyContents = css`
   border-radius: 4px;
   background: ${COLOR.GRAY100};
   text-align: center;
-
-  strong {
-    font-weight: ${FONT_WEIGHT.BOLD};
-    color: ${COLOR.POINT};
-  }
 `;
 
 export default TraderList;
