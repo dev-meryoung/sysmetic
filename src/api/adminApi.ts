@@ -111,3 +111,12 @@ export const createAdminStocks = async (params: StocksPostRequestProps) => {
 
   return response.data;
 };
+
+// 종목 삭제 API
+export const deleteAdminStocks = async (ids: number[]) => {
+  const response = await axiosInstance.delete(`/v1/admin/stock`, {
+    data: { stockIdList: ids },
+  });
+
+  return response.data;
+};

@@ -2,6 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   approveAdminStrategy,
   createAdminStocks,
+  deleteAdminStocks,
   getAdminStocks,
   rejectAdminStrategy,
   StocksPaginatedResponse,
@@ -33,4 +34,9 @@ export const useGetAdminStocks = (
 export const useCreateAdminStocks = () =>
   useMutation({
     mutationFn: createAdminStocks,
+  });
+
+export const useDeleteAdminStocks = () =>
+  useMutation({
+    mutationFn: deleteAdminStocks,
   });

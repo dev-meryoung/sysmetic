@@ -17,7 +17,11 @@ import Tag from '@/components/Tag';
 import TextInput from '@/components/TextInput';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
-import { useCreateAdminStocks, useGetAdminStocks } from '@/hooks/useAdminApi';
+import {
+  useCreateAdminStocks,
+  useDeleteAdminStocks,
+  useGetAdminStocks,
+} from '@/hooks/useAdminApi';
 import useModalStore from '@/stores/useModalStore';
 import { useTableStore } from '@/stores/useTableStore';
 
@@ -28,28 +32,41 @@ interface AdminStocksDataProps {
 }
 
 interface DelModalProps {
+  checkedItems: number[];
+  stocks: AdminStocksDataProps[];
+  setFetch: Dispatch<SetStateAction<boolean>>;
   toggleAllCheckBoxes: (value: number) => void;
 }
 
 interface AddModalProps {
   setFetch: Dispatch<SetStateAction<boolean>>;
   stocks: AdminStocksDataProps[];
+  toggleAllCheckBoxes: (value: number) => void;
 }
 
-// const PAGE_SIZE = 10;
-
-const DelModal: React.FC<DelModalProps> = ({ toggleAllCheckBoxes }) => {
+//? 삭제 모달
+const DelModal: React.FC<DelModalProps> = ({
+  checkedItems,
+  stocks,
+  setFetch,
+  toggleAllCheckBoxes,
+}) => {
   const delModal = useModalStore();
+  const checkedStocks = checkedItems.map((idx) => stocks[idx].no);
+  //삭제 mutation
+  const { mutate: deleteAdminStocksMutation } = useDeleteAdminStocks();
 
   const handleDeleteClick = () => {
-    //? 데이터 삭제 코드
-    //1. data.filter()를 통해 체크된 항목을 제외한 새로운 데이터 생성
-    //2. setData(변수명)을 통해 data 상태 업데이트
-    //3. 페이지 수 최신화 업데이트
-
-    //4.체크박스 상태 초기화 및 모달 닫기
-    toggleAllCheckBoxes(0);
-    delModal.closeModal('delete');
+    deleteAdminStocksMutation(checkedStocks, {
+      onSuccess: () => {
+        delModal.closeModal('delete');
+        setFetch(true);
+        toggleAllCheckBoxes(0);
+      },
+      onError: (error) => {
+        console.error('종목 삭제 중 오류 발생!', error);
+      },
+    });
   };
 
   return (
@@ -68,7 +85,12 @@ const DelModal: React.FC<DelModalProps> = ({ toggleAllCheckBoxes }) => {
   );
 };
 
-const AddModal: React.FC<AddModalProps> = ({ setFetch, stocks }) => {
+//? 등록 모달
+const AddModal: React.FC<AddModalProps> = ({
+  setFetch,
+  stocks,
+  toggleAllCheckBoxes,
+}) => {
   const addModal = useModalStore();
   const [stocksValue, setStocksValue] = useState('');
   const [iconValue, setIconValue] = useState('');
@@ -125,6 +147,7 @@ const AddModal: React.FC<AddModalProps> = ({ setFetch, stocks }) => {
       onSuccess: () => {
         addModal.closeModal('add');
         setFetch(true);
+        toggleAllCheckBoxes(0);
       },
       onError: (error) => {
         console.error('등록 실패', error);
@@ -196,6 +219,7 @@ const AddModal: React.FC<AddModalProps> = ({ setFetch, stocks }) => {
   );
 };
 
+//? 수정 모달
 const ModModal = () => {
   const modModal = useModalStore();
   const [stocksValue, setStocksValue] = useState('');
@@ -331,9 +355,10 @@ const AdminStocks = () => {
     })) || [];
 
   const openDeleteModal = () => {
-    if (checkedItems.length > 0) {
-      delModal.openModal('delete');
-    }
+    // if (checkedItems.length > 0) {
+    //   delModal.openModal('delete');
+    // }
+    delModal.openModal('delete');
   };
 
   const openAddModal = () => {
@@ -399,11 +424,24 @@ const AdminStocks = () => {
         />
       </div>
       <Modal
-        content={<DelModal toggleAllCheckBoxes={toggleAllCheckboxes} />}
+        content={
+          <DelModal
+            checkedItems={checkedItems}
+            stocks={stocks}
+            setFetch={setFetch}
+            toggleAllCheckBoxes={toggleAllCheckboxes}
+          />
+        }
         id='delete'
       />
       <Modal
-        content={<AddModal setFetch={setFetch} stocks={stocks} />}
+        content={
+          <AddModal
+            setFetch={setFetch}
+            stocks={stocks}
+            toggleAllCheckBoxes={toggleAllCheckboxes}
+          />
+        }
         id='add'
       />
       <Modal content={<ModModal />} id='modify' />
