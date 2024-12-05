@@ -13,6 +13,11 @@ import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 import useStrategyAdd from '@/hooks/useStrategyAdd';
 
+const CYCLE_OPTIONS = [
+  { label: '데이', value: 'D' },
+  { label: '포지션', value: 'P' },
+];
+
 const StrategyAdd = () => {
   const {
     methodOptions,
@@ -37,11 +42,6 @@ const StrategyAdd = () => {
   } = useStrategyAdd();
 
   const navigate = useNavigate();
-
-  const CYCLE_OPTIONS = [
-    { label: '데이', value: 'D' },
-    { label: '포지션', value: 'P' },
-  ];
 
   const conditionalRender = {
     trader: (
