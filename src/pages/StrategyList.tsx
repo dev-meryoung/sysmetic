@@ -192,7 +192,7 @@ const AddInterestModalContent = ({
 
   return (
     <div css={addInteresmodalStyle}>
-      <span>관심등록</span>
+      <span>관심 등록</span>
       <RadioButton
         options={folderOptions}
         name='folder-radio'
