@@ -12,6 +12,11 @@ import {
   createAdminNotice,
   deleteAdminNoticeList,
   getAdminNoticeEdit,
+  getInquiryList,
+  DeleteInquiryListRequest,
+  deleteInquiryList,
+  getInquiryDetail,
+  deleteDetailInquiry,
 } from '@/api';
 
 export const useApproveAdminStrategy = () =>
@@ -76,3 +81,60 @@ export const useGetAdminNoticeEdit = (noticeId: string) =>
     queryKey: ['adminNoticeEdit', noticeId],
     queryFn: () => getAdminNoticeEdit(noticeId),
   });
+
+// 관리자 문의 조회
+export const useGetInquiryList = (
+  page: number,
+  closed: string,
+  searchType: string,
+  searchText: string
+) =>
+  useQuery({
+    queryKey: ['adminInquiryList', page, closed, searchType, searchText],
+    queryFn: () => getInquiryList(page, closed, searchType, searchText),
+  });
+
+// 관리자 문의 목록 삭제
+export const useDeleteInquiryList = () => {
+  const mutation = useMutation<any, Error, DeleteInquiryListRequest>({
+    mutationFn: (requestData: DeleteInquiryListRequest) =>
+      deleteInquiryList(requestData),
+  });
+
+  return mutation;
+};
+
+// 관리자 문의 상세조회
+export const useGetInquiryDetail = (
+  qnaId: number,
+  page: number,
+  closed: string,
+  searchType: string,
+  searchText: string
+) =>
+  useQuery({
+    queryKey: [
+      'adminInquiryDetail',
+      qnaId,
+      page,
+      closed,
+      searchType,
+      searchText,
+    ],
+    queryFn: () =>
+      getInquiryDetail(qnaId, {
+        page,
+        closed,
+        searchType,
+        searchText,
+      }),
+  });
+
+// 관리자 문의 특정 삭제 API
+export const useDeleteDetailInquiry = () => {
+  const mutation = useMutation<any, Error, number>({
+    mutationFn: (qnaId: number) => deleteDetailInquiry(qnaId),
+  });
+
+  return mutation;
+};

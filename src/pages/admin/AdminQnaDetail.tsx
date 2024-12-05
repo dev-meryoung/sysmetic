@@ -1,33 +1,136 @@
+import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import SubdirectoryArrowRightOutlinedIcon from '@mui/icons-material/SubdirectoryArrowRightOutlined';
-import TagTest from '@/assets/images/test-tag.jpg';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
 import ProfileImage from '@/components/ProfileImage';
 import Tag from '@/components/Tag';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
+import { PATH } from '@/constants/path';
+import {
+  useDeleteDetailInquiry,
+  useGetInquiryDetail,
+} from '@/hooks/useAdminApi';
 import useModalStore from '@/stores/useModalStore';
+import { extractDate } from '@/utils/dataUtils';
 
-const DelModal = () => (
-  <div css={ModalStyle}>
-    <p>해당 문의를 삭제하시겠습니까?</p>
-    <div className='btn'>
-      <Button
-        width={120}
-        border={true}
-        label='아니오'
-        handleClick={() => console.log('아니오')}
-      />
-      <Button width={120} label='예' handleClick={() => console.log('예')} />
+interface AdminQnaDetailDataProps {
+  answerContent: string;
+  answerRegistrationDate: string;
+  answerTitle: string;
+  closed: string;
+  cycle: string;
+  inquirerNickname: string;
+  inquiryAnswerId: number;
+  inquiryContent: string;
+  inquiryId: number;
+  inquiryRegistrationDate: string;
+  inquiryStatus: string;
+  inquiryTitle: string;
+  methodIconPath: string;
+  methodId: number;
+  nextTitle: string | null;
+  nextWriteDate: string | null;
+  page: number;
+  previousTitle: string | null;
+  previousWriteDate: string | null;
+  searchText: string;
+  searchType: string;
+  statusCode: string;
+  stockList: StockListProps;
+  stockIds: number[];
+  stockNames: string[];
+  strategyId: number;
+  strategyName: string;
+  traderId: number;
+  traderNickname: string;
+  traderProfileImagePath: string;
+}
+
+interface StockListProps {
+  stockIconPath: string[];
+}
+
+const DelModal = ({
+  inquiryId,
+  inquiryDetailDataRefetch,
+}: {
+  inquiryId: number;
+  inquiryDetailDataRefetch: () => void;
+}) => {
+  const { closeModal } = useModalStore();
+  const navigate = useNavigate();
+  const { mutate: deleteMutaion } = useDeleteDetailInquiry();
+
+  const qnaId = inquiryId;
+
+  const handleDelete = (qnaId: number) => {
+    deleteMutaion(qnaId, {
+      onSuccess: () => {
+        inquiryDetailDataRefetch();
+        closeModal('delete');
+        navigate(PATH.ADMIN_QNA);
+      },
+      onError: (error) => {
+        console.log('삭제 실패', error);
+      },
+    });
+  };
+
+  return (
+    <div css={ModalStyle}>
+      <p>해당 문의를 삭제하시겠습니까?</p>
+      <div className='btn'>
+        <Button
+          width={120}
+          border={true}
+          label='아니오'
+          handleClick={() => closeModal('delete')}
+        />
+        <Button
+          width={120}
+          label='예'
+          handleClick={() => {
+            handleDelete(qnaId);
+          }}
+        />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const AdminQnaDetail = () => {
-  //모달
+  const navigate = useNavigate();
+  const location = useLocation();
+  const inquiry = location.state?.inquiry;
   const deleteModal = useModalStore();
+  const urlNumber = Number(window.location.pathname.split('/').pop()) || null;
 
+  const [currentPage, setCurrentPage] = useState(0);
+  const [searchType, setSearchType] = useState('strategy');
+  const [searchText, setSearchText] = useState('');
+  const [data, setData] = useState<AdminQnaDetailDataProps>();
+
+  const { data: inquiryDetailData, refetch: inquiryDetailDataRefetch } =
+    useGetInquiryDetail(
+      inquiry?.inquiryId,
+      currentPage,
+      inquiry?.inquiryStatus,
+      searchType,
+      searchText
+    );
+
+  useEffect(() => {
+    setData(inquiryDetailData?.data);
+  }, [inquiryDetailData]);
+
+  useEffect(() => {
+    inquiryDetailDataRefetch();
+  }, [urlNumber]);
+  // console.log(inquiry, 'inquiry');
+  console.log(data, 'data');
   return (
     <div css={adminQnaWrapperStyle}>
       <div css={adminQnaHeaderStyle}>
@@ -39,15 +142,15 @@ const AdminQnaDetail = () => {
       </div>
       <div css={adminQDivStyle}>
         <div css={adminQTitleStyle}>
-          <h6>미국발 경제악화가 한국 증시에 미치는 영향은 무엇인가요?</h6>
+          <h6>{data?.inquiryTitle}</h6>
           <div className='info'>
             <div>
               <p>작성일</p>
-              <p>2024. 11. 28.</p>
+              <p>{extractDate(data?.inquiryRegistrationDate || '')}</p>
             </div>
             <div>
               <p>작성자</p>
-              <p>주식초보123</p>
+              <p>{data?.inquirerNickname}</p>
             </div>
             <Button
               width={25}
@@ -60,66 +163,78 @@ const AdminQnaDetail = () => {
         </div>
         <div css={adminQStrategyStyle}>
           <div className='strategyName'>
-            <Tag src={TagTest} />
-            <p>따라하면 너도나도 부자되는 전략</p>
+            <div className='tag'>
+              <Tag src={data?.methodIconPath || ''} />
+              {data?.stockList?.stockIconPath &&
+                data?.stockList?.stockIconPath.map(
+                  (stock: string, index: number) => (
+                    <Tag key={index} src={stock || ''} alt='tag' />
+                  )
+                )}
+            </div>
+            <p>{data?.strategyName}</p>
           </div>
           <div className='profile'>
-            <ProfileImage />
-            <p>트레이더123</p>
+            <ProfileImage src={data?.traderProfileImagePath} />
+            <p>{data?.traderNickname}</p>
           </div>
         </div>
         <div css={adminQContentStyle}>
-          <p>미국발 경제악화가 한국 증시에 미치는 영향이 뭔가요?</p>
+          <p>{data?.inquiryContent}</p>
         </div>
         <div css={adminATitleStyle}>
           <div className='answer'>
             <div className='title'>
               <SubdirectoryArrowRightOutlinedIcon css={iconStyle} />
-              <h6>답변 드립니다.</h6>
+              <h6>{data?.answerTitle}</h6>
             </div>
             <div className='info'>
               <p>작성일</p>
-              <p>2024. 11. 28.</p>
+              <p>{extractDate(data?.answerRegistrationDate)}</p>
             </div>
           </div>
           <div className='profile'>
-            <ProfileImage />
-            <p>트레이더123</p>
+            <ProfileImage src={data?.traderProfileImagePath} />
+            <p>{data?.traderNickname}</p>
           </div>
         </div>
         <div css={adminQContentStyle}>
-          <p>
-            안녕하세요 트레이더 트레이더123입니다. <br />
-            말씀드리기 어렵습니다 ㅈㅅㅈㅅ ㅋㅋ <br />
-            감사합니다 땡큐
-          </p>
+          <p>{data?.answerContent}</p>
         </div>
       </div>
       <div css={adminQnaNavStyle}>
-        <div className='back-qna'>
+        <Link className='back-qna' to={`/admin/qna/${urlNumber - 1}`}>
           <div>
             <p>이전</p>
-            <p>시스메틱 12월에도 놀러와 이벤트에 오신 것을 환영합니다.</p>
+            <p>{data?.previousTitle}</p>
           </div>
-          <p>2024. 11. 30</p>
-        </div>
-        <div className='next-qna'>
+          <p>{extractDate(data?.previousWriteDate)}</p>
+        </Link>
+        <Link to={`/admin/qna/${urlNumber + 1}`} className='next-qna'>
           <div>
             <p>다음</p>
-            <p>변경 내용에 대해 다시 알려드립니다.</p>
+            <p>{data?.nextTitle}</p>
           </div>
-          <p>2024. 11. 25</p>
-        </div>
+          <p>{extractDate(data?.nextWriteDate)}</p>
+        </Link>
       </div>
       <div css={buttonStyle}>
         <Button
           width={80}
           color='textBlack'
           label='목록보기'
-          handleClick={() => console.log('목록보기')}
+          handleClick={() => navigate(-1)}
         />
       </div>
-      <Modal content={<DelModal />} id='delete' />
+      <Modal
+        content={
+          <DelModal
+            inquiryId={data?.inquiryId}
+            inquiryDetailDataRefetch={inquiryDetailDataRefetch}
+          />
+        }
+        id='delete'
+      />
     </div>
   );
 };
@@ -147,6 +262,7 @@ const adminQnaHeaderStyle = css`
 const adminQDivStyle = css`
   padding-top: 40px;
 `;
+
 const adminQTitleStyle = css`
   display: flex;
   flex-direction: column;
@@ -184,6 +300,11 @@ const adminQStrategyStyle = css`
     display: flex;
     flex-direction: column;
     gap: 16px;
+
+    .tag {
+      display: flex;
+      gap: 4px;
+    }
   }
 
   .profile {
@@ -250,6 +371,8 @@ const adminQnaNavStyle = css`
     padding: 24px;
     height: 64px;
     border-bottom: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
+    text-decoration: none;
+    color: inherit;
 
     div {
       display: flex;
@@ -271,6 +394,8 @@ const adminQnaNavStyle = css`
     padding: 24px;
     height: 64px;
     border-bottom: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
+    text-decoration: none;
+    color: inherit;
 
     div {
       display: flex;
