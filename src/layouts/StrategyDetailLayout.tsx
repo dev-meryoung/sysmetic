@@ -13,12 +13,15 @@ import facebookIcon from '@/assets/images/facebook-icon.png';
 import positionIcon from '@/assets/images/position-icon.png';
 import xIcon from '@/assets/images/x-icon.png';
 import Button from '@/components/Button';
+import Chart from '@/components/Chart';
 import Comment from '@/components/Comment';
 import DetailCard from '@/components/DetailCard';
 import IconButton from '@/components/IconButton';
 import Modal from '@/components/Modal';
 import Pagination from '@/components/Pagination';
 import ProfileImage from '@/components/ProfileImage';
+import RadioButton from '@/components/RadioButton';
+import SelectBox from '@/components/SelectBox';
 import TabButton from '@/components/TabButton';
 import Tag from '@/components/Tag';
 import TextArea from '@/components/TextArea';
@@ -26,18 +29,48 @@ import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 import {
+  useCreateFollowFolder,
   useCreateStrategyComment,
+  useDeleteSingleInterestStrategy,
   useDeleteStrategyComment,
-  useGetStrategyAccount,
+  useGetStrategyAnalysis,
   useGetStrategyComment,
-  useGetStrategyDaily,
   useGetStrategyInfo,
-  useGetStrategyMonthly,
+  useGetUserFolderList,
 } from '@/hooks/useStrategyApi';
 import useAuthStore from '@/stores/useAuthStore';
 import useModalStore from '@/stores/useModalStore';
 
 const TAB_BUTTONS = ['통계', '일간분석', '월간분석', '실계좌정보'];
+const ANALYSIS_OPTIONS = [
+  { label: '기준가', value: 'standardAmounts', unit: '원' },
+  { label: '잔고', value: 'currentBalance', unit: '원' },
+  { label: '원금', value: 'principal', unit: '원' },
+  {
+    label: '누적 입출 금액',
+    value: 'accumulatedDepositWithdrawalAmount',
+    unit: '원',
+  },
+  { label: '일별 입출 금액', value: 'depositWithdrawalAmount', unit: '원' },
+  { label: '일 손익 금액', value: 'dailyProfitLossAmount', unit: '원' },
+  { label: '일 손익율', value: 'dailyProfitLossRate', unit: '%' },
+  { label: '누적 손익 금액', value: 'accumulatedProfitLossAmount', unit: '원' },
+  {
+    label: '현재 자본 인하 금액',
+    value: 'currentCapitalReductionAmount',
+    unit: '원',
+  },
+  {
+    label: '현재 자본 인하율',
+    value: 'currentCapitalReductionRate',
+    unit: '%',
+  },
+  { label: '평균 손익 금액', value: 'averageProfitLossAmount', unit: '원' },
+  { label: '평균 손익률', value: 'averageProfitLossRate', unit: '%' },
+  { label: '승률', value: 'winningRate', unit: '%' },
+  { label: 'Profit Factor', value: 'profitFactor', unit: '' },
+  { label: 'ROA', value: 'roa', unit: '' },
+];
 
 const StrategyDetailLayout = () => {
   const navigate = useNavigate();
@@ -46,19 +79,14 @@ const StrategyDetailLayout = () => {
     useAuthStore();
   const { openModal, closeModal } = useModalStore();
 
-  const [isAnalyzeOpen, setIsAnalyzeOpen] = useState<boolean>(false);
+  const [isAnalyzeOpen, setIsAnalyzeOpen] = useState<boolean>(true);
   const [currentTab, setCurrentTab] = useState<number>(0);
-  const [dailyPage, setDailyPage] = useState<number>(0);
-  const [monthlyPage, setMonthlyPage] = useState<number>(0);
-  const [accountPage, setAccountPage] = useState<number>(0);
-  const [dailyStartDate, setDailyStartDate] = useState<string>('');
-  const [dailyEndDate, setDailyEndDate] = useState<string>('');
-  const [dailyTotalPage, setDailyTotalPage] = useState<string>('');
-  const [monthlyStartYearMonth, setMonthlyStartYearMonth] =
-    useState<string>('');
-  const [monthlyEndYearMonth, setMonthlyEndYearMonth] = useState<string>('');
-  const [monthlyTotalPage, setMonthlyTotalPage] = useState<string>('');
-  const [accountTotalPage, setAccountTotalPage] = useState<string>('');
+  const [graphOption1, setGraphOption1] = useState<string>('standardAmounts');
+  const [graphOption2, setGraphOption2] = useState<string>('currentBalance');
+  const [chartData, setChartData] = useState({
+    data1: [],
+    data2: [],
+  });
   const [comment, setComment] = useState<string>('');
   const [deleteCommentId, setDeleteCommentId] = useState<number>(0);
   const [commentPage, setCommentPage] = useState<number>(0);
@@ -70,21 +98,8 @@ const StrategyDetailLayout = () => {
     isError: strategyInfoIsError,
     refetch: refetchStrategyInfo,
   } = useGetStrategyInfo(strategyId as string);
-  const { data: strategyDaily } = useGetStrategyDaily(
-    strategyId as string,
-    dailyPage,
-    dailyStartDate,
-    dailyEndDate
-  );
-  const { data: strategyMonthly } = useGetStrategyMonthly(
-    strategyId as string,
-    monthlyPage,
-    monthlyStartYearMonth,
-    monthlyEndYearMonth
-  );
-  const { data: strategyAccount } = useGetStrategyAccount(
-    strategyId as string,
-    accountPage
+  const { data: strategyAnalysis } = useGetStrategyAnalysis(
+    strategyId as string
   );
   const { data: strategyComment, refetch: refetchStrategyComment } =
     useGetStrategyComment(strategyId as string, commentPage);
@@ -103,7 +118,24 @@ const StrategyDetailLayout = () => {
   }, [currentTab, navigate]);
 
   useEffect(() => {
-    if (strategyInfoIsError) navigate(PATH.ROOT);
+    if (strategyAnalysis) {
+      const data1 =
+        strategyAnalysis[graphOption1]?.map((value: number, idx: number) => [
+          new Date(strategyAnalysis.xaxis[idx]).getTime(),
+          value,
+        ]) || [];
+      const data2 =
+        strategyAnalysis[graphOption2]?.map((value: number, idx: number) => [
+          new Date(strategyAnalysis.xaxis[idx]).getTime(),
+          value,
+        ]) || [];
+
+      setChartData({ data1, data2 });
+    }
+  }, [strategyAnalysis, graphOption1, graphOption2]);
+
+  useEffect(() => {
+    if (strategyInfoIsError) navigate(PATH.NOT_FOUND);
   }, [strategyInfo, strategyInfoIsError]);
 
   useEffect(() => {
@@ -111,12 +143,10 @@ const StrategyDetailLayout = () => {
       setCommentTotalPage(strategyComment.totalPages.toString());
   }, [strategyComment]);
 
-  const handleCommentCheckLogin = () => {
-    if (!isLoggedIn) {
-      openModal('check-login', 400);
-      return;
-    }
-  };
+  const [selectedOption1, selectedOption2] = [graphOption1, graphOption2].map(
+    (optionValue) =>
+      ANALYSIS_OPTIONS.find((option) => option.value === optionValue) || null
+  );
 
   const handleCreateCommentButton = () => {
     if (comment.trim().length <= 0) {
@@ -139,6 +169,13 @@ const StrategyDetailLayout = () => {
     }
   };
 
+  const handleCommentCheckLogin = () => {
+    if (!isLoggedIn) {
+      openModal('check-login', 400);
+      return;
+    }
+  };
+
   const handleCommentDeleteButton = () => {
     if (strategyId) {
       deleteCommentMutate(
@@ -152,6 +189,128 @@ const StrategyDetailLayout = () => {
         }
       );
     }
+  };
+
+  const AddInterestModalContent = () => {
+    const { closeModal } = useModalStore();
+
+    const { data: folderListData } = useGetUserFolderList();
+    const { mutate: createFollowFolder } = useCreateFollowFolder();
+    const [selectedOption, setSelectedOption] = useState<string | ''>('');
+    const [errorMessage, setErrorMessage] = useState<string>('');
+
+    const folderOptions =
+      folderListData?.data.map((folder: any) => ({
+        value: folder.id,
+        label: folder.name,
+      })) || [];
+
+    const handleRadioChange = (value: string) => {
+      const numericValue = Number(value);
+      if (!isNaN(numericValue)) {
+        setSelectedOption(value);
+        setErrorMessage('');
+      }
+    };
+
+    const validateRequest = (
+      folderId: number | '',
+      strategyId: number
+    ): boolean => {
+      if (!folderId) {
+        setErrorMessage('폴더를 선택해주세요.');
+        return false;
+      }
+
+      if (!Number.isInteger(strategyId) || strategyId <= 0) {
+        setErrorMessage('유효하지 않은 전략 ID입니다.');
+        return false;
+      }
+
+      return true;
+    };
+
+    const handleAddButtonClick = () => {
+      const selectedOptionNumber = Number(selectedOption);
+
+      if (strategyId && !validateRequest(selectedOptionNumber, +strategyId)) {
+        return;
+      }
+
+      const requestBody = {
+        folderId: selectedOptionNumber,
+        strategyId: Number(strategyId),
+      };
+
+      createFollowFolder(requestBody, {
+        onSuccess: () => {
+          closeModal('add-interest-modal');
+          refetchStrategyInfo();
+          openModal('add-complete-modal');
+          setErrorMessage('');
+          setSelectedOption('');
+        },
+      });
+    };
+
+    return (
+      <div css={addInteresmodalStyle}>
+        <span>관심 등록</span>
+        <RadioButton
+          options={folderOptions}
+          name='folder-radio'
+          selected={selectedOption}
+          handleChange={handleRadioChange}
+        />
+        {errorMessage && <span className='error-msg'>{errorMessage}</span>}
+        <Button
+          label='등록하기'
+          size='sm'
+          handleClick={handleAddButtonClick}
+          disabled={!selectedOption}
+        />
+      </div>
+    );
+  };
+
+  const DeleteInterestModalContent = () => {
+    const { closeModal } = useModalStore();
+
+    const { mutate: deleteInteresMutate } = useDeleteSingleInterestStrategy();
+
+    const handleDeleteInteres = () => {
+      if (strategyId)
+        deleteInteresMutate(+strategyId, {
+          onSuccess: () => {
+            closeModal('delete-modal');
+            refetchStrategyInfo();
+            openModal('delete-complete-modal');
+          },
+        });
+    };
+
+    return (
+      <div css={commonModalStyle}>
+        해당전략을 관심취소하시겠습니까?
+        <div className='btn-area'>
+          <Button
+            label='아니오'
+            border={true}
+            width={120}
+            handleClick={() => {
+              closeModal('delete-modal');
+            }}
+          />
+          <Button
+            label='예'
+            width={120}
+            handleClick={() => {
+              handleDeleteInteres();
+            }}
+          />
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -170,8 +329,28 @@ const StrategyDetailLayout = () => {
                 <span>{strategyInfo?.followerCount}</span>
               </div>
             </div>
-            {isLoggedIn && roleCode === 'USER' ? (
-              <div className='buttons'>
+            <div className='buttons'>
+              {strategyInfo?.isFollow ? (
+                <Button
+                  label='관심취소'
+                  size='xs'
+                  shape='round'
+                  border={true}
+                  color='pointOpacity10'
+                  width={80}
+                  handleClick={() => {
+                    if (roleCode === 'USER') {
+                      if (isLoggedIn) {
+                        openModal('delete-modal');
+                      } else {
+                        openModal('check-login-modal', 360);
+                      }
+                    } else {
+                      openModal('sign-up-modal', 360);
+                    }
+                  }}
+                />
+              ) : (
                 <Button
                   label='관심등록'
                   size='xs'
@@ -179,21 +358,39 @@ const StrategyDetailLayout = () => {
                   border={true}
                   color='pointOpacity10'
                   width={80}
-                  handleClick={() => {}}
+                  handleClick={() => {
+                    if (roleCode === 'USER') {
+                      if (isLoggedIn) {
+                        openModal('add-interest-modal', 216);
+                      } else {
+                        openModal('check-login-modal', 360);
+                      }
+                    } else {
+                      openModal('sign-up-modal', 360);
+                    }
+                  }}
                 />
-                <Button
-                  label='문의하기'
-                  size='xs'
-                  shape='round'
-                  border={true}
-                  color='primaryOpacity10'
-                  width={80}
-                  handleClick={() => navigate(PATH.STRATEGIES_QNA(strategyId))}
-                />
-              </div>
-            ) : (
-              ''
-            )}
+              )}
+              <Button
+                label='문의하기'
+                size='xs'
+                shape='round'
+                border={true}
+                color='primaryOpacity10'
+                width={80}
+                handleClick={() => {
+                  if (roleCode === 'USER') {
+                    if (isLoggedIn) {
+                      navigate(PATH.STRATEGIES_QNA(strategyId));
+                    } else {
+                      openModal('check-login-modal', 360);
+                    }
+                  } else {
+                    openModal('sign-up-modal', 360);
+                  }
+                }}
+              />
+            </div>
           </div>
           <div className='right-box'>
             <div className='buttons'>
@@ -393,7 +590,30 @@ const StrategyDetailLayout = () => {
           <KeyboardArrowDown sx={{ fontSize: '40px' }} />
         </div>
         <div className='content'>
-          <div className='chart-box'></div>
+          <div className='chart-box'>
+            <div className='select-box'>
+              <SelectBox
+                options={ANALYSIS_OPTIONS}
+                handleChange={setGraphOption1}
+                value={graphOption1}
+              />
+              <SelectBox
+                options={ANALYSIS_OPTIONS}
+                handleChange={setGraphOption2}
+                value={graphOption2}
+              />
+            </div>
+
+            <Chart
+              chartData={chartData}
+              name={[
+                selectedOption1?.label || '',
+                selectedOption2?.label || '',
+              ]}
+              unit={[selectedOption1?.unit || '', selectedOption2?.unit || '']}
+              type={['line', 'line']}
+            />
+          </div>
           <div className='tab-box'>
             <TabButton
               tabs={TAB_BUTTONS}
@@ -536,6 +756,101 @@ const StrategyDetailLayout = () => {
                 width={120}
               />
             </div>
+          </div>
+        }
+      />
+      <Modal id='add-interest-modal' content={<AddInterestModalContent />} />
+      <Modal id='delete-modal' content={<DeleteInterestModalContent />} />
+      <Modal
+        id='add-complete-modal'
+        content={
+          <div css={commonModalStyle}>
+            해당전략을 관심등록했습니다.
+            <br />
+            마이페이지에서 확인하세요.
+            <div className='btn-area'>
+              <Button
+                label='마이페이지 가기'
+                border={true}
+                width={120}
+                handleClick={() => {
+                  navigate(PATH.MYPAGE);
+                  closeModal('add-complete-modal');
+                }}
+              />
+              <Button
+                label='계속하기'
+                width={120}
+                handleClick={() => {
+                  closeModal('add-complete-modal');
+                }}
+              />
+            </div>
+          </div>
+        }
+      />
+      <Modal
+        id='delete-complete-modal'
+        content={
+          <div css={commonModalStyle}>
+            해당전략을 관심취소했습니다.
+            <div className='btn-area'>
+              <Button
+                label='마이페이지 가기'
+                border={true}
+                width={120}
+                handleClick={() => {
+                  navigate(PATH.MYPAGE);
+                  closeModal('delete-complete-modal');
+                }}
+              />
+              <Button
+                label='계속하기'
+                width={120}
+                handleClick={() => {
+                  closeModal('delete-complete-modal');
+                }}
+              />
+            </div>
+          </div>
+        }
+      />
+      <Modal
+        id='check-login-modal'
+        content={
+          <div css={commonModalStyle}>
+            로그인이 필요합니다.
+            <br />
+            로그인하시겠습니까?
+            <div className='btn-area'>
+              <Button
+                label='메인가기'
+                border={true}
+                width={120}
+                handleClick={() => {
+                  navigate(PATH.ROOT);
+                  closeModal('check-login-modal');
+                }}
+              />
+              <Button
+                label='로그인'
+                width={120}
+                handleClick={() => {
+                  navigate(PATH.SIGN_IN);
+                  closeModal('check-login-modal');
+                }}
+              />
+            </div>
+          </div>
+        }
+      />
+      <Modal
+        id='sign-up-modal'
+        content={
+          <div css={commonModalStyle}>
+            투자자 회원가입이 필요한 서비스 입니다.
+            <br />
+            회원가입을 진행해주세요.
           </div>
         }
       />
@@ -750,10 +1065,19 @@ const analyzeBoxStlye = (isOpen: boolean) => css`
     display: ${isOpen ? 'block' : 'none'};
 
     .chart-box {
+      display: flex;
+      position: relative;
       width: 100%;
-      height: 560px;
-      background-color: ${COLOR.GRAY};
       margin-bottom: 80px;
+
+      .select-box {
+        display: flex;
+        position: absolute;
+        top: 30px;
+        right: 0;
+        gap: 16px;
+        z-index: 1;
+      }
     }
 
     .tab-box {
@@ -835,6 +1159,38 @@ const modalStyle = css`
     display: flex;
     justify-content: center;
     gap: 16px;
+  }
+`;
+
+const commonModalStyle = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  line-height: 160%;
+  padding-top: 8px;
+
+  .btn-area {
+    display: flex;
+    gap: 16px;
+  }
+`;
+
+const addInteresmodalStyle = css`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  .css-1o97835 {
+    flex-direction: column;
+  }
+  span {
+    font-size: ${FONT_SIZE.TEXT_SM};
+    font-weight: ${FONT_WEIGHT.MEDIUM};
+  }
+  .error-msg {
+    color: ${COLOR.ERROR_RED};
+    font-size: ${FONT_SIZE.TEXT_SM};
   }
 `;
 

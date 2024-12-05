@@ -240,6 +240,24 @@ export const getStrategyInfo = async (strategyId: string) => {
   return response.data;
 };
 
+// 전략 분석 그래프 데이터 조회 API
+export const getStrategyAnalysis = async (strategyId: string) => {
+  const response = await axiosInstance.get(
+    `/v1/strategy/detail/analysis/${strategyId}`
+  );
+
+  return response.data;
+};
+
+// 전략 통계 정보 조회 API
+export const getStrategyStatistics = async (strategyId: string) => {
+  const response = await axiosInstance.get(
+    `/v1/strategy/statistics/${strategyId}`
+  );
+
+  return response.data;
+};
+
 // 전략 일간분석 정보 조회 API
 export const getStrategyDaily = async (
   strategyId: string,
@@ -254,6 +272,27 @@ export const getStrategyDaily = async (
       endDate,
     },
   });
+
+  return response.data;
+};
+
+// 전략 일간분석 엑셀 다운로드 API
+export const getDailyExcelLink = async (strategyId: string) => {
+  const response = await axiosInstance.get(`/v1/excel/daily/${strategyId}`, {
+    responseType: 'blob',
+  });
+
+  return response.data;
+};
+
+// 전략 일간분석 엑셀 다운로드 API
+export const getDailyDataExcelLink = async (strategyId: string) => {
+  const response = await axiosInstance.get(
+    `/v1/excel/daily/statistics/${strategyId}`,
+    {
+      responseType: 'blob',
+    }
+  );
 
   return response.data;
 };
@@ -275,6 +314,15 @@ export const getStrategyMonthly = async (
       },
     }
   );
+
+  return response.data;
+};
+
+// 전략 월간분석 엑셀 다운로드 API
+export const getMonthlyExcelLink = async (strategyId: string) => {
+  const response = await axiosInstance.get(`/v1/excel/monthly/${strategyId}`, {
+    responseType: 'blob',
+  });
 
   return response.data;
 };

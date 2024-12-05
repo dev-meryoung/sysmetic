@@ -39,6 +39,11 @@ import {
   getStrategyComment,
   createStrategyComment,
   deleteStrategyComment,
+  getStrategyAnalysis,
+  getStrategyStatistics,
+  getDailyExcelLink,
+  getDailyDataExcelLink,
+  getMonthlyExcelLink,
 } from '@/api';
 
 export interface BaseResponse<T> {
@@ -98,6 +103,59 @@ export type GetStrategyInfoResponse = BaseResponse<{
     originalName: string;
     fileSize: number;
   };
+}>;
+
+export type getStrategyAnalysisResponse = BaseResponse<{
+  standardAmounts: number[];
+  currentBalance: number[];
+  principal: number[];
+  accumulatedDepositWithdrawalAmount: number[];
+  depositWithdrawalAmount: number[];
+  dailyProfitLossAmount: number[];
+  dailyProfitLossRate: number[];
+  accumulatedProfitLossAmount: number[];
+  currentCapitalReductionAmount: number[];
+  currentCapitalReductionRate: number[];
+  averageProfitLossAmount: number[];
+  averageProfitLossRate: number[];
+  winningRate: number[];
+  profitFactor: number[];
+  roa: number[];
+  xaxis: string[];
+  [key: string]: any;
+}>;
+
+export type getStrategyStatisticsResponse = BaseResponse<{
+  currentBalance: number;
+  accumulatedDepositWithdrawalAmount: number;
+  principal: number;
+  operationPeriod: string;
+  startDate: string;
+  endDate: string;
+  accumulatedProfitLossAmount: number;
+  accumulatedProfitLossRate: number;
+  maximumAccumulatedProfitLossAmount: number;
+  maximumAccumulatedProfitLossRate: number;
+  currentCapitalReductionAmount: number;
+  currentCapitalReductionRate: number;
+  maximumCapitalReductionAmount: number;
+  maximumCapitalReductionRate: number;
+  averageProfitLossAmount: number;
+  averageProfitLossRate: number;
+  maximumDailyProfitAmount: number;
+  maximumDailyProfitRate: number;
+  maximumDailyLossAmount: number;
+  maximumDailyLossRate: number;
+  totalTradingDays: number;
+  totalProfitDays: number;
+  totalLossDays: number;
+  currentContinuousProfitLossDays: number;
+  maxContinuousProfitDays: number;
+  maxContinuousLossDays: number;
+  winningRate: number;
+  profitFactor: number;
+  roa: number;
+  highPointRenewalProgress: number;
 }>;
 
 export type GetStrategyDailyResponse = BaseResponse<{
@@ -491,6 +549,33 @@ export const useGetStrategyInfo = (strategyId: string) => {
   };
 };
 
+export const useGetStrategyAnalysis = (strategyId: string) => {
+  const { data, isSuccess, refetch } = useQuery<getStrategyAnalysisResponse>({
+    queryKey: ['strategyAnalysis', strategyId],
+    queryFn: () => getStrategyAnalysis(strategyId),
+    retry: 0,
+  });
+
+  return {
+    data: isSuccess && data?.code === 200 ? data.data : undefined,
+    isError: isSuccess && data?.code !== 200,
+    refetch,
+  };
+};
+
+export const useGetStrategyStatistics = (strategyId: string) => {
+  const { data, isSuccess, refetch } = useQuery<getStrategyStatisticsResponse>({
+    queryKey: ['strategyStatistics', strategyId],
+    queryFn: () => getStrategyStatistics(strategyId),
+  });
+
+  return {
+    data: isSuccess && data?.code === 200 ? data.data : undefined,
+    isError: isSuccess && data?.code !== 200,
+    refetch,
+  };
+};
+
 export const useGetStrategyDaily = (
   strategyId: string,
   page: number,
@@ -702,3 +787,42 @@ export const useDeleteStrategyComment = () =>
     mutationFn: (commentData: DeleteStrategyCommentRequest) =>
       deleteStrategyComment(commentData),
   });
+
+export const useGetDailyExcelLink = (strategyId: string) => {
+  const { data, isSuccess } = useQuery<Blob>({
+    queryKey: ['dailyExcelLink'],
+    queryFn: () => getDailyExcelLink(strategyId),
+  });
+
+  if (isSuccess && data) {
+    return { data };
+  }
+
+  return { data: undefined };
+};
+
+export const useGetDailyDataExcelLink = (strategyId: string) => {
+  const { data, isSuccess } = useQuery<Blob>({
+    queryKey: ['dailyDataExcelLink'],
+    queryFn: () => getDailyDataExcelLink(strategyId),
+  });
+
+  if (isSuccess && data) {
+    return { data };
+  }
+
+  return { data: undefined };
+};
+
+export const useGetMonthlyExcelLink = (strategyId: string) => {
+  const { data, isSuccess } = useQuery<Blob>({
+    queryKey: ['monthlyExcelLink'],
+    queryFn: () => getMonthlyExcelLink(strategyId),
+  });
+
+  if (isSuccess && data) {
+    return { data };
+  }
+
+  return { data: undefined };
+};
