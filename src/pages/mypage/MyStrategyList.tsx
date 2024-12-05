@@ -95,19 +95,18 @@ const MyStrategyList = () => {
   const [tableData, setTableData] = useState<MyStrategyListDataProps[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPage, setTotalPage] = useState(0);
+  const [totalElement, setTotalElement] = useState(0);
   const [pageSize, setPageSize] = useState(PAGE_SIZE);
-
   const checkedItems = useTableStore((state) => state.checkedItems);
   const toggleCheckbox = useTableStore((state) => state.toggleCheckbox);
   const toggleAllCheckboxes = useTableStore(
     (state) => state.toggleAllCheckboxes
   );
 
-  const page = 0;
   const {
     data: traderAddStrategyListData,
     refetch: traderAddStrategyListRefetch,
-  } = useGetTraderAddStrategyList(page);
+  } = useGetTraderAddStrategyList(currentPage);
 
   const traderName = traderAddStrategyListData?.data?.traderNickname;
 
@@ -117,6 +116,7 @@ const MyStrategyList = () => {
       setTotalPage(data?.totalPages);
       setTableData(data?.content);
       setPageSize(data?.pageSize);
+      setTotalElement(data?.totalElement);
     }
   }, [traderAddStrategyListData]);
 
@@ -209,9 +209,9 @@ const MyStrategyList = () => {
             shape='round'
             size='xs'
             width={80}
-            handleClick={() =>
-              navigate(PATH.MYPAGE_STRATEGIES_EDIT(String(item.strategyId)))
-            }
+            handleClick={() => {
+              navigate(PATH.MYPAGE_STRATEGIES_EDIT(String(item.strategyId)));
+            }}
           />
         </div>
       ),
@@ -222,7 +222,7 @@ const MyStrategyList = () => {
     <div css={strategyListWrapperStyle}>
       <div className='table-info'>
         <h6 className='info-text'>
-          {/* 총 <strong>{tradersStrategyData?.data?.length}개</strong>의 리스트 */}
+          총 <strong>{totalElement}개</strong>의 리스트
         </h6>
         <div className='btn-area'>
           <Button
@@ -241,11 +241,27 @@ const MyStrategyList = () => {
         handleCheckboxChange={toggleCheckbox}
         handleHeaderCheckboxChange={() => toggleAllCheckboxes(tableData.length)}
       />
-      <Pagination
-        totalPage={totalPage}
-        currentPage={currentPage}
-        handlePageChange={setCurrentPage}
-      />
+      {totalElement > 0 ? (
+        <Pagination
+          totalPage={totalPage}
+          currentPage={currentPage}
+          handlePageChange={setCurrentPage}
+        />
+      ) : (
+        <div css={emptyContents}>
+          <span>등록된 전략이 없습니다. 전략을 등록해보세요.</span>
+          <Button
+            label='전략 등록하기'
+            border={true}
+            width={100}
+            size='sm'
+            handleClick={() => {
+              navigate(PATH.STRATEGIES_ADD);
+            }}
+          />
+        </div>
+      )}
+
       <Modal
         content={
           <DeleteStrategyModalContent
@@ -284,6 +300,17 @@ const strategyListWrapperStyle = css`
       gap: 16px;
     }
   }
+`;
+
+const emptyContents = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px;
+  border-radius: 4px;
+  line-height: 160%;
+  text-align: center;
 `;
 
 const buttonStyle = css`
