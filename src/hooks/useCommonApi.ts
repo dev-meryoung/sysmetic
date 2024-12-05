@@ -15,7 +15,54 @@ import {
   getInquiryDetailUser,
   deleteInquiry,
   createUserInquiry,
+  getNoticeList,
+  GetNoticeListData,
+  getNoticeDetail,
+  GetNoticeDetailData,
 } from '@/api';
+import { getMainPage, getMainPageChart } from '@/api/commonApi';
+interface MainPageDataProps {
+  data: {
+    rankedTrader: {
+      id: number;
+      nickname: string;
+      followerCount: number;
+      accumProfitLossRate: number;
+      traderProfileImage: string;
+    }[];
+
+    totalTraderCount: number;
+    totalStrategyCount: number;
+
+    smScoreTopFives: {
+      id: number;
+      traderProfileImage: string;
+      traderId: number;
+      nickname: string;
+      name: string;
+      accumulatedProfitLossRate: number;
+      smScore: number;
+      stocks: {
+        stockIds: number[];
+        stockNames: string[];
+      }[];
+    }[];
+  };
+}
+
+// 메인페이지 조회
+export const useGetMainPage = () =>
+  useQuery<MainPageDataProps>({
+    queryKey: ['mainPage'],
+    queryFn: () => getMainPage(),
+  });
+
+// 메인페이지 차트 정보 조회
+export const useGetMainPageChart = () =>
+  useQuery({
+    queryKey: ['mainChart'],
+    queryFn: () => getMainPageChart(),
+  });
 
 // 질문자 문의 수정 화면 조회
 export const useGetEditInquiry = (
@@ -106,4 +153,18 @@ export const useCreateUserInquiry = () =>
   useMutation({
     mutationFn: (createData: CreateInquiryData) =>
       createUserInquiry(createData),
+  });
+
+// 사용자 공지 목록 조회
+export const useGetNoticeList = (params: GetNoticeListData) =>
+  useQuery({
+    queryKey: ['getNoticeList', params],
+    queryFn: () => getNoticeList(params),
+  });
+
+// 사용자 공지 상세 조회
+export const useGetNoticeDetail = (params: GetNoticeDetailData) =>
+  useQuery({
+    queryKey: ['getNoticeDetail', params],
+    queryFn: () => getNoticeDetail(params),
   });

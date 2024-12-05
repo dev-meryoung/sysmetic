@@ -23,20 +23,21 @@ interface ChartDataProps {
   type?: ChartTypes[];
 }
 
-const dateFilter = ['1개월', '3개월', '6개월', '1년', 'YTD', 'ALL'];
-
 const Chart: React.FC<ChartDataProps> = ({
   chartData,
   name,
   type = 'line',
   unit,
 }) => {
-  const [selectedPeriod, setSelectedPeriod] = useState('ALL');
+  const [selectedFilter, setSelectedFilter] = useState('ALL');
+  const dateFilter = ['1개월', '3개월', '6개월', '1년', 'ALL'];
 
   const getFilteredData = (
     data: [number, number][],
     selectedPeriod: string
   ): [number, number][] => {
+    if (selectedPeriod === 'ALL') return data;
+
     const today = new Date();
     const filterDate = new Date();
 
@@ -53,22 +54,14 @@ const Chart: React.FC<ChartDataProps> = ({
       case '1년':
         filterDate.setFullYear(today.getFullYear() - 1);
         break;
-      case 'YTD': //올해의 1월 1일을 기준 날짜
-        filterDate.setMonth(0);
-        filterDate.setDate(1);
-        break;
-      default:
-        return data;
     }
 
-    return data.filter(
-      (item): item is [number, number] => item[0] >= filterDate.getTime()
-    );
+    return data.filter(([dateStr]) => new Date(dateStr) >= filterDate);
   };
 
   const filteredData = {
-    data1: getFilteredData(chartData.data1, selectedPeriod),
-    data2: getFilteredData(chartData.data2, selectedPeriod),
+    data1: getFilteredData(chartData.data1, selectedFilter),
+    data2: getFilteredData(chartData.data2, selectedFilter),
   };
 
   const options = {
@@ -82,7 +75,9 @@ const Chart: React.FC<ChartDataProps> = ({
       type: 'line',
       width: null,
       spacingTop: 40,
-      zoomType: 'xy',
+      zoomType: 'x',
+      panning: true,
+      panKey: 'shift',
       zooming: {
         mouseWheel: {
           enabled: true,
@@ -92,7 +87,6 @@ const Chart: React.FC<ChartDataProps> = ({
         fontFamily: 'Pretendard, sans-serif',
       },
     },
-    // 화면 크기가 1400px(13인치 노트북) 이하일 경우 높이 500
     responsive: {
       rules: [
         {
@@ -131,15 +125,21 @@ const Chart: React.FC<ChartDataProps> = ({
     },
     xAxis: {
       type: 'datetime',
-      allowDecimals: false,
+      title: {
+        text: '',
+      },
+      dateTimeLabelFormats: {
+        year: '%Y-%m',
+        month: '%Y-%m',
+        week: '%Y-%m',
+        day: '%Y-%m',
+      },
       labels: {
-        //TODO:현재는 년 단위 표시인데, 추후 월단위로 표시할수도 있음
-        format: '{value:%Y}',
+        style: {
+          fontSize: '12px',
+        },
       },
-      tickInterval: 365 * 24 * 3600 * 1000,
-      accessibility: {
-        rangeDescription: 'Range: 1940 to 2024.',
-      },
+      tickInterval: 2 * 365 * 24 * 3600 * 1000,
     },
     yAxis: [
       {
@@ -173,7 +173,7 @@ const Chart: React.FC<ChartDataProps> = ({
         name: name[0],
         type: type[0],
         data: filteredData.data1,
-        yAxis: 0, // 첫 번째 Y축 사용
+        yAxis: 0,
         color:
           type === 'line'
             ? `${COLOR.POINT400}`
@@ -196,12 +196,18 @@ const Chart: React.FC<ChartDataProps> = ({
         tooltip: {
           valueSuffix: unit[0],
         },
+        plotOptions: {
+          series: {
+            findNearestPointBy: 'xy',
+            stickyTracking: true,
+          },
+        },
       },
       {
         name: name[1],
         type: type[1],
         data: filteredData.data2,
-        yAxis: 1, // 두 번째 Y축 사용
+        yAxis: 1,
         color:
           type === 'line'
             ? `${COLOR.PRIMARY}`
@@ -236,14 +242,13 @@ const Chart: React.FC<ChartDataProps> = ({
         containerProps={{ style: { width: '100%', height: 'auto' } }}
       />
       <section css={buttonWrapperStyle}>
-        {dateFilter.map((period) => (
+        {dateFilter.map((filter) => (
           <Button
-            label={period}
-            key={period}
+            label={filter}
+            key={filter}
             size='sm'
-            shape='round'
-            color={selectedPeriod === period ? 'primary' : 'transparent'}
-            handleClick={() => setSelectedPeriod(period)}
+            shape={selectedFilter === filter ? 'round' : 'none'}
+            handleClick={() => setSelectedFilter(filter)}
           />
         ))}
       </section>

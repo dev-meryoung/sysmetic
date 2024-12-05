@@ -1,20 +1,20 @@
-export type FilterTypes = 'select' | 'checkbox' | 'radio';
+export type FilterTypes = 'select' | 'checkbox' | 'radio' | 'range';
 
-export type ItemFilterTypes = {
-  operationMethod: string[];
-  operationPeriod: string[];
-  operationType: string[];
-  operationTerm: string;
-  profitRate: string;
-};
+export type FilterValueTypes = string | string[] | number[] | [number, number];
 
-export type AlgorithmFilterTypes = {
-  algorithm: string;
-};
-
-export interface FilterOptionProps {
-  value: string;
-  label: string;
+export interface FilterItemsProps {
+  strategyId?: number;
+  traderNickname?: string;
+  name?: string;
+  mdd?: number;
+  smScore?: number;
+  methodId?: number;
+  stockList?: string[];
+  cycle?: string[] | string;
+  accumProfitLossRate?: [number, number] | number[];
+  operationTerm?: string[] | string;
+  methodName?: string[] | string;
+  algorithm?: string[] | string;
 }
 
 export interface FilterProps {
@@ -22,4 +22,17 @@ export interface FilterProps {
   label: string;
   type: FilterTypes;
   options?: FilterOptionProps[];
+}
+
+export interface TabFiltersTypes {
+  [key: number]: FilterProps[];
+}
+
+export interface FilterOptionProps {
+  value: string;
+  label: string;
+}
+
+export interface UseStrategyFiltersProps {
+  handleFilterChange?: (filters: FilterItemsProps) => void;
 }

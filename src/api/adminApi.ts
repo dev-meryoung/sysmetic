@@ -1,5 +1,19 @@
 import axiosInstance from '@/api/axiosInstance';
 
+export interface GetAdminNoticeListData {
+  noticeId?: string;
+  page?: number;
+  searchType?: string;
+  searchText?: string;
+}
+
+export interface GetAdminNoticeData {
+  noticeId?: string;
+  page?: number;
+  searchType?: string;
+  searchText?: string;
+}
+
 // 회원 목록 조회 API
 export const getAdminUserList = async () => {};
 
@@ -9,14 +23,64 @@ export const updateAdminUserRole = async () => {};
 // 회원 강제 탈퇴 API
 export const deleteAdminUser = async () => {};
 
-// 공지사항 등록 API
-export const createAdminNotice = async () => {};
-
 // 공지사항 목록 조회 API
-export const getAdminNoticeList = async () => {};
+export const getAdminNoticeList = async (
+  getAdminNoticeListData: GetAdminNoticeListData
+) => {
+  const response = await axiosInstance.get(`/v1/admin/notice`, {
+    params: getAdminNoticeListData,
+  });
+  return response.data;
+};
 
 // 공지사항 상세 정보 조회 API
-export const getAdminNotice = async () => {};
+export const getAdminNotice = async (params: GetAdminNoticeData) => {
+  const { noticeId, ...queryParams } = params;
+  const response = await axiosInstance.get(`/v1/admin/notice/${noticeId}`, {
+    params: queryParams,
+  });
+  return response.data;
+};
+
+// 공지사항 수정 API
+export const updateAdminNotice = async (noticeId: string) => {
+  const response = await axiosInstance.put(`/v1/admin/notice/${noticeId}`);
+  return response.data;
+};
+
+// 공지사항 삭제 API
+export const deleteAdminNotice = async (noticeId: string) => {
+  const response = await axiosInstance.delete(`/v1/admin/notice/${noticeId}`);
+  return response.data;
+};
+
+// 공지사항 목록에서 개별 공개여부 수정 API
+export const updateAdminNoticeStatus = async (noticeId: string) => {
+  const response = await axiosInstance.put(
+    `/v1/admin/notice/${noticeId}/open-close`
+  );
+  return response.data;
+};
+
+// 공지사항 등록 API
+export const createAdminNotice = async () => {
+  const response = await axiosInstance.put(`/v1/admin/notice`);
+  return response.data;
+};
+
+// 공지사항 목록 삭제 API
+export const deleteAdminNoticeList = async () => {
+  const response = await axiosInstance.delete(`/v1/admin/notice`);
+  return response.data;
+};
+
+// 공지사항 수정 화면 조회 API
+export const getAdminNoticeEdit = async (noticeId: string) => {
+  const response = await axiosInstance.get(
+    `/v1/admin/notice/${noticeId}/modify`
+  );
+  return response.data;
+};
 
 // 전략 목록 조회 API
 export const getAdminStrategyList = async () => {};
