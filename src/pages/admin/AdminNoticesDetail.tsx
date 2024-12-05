@@ -225,6 +225,9 @@ const noticesFileDivStyle = css`
       font-size: ${FONT_SIZE.TEXT_SM};
       color: ${COLOR_OPACITY.BLACK_OPACITY30};
     }
+    svg {
+      cursor: pointer;
+    }
   }
 `;
 

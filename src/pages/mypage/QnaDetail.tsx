@@ -163,7 +163,7 @@ const QnaDetail = () => {
                 </div>
               </>
             ) : (
-              <div css={deletedStrategyStyle}>해당 전략이 삭제되었습니다.</div>
+              <div css={deletedStrategyStyle}>조회할 수 없는 전략입니다.</div>
             )}
           </div>
 
