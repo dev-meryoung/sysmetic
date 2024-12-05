@@ -2,14 +2,16 @@ import { css } from '@emotion/react';
 import ProfileImage from '@/components/ProfileImage';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE } from '@/constants/font';
+import useModalStore from '@/stores/useModalStore';
 import { parseDateTime } from '@/utils/dateUtils';
 
 interface CommentProps {
   profileImage: string;
   nickname: string;
   date: string;
-  content: string;
+  content: React.ReactNode;
   isAuthor: boolean;
+  handleSetDeleteComment?: () => void;
 }
 
 const Comment: React.FC<CommentProps> = ({
@@ -18,8 +20,10 @@ const Comment: React.FC<CommentProps> = ({
   date,
   content,
   isAuthor,
+  handleSetDeleteComment = () => {},
 }) => {
   const commentDate = parseDateTime(date);
+  const { openModal } = useModalStore();
 
   return (
     <div css={commentStyle}>
@@ -33,9 +37,14 @@ const Comment: React.FC<CommentProps> = ({
         </div>
         {isAuthor ? (
           <div className='action-box'>
-            <a>수정</a>
-            <span>|</span>
-            <a>삭제</a>
+            <a
+              onClick={() => {
+                handleSetDeleteComment();
+                openModal('comment-delete');
+              }}
+            >
+              삭제
+            </a>
           </div>
         ) : (
           ''
@@ -66,7 +75,8 @@ const commentStyle = css`
     .text-box {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      justify-content: center;
+      gap: 12px;
 
       .date {
         color: ${COLOR_OPACITY.BLACK_OPACITY50};

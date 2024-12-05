@@ -20,7 +20,6 @@ export const getMethodAndStockList = async () => {
   return response.data;
 };
 
-
 // 전략 목록 조회 API
 export const getStrategyList = async (pageNum: number) => {
   const response = await axiosInstance.get('/v1/strategy/list', {
@@ -209,7 +208,6 @@ export const createStrategy = async (formData: FormData) => {
 
   return response.data;
 };
-
 
 // 전략 수정 API
 export const updateStrategy = async (
@@ -408,6 +406,53 @@ export const deleteMyStrategyAccount = async (
       },
     }
   );
+
+  return response.data;
+};
+
+// 전략 댓글 조회 API
+export const getStrategyComment = async (strategyId: string, page: number) => {
+  const response = await axiosInstance.get(
+    `/v1/strategy/${strategyId}/replies`,
+    {
+      params: {
+        page,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+// 전략 댓글 등록 API
+export const createStrategyComment = async (commentData: {
+  strategyId: number;
+  content: string;
+}) => {
+  const response = await axiosInstance.post(
+    `/v1/strategy/reply`,
+    JSON.stringify(commentData),
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+
+  return response.data;
+};
+
+// 전략 댓글 삭제 API
+export const deleteStrategyComment = async (commentData: {
+  strategyId: number;
+  replyId: number;
+}) => {
+  const response = await axiosInstance.delete(`/v1/strategy/reply`, {
+    data: commentData,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 
   return response.data;
 };

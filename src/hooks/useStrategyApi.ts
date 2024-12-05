@@ -36,6 +36,9 @@ import {
   deleteSingleInterestStrategy,
   deleteInterestStrategy,
   getTraderAddStrategyList,
+  getStrategyComment,
+  createStrategyComment,
+  deleteStrategyComment,
 } from '@/api';
 
 export interface BaseResponse<T> {
@@ -84,7 +87,10 @@ export type GetStrategyInfoResponse = BaseResponse<{
   averageProfitLossRate: number;
   profitFactor: number;
   winningRate: number;
-  monthlyRecord: number[];
+  monthlyRecord: {
+    year: number;
+    data: { month: number; value: number }[];
+  }[];
   analysis: null;
   fileWithInfoResponse: {
     id: number;
@@ -184,6 +190,24 @@ export type CreateStrategyItemFilterResponse = BaseResponse<{
   ];
 }>;
 
+export type GetStrategyCommentResponse = BaseResponse<{
+  currentPage: number;
+  pageSize: number;
+  totalElement: number;
+  totalPages: number;
+  content: [
+    {
+      strategyId: number;
+      replyId: number;
+      memberId: number;
+      memberNickname: string;
+      content: string;
+      createdAt: string;
+      memberProfilePath: string;
+    },
+  ];
+}>;
+
 export type CreateMyStrategyDailyRequest = {
   date: string;
   depositWithdrawalAmount: number;
@@ -196,12 +220,6 @@ export type DeleteMyStrategyAccountRequest = {
 
 export interface DeleteTraderAddStrategyListRequest {
   idList: number[];
-}
-
-export interface BaseResponse<T> {
-  code: number;
-  message: string;
-  data: T;
 }
 
 export interface CreateStrategyItemFilterRequest {
@@ -240,6 +258,16 @@ export interface CreateFolderRequest {
 
 export interface DeleteFollowFolderRequest {
   strategyId: number[];
+}
+
+export interface CreateStrategyCommentRequest {
+  strategyId: number;
+  content: string;
+}
+
+export interface DeleteStrategyCommentRequest {
+  strategyId: number;
+  replyId: number;
 }
 
 export const useGetStrategyList = (pageNum: number) =>
@@ -636,4 +664,41 @@ export const useDeleteMyStrateAccount = () =>
   useMutation({
     mutationFn: (deletedData: DeleteMyStrategyAccountRequest) =>
       deleteMyStrategyAccount(deletedData),
+  });
+
+export const useGetStrategyComment = (strategyId: string, page: number) => {
+  const { data, isSuccess, refetch } = useQuery<GetStrategyCommentResponse>({
+    queryKey: ['strategyComment', strategyId, page],
+    queryFn: () => getStrategyComment(strategyId, page),
+    placeholderData: keepPreviousData,
+    retry: 0,
+  });
+
+  const processedData =
+    isSuccess && data?.code === 200
+      ? data.data
+      : {
+          currentPage: 0,
+          pageSize: 0,
+          totalElement: 0,
+          totalPages: 0,
+          content: [],
+        };
+
+  return {
+    data: processedData,
+    refetch,
+  };
+};
+
+export const useCreateStrategyComment = () =>
+  useMutation({
+    mutationFn: (commentData: CreateStrategyCommentRequest) =>
+      createStrategyComment(commentData),
+  });
+
+export const useDeleteStrategyComment = () =>
+  useMutation({
+    mutationFn: (commentData: DeleteStrategyCommentRequest) =>
+      deleteStrategyComment(commentData),
   });
