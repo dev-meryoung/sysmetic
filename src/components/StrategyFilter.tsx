@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
-import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
+import SearchIcon from '@mui/icons-material/Search';
 import Checkbox from '@/components/Checkbox';
 import IconButton from '@/components/IconButton';
 import RadioButton from '@/components/RadioButton';
@@ -215,7 +215,7 @@ const FilterInput = ({ filter, currentValue, onChange }: FilterInputProps) => {
             />
             %
             <IconButton
-              IconComponent={KeyboardDoubleArrowRightIcon}
+              IconComponent={SearchIcon}
               shape='none'
               handleClick={handleSubmit}
             />
