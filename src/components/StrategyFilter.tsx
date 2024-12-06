@@ -342,7 +342,7 @@ const filterContentStyle = css`
 
     .filter-label {
       display: block;
-      width: 70px;
+      width: 80px;
       font-weight: ${FONT_WEIGHT.BOLD};
       color: ${COLOR.BLACK};
     }
