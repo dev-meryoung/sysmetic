@@ -1,4 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
+import RequireAdmin from '@/components/auth/RequireAdmin';
+import RequireAuth from '@/components/auth/RequireAuth';
 import { PATH } from '@/constants/path';
 import AdminStrategyLayout from '@/layouts/AdminStrategyLayout';
 import Layout from '@/layouts/Layout';
@@ -131,125 +133,135 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: PATH.STRATEGIES_QNA(),
-        element: <QnaQuestion />,
-      },
-      {
         path: PATH.TRADER_STRATEGIES(),
         element: <TraderStrategyList />,
       },
       {
-        path: PATH.STRATEGIES_ADD,
-        element: <StrategyAdd />,
-      },
-      {
-        path: PATH.MYPAGE,
-        element: <MyPageLayout />,
+        element: <RequireAuth />,
         children: [
           {
-            index: true,
-            element: <MyPage />,
+            path: PATH.STRATEGIES_QNA(),
+            element: <QnaQuestion />,
           },
           {
-            path: PATH.MYPAGE_PROFILE(),
-            element: <Profile />,
+            path: PATH.STRATEGIES_ADD,
+            element: <StrategyAdd />,
           },
           {
-            path: PATH.MYPAGE_QNA(),
+            path: PATH.MYPAGE,
+            element: <MyPageLayout />,
             children: [
               {
                 index: true,
-                element: <QnaList />,
+                element: <MyPage />,
               },
               {
-                path: PATH.MYPAGE_QNA_DETAIL(),
-                element: <QnaDetail />,
+                path: PATH.MYPAGE_PROFILE(),
+                element: <Profile />,
+              },
+              {
+                path: PATH.MYPAGE_QNA(),
+                children: [
+                  {
+                    index: true,
+                    element: <QnaList />,
+                  },
+                  {
+                    path: PATH.MYPAGE_QNA_DETAIL(),
+                    element: <QnaDetail />,
+                  },
+                ],
               },
             ],
           },
+          {
+            path: PATH.MYPAGE_QNA_ANSWER(),
+            element: <QnaAnswer />,
+          },
+          {
+            path: PATH.MYPAGE_PROFILE_EDIT(),
+            element: <ProfileEdit />,
+          },
+          {
+            path: PATH.MYPAGE_PASSWORD(),
+            element: <MyPagePassword />,
+          },
+          {
+            path: PATH.MYPAGE_OPT(),
+            element: <MyPageOpt />,
+          },
+          {
+            path: PATH.MYPAGE_QNA_EDIT(),
+            element: <MyQnaEdit />,
+          },
+          {
+            path: PATH.MYPAGE_WITHDRAW,
+            element: <Withdraw />,
+          },
+          {
+            path: PATH.MYPAGE_STRATEGIES_EDIT(),
+            element: <MyStrategyEdit />,
+          },
         ],
       },
       {
-        path: PATH.MYPAGE_QNA_ANSWER(),
-        element: <QnaAnswer />,
-      },
-      {
-        path: PATH.MYPAGE_PROFILE_EDIT(),
-        element: <ProfileEdit />,
-      },
-      {
-        path: PATH.MYPAGE_PASSWORD(),
-        element: <MyPagePassword />,
-      },
-      {
-        path: PATH.MYPAGE_OPT(),
-        element: <MyPageOpt />,
-      },
-      {
-        path: PATH.MYPAGE_QNA_EDIT(),
-        element: <MyQnaEdit />,
-      },
-      {
-        path: PATH.MYPAGE_WITHDRAW,
-        element: <Withdraw />,
-      },
-      {
-        path: PATH.MYPAGE_STRATEGIES_EDIT(),
-        element: <MyStrategyEdit />,
-      },
-      {
-        path: PATH.ADMIN,
-        element: <Admin />,
-      },
-      {
-        path: PATH.ADMIN_USERS,
-        element: <AdminUsers />,
-      },
-      {
-        path: PATH.ADMIN_NOTICES,
-        element: <AdminNotices />,
-      },
-      {
-        path: PATH.ADMIN_NOTICES_ADD,
-        element: <AdminNoticeAdd />,
-      },
-      {
-        path: PATH.ADMIN_NOTICES_EDIT(),
-        element: <AdminNoticeEdit />,
-      },
-      {
-        path: PATH.ADMIN_NOTICES_DETAIL(),
-        element: <AdminNoticesDetail />,
-      },
-      {
-        path: PATH.ADMIN_STRATEGIES_CONTROL(),
-        element: <AdminStrategiesControl />,
-      },
-      {
-        path: PATH.ADMIN_STRATEGIES,
-        element: <AdminStrategyLayout />,
+        element: <RequireAdmin />,
         children: [
           {
-            index: true,
-            element: <AdminStrategies />,
+            path: PATH.ADMIN,
+            element: <Admin />,
           },
           {
-            path: PATH.ADMIN_METHODS,
-            element: <AdminMethods />,
+            path: PATH.ADMIN_USERS,
+            element: <AdminUsers />,
           },
           {
-            path: PATH.ADMIN_STOCKS,
-            element: <AdminStocks />,
+            path: PATH.ADMIN_NOTICES,
+            element: <AdminNotices />,
+          },
+          {
+            path: PATH.ADMIN_NOTICES_ADD,
+            element: <AdminNoticeAdd />,
+          },
+          {
+            path: PATH.ADMIN_NOTICES_EDIT(),
+            element: <AdminNoticeEdit />,
+          },
+          {
+            path: PATH.ADMIN_NOTICES_DETAIL(),
+            element: <AdminNoticesDetail />,
+          },
+          {
+            path: PATH.ADMIN_STRATEGIES_CONTROL(),
+            element: <AdminStrategiesControl />,
+          },
+          {
+            path: PATH.ADMIN_STRATEGIES,
+            element: <AdminStrategyLayout />,
+            children: [
+              {
+                index: true,
+                element: <AdminStrategies />,
+              },
+              {
+                path: PATH.ADMIN_METHODS,
+                element: <AdminMethods />,
+              },
+              {
+                path: PATH.ADMIN_STOCKS,
+                element: <AdminStocks />,
+              },
+            ],
+          },
+          {
+            path: PATH.ADMIN_QNA,
+            element: <AdminQna />,
+          },
+          {
+            path: PATH.ADMIN_QNA_DETAIL(),
+            element: <AdminQnaDetail />,
           },
         ],
-      },
-      {
-        path: PATH.ADMIN_QNA,
-        element: <AdminQna />,
-      },
-      {
-        path: PATH.ADMIN_QNA_DETAIL(),
-        element: <AdminQnaDetail />,
       },
       {
         path: PATH.NOTICES,
