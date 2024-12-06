@@ -11,9 +11,9 @@ import {
   useDeleteMyStrateDaily,
   useGetExampleExcelLink,
   useGetMethodAndStock,
+  useGetMyStrategyInfo,
   useGetStrategyAccount,
   useGetStrategyDaily,
-  useGetStrategyInfo,
   useRequestApproveStrategy,
   useUpdateMyStrategyDaily,
   useUpdateStrategy,
@@ -83,7 +83,7 @@ const useMyStrategyEdit = () => {
     data: strategyInfo,
     isError: strategyInfoIsError,
     refetch: refetchStrategyInfo,
-  } = useGetStrategyInfo(strategyId as string);
+  } = useGetMyStrategyInfo(strategyId as string);
   const { data: strategyDaily, refetch: refetchDaily } = useGetStrategyDaily(
     strategyId as string,
     dailyPage,
@@ -105,7 +105,7 @@ const useMyStrategyEdit = () => {
   const { mutate: deleteAccountMutate } = useDeleteMyStrateAccount();
 
   useEffect(() => {
-    if (strategyInfoIsError) navigate(PATH.ROOT);
+    if (strategyInfoIsError) navigate(PATH.NOT_FOUND);
 
     if (roleCode === 'TRADER' && methodsAndStocks && strategyInfo) {
       setMethodOptions(
@@ -232,7 +232,7 @@ const useMyStrategyEdit = () => {
     }
 
     if (stocks.length === 0) {
-      errors.push('운용 종목');
+      errors.push('운용종목');
     }
 
     if (isInvalidInput(content)) {

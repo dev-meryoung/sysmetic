@@ -34,7 +34,6 @@ const Profile: React.FC = () => {
     return null;
   }
 
-
   return (
     <div css={wrapperStyle}>
       <div css={profileWrapperStyle}>

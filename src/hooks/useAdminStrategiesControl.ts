@@ -65,7 +65,7 @@ const useAdminStrategiesControl = () => {
   const { mutate: deleteMutate } = useDeleteTraderAddStrategyList();
 
   useEffect(() => {
-    if (strategyInfoIsError) navigate(PATH.ROOT);
+    if (strategyInfoIsError) navigate(PATH.NOT_FOUND);
 
     if (methodsAndStocks && strategyInfo) {
       setStockOptions(

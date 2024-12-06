@@ -1,59 +1,101 @@
 import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import SearchIcon from '@mui/icons-material/Search';
+import { Link, useParams } from 'react-router-dom';
 import Pagination from '@/components/Pagination';
-import Table from '@/components/Table';
+import Table, { ColumnProps } from '@/components/Table';
 import TextInput from '@/components/TextInput';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
-import notices from '@/mocks/notices.json';
+import { PATH } from '@/constants/path';
+import { useGetNoticeList } from '@/hooks/useCommonApi';
 
 interface NoticesStrategyDataProps {
-  strategyName: string;
-  date: string;
+  noticeId?: string;
+  noticeTitle?: string;
+  writeDate?: string;
 }
 
 const PAGE_SIZE = 10;
 
 const Notices = () => {
   const [searchValue, setSearchValue] = useState('');
-  //테이블 관련
-  const [curPage, setCurPage] = useState(0);
+  const [curPage, setCurPage] = useState<number>(0);
   const [data, setData] = useState<NoticesStrategyDataProps[]>([]);
-  //페이지네이션 관련
+  const [_filteredData, setFilteredData] = useState<NoticesStrategyDataProps[]>(
+    []
+  );
   const [totalPage, setTotalPage] = useState(0);
-
-  const columns = [
-    {
-      key: 'strategyName' as keyof NoticesStrategyDataProps,
-      header: '',
-    },
-    {
-      key: 'date' as keyof NoticesStrategyDataProps,
-      header: '',
-    },
-  ];
-
-  const getPaginatedData = (page: number) => {
-    const startIndex = page * PAGE_SIZE;
-    const endIndex = startIndex + PAGE_SIZE;
-    return data.slice(startIndex, endIndex);
+  const { noticeId } = useParams<{ noticeId: string }>();
+  const params = {
+    noticeId,
+    page: curPage,
+    searchText: searchValue,
   };
 
-  const paginatedData = getPaginatedData(curPage);
+  const noticeMutation = useGetNoticeList(params);
 
   useEffect(() => {
-    // 순서를 기준으로
-    const sortedData = [...notices].sort((a, b) => b.no - a.no);
-    const arrangedData = sortedData.map((item, index) => ({
-      ...item,
-      no: index + 1,
-    }));
-    setData(arrangedData);
+    const total = noticeMutation.data?.data?.totalElement;
+    const fetchedData = noticeMutation.data?.data?.content;
 
-    const pages = Math.ceil(arrangedData.length / PAGE_SIZE);
-    setTotalPage(pages);
-  }, []);
+    if (Array.isArray(fetchedData)) {
+      const sortedData = [...fetchedData].sort((a, b) => b.no - a.no);
+      setData(sortedData);
+      setFilteredData(sortedData);
+      setTotalPage(Math.ceil(total / PAGE_SIZE));
+    } else {
+      setData([]);
+      setFilteredData([]);
+      setTotalPage(0);
+    }
+  }, [noticeMutation.data]);
+
+  const formatDate = (isoDate: string | undefined): string =>
+    isoDate
+      ? new Date(isoDate).toISOString().split('T')[0].replace(/-/g, '.')
+      : '';
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(e.target.value);
+  };
+
+  const handleSearch = () => {
+    const filtered = data.filter((item) =>
+      item.noticeTitle?.toLowerCase().includes(searchValue.trim().toLowerCase())
+    );
+    setFilteredData(filtered);
+    setCurPage(0);
+    setTotalPage(Math.ceil(filtered.length / PAGE_SIZE));
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') handleSearch();
+  };
+
+  const columns: ColumnProps<NoticesStrategyDataProps>[] = [
+    {
+      key: 'noticeTitle',
+      header: '',
+      render: (value, row) => (
+        <div css={questionContainerStyle}>
+          <div css={questionTitleStyle}>
+            <Link
+              to={PATH.NOTICES_DETAIL(String(row.noticeId))}
+              css={linkStyle}
+            >
+              {value}
+            </Link>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'writeDate',
+      header: '',
+      render: (value) => <span>{formatDate(value)}</span>,
+    },
+  ];
 
   return (
     <div css={noticesWrapperStyle}>
@@ -63,14 +105,15 @@ const Notices = () => {
       </div>
       <div css={noticesSearchStyle}>
         <TextInput
-          placeholder='제목, 내용'
+          placeholder='검색어를 입력하세요.'
           value={searchValue}
-          handleChange={(e) => setSearchValue(e.target.value)}
+          handleChange={handleChange}
+          handleKeyDown={handleKeyDown}
         />
-        <SearchIcon css={iconStyle} />
+        <SearchIcon css={iconStyle} onClick={handleSearch} />{' '}
       </div>
       <div css={noticesListStyle}>
-        <Table data={paginatedData} columns={columns} />
+        <Table data={data} columns={columns} />
       </div>
       <div css={noticesPaginationStyle}>
         <Pagination
@@ -86,7 +129,7 @@ const Notices = () => {
 const noticesWrapperStyle = css`
   display: flex;
   flex-direction: column;
-  margin: 96px auto 96px;
+  margin: 96px auto;
   padding: 0 10px;
   max-width: 1200px;
 `;
@@ -129,25 +172,47 @@ const iconStyle = css`
 const noticesListStyle = css`
   border-top: 2px solid ${COLOR.PRIMARY600};
 
-  table > thead > tr > th {
-    padding: 0;
+  th {
+    display: none; 
+  }
+  thead {
+    background-color: transparent;
   }
 
   table > tbody > tr > td {
     padding: 24px;
 
     &:first-of-type {
-      display: flex;
-      justify-content: flex-start;
       font-weight: ${FONT_WEIGHT.BOLD};
     }
     &:last-of-type {
-      width: 180px;
+      display: flex;
+      justify-content: flex-end; 
+      align-items: center;
     }
-  }
 `;
 
 const noticesPaginationStyle = css`
   margin-top: 32px;
 `;
+
+const questionContainerStyle = css`
+  display: flex;
+  align-items: center;
+  height: 100%;
+`;
+
+const questionTitleStyle = css`
+  text-align: left;
+  width: 100%;
+`;
+
+const linkStyle = css`
+  margin-left: 24px;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: ${FONT_WEIGHT.BOLD};
+  color: ${COLOR.TEXT_BLACK};
+`;
+
 export default Notices;

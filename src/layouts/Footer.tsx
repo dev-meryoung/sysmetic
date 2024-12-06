@@ -6,9 +6,13 @@ import Button from '@/components/Button';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+import useAuthStore from '@/stores/useAuthStore';
 
 const Footer = () => {
   const navigate = useNavigate();
+  const roleCode = useAuthStore((state) => state.roleCode);
+
+  const isAdmin = roleCode === 'MANAGER' || roleCode === 'ADMIN';
 
   return (
     <footer css={wrapperStyle}>
@@ -35,15 +39,19 @@ const Footer = () => {
               All Rights Reserved.
             </span>
           </div>
-          <Button
-            label='관리자모드 바로가기'
-            border={true}
-            color='white'
-            width={171}
-            handleClick={() => {
-              navigate(PATH.ADMIN);
-            }}
-          />
+          {isAdmin ? (
+            <Button
+              label='관리자모드 바로가기'
+              border={true}
+              color='white'
+              width={171}
+              handleClick={() => {
+                navigate(PATH.ADMIN);
+              }}
+            />
+          ) : (
+            ''
+          )}
         </div>
       </section>
       <section css={footerBottomStyle}>

@@ -142,7 +142,7 @@ const MyStrategyEdit = () => {
             />
           </div>
           <div className='form-item'>
-            <span>운용 종목</span>
+            <span>운용종목</span>
             {stockOptions.map((option: { label: string; value: string }) => (
               <Checkbox
                 key={option.value}
@@ -229,7 +229,7 @@ const MyStrategyEdit = () => {
             </span>
           </div>
           <div className='form-item'>
-            <span>운용 종목</span>
+            <span>운용종목</span>
             <div className='options'>
               {stockOptions.map((option) => (
                 <Checkbox
@@ -327,8 +327,8 @@ const MyStrategyEdit = () => {
                 <th>입출금</th>
                 <th>일 손익</th>
                 <th>일 손익률</th>
-                <th>누적손익</th>
-                <th>누적손익률</th>
+                <th>누적 손익</th>
+                <th>누적 손익률</th>
                 <th>관리</th>
               </tr>
             </thead>
@@ -458,7 +458,7 @@ const MyStrategyEdit = () => {
                 <tr>
                   <td
                     colSpan={8}
-                    style={{ textAlign: 'center', padding: '20px' }}
+                    style={{ textAlign: 'center', padding: '64px' }}
                   >
                     <div>해당하는 데이터가 없습니다.</div>
                   </td>
@@ -471,11 +471,15 @@ const MyStrategyEdit = () => {
             날까지의 일간분석 데이터를 토대로 계산됩니다.
           </span>
         </div>
-        <Pagination
-          currentPage={dailyPage}
-          totalPage={+dailyTotalPage}
-          handlePageChange={setDailyPage}
-        />
+        {strategyDaily?.content && strategyDaily.content.length > 0 ? (
+          <Pagination
+            currentPage={dailyPage}
+            totalPage={+dailyTotalPage}
+            handlePageChange={setDailyPage}
+          />
+        ) : (
+          ''
+        )}
       </div>
     ),
     실계좌정보: (
@@ -524,17 +528,19 @@ const MyStrategyEdit = () => {
             ))
           ) : (
             <div
-              style={{ textAlign: 'center', width: '100%', padding: '20px' }}
+              style={{ textAlign: 'center', width: '100%', padding: '64px' }}
             >
               해당하는 데이터가 없습니다.
             </div>
           )}
         </div>
-        <Pagination
-          currentPage={accountPage}
-          totalPage={+accountTotalPage}
-          handlePageChange={setAccountPage}
-        />
+        {strategyAccount?.content && strategyAccount.content.length > 0 && (
+          <Pagination
+            currentPage={accountPage}
+            totalPage={+accountTotalPage}
+            handlePageChange={setAccountPage}
+          />
+        )}
       </div>
     ),
   };

@@ -11,9 +11,13 @@ const MyPageLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { userId: paramUserId } = useParams<{ userId: string }>();
-  const { memberId } = useAuthStore();
+  const { memberId, roleCode } = useAuthStore();
   const userId =
     paramUserId && !isNaN(Number(paramUserId)) ? Number(paramUserId) : memberId;
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     if (location.pathname === PATH.MYPAGE) {
@@ -47,30 +51,28 @@ const MyPageLayout = () => {
     }
   };
 
-  const discriptionTab = () => {
-    switch (tab) {
-      case 0:
-        return '시스메틱 마이페이지에서는 내 관심 전략 관리, 개인정보 수정, 상담 문의 등 다양한 서비스를 편리하게 이용하실 수 있습니다.';
-      case 1:
-        return '시스메틱 마이페이지에서는 내 관심 전략 관리, 개인정보 수정, 상담 문의 등 다양한 서비스를 편리하게 이용하실 수 있습니다.';
-      case 2:
-        return '시스메틱 마이페이지에서는 내 관심 전략 관리, 개인정보 수정, 상담 문의 등 다양한 서비스를 편리하게 이용하실 수 있습니다.';
-       
+  const tabs = (() => {
+    switch (roleCode) {
+      case 'USER':
+        return ['내관심전략', '내정보수정', '상담문의'];
       default:
-        return '';
+        return ['내투자전략', '내정보수정', '상담문의'];
     }
-  };
+  })();
 
   return (
     <div css={wrapperStyle}>
       <div css={indexStyle}>
         <div css={titleStyle}>마이페이지</div>
-        <div css={textStyle}>{discriptionTab()}</div>
+        <div css={textStyle}>
+          시스메틱 마이페이지에서는 내관심전략 관리, 개인정보 수정, 상담 문의 등
+          <br /> 다양한 서비스를 편리하게 이용하실 수 있습니다.
+        </div>
       </div>
       <div css={tabBtnStyle}>
         <TabButton
           shape='round'
-          tabs={['내관심전략', '내정보수정', '상담문의']}
+          tabs={tabs}
           currentTab={tab}
           handleTabChange={handleTabChange}
         />
@@ -110,6 +112,7 @@ const textStyle = css`
   margin-top: 16px;
   font-size: ${FONT_SIZE.TEXT_MD};
   font-weight: ${FONT_WEIGHT.REGULAR};
+  line-height: 160%;
 `;
 
 const tabBtnStyle = css`

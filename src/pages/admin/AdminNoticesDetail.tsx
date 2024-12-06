@@ -1,25 +1,138 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import Button from '@/components/Button';
+import Loading from '@/components/Loading';
+import Modal from '@/components/Modal';
 import Toggle from '@/components/Toggle';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+import { useGetAdminNotice, useDeleteAdminNotice } from '@/hooks/useAdminApi';
+import useModalStore from '@/stores/useModalStore';
+
+interface FileDto {
+  name: string;
+  url: string;
+  size: string;
+}
+
+interface NoticesDataProps {
+  noticeId?: string;
+  noticeTitle?: string;
+  writeDate?: string;
+  correctDate?: string;
+  writerNickname?: string;
+  hits?: number;
+  fileExist?: boolean;
+  imageExist?: boolean;
+  isOpen?: boolean;
+  noticeContent?: string;
+  previousTitle?: string;
+  previousWriteDate?: string;
+  nextTitle?: string;
+  nextWriteDate?: string;
+  fileDtoList?: FileDto[];
+}
 
 const AdminNoticesDetail = () => {
   const [toggleOn, setToggleOn] = useState(false);
   const navigate = useNavigate();
+  const { openModal, closeModal } = useModalStore();
+  const { noticeId: paramNoticeId } = useParams<{ noticeId: string }>();
+  const noticeId = paramNoticeId ? Number(paramNoticeId) : 0;
+  const [data, setData] = useState<NoticesDataProps>({ fileDtoList: [] });
 
-  const handleToggle = () => {
-    setToggleOn(!toggleOn);
+  const params = { noticeId: String(noticeId) };
+  const getNoticeMutation = useGetAdminNotice(params);
+
+  useEffect(() => {
+    if (getNoticeMutation.data?.data) {
+      const fileDtoList =
+        getNoticeMutation.data.data.fileDtoList?.map((file: any) => ({
+          name: file.originalName || '알 수 없는 파일',
+          url: file.path || '',
+          size: `${file.fileSize || 0} KB`,
+        })) || [];
+
+      setData({
+        ...getNoticeMutation.data.data,
+        fileDtoList,
+      });
+
+      if (getNoticeMutation.data.data.isOpen !== undefined) {
+        setToggleOn(getNoticeMutation.data.data.isOpen);
+      }
+    }
+  }, [getNoticeMutation.data]);
+
+  const downloadFile = async (url: string, fileName: string) => {
+    if (!url || !fileName) return;
+
+    try {
+      const response = await fetch(url, { method: 'GET' });
+
+      if (!response.ok) {
+        throw new Error('파일을 다운로드할 수 없습니다.');
+      }
+
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(blobUrl);
+    } catch {
+      openModal('error');
+    }
   };
+
+  const downloadAllFiles = () => {
+    if (!data.fileDtoList || data.fileDtoList.length === 0) {
+      return;
+    }
+    data.fileDtoList.forEach((file) => {
+      if (file.url) {
+        downloadFile(file.url, file.name);
+      }
+    });
+  };
+
+  const formatDate = (isoDate: string | undefined): string =>
+    isoDate
+      ? new Date(isoDate).toISOString().split('T')[0].replace(/-/g, '.')
+      : '';
 
   const handleGoList = () => {
     navigate(PATH.ADMIN_NOTICES);
   };
+
+  const handleEdit = () => {
+    navigate(PATH.ADMIN_NOTICES_EDIT(String(noticeId)));
+  };
+
+  const deleteMutation = useDeleteAdminNotice();
+  const handleDelete = () => {
+    openModal('delete-confirm');
+  };
+
+  if (!data) {
+    return (
+      <div>
+        <Loading />
+      </div>
+    );
+  }
+
+  const handleToggle = () => {
+    setToggleOn((prev) => !prev);
+  };
+
   return (
     <div css={noticesDetailWrapperStyle}>
       <div css={noticesDetailHeaderStyle}>
@@ -28,20 +141,20 @@ const AdminNoticesDetail = () => {
       </div>
       <div css={noticesDetailMainStyle}>
         <div css={noticesTitleStyle}>
-          <h6>시스메틱 내 오늘의투자판이 출시됩니다!</h6>
+          <h6>{data.noticeTitle}</h6>
           <div css={noticesStyle}>
             <div className='left-section'>
               <div>
                 <span>작성일</span>
-                <p>2024. 11. 28.</p>
+                <p>{formatDate(data.writeDate)}</p>
               </div>
               <div>
                 <span>수정일</span>
-                <p>2024. 12. 04.</p>
+                <p>{formatDate(data.correctDate)}</p>
               </div>
               <div>
                 <span>작성자</span>
-                <p>관리자작성용</p>
+                <p>{data.writerNickname}</p>
               </div>
               <div className='buttons'>
                 <Button
@@ -50,7 +163,7 @@ const AdminNoticesDetail = () => {
                   shape='none'
                   label='수정'
                   color='primary'
-                  handleClick={() => console.log('수정 클릭')}
+                  handleClick={handleEdit}
                 />
                 <span>|</span>
                 <Button
@@ -59,7 +172,7 @@ const AdminNoticesDetail = () => {
                   shape='none'
                   label='삭제'
                   color='primary'
-                  handleClick={() => console.log('삭제 클릭')}
+                  handleClick={handleDelete}
                 />
               </div>
             </div>
@@ -67,71 +180,136 @@ const AdminNoticesDetail = () => {
               <span className='toggle-text'>공개여부</span>
               <Toggle checked={toggleOn} handleChange={handleToggle} />
               <p className='hits'>
-                조회수 <span>99</span>
+                조회수 <span>{data.hits}</span>
               </p>
             </div>
           </div>
         </div>
         <div css={noticesContentStyle}>
-          <p>공지내용</p>
+          <p>{data.noticeContent}</p>
         </div>
-        <div css={noticesFileStyle}>
-          <div className='file-title'>
-            <AttachFileIcon css={iconStyle} />
-            <p>
-              첨부파일 <span>2</span>개
-            </p>
-            <Button
-              width={72}
-              size='xxs'
-              shape='none'
-              label='모두 저장'
-              color='primary'
-              handleClick={() => console.log('click')}
-            />
-          </div>
-          <div css={noticesFileDivStyle}>
-            <div className='file-content'>
+        {data.fileDtoList && data.fileDtoList.length > 0 && (
+          <div css={noticesFileStyle}>
+            <div className='file-title'>
+              <AttachFileIcon css={iconStyle} />
               <p>
-                시스메틱 특약 변경 대비표1.pdf<span>(1.2MB)</span>
+                첨부파일 <span>{data.fileDtoList?.length || 0}</span>개
               </p>
-              <FileDownloadOutlinedIcon css={iconStyle} />
+              <Button
+                width={72}
+                size='xxs'
+                shape='none'
+                label='모두 저장'
+                color='primary'
+                handleClick={downloadAllFiles}
+              />
             </div>
-            <div className='file-content'>
-              <p>
-                시스메틱 특약 변경 대비표2.pdf<span>(1.2MB)</span>
-              </p>
-              <FileDownloadOutlinedIcon css={iconStyle} />
+
+            <div css={noticesFileDivStyle}>
+              {data.fileDtoList.map((file, index) => (
+                <div key={index} className='file-content'>
+                  <p>
+                    {file.name}
+                    <span>({file.size})</span>
+                  </p>
+                  <FileDownloadOutlinedIcon
+                    css={iconStyle}
+                    onClick={() =>
+                      downloadFile(file.url, file.name || 'default-file-name')
+                    }
+                  />
+                </div>
+              ))}
             </div>
           </div>
-        </div>
+        )}
       </div>
       <div css={noticesDetailNavStyle}>
-        <div className='page-nav'>
-          <div>
-            <p>이전</p>
-            <p>이전 공지사항</p>
+        {data.previousTitle && (
+          <div className='page-nav'>
+            <div>
+              <p>이전</p>
+              <span>
+                <Link to={`/notices/${Number(noticeId) - 1}`} css={linkStyle}>
+                  {data.previousTitle}
+                </Link>
+              </span>
+            </div>
+            <p>{formatDate(data.previousWriteDate)}</p>
           </div>
-          <p>2024. 11. 11.</p>
-        </div>
-        <div className='page-nav'>
-          <div>
-            <p>다음</p>
-            <p>다음 공지사항</p>
+        )}
+        {data.nextTitle && (
+          <div className='page-nav'>
+            <div>
+              <p>다음</p>
+              <p>
+                <Link to={`/notices/${Number(noticeId) + 1}`} css={linkStyle}>
+                  {data.nextTitle}
+                </Link>
+              </p>
+            </div>
+            <p>{formatDate(data.nextWriteDate)}</p>
           </div>
-          <p>2024. 12. 1.</p>
-        </div>
-        <div css={goListBtnStyle}>
-          <Button
-            label='목록보기'
-            color='black'
-            shape='square'
-            width={80}
-            size='md'
-            handleClick={handleGoList}
-          />
-        </div>
+        )}
       </div>
+      <div css={buttonWrapperStyle}>
+        <Button
+          label='목록보기'
+          size='md'
+          width={80}
+          color='black'
+          handleClick={handleGoList}
+        />
+      </div>
+
+      <Modal
+        id='delete-confirm'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>공지를 삭제하시겠습니까?</p>
+            <div css={modalButtonWrapperStyle}>
+              <Button
+                label='아니오'
+                handleClick={() => closeModal('delete-confirm')} // 모달 닫기
+                color='primaryOpacity10'
+                border
+              />
+              <Button
+                label='예'
+                handleClick={() => {
+                  closeModal('delete-confirm'); // 모달 닫기
+                  deleteMutation.mutate(String(noticeId), {
+                    onSuccess: () => {
+                      navigate(PATH.ADMIN_NOTICES);
+                    },
+                    onError: () => {
+                      openModal('error-delete');
+                    },
+                  });
+                }}
+                color='primary'
+              />
+            </div>
+          </div>
+        }
+      />
+
+      <Modal
+        id='error-delete'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>공지를 삭제할 수 없습니다.</p>
+          </div>
+        }
+      />
+      <Modal
+        id='error'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>실패하였습니다.</p>
+          </div>
+        }
+      />
     </div>
   );
 };
@@ -187,7 +365,7 @@ const noticesTitleStyle = css`
 `;
 const noticesContentStyle = css`
   padding: 24px 24px 64px;
-  min-height: 120px;
+  min-height: 280px;
 `;
 const noticesFileStyle = css`
   display: flex;
@@ -225,6 +403,9 @@ const noticesFileDivStyle = css`
       font-size: ${FONT_SIZE.TEXT_SM};
       color: ${COLOR_OPACITY.BLACK_OPACITY30};
     }
+    svg {
+      cursor: pointer;
+    }
   }
 `;
 
@@ -237,11 +418,6 @@ const noticesDetailNavStyle = css`
     justify-content: space-between;
     border-bottom: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
 
-    p {
-      &:last-of-type {
-        width: 100px;
-      }
-    }
     div {
       display: flex;
       gap: 40px;
@@ -321,10 +497,38 @@ const noticesStyle = css`
   }
 `;
 
-const goListBtnStyle = css`
+const linkStyle = css`
+  text-decoration: none;
+  color: inherit;
+  margin-right: 400px;
+`;
+
+const buttonWrapperStyle = css`
   display: flex;
-  justify-content: flex-end; /* 오른쪽 정렬 */
-  margin-top: 40px;
+  justify-content: flex-end;
+  margin-top: 24px;
+`;
+
+const modalButtonWrapperStyle = css`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 16px;
+`;
+
+const modalContentStyle = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+`;
+
+const modalTextStyle = css`
+  font-size: ${FONT_SIZE.TEXT_MD};
+  text-align: center;
+  margin-top: 32px;
+  margin-bottom: 24px;
 `;
 
 export default AdminNoticesDetail;

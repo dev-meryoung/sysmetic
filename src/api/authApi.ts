@@ -1,6 +1,5 @@
 import axiosInstance from '@/api/axiosInstance';
 
-export type RoleCodeTypes = 'USER' | 'TRADER';
 export interface LoginRequestData {
   email: string;
   password: string;

@@ -2,6 +2,7 @@ import { css } from '@emotion/react';
 import { useNavigate } from 'react-router-dom';
 import pageNotFoundImage from '@/assets/images/page-not-found.png';
 import Button from '@/components/Button';
+import { PATH } from '@/constants/path';
 
 const NotFound = () => {
   const navigate = useNavigate();
@@ -15,10 +16,10 @@ const NotFound = () => {
           <span>이 페이지는 현재 존재하지 않거나 삭제되었습니다.</span>
         </div>
         <Button
-          label='이전 페이지로 이동'
+          label='메인 페이지로 이동'
           width={160}
           border={true}
-          handleClick={() => navigate(-1)}
+          handleClick={() => navigate(PATH.ROOT)}
         />
       </div>
     </div>

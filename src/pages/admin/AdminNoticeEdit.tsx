@@ -1,16 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CloseIcon from '@mui/icons-material/Close';
-import CropOriginalIcon from '@mui/icons-material/CropOriginal';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
+import Modal from '@/components/Modal';
 import RadioButton from '@/components/RadioButton';
 import TextArea from '@/components/TextArea';
 import TextInput from '@/components/TextInput';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+import {
+  useGetAdminNoticeEdit,
+  useUpdateAdminNotice,
+} from '@/hooks/useAdminApi';
+import useModalStore from '@/stores/useModalStore';
 
 const options = [
   { label: '공개', value: 'unclosed' },
@@ -21,28 +26,102 @@ const AdminNoticeEdit = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [isChecked, setIsChecked] = useState('closed');
+  const [existingFiles, setExistingFiles] = useState<any[]>([]);
+  const [newFiles, setNewFiles] = useState<File[]>([]);
+  const [deleteFileIds, setDeleteFileIds] = useState<number[]>([]);
+  const { noticeId } = useParams<{ noticeId: string }>();
   const navigate = useNavigate();
+  const { openModal } = useModalStore();
+  const [deleteImageIds, setDeleteImageIds] = useState<number[]>([]);
+
+  const { data: noticeData, isError } = useGetAdminNoticeEdit(String(noticeId));
+
+  useEffect(() => {
+    if (noticeData && noticeData.data) {
+      const { noticeTitle, noticeContent, isOpen, fileDtoList } =
+        noticeData.data;
+      setTitle(noticeTitle || '');
+      setContent(noticeContent || '');
+      setIsChecked(isOpen ? 'unclosed' : 'closed');
+      setExistingFiles(fileDtoList || []);
+    } else if (isError) {
+      openModal('error-load');
+    }
+  }, [noticeData, isError, openModal]);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
   };
+
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContent(e.target.value);
   };
 
-  // 나중에 정확한 경로로 변경
+  const handleFileChange = ({
+    target: { files },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    if (files) {
+      setNewFiles((prev) => [...prev, ...Array.from(files)]);
+    }
+  };
+
+  const handleFileRemove = (fileId: number) => {
+    setDeleteFileIds((prev) => [...prev, fileId]);
+    setExistingFiles((prev) => prev.filter((file) => file.fileId !== fileId));
+  };
+
+  const handleNewFileRemove = (index: number) => {
+    setNewFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleGoList = () => {
     navigate(PATH.ADMIN_NOTICES);
   };
 
+  const updateMutation = useUpdateAdminNotice();
+
   const handleSubmit = () => {
-    navigate(PATH.ADMIN_NOTICES);
+    if (!title.trim() || !content.trim()) {
+      openModal('error-input');
+      return;
+    }
+
+    const formData = new FormData();
+
+    const noticeModifyRequestDto = {
+      noticeTitle: title,
+      noticeContent: content,
+      isOpen: isChecked === 'unclosed',
+      deleteFileIdList: deleteFileIds,
+      deleteImageIdList: deleteImageIds,
+    };
+
+    formData.append(
+      'NoticeModifyRequestDto',
+      JSON.stringify(noticeModifyRequestDto)
+    );
+
+    newFiles.forEach((file) => {
+      formData.append('newFileList', file);
+    });
+
+    updateMutation.mutate(
+      { formData, noticeId: String(noticeId) },
+      {
+        onSuccess: async () => {
+          setDeleteFileIds([]);
+          setDeleteImageIds([]);
+          setNewFiles([]);
+          navigate(PATH.ADMIN_NOTICES_DETAIL(String(noticeId)));
+        },
+      }
+    );
   };
 
   return (
     <div css={noticesDetailWrapperStyle}>
       <div css={noticesDetailHeaderStyle}>
-        <h1>공지 작성</h1>
+        <h1>공지 수정</h1>
       </div>
       <div css={inputStyle}>
         <TextInput
@@ -53,8 +132,15 @@ const AdminNoticeEdit = () => {
         />
       </div>
       <div css={textAreaIconStyle}>
-        <CropOriginalIcon />
-        <AttachFileIcon />
+        <label>
+          <AttachFileIcon />
+          <input
+            type='file'
+            multiple
+            onChange={handleFileChange}
+            style={{ display: 'none' }}
+          />
+        </label>
       </div>
       <div>
         <TextArea
@@ -67,27 +153,33 @@ const AdminNoticeEdit = () => {
       <div css={noticesDetailMainStyle}>
         <div css={noticesFileStyle}>
           <div className='file-title'>
-            <p>
-              첨부파일 <span>2</span>개<span>(1.2MB)</span>
-            </p>
-            <p className='point'>
-              *파일 1개당 최대 첨부용량 20MB, 전체 파일 최대 첨부용량 40MB
-              게시판
-            </p>
+            <p>첨부파일</p>
           </div>
           <div css={noticesFileDivStyle}>
-            <div className='file-content'>
-              <p>
-                시스메틱 특약 변경 대비표1.pdf<span>(1.2MB)</span>
-              </p>
-              <CloseIcon css={iconStyle} />
-            </div>
-            <div className='file-content'>
-              <p>
-                시스메틱 특약 변경 대비표2.pdf<span>(1.2MB)</span>
-              </p>
-              <CloseIcon css={iconStyle} />
-            </div>
+            {existingFiles.map((file) => (
+              <div key={file.fileId} className='file-content'>
+                <p>
+                  {file.originalName}
+                  <span>({(file.fileSize / 1024).toFixed(2)} KB)</span>
+                </p>
+                <CloseIcon
+                  css={iconStyle}
+                  onClick={() => handleFileRemove(file.fileId)}
+                />
+              </div>
+            ))}
+            {newFiles.map((file, index) => (
+              <div key={index} className='file-content'>
+                <p>
+                  {file.name}
+                  <span>({(file.size / 1024).toFixed(2)} KB)</span>
+                </p>
+                <CloseIcon
+                  css={iconStyle}
+                  onClick={() => handleNewFileRemove(index)}
+                />
+              </div>
+            ))}
           </div>
           <div css={radioBtnStyle}>
             <p>공개설정</p>
@@ -100,7 +192,6 @@ const AdminNoticeEdit = () => {
           </div>
         </div>
       </div>
-
       <div css={btnStyle}>
         <Button
           label='이전'
@@ -112,7 +203,7 @@ const AdminNoticeEdit = () => {
           border
         />
         <Button
-          label='게시물 등록'
+          label='수정완료'
           color='primary'
           shape='square'
           width={120}
@@ -120,6 +211,33 @@ const AdminNoticeEdit = () => {
           handleClick={handleSubmit}
         />
       </div>
+
+      <Modal
+        id='error-load'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>
+              공지사항 데이터를 불러오는 데 실패했습니다.
+            </p>
+          </div>
+        }
+      />
+      <Modal
+        id='error-input'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>제목과 내용을 입력하세요.</p>
+          </div>
+        }
+      />
+      <Modal
+        id='error-submit'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>공지 수정에 실패했습니다.</p>
+          </div>
+        }
+      />
     </div>
   );
 };
@@ -250,4 +368,20 @@ const radioBtnStyle = css`
     font-weight: ${FONT_WEIGHT.BOLD};
   }
 `;
+
+const modalContentStyle = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+`;
+
+const modalTextStyle = css`
+  font-size: ${FONT_SIZE.TEXT_LG};
+  text-align: center;
+  margin-top: 32px;
+  margin-bottom: 24px;
+`;
+
 export default AdminNoticeEdit;

@@ -20,6 +20,7 @@ interface AuthStateProps extends AuthConfig {
   setAuthState: (authData: AuthConfig) => void;
   resetAuthState: () => void;
   initializeAuth: () => Promise<void>;
+  isAuthInitialized: boolean;
 }
 
 const resetState = (set: Function) => {
@@ -34,6 +35,7 @@ const resetState = (set: Function) => {
     profileImage: null,
     totalFollowerCount: 0,
     totalStrategyCount: 0,
+    isAuthInitialized: true,
   });
   localStorage.removeItem('token');
 };
@@ -50,6 +52,7 @@ const updateState = (set: Function, authData: AuthConfig) => {
     profileImage: authData.profileImage,
     totalFollowerCount: authData.totalFollowerCount,
     totalStrategyCount: authData.totalStrategyCount,
+    isAuthInitialized: true,
   });
 };
 
@@ -64,6 +67,7 @@ const useAuthStore = create<AuthStateProps>((set) => ({
   profileImage: null,
   totalFollowerCount: 0,
   totalStrategyCount: 0,
+  isAuthInitialized: false,
 
   setAuthState: (authData) => updateState(set, authData),
 
@@ -79,6 +83,8 @@ const useAuthStore = create<AuthStateProps>((set) => ({
       } catch {
         resetState(set);
       }
+    } else {
+      set({ isAuthInitialized: true });
     }
   },
 }));
