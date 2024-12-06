@@ -25,7 +25,8 @@ export interface UpdateAdminNoticeData {
 
 export interface UpdateAdminNoticeStatusData {
   noticeId?: string;
-  isOpen?: boolean;
+  isOpen?: boolean; 
+}
 
 export interface DeleteInquiryListRequest {
   inquiryIdList: number[];
