@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import TagTest from '@/assets/images/test-tag.jpg';
 import Button from '@/components/Button';
 import Pagination from '@/components/Pagination';
 import SelectBox from '@/components/SelectBox';
@@ -12,8 +11,8 @@ import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { useGetAdminStrategyList } from '@/hooks/useAdminApi';
 
-type OpenStatusTypes = 'PUBLIC' | 'PRIVATE';
-type ApprovalStatusTypes = '요청 전' | '승인' | '반려' | '승인 요청';
+export type OpenStatusTypes = 'PUBLIC' | 'PRIVATE';
+export type ApprovalStatusTypes = '요청 전' | '승인' | '반려' | '승인 요청';
 
 interface AdminStrategyDataProps {
   strategyId: number;
@@ -39,10 +38,10 @@ const StatusOption = [
 ];
 
 const StagedOption = [
-  { label: '승인', value: 'approval' },
-  { label: '반려', value: 'companion' },
-  { label: '요청전', value: 'unstaged' },
-  { label: '승인요청', value: 'staging' },
+  { label: '승인', value: '승인' },
+  { label: '반려', value: '반려' },
+  { label: '요청 전', value: '요청 전' },
+  { label: '승인 요청', value: '승인 요청' },
 ];
 
 const AdminStrategies = () => {
@@ -50,6 +49,7 @@ const AdminStrategies = () => {
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedStaged, setSelectedStaged] = useState('');
   const [value, SetValue] = useState('');
+  const [searchKeyword, setSearchKeyword] = useState('');
   //테이블 관련
   const [curPage, setCurPage] = useState(0);
   const [totalPage, setTotalPage] = useState(0);
@@ -57,14 +57,13 @@ const AdminStrategies = () => {
   // const [pageSize, setPageSize] = useState(0);
   const [tableData, setTableData] = useState<AdminStrategyDataProps[]>([]);
   //데이터 관련
-
   const params = {
     ...(selectedStatus && { openStatus: selectedStatus }),
     ...(selectedStaged && { approvalStatus: selectedStaged }),
-    ...(value && { keyword: value }),
+    ...(searchKeyword && { keyword: searchKeyword }),
     page: curPage,
   };
-  const { data } = useGetAdminStrategyList(params);
+  const { data, refetch } = useGetAdminStrategyList(params);
 
   const handleStatusChange = (value: string) => {
     setSelectedStatus(value);
@@ -75,7 +74,8 @@ const AdminStrategies = () => {
   };
 
   const handleIconClick = () => {
-    console.log(value);
+    setSearchKeyword(value);
+    refetch();
   };
 
   useEffect(() => {
@@ -129,7 +129,7 @@ const AdminStrategies = () => {
       key: 'openStatusCode' as keyof AdminStrategyDataProps,
       header: '공개여부',
       render: (_, item) =>
-        item.openStatusCode === 'PRIVATE' ? '공개' : '비공개',
+        item.openStatusCode === 'PUBLIC' ? '공개' : '비공개',
     },
     {
       key: 'approvalStatusCode' as keyof AdminStrategyDataProps,
