@@ -141,12 +141,7 @@ const AdminQna = () => {
     data: InquiryListData,
     refetch: inquiryListDataRefetch,
     isLoading,
-  } = useGetInquiryList(
-    currentPage,
-    getTabValue(tab),
-    selectiedOption,
-    searchText
-  );
+  } = useGetInquiryList(0, getTabValue(tab), selectiedOption, searchText);
 
   const handleOptionChange = (value: string) => {
     setSelectedOption(value);
@@ -186,6 +181,14 @@ const AdminQna = () => {
     setTotalElement(InquiryListData?.data?.totalElement || 0);
     setPageSize(InquiryListData?.data?.pageSize || 0);
   }, [InquiryListData]);
+
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [tab]);
+
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [searchText]);
 
   const columns: ColumnProps<AdminQnaDataProps>[] = [
     {
@@ -250,9 +253,7 @@ const AdminQna = () => {
           border={true}
           width={80}
           handleClick={() =>
-            navigate(PATH.ADMIN_QNA_DETAIL(String(item.inquiryId)), {
-              state: { inquiry: item },
-            })
+            navigate(PATH.ADMIN_QNA_DETAIL(String(item.inquiryId)))
           }
         />
       ),
@@ -284,7 +285,7 @@ const AdminQna = () => {
           handleChange={handleOptionChange}
         />
         <TextInput
-          placeholder='전략명'
+          placeholder='검색어를 입력해주세요.'
           color='skyblue'
           value={value}
           handleKeyDown={(e) => {

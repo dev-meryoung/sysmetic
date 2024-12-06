@@ -155,18 +155,8 @@ export const deleteInquiryList = async (
 };
 
 // 관리자 문의 상세조회 API
-export const getInquiryDetail = async (
-  qnaId: number,
-  params: {
-    page: number;
-    closed: string;
-    searchType: string;
-    searchText: string;
-  }
-) => {
-  const response = await axiosInstance.get(`/v1/admin/qna/${qnaId}`, {
-    params,
-  });
+export const getAdminInquiryDetail = async (qnaId: number) => {
+  const response = await axiosInstance.get(`/v1/admin/qna/${qnaId}`);
 
   return response.data;
 };

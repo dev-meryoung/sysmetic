@@ -15,8 +15,8 @@ import {
   getInquiryList,
   DeleteInquiryListRequest,
   deleteInquiryList,
-  getInquiryDetail,
   deleteDetailInquiry,
+  getAdminInquiryDetail,
 } from '@/api';
 
 export const useApproveAdminStrategy = () =>
@@ -105,29 +105,10 @@ export const useDeleteInquiryList = () => {
 };
 
 // 관리자 문의 상세조회
-export const useGetInquiryDetail = (
-  qnaId: number,
-  page: number,
-  closed: string,
-  searchType: string,
-  searchText: string
-) =>
+export const useGetAdminInquiryDetail = (qnaId: number) =>
   useQuery({
-    queryKey: [
-      'adminInquiryDetail',
-      qnaId,
-      page,
-      closed,
-      searchType,
-      searchText,
-    ],
-    queryFn: () =>
-      getInquiryDetail(qnaId, {
-        page,
-        closed,
-        searchType,
-        searchText,
-      }),
+    queryKey: ['adminInquiryDetail', qnaId],
+    queryFn: () => getAdminInquiryDetail(qnaId),
   });
 
 // 관리자 문의 특정 삭제 API

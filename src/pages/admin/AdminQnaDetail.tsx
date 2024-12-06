@@ -11,7 +11,7 @@ import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 import {
   useDeleteDetailInquiry,
-  useGetInquiryDetail,
+  useGetAdminInquiryDetail,
 } from '@/hooks/useAdminApi';
 import useModalStore from '@/stores/useModalStore';
 import { extractDate } from '@/utils/dataUtils';
@@ -47,11 +47,15 @@ interface AdminQnaDetailDataProps {
   traderId: number;
   traderNickname: string;
   traderProfileImagePath: string;
+  previousId: number;
+  nextId: number;
 }
 
 interface StockListProps {
   stockIconPath: string[];
 }
+
+const FailModal = () => <div css={ModalStyle}>문의 삭제에 실패했습니다.</div>;
 
 const DelModal = ({
   inquiryId,
@@ -61,6 +65,7 @@ const DelModal = ({
   inquiryDetailDataRefetch: () => void;
 }) => {
   const { closeModal } = useModalStore();
+  const failModal = useModalStore();
   const navigate = useNavigate();
   const { mutate: deleteMutaion } = useDeleteDetailInquiry();
 
@@ -73,8 +78,8 @@ const DelModal = ({
         closeModal('delete');
         navigate(PATH.ADMIN_QNA);
       },
-      onError: (error) => {
-        console.log('삭제 실패', error);
+      onError: () => {
+        failModal.openModal('fail-modal');
       },
     });
   };
@@ -104,33 +109,33 @@ const DelModal = ({
 const AdminQnaDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const inquiry = location.state?.inquiry;
   const deleteModal = useModalStore();
-  const urlNumber = Number(window.location.pathname.split('/').pop()) || null;
+  const [qnaId, setQnaId] = useState(1);
 
-  const [currentPage, setCurrentPage] = useState(0);
-  const [searchType, setSearchType] = useState('strategy');
-  const [searchText, setSearchText] = useState('');
   const [data, setData] = useState<AdminQnaDetailDataProps>();
 
   const { data: inquiryDetailData, refetch: inquiryDetailDataRefetch } =
-    useGetInquiryDetail(
-      inquiry?.inquiryId,
-      currentPage,
-      inquiry?.inquiryStatus,
-      searchType,
-      searchText
-    );
+    useGetAdminInquiryDetail(qnaId);
 
   useEffect(() => {
-    setData(inquiryDetailData?.data);
+    const urlNumber = Number(window.location.pathname.split('/').pop()) || null;
+    if (urlNumber && urlNumber !== qnaId) {
+      setQnaId(urlNumber);
+    }
+  }, [location.pathname, qnaId]);
+
+  useEffect(() => {
+    if (inquiryDetailData?.data) {
+      setData(inquiryDetailData.data);
+    }
   }, [inquiryDetailData]);
 
   useEffect(() => {
-    inquiryDetailDataRefetch();
-  }, [urlNumber]);
-  // console.log(inquiry, 'inquiry');
-  console.log(data, 'data');
+    if (qnaId) {
+      inquiryDetailDataRefetch();
+    }
+  }, [qnaId, inquiryDetailDataRefetch]);
+
   return (
     <div css={adminQnaWrapperStyle}>
       <div css={adminQnaHeaderStyle}>
@@ -146,7 +151,7 @@ const AdminQnaDetail = () => {
           <div className='info'>
             <div>
               <p>작성일</p>
-              <p>{extractDate(data?.inquiryRegistrationDate || '')}</p>
+              <p>{data?.inquiryRegistrationDate}</p>
             </div>
             <div>
               <p>작성자</p>
@@ -190,7 +195,7 @@ const AdminQnaDetail = () => {
             </div>
             <div className='info'>
               <p>작성일</p>
-              <p>{extractDate(data?.answerRegistrationDate)}</p>
+              <p>{extractDate(data?.answerRegistrationDate || '')}</p>
             </div>
           </div>
           <div className='profile'>
@@ -203,19 +208,19 @@ const AdminQnaDetail = () => {
         </div>
       </div>
       <div css={adminQnaNavStyle}>
-        <Link className='back-qna' to={`/admin/qna/${urlNumber - 1}`}>
+        <Link className='back-qna' to={`/admin/qna/${data?.previousId}`}>
           <div>
             <p>이전</p>
             <p>{data?.previousTitle}</p>
           </div>
-          <p>{extractDate(data?.previousWriteDate)}</p>
+          <p>{extractDate(data?.previousWriteDate || '')}</p>
         </Link>
-        <Link to={`/admin/qna/${urlNumber + 1}`} className='next-qna'>
+        <Link to={`/admin/qna/${data?.nextId}`} className='next-qna'>
           <div>
             <p>다음</p>
             <p>{data?.nextTitle}</p>
           </div>
-          <p>{extractDate(data?.nextWriteDate)}</p>
+          <p>{extractDate(data?.nextWriteDate || '')}</p>
         </Link>
       </div>
       <div css={buttonStyle}>
@@ -223,18 +228,19 @@ const AdminQnaDetail = () => {
           width={80}
           color='textBlack'
           label='목록보기'
-          handleClick={() => navigate(-1)}
+          handleClick={() => navigate(PATH.ADMIN_QNA)}
         />
       </div>
       <Modal
         content={
           <DelModal
-            inquiryId={data?.inquiryId}
+            inquiryId={data?.inquiryId || 0}
             inquiryDetailDataRefetch={inquiryDetailDataRefetch}
           />
         }
         id='delete'
       />
+      <Modal content={<FailModal />} id='fail-modal' />
     </div>
   );
 };
@@ -377,8 +383,6 @@ const adminQnaNavStyle = css`
     div {
       display: flex;
       gap: 40px;
-      width: 1040px;
-
       p {
         &:nth-of-type(1) {
           font-weight: ${FONT_WEIGHT.BOLD};
@@ -400,7 +404,6 @@ const adminQnaNavStyle = css`
     div {
       display: flex;
       gap: 40px;
-      width: 1040px;
 
       p {
         &:nth-of-type(1) {
