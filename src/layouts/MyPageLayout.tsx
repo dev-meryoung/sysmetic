@@ -16,6 +16,10 @@ const MyPageLayout = () => {
     paramUserId && !isNaN(Number(paramUserId)) ? Number(paramUserId) : memberId;
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     if (location.pathname === PATH.MYPAGE) {
       setTab(0);
     } else if (
