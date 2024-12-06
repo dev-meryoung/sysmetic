@@ -105,7 +105,7 @@ const useMyStrategyEdit = () => {
   const { mutate: deleteAccountMutate } = useDeleteMyStrateAccount();
 
   useEffect(() => {
-    if (strategyInfoIsError) navigate(PATH.ROOT);
+    if (strategyInfoIsError) navigate(PATH.NOT_FOUND);
 
     if (roleCode === 'TRADER' && methodsAndStocks && strategyInfo) {
       setMethodOptions(

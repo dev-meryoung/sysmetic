@@ -181,7 +181,7 @@ const AdminStrategiesControl = () => {
                 <tr>
                   <td
                     colSpan={8}
-                    style={{ textAlign: 'center', padding: '20px' }}
+                    style={{ textAlign: 'center', padding: '64px' }}
                   >
                     <div>해당하는 데이터가 없습니다.</div>
                   </td>
@@ -194,11 +194,15 @@ const AdminStrategiesControl = () => {
             날까지의 일간분석 데이터를 토대로 계산됩니다.
           </span>
         </div>
-        <Pagination
-          currentPage={dailyPage}
-          totalPage={+dailyTotalPage}
-          handlePageChange={setDailyPage}
-        />
+        {strategyDaily?.content && strategyDaily.content.length > 0 ? (
+          <Pagination
+            currentPage={dailyPage}
+            totalPage={+dailyTotalPage}
+            handlePageChange={setDailyPage}
+          />
+        ) : (
+          ''
+        )}
       </div>
     ),
     월간분석: (
@@ -247,7 +251,7 @@ const AdminStrategiesControl = () => {
                 <tr>
                   <td
                     colSpan={8}
-                    style={{ textAlign: 'center', padding: '20px' }}
+                    style={{ textAlign: 'center', padding: '64px' }}
                   >
                     <div>해당하는 데이터가 없습니다.</div>
                   </td>
@@ -260,11 +264,13 @@ const AdminStrategiesControl = () => {
             날까지의 일간분석 데이터를 토대로 계산됩니다.
           </span>
         </div>
-        <Pagination
-          currentPage={monthlyPage}
-          totalPage={+monthlyTotalPage}
-          handlePageChange={setMonthlyPage}
-        />
+        {strategyMonthly?.content && strategyMonthly.content.length > 0 && (
+          <Pagination
+            currentPage={monthlyPage}
+            totalPage={+monthlyTotalPage}
+            handlePageChange={setMonthlyPage}
+          />
+        )}
       </div>
     ),
     실계좌정보: (
@@ -288,17 +294,19 @@ const AdminStrategiesControl = () => {
             ))
           ) : (
             <div
-              style={{ textAlign: 'center', width: '100%', padding: '20px' }}
+              style={{ textAlign: 'center', width: '100%', padding: '64px' }}
             >
               해당하는 데이터가 없습니다.
             </div>
           )}
         </div>
-        <Pagination
-          currentPage={accountPage}
-          totalPage={+accountTotalPage}
-          handlePageChange={setAccountPage}
-        />
+        {strategyAccount?.content && strategyAccount.content.length > 0 && (
+          <Pagination
+            currentPage={accountPage}
+            totalPage={+accountTotalPage}
+            handlePageChange={setAccountPage}
+          />
+        )}
       </div>
     ),
   };

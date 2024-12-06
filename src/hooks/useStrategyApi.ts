@@ -36,6 +36,14 @@ import {
   deleteSingleInterestStrategy,
   deleteInterestStrategy,
   getTraderAddStrategyList,
+  getStrategyComment,
+  createStrategyComment,
+  deleteStrategyComment,
+  getStrategyAnalysis,
+  getStrategyStatistics,
+  getDailyExcelLink,
+  getDailyDataExcelLink,
+  getMonthlyExcelLink,
 } from '@/api';
 
 export interface BaseResponse<T> {
@@ -84,7 +92,10 @@ export type GetStrategyInfoResponse = BaseResponse<{
   averageProfitLossRate: number;
   profitFactor: number;
   winningRate: number;
-  monthlyRecord: number[];
+  monthlyRecord: {
+    year: number;
+    data: { month: number; value: number }[];
+  }[];
   analysis: null;
   fileWithInfoResponse: {
     id: number;
@@ -92,6 +103,59 @@ export type GetStrategyInfoResponse = BaseResponse<{
     originalName: string;
     fileSize: number;
   };
+}>;
+
+export type getStrategyAnalysisResponse = BaseResponse<{
+  standardAmounts: number[];
+  currentBalance: number[];
+  principal: number[];
+  accumulatedDepositWithdrawalAmount: number[];
+  depositWithdrawalAmount: number[];
+  dailyProfitLossAmount: number[];
+  dailyProfitLossRate: number[];
+  accumulatedProfitLossAmount: number[];
+  currentCapitalReductionAmount: number[];
+  currentCapitalReductionRate: number[];
+  averageProfitLossAmount: number[];
+  averageProfitLossRate: number[];
+  winningRate: number[];
+  profitFactor: number[];
+  roa: number[];
+  xaxis: string[];
+  [key: string]: any;
+}>;
+
+export type getStrategyStatisticsResponse = BaseResponse<{
+  currentBalance: number;
+  accumulatedDepositWithdrawalAmount: number;
+  principal: number;
+  operationPeriod: string;
+  startDate: string;
+  endDate: string;
+  accumulatedProfitLossAmount: number;
+  accumulatedProfitLossRate: number;
+  maximumAccumulatedProfitLossAmount: number;
+  maximumAccumulatedProfitLossRate: number;
+  currentCapitalReductionAmount: number;
+  currentCapitalReductionRate: number;
+  maximumCapitalReductionAmount: number;
+  maximumCapitalReductionRate: number;
+  averageProfitLossAmount: number;
+  averageProfitLossRate: number;
+  maximumDailyProfitAmount: number;
+  maximumDailyProfitRate: number;
+  maximumDailyLossAmount: number;
+  maximumDailyLossRate: number;
+  totalTradingDays: number;
+  totalProfitDays: number;
+  totalLossDays: number;
+  currentContinuousProfitLossDays: number;
+  maxContinuousProfitDays: number;
+  maxContinuousLossDays: number;
+  winningRate: number;
+  profitFactor: number;
+  roa: number;
+  highPointRenewalProgress: number;
 }>;
 
 export type GetStrategyDailyResponse = BaseResponse<{
@@ -184,6 +248,24 @@ export type CreateStrategyItemFilterResponse = BaseResponse<{
   ];
 }>;
 
+export type GetStrategyCommentResponse = BaseResponse<{
+  currentPage: number;
+  pageSize: number;
+  totalElement: number;
+  totalPages: number;
+  content: [
+    {
+      strategyId: number;
+      replyId: number;
+      memberId: number;
+      memberNickname: string;
+      content: string;
+      createdAt: string;
+      memberProfilePath: string;
+    },
+  ];
+}>;
+
 export type CreateMyStrategyDailyRequest = {
   date: string;
   depositWithdrawalAmount: number;
@@ -196,12 +278,6 @@ export type DeleteMyStrategyAccountRequest = {
 
 export interface DeleteTraderAddStrategyListRequest {
   idList: number[];
-}
-
-export interface BaseResponse<T> {
-  code: number;
-  message: string;
-  data: T;
 }
 
 export interface CreateStrategyItemFilterRequest {
@@ -240,6 +316,16 @@ export interface CreateFolderRequest {
 
 export interface DeleteFollowFolderRequest {
   strategyId: number[];
+}
+
+export interface CreateStrategyCommentRequest {
+  strategyId: number;
+  content: string;
+}
+
+export interface DeleteStrategyCommentRequest {
+  strategyId: number;
+  replyId: number;
 }
 
 export const useGetStrategyList = (pageNum: number) =>
@@ -463,6 +549,33 @@ export const useGetStrategyInfo = (strategyId: string) => {
   };
 };
 
+export const useGetStrategyAnalysis = (strategyId: string) => {
+  const { data, isSuccess, refetch } = useQuery<getStrategyAnalysisResponse>({
+    queryKey: ['strategyAnalysis', strategyId],
+    queryFn: () => getStrategyAnalysis(strategyId),
+    retry: 0,
+  });
+
+  return {
+    data: isSuccess && data?.code === 200 ? data.data : undefined,
+    isError: isSuccess && data?.code !== 200,
+    refetch,
+  };
+};
+
+export const useGetStrategyStatistics = (strategyId: string) => {
+  const { data, isSuccess, refetch } = useQuery<getStrategyStatisticsResponse>({
+    queryKey: ['strategyStatistics', strategyId],
+    queryFn: () => getStrategyStatistics(strategyId),
+  });
+
+  return {
+    data: isSuccess && data?.code === 200 ? data.data : undefined,
+    isError: isSuccess && data?.code !== 200,
+    refetch,
+  };
+};
+
 export const useGetStrategyDaily = (
   strategyId: string,
   page: number,
@@ -637,3 +750,79 @@ export const useDeleteMyStrateAccount = () =>
     mutationFn: (deletedData: DeleteMyStrategyAccountRequest) =>
       deleteMyStrategyAccount(deletedData),
   });
+
+export const useGetStrategyComment = (strategyId: string, page: number) => {
+  const { data, isSuccess, refetch } = useQuery<GetStrategyCommentResponse>({
+    queryKey: ['strategyComment', strategyId, page],
+    queryFn: () => getStrategyComment(strategyId, page),
+    placeholderData: keepPreviousData,
+    retry: 0,
+  });
+
+  const processedData =
+    isSuccess && data?.code === 200
+      ? data.data
+      : {
+          currentPage: 0,
+          pageSize: 0,
+          totalElement: 0,
+          totalPages: 0,
+          content: [],
+        };
+
+  return {
+    data: processedData,
+    refetch,
+  };
+};
+
+export const useCreateStrategyComment = () =>
+  useMutation({
+    mutationFn: (commentData: CreateStrategyCommentRequest) =>
+      createStrategyComment(commentData),
+  });
+
+export const useDeleteStrategyComment = () =>
+  useMutation({
+    mutationFn: (commentData: DeleteStrategyCommentRequest) =>
+      deleteStrategyComment(commentData),
+  });
+
+export const useGetDailyExcelLink = (strategyId: string) => {
+  const { data, isSuccess } = useQuery<Blob>({
+    queryKey: ['dailyExcelLink'],
+    queryFn: () => getDailyExcelLink(strategyId),
+  });
+
+  if (isSuccess && data) {
+    return { data };
+  }
+
+  return { data: undefined };
+};
+
+export const useGetDailyDataExcelLink = (strategyId: string) => {
+  const { data, isSuccess } = useQuery<Blob>({
+    queryKey: ['dailyDataExcelLink'],
+    queryFn: () => getDailyDataExcelLink(strategyId),
+  });
+
+  if (isSuccess && data) {
+    return { data };
+  }
+
+  return { data: undefined };
+};
+
+export const useGetMonthlyExcelLink = (strategyId: string) => {
+  const { data, isSuccess } = useQuery<Blob>({
+    queryKey: ['monthlyExcelLink'],
+    queryFn: () => getMonthlyExcelLink(strategyId),
+  });
+
+  if (isSuccess && data) {
+    return { data };
+  }
+
+  return { data: undefined };
+};
