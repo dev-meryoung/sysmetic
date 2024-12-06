@@ -107,6 +107,10 @@ const StrategyDetailLayout = () => {
   const { mutate: deleteCommentMutate } = useDeleteStrategyComment();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     const pathArr: string[] = [
       PATH.STRATEGIES_DETAIL(strategyId),
       PATH.STRATEGIES_DETAIL_DAILY(strategyId),
