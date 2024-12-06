@@ -73,11 +73,6 @@ const Notices = () => {
     if (e.key === 'Enter') handleSearch();
   };
 
-  const getPaginatedData = () => {
-    const startIndex = curPage * PAGE_SIZE;
-    return filteredData.slice(startIndex, startIndex + PAGE_SIZE);
-  };
-
   const columns: ColumnProps<NoticesStrategyDataProps>[] = [
     {
       key: 'noticeTitle',
