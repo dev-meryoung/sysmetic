@@ -17,7 +17,11 @@ import Tag from '@/components/Tag';
 import TextInput from '@/components/TextInput';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
-import { useCreateAdminMethods, useGetAdminMethods } from '@/hooks/useAdminApi';
+import {
+  useCreateAdminMethods,
+  useDeleteAdminMethods,
+  useGetAdminMethods,
+} from '@/hooks/useAdminApi';
 import useModalStore from '@/stores/useModalStore';
 import { useTableStore } from '@/stores/useTableStore';
 
@@ -33,21 +37,34 @@ interface AddModalProps {
 }
 
 interface DelModalProps {
+  checkedItems: number[];
+  methods: AdminMethodsDataProps[];
+  setFetch: Dispatch<SetStateAction<boolean>>;
   toggleAllCheckBoxes: (value: number) => void;
 }
 
-const DelModal: React.FC<DelModalProps> = ({ toggleAllCheckBoxes }) => {
+const DelModal: React.FC<DelModalProps> = ({
+  toggleAllCheckBoxes,
+  checkedItems,
+  methods,
+  setFetch,
+}) => {
   const delModal = useModalStore();
+  const checkedStocks = checkedItems.map((idx) => methods[idx].no);
+  //삭제 mutation
+  const { mutate: deleteAdminMethodsMutation } = useDeleteAdminMethods();
 
   const handleDeleteClick = () => {
-    //? 데이터 삭제 코드
-    //1. data.filter()를 통해 체크된 항목을 제외한 새로운 데이터 생성
-    //2. setData(변수명)을 통해 data 상태 업데이트
-    //3. 페이지 수 최신화 업데이트
-
-    //4.체크박스 상태 초기화 및 모달 닫기
-    toggleAllCheckBoxes(0);
-    delModal.closeModal('delete');
+    deleteAdminMethodsMutation(checkedStocks, {
+      onSuccess: () => {
+        delModal.closeModal('delete');
+        setFetch(true);
+        toggleAllCheckBoxes(0);
+      },
+      onError: (error) => {
+        console.error('종목 삭제 중 오류 발생!', error);
+      },
+    });
   };
 
   return (
@@ -259,6 +276,7 @@ const ModModal = () => {
 };
 
 const AdminMethods = () => {
+  const [delDisabled, setDelDisabled] = useState(true);
   const [fetch, setFetch] = useState(true);
   //테이블 관련
   const [curPage, setCurPage] = useState(0);
@@ -368,6 +386,13 @@ const AdminMethods = () => {
     }
   }, [fetch, refetch]);
 
+  useEffect(() => {
+    if (checkedItems.length > 0) {
+      setDelDisabled(false);
+    } else {
+      setDelDisabled(true);
+    }
+  }, [checkedItems]);
   return (
     <div css={methodsWrapperStyle}>
       <div css={methodsInfoStyle}>
@@ -381,6 +406,7 @@ const AdminMethods = () => {
             color='black'
             label='삭제'
             handleClick={openDeleteModal}
+            disabled={delDisabled}
           />
         </div>
       </div>
@@ -402,7 +428,14 @@ const AdminMethods = () => {
         />
       </div>
       <Modal
-        content={<DelModal toggleAllCheckBoxes={toggleAllCheckboxes} />}
+        content={
+          <DelModal
+            checkedItems={checkedItems}
+            methods={methods}
+            setFetch={setFetch}
+            toggleAllCheckBoxes={toggleAllCheckboxes}
+          />
+        }
         id='delete'
       />
       <Modal

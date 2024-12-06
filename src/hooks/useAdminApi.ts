@@ -3,6 +3,7 @@ import {
   approveAdminStrategy,
   createAdminMethods,
   createAdminStocks,
+  deleteAdminMethods,
   deleteAdminStocks,
   getAdminMethods,
   getAdminStocks,
@@ -64,4 +65,9 @@ export const useGetAdminMethods = (
 export const useCreateAdminMethods = () =>
   useMutation({
     mutationFn: createAdminMethods,
+  });
+
+export const useDeleteAdminMethods = () =>
+  useMutation({
+    mutationFn: deleteAdminMethods,
   });

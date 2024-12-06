@@ -208,3 +208,12 @@ export const createAdminMethods = async (params: MethodsPostRequestProps) => {
 
   return response.data;
 };
+
+//매매방식 삭제 API
+export const deleteAdminMethods = async (ids: number[]) => {
+  const response = await axiosInstance.delete(`/v1/admin/method`, {
+    data: { methodIdList: ids },
+  });
+
+  return response.data;
+};
