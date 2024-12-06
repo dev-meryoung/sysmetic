@@ -3,7 +3,10 @@ import {
   approveAdminStrategy,
   createAdminStocks,
   deleteAdminStocks,
+  getAdminMethods,
   getAdminStocks,
+  MethodsPaginatedResponse,
+  MethodsParameterProps,
   rejectAdminStrategy,
   StocksPaginatedResponse,
   StocksParameterProps,
@@ -45,4 +48,14 @@ export const useDeleteAdminStocks = () =>
 export const useUpdateAdminStocks = () =>
   useMutation({
     mutationFn: updateAdminStocks,
+  });
+
+export const useGetAdminMethods = (
+  params: MethodsParameterProps,
+  enabled: boolean
+) =>
+  useQuery<MethodsPaginatedResponse, Error>({
+    queryKey: ['adminMethods', params],
+    queryFn: () => getAdminMethods(params),
+    enabled: !!enabled,
   });

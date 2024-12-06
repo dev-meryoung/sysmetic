@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
+import { MethodsParameterProps } from '@/api';
 import TagTest from '@/assets/images/test-tag.jpg';
 import Button from '@/components/Button';
 import IconButton from '@/components/IconButton';
@@ -11,20 +12,20 @@ import Tag from '@/components/Tag';
 import TextInput from '@/components/TextInput';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
+import { useGetAdminMethods } from '@/hooks/useAdminApi';
 import adminMethods from '@/mocks/adminMethods.json';
 import useModalStore from '@/stores/useModalStore';
 import { useTableStore } from '@/stores/useTableStore';
 
 interface AdminMethodsDataProps {
   no: number;
-  type: string;
+  methodsName: string;
+  filePath: string;
 }
 
 interface DelModalProps {
   toggleAllCheckBoxes: (value: number) => void;
 }
-
-const PAGE_SIZE = 10;
 
 const DelModal: React.FC<DelModalProps> = ({ toggleAllCheckBoxes }) => {
   const delModal = useModalStore();
@@ -183,16 +184,17 @@ const ModModal = () => {
 };
 
 const AdminMethods = () => {
+  const [fetch, setFetch] = useState(true);
   //테이블 관련
   const [curPage, setCurPage] = useState(0);
-  const [data, setData] = useState<AdminMethodsDataProps[]>([]);
+  // const [data, setData] = useState<AdminMethodsDataProps[]>([]);
   //페이지네이션 관련
-  const [totalPage, setTotalPage] = useState(0);
-  const getPaginatedData = (page: number) => {
-    const startIndex = page * PAGE_SIZE;
-    const endIndex = startIndex + PAGE_SIZE;
-    return data.slice(startIndex, endIndex);
-  };
+  // const [totalPage, setTotalPage] = useState(0);
+  // const getPaginatedData = (page: number) => {
+  //   const startIndex = page * PAGE_SIZE;
+  //   const endIndex = startIndex + PAGE_SIZE;
+  //   return data.slice(startIndex, endIndex);
+  // };
 
   const checkedItems = useTableStore((state) => state.checkedItems);
   const toggleCheckbox = useTableStore((state) => state.toggleCheckbox);
@@ -200,25 +202,25 @@ const AdminMethods = () => {
     (state) => state.toggleAllCheckboxes
   );
 
-  const paginatedData = getPaginatedData(curPage);
+  // const [imgIcon, setImgIcon] = useState('');
+  // const paginatedData = getPaginatedData(curPage);
   const columns = [
     {
       key: 'no' as keyof AdminMethodsDataProps,
       header: '순서',
     },
     {
-      key: 'type' as keyof AdminMethodsDataProps,
+      key: 'methodsName' as keyof AdminMethodsDataProps,
       header: '상품유형',
     },
     {
-      key: 'icon' as keyof AdminMethodsDataProps,
+      key: 'filePath' as keyof AdminMethodsDataProps,
       header: '아이콘',
       render: (value: string | number) => (
         <div css={tagStyle}>
           <div>
-            <Tag src={TagTest} alt='tag' />
+            <Tag src={value as string} alt='tag' />
           </div>
-          {value}
         </div>
       ),
     },
@@ -256,24 +258,46 @@ const AdminMethods = () => {
     modModal.openModal('modify', 648);
   };
 
-  useEffect(() => {
-    // 순서를 기준으로
-    const sortedData = [...adminMethods].sort((a, b) => b.no - a.no);
-    const arrangedData = sortedData.map((item, index) => ({
-      ...item,
-      no: index + 1,
-    }));
-    setData(arrangedData);
+  // useEffect(() => {
+  //   // 순서를 기준으로
+  //   const sortedData = [...adminMethods].sort((a, b) => b.no - a.no);
+  //   const arrangedData = sortedData.map((item, index) => ({
+  //     ...item,
+  //     no: index + 1,
+  //   }));
+  //   setData(arrangedData);
 
-    const pages = Math.ceil(arrangedData.length / PAGE_SIZE);
-    setTotalPage(pages);
-  }, []);
+  //   const pages = Math.ceil(arrangedData.length / PAGE_SIZE);
+  //   setTotalPage(pages);
+  // }, []);
+
+  const params: MethodsParameterProps = {
+    page: curPage,
+  };
+
+  const { data, refetch } = useGetAdminMethods(params, fetch);
+  const totalPage = data?.totalPages || 0;
+  const totalElement = data?.totalElement || 0;
+
+  const methods: AdminMethodsDataProps[] =
+    data?.content?.map((stock) => ({
+      no: stock.id,
+      methodsName: stock.name,
+      filePath: stock.filePath,
+    })) || [];
+
+  useEffect(() => {
+    if (fetch) {
+      refetch();
+      setFetch(false);
+    }
+  }, [fetch, refetch]);
 
   return (
     <div css={methodsWrapperStyle}>
       <div css={methodsInfoStyle}>
         <p>
-          총 <span>15개</span>의 매매방식이 있습니다.
+          총 <span>{totalElement}개</span>의 매매방식이 있습니다.
         </p>
         <div className='manage-btn'>
           <Button width={80} label='등록' handleClick={openAddModal} />
@@ -287,14 +311,12 @@ const AdminMethods = () => {
       </div>
       <div css={methodsTableStyle}>
         <Table
-          data={paginatedData}
+          data={methods}
           columns={columns}
           hasCheckbox={true}
           checkedItems={checkedItems}
           handleCheckboxChange={toggleCheckbox}
-          handleHeaderCheckboxChange={() =>
-            toggleAllCheckboxes(paginatedData.length)
-          }
+          handleHeaderCheckboxChange={() => toggleAllCheckboxes(methods.length)}
         />
       </div>
       <div css={methodsPaginationStyle}>

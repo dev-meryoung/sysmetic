@@ -39,6 +39,24 @@ export interface StocksPutRequestProps {
   file: File;
 }
 
+export interface MethodsPaginatedResponse {
+  currentPage: number;
+  pageSize: number;
+  totalElement: number;
+  totalPages: number;
+  content: MethodsData[];
+}
+
+export interface MethodsData {
+  id: number;
+  name: string;
+  filePath: string;
+}
+
+export interface MethodsParameterProps {
+  page: number;
+}
+
 // 회원 목록 조회 API
 export const getAdminUserList = async () => {};
 
@@ -149,4 +167,15 @@ export const updateAdminStocks = async (params: StocksPutRequestProps) => {
   });
 
   return response.data;
+};
+
+// 매매방식 조회 API
+export const getAdminMethods = async (params: MethodsParameterProps) => {
+  const response = await axiosInstance.get(`/v1/admin/methodlist`, {
+    params: {
+      page: params.page,
+    },
+  });
+
+  return response.data.data;
 };
