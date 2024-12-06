@@ -23,6 +23,18 @@ import {
   PaginatedResponse,
   updateAdminUserRole,
   UpDateUserRole,
+  createAdminMethods,
+  createAdminStocks,
+  deleteAdminMethods,
+  deleteAdminStocks,
+  getAdminMethods,
+  getAdminStocks,
+  MethodsPaginatedResponse,
+  MethodsParameterProps,
+  StocksPaginatedResponse,
+  StocksParameterProps,
+  updateAdminMethods,
+  updateAdminStocks,
 } from '@/api';
 
 export const useApproveAdminStrategy = () =>
@@ -35,6 +47,56 @@ export const useRejectAdminStrategy = () =>
   useMutation({
     mutationFn: (rejectData: { strategyId: number; rejectReason: string }) =>
       rejectAdminStrategy(rejectData),
+  });
+
+export const useGetAdminStocks = (
+  params: StocksParameterProps,
+  enabled: boolean
+) =>
+  useQuery<StocksPaginatedResponse, Error>({
+    queryKey: ['adminStocks', params],
+    queryFn: () => getAdminStocks(params),
+    enabled: !!enabled,
+  });
+
+export const useCreateAdminStocks = () =>
+  useMutation({
+    mutationFn: createAdminStocks,
+  });
+
+export const useDeleteAdminStocks = () =>
+  useMutation({
+    mutationFn: deleteAdminStocks,
+  });
+
+export const useUpdateAdminStocks = () =>
+  useMutation({
+    mutationFn: updateAdminStocks,
+  });
+
+export const useGetAdminMethods = (
+  params: MethodsParameterProps,
+  enabled: boolean
+) =>
+  useQuery<MethodsPaginatedResponse, Error>({
+    queryKey: ['adminMethods', params],
+    queryFn: () => getAdminMethods(params),
+    enabled: !!enabled,
+  });
+
+export const useCreateAdminMethods = () =>
+  useMutation({
+    mutationFn: createAdminMethods,
+  });
+
+export const useDeleteAdminMethods = () =>
+  useMutation({
+    mutationFn: deleteAdminMethods,
+  });
+
+export const useUpdateAdminMethods = () =>
+  useMutation({
+    mutationFn: updateAdminMethods,
   });
 
 // 공지사항 목록 조회 API
