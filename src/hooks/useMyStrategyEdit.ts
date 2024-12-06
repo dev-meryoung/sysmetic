@@ -11,9 +11,9 @@ import {
   useDeleteMyStrateDaily,
   useGetExampleExcelLink,
   useGetMethodAndStock,
+  useGetMyStrategyInfo,
   useGetStrategyAccount,
   useGetStrategyDaily,
-  useGetStrategyInfo,
   useRequestApproveStrategy,
   useUpdateMyStrategyDaily,
   useUpdateStrategy,
@@ -83,7 +83,7 @@ const useMyStrategyEdit = () => {
     data: strategyInfo,
     isError: strategyInfoIsError,
     refetch: refetchStrategyInfo,
-  } = useGetStrategyInfo(strategyId as string);
+  } = useGetMyStrategyInfo(strategyId as string);
   const { data: strategyDaily, refetch: refetchDaily } = useGetStrategyDaily(
     strategyId as string,
     dailyPage,

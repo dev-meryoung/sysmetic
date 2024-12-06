@@ -368,6 +368,13 @@ export const changePrivateStrategy = async (strategyId: string) => {
   return response.data;
 };
 
+// 전략(관리) 상세 정보 조회 API
+export const getMyStrategyInfo = async (strategyId: string) => {
+  const response = await axiosInstance.get(`/v1/strategy/${strategyId}`);
+
+  return response.data;
+};
+
 // 전략(관리) 양식 엑셀 다운로드 API
 export const getExampleExcelLink = async () => {
   const response = await axiosInstance.get('/v1/excel/daily');

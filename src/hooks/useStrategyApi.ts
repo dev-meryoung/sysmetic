@@ -44,6 +44,7 @@ import {
   getDailyExcelLink,
   getDailyDataExcelLink,
   getMonthlyExcelLink,
+  getMyStrategyInfo,
 } from '@/api';
 
 export interface BaseResponse<T> {
@@ -682,6 +683,22 @@ export const useChangePrivateStrategy = () =>
   useMutation({
     mutationFn: (strategyId: string) => changePrivateStrategy(strategyId),
   });
+
+export const useGetMyStrategyInfo = (strategyId: string) => {
+  const { data, isSuccess, refetch } = useQuery<GetStrategyInfoResponse, Error>(
+    {
+      queryKey: ['myStrategyInfo'],
+      queryFn: () => getMyStrategyInfo(strategyId),
+      refetchOnWindowFocus: false,
+    }
+  );
+
+  return {
+    data: isSuccess && data?.code === 200 ? data.data : undefined,
+    isError: isSuccess && data?.code !== 200,
+    refetch,
+  };
+};
 
 export const useGetExampleExcelLink = () => {
   const { data, isSuccess } = useQuery<BaseResponse<string>>({
