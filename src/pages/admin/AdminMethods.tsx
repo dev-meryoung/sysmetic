@@ -1,7 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
 import { css } from '@emotion/react';
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
-import TagTest from '@/assets/images/test-tag.jpg';
+import { MethodsData, MethodsParameterProps } from '@/api';
 import Button from '@/components/Button';
 import IconButton from '@/components/IconButton';
 import Modal from '@/components/Modal';
@@ -11,33 +17,62 @@ import Tag from '@/components/Tag';
 import TextInput from '@/components/TextInput';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
-import adminMethods from '@/mocks/adminMethods.json';
+import {
+  useCreateAdminMethods,
+  useDeleteAdminMethods,
+  useGetAdminMethods,
+  useUpdateAdminMethods,
+} from '@/hooks/useAdminApi';
 import useModalStore from '@/stores/useModalStore';
 import { useTableStore } from '@/stores/useTableStore';
 
 interface AdminMethodsDataProps {
   no: number;
-  type: string;
+  methodsName: string;
+  filePath: string;
+}
+
+interface AddModalProps {
+  setFetch: Dispatch<SetStateAction<boolean>>;
+  methods: AdminMethodsDataProps[];
 }
 
 interface DelModalProps {
+  checkedItems: number[];
+  methods: AdminMethodsDataProps[];
+  setFetch: Dispatch<SetStateAction<boolean>>;
   toggleAllCheckBoxes: (value: number) => void;
 }
 
-const PAGE_SIZE = 10;
+interface ModModalProps {
+  methods: AdminMethodsDataProps[];
+  setFetch: Dispatch<SetStateAction<boolean>>;
+  toggleAllCheckBoxes: (value: number) => void;
+  selectedMethod: MethodsData | null;
+}
 
-const DelModal: React.FC<DelModalProps> = ({ toggleAllCheckBoxes }) => {
+const DelModal: React.FC<DelModalProps> = ({
+  toggleAllCheckBoxes,
+  checkedItems,
+  methods,
+  setFetch,
+}) => {
   const delModal = useModalStore();
+  const checkedStocks = checkedItems.map((idx) => methods[idx].no);
+  //삭제 mutation
+  const { mutate: deleteAdminMethodsMutation } = useDeleteAdminMethods();
 
   const handleDeleteClick = () => {
-    //? 데이터 삭제 코드
-    //1. data.filter()를 통해 체크된 항목을 제외한 새로운 데이터 생성
-    //2. setData(변수명)을 통해 data 상태 업데이트
-    //3. 페이지 수 최신화 업데이트
-
-    //4.체크박스 상태 초기화 및 모달 닫기
-    toggleAllCheckBoxes(0);
-    delModal.closeModal('delete');
+    deleteAdminMethodsMutation(checkedStocks, {
+      onSuccess: () => {
+        delModal.closeModal('delete');
+        setFetch(true);
+        toggleAllCheckBoxes(0);
+      },
+      onError: (error) => {
+        console.error('종목 삭제 중 오류 발생!', error);
+      },
+    });
   };
 
   return (
@@ -56,10 +91,70 @@ const DelModal: React.FC<DelModalProps> = ({ toggleAllCheckBoxes }) => {
   );
 };
 
-const AddModal = () => {
+const AddModal: React.FC<AddModalProps> = ({ setFetch, methods }) => {
   const addModal = useModalStore();
   const [methodsValue, setMethodsValue] = useState('');
   const [iconValue, setIconValue] = useState('');
+  const [iconImg, setIconImg] = useState('');
+  const [isDuplicated, setIsDuplicated] = useState(false);
+
+  const handleOpenFileExplorer = () => {
+    const fileInput = document.getElementById('file-input');
+    fileInput?.click();
+  };
+
+  const checkDuplicate = (value: string) => {
+    const isDuplicate = methods.some((method) => method.methodsName === value);
+    setIsDuplicated(isDuplicate);
+  };
+
+  const handleMethodsChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setMethodsValue(e.target.value);
+    checkDuplicate(e.target.value);
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const imageUrl = reader.result as string;
+        setIconImg(imageUrl);
+        setIconValue(imageUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const { mutate: createAdminMethodsMutation } = useCreateAdminMethods();
+
+  const handleCreateClick = () => {
+    const fileInput = document.getElementById('file-input') as HTMLInputElement;
+    const file = fileInput?.files?.[0];
+
+    if (!file) {
+      alert('파일을 첨부해주세요.');
+      return;
+    }
+
+    const formData = {
+      methodPostRequestDto: {
+        name: methodsValue,
+        checkDupl: !isDuplicated,
+      },
+      file,
+    };
+
+    createAdminMethodsMutation(formData, {
+      onSuccess: () => {
+        addModal.closeModal('add');
+        setFetch(true);
+      },
+      onError: (error) => {
+        console.error('등록 실패', error);
+      },
+    });
+  };
 
   return (
     <div css={addModalStyle}>
@@ -77,12 +172,15 @@ const AddModal = () => {
               <TextInput
                 width={224}
                 value={methodsValue}
-                handleChange={(e) => setMethodsValue(e.target.value)}
+                handleChange={handleMethodsChange}
               />
-              <p>1글자 이상 입력하세요.</p>
+              {/* <p>1글자 이상 입력하세요.</p> */}
             </td>
             <td>
-              <p>등록아이콘</p>
+              <div css={thumbnailStyle}>
+                <p>등록아이콘</p>
+                {iconImg && <img src={iconImg} alt='미리보기' />}
+              </div>
               <div>
                 <TextInput
                   width={302}
@@ -94,10 +192,17 @@ const AddModal = () => {
                   iconBgSize='lg'
                   iconSize='md'
                   IconComponent={AddPhotoAlternateOutlinedIcon}
-                  handleClick={() => console.log('클릭')}
+                  handleClick={handleOpenFileExplorer}
+                />
+                <input
+                  id='file-input'
+                  type='file'
+                  accept='image/jpg,image/jpeg,image/png'
+                  style={{ display: 'none' }}
+                  onChange={handleFileChange}
                 />
               </div>
-              <p>jp(e)g, png 형식의 파일만 첨부 가능합니다.</p>
+              {/* <p>jp(e)g, png 형식의 파일만 첨부 가능합니다.</p> */}
             </td>
           </tr>
         </tbody>
@@ -109,20 +214,84 @@ const AddModal = () => {
           label='취소'
           handleClick={() => addModal.closeModal('add')}
         />
-        <Button
-          width={120}
-          label='등록하기'
-          handleClick={() => console.log('click')}
-        />
+        <Button width={120} label='등록하기' handleClick={handleCreateClick} />
       </div>
     </div>
   );
 };
 
-const ModModal = () => {
+const ModModal: React.FC<ModModalProps> = ({
+  methods,
+  selectedMethod,
+  setFetch,
+}) => {
   const modModal = useModalStore();
-  const [methodsValue, setMethodsValue] = useState('');
-  const [iconValue, setIconValue] = useState('');
+  const [methodsValue, setMethodsValue] = useState(selectedMethod?.name || '');
+  const [iconValue, setIconValue] = useState(selectedMethod?.filePath || '');
+  const [iconImg, setIconImg] = useState(selectedMethod?.filePath || '');
+  const [isDuplicated, setIsDuplicated] = useState(false);
+
+  useEffect(() => {
+    if (iconValue) {
+      setIconImg(iconValue); // iconValue와 iconImg 동기화
+    }
+  }, [iconValue]);
+
+  const handleOpenFileExplorer = () => {
+    const fileInput = document.getElementById('file-input');
+    fileInput?.click();
+  };
+
+  const checkDuplicate = (value: string) => {
+    const isDuplicate = methods.some((method) => method.methodsName === value);
+    setIsDuplicated(isDuplicate);
+  };
+
+  const handleMethodsChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setMethodsValue(e.target.value);
+    checkDuplicate(e.target.value);
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const imageUrl = reader.result as string;
+        setIconImg(imageUrl);
+        setIconValue(imageUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  const { mutate: updateAdminMethodsMutation } = useUpdateAdminMethods();
+
+  const handleUpdateClick = () => {
+    const fileInput = document.getElementById('file-input') as HTMLInputElement;
+    const file = fileInput?.files?.[0];
+    if (!selectedMethod) return;
+    if (!file) return;
+
+    const formData = {
+      methodPutRequestDto: {
+        id: selectedMethod?.id,
+        name: methodsValue,
+        checkDuplicate: !isDuplicated,
+      },
+      file,
+    };
+
+    updateAdminMethodsMutation(formData, {
+      onSuccess: (data) => {
+        console.log('종목 수정 성공!', data);
+        setFetch(true);
+        modModal.closeModal('modify');
+      },
+      onError: (error) => {
+        console.error('종목 수정 중 오류 발생', error);
+      },
+    });
+  };
 
   return (
     <div css={addModalStyle}>
@@ -140,27 +309,40 @@ const ModModal = () => {
               <TextInput
                 width={224}
                 value={methodsValue}
-                handleChange={(e) => setMethodsValue(e.target.value)}
+                handleChange={handleMethodsChange}
               />
-              <p>1글자 이상 입력하세요.</p>
+              {/* <p>1글자 이상 입력하세요.</p> */}
             </td>
             <td>
-              <p>등록아이콘</p>
+              <div css={thumbnailStyle}>
+                <p>등록아이콘</p>
+                {iconImg && <img src={iconImg} alt='미리보기' />}
+              </div>
               <div>
                 <TextInput
                   width={302}
                   value={iconValue}
-                  handleChange={(e) => setIconValue(e.target.value)}
+                  handleChange={(e) => {
+                    setIconValue(e.target.value);
+                    setIconImg(e.target.value);
+                  }}
                 />
                 <IconButton
                   color='white'
                   iconBgSize='lg'
                   iconSize='md'
                   IconComponent={AddPhotoAlternateOutlinedIcon}
-                  handleClick={() => console.log('클릭')}
+                  handleClick={handleOpenFileExplorer}
                 />
               </div>
-              <p>jp(e)g, png 형식의 파일만 첨부 가능합니다.</p>
+              <input
+                id='file-input'
+                type='file'
+                accept='image/jpg,image/jpeg,image/png'
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+              />
+              {/* <p>jp(e)g, png 형식의 파일만 첨부 가능합니다.</p> */}
             </td>
           </tr>
         </tbody>
@@ -172,27 +354,20 @@ const ModModal = () => {
           label='취소'
           handleClick={() => modModal.closeModal('modify')}
         />
-        <Button
-          width={120}
-          label='등록하기'
-          handleClick={() => console.log('click')}
-        />
+        <Button width={120} label='등록하기' handleClick={handleUpdateClick} />
       </div>
     </div>
   );
 };
 
 const AdminMethods = () => {
+  const [selectedMethod, setSelectedMethod] = useState<MethodsData | null>(
+    null
+  );
+  const [delDisabled, setDelDisabled] = useState(true);
+  const [fetch, setFetch] = useState(true);
   //테이블 관련
   const [curPage, setCurPage] = useState(0);
-  const [data, setData] = useState<AdminMethodsDataProps[]>([]);
-  //페이지네이션 관련
-  const [totalPage, setTotalPage] = useState(0);
-  const getPaginatedData = (page: number) => {
-    const startIndex = page * PAGE_SIZE;
-    const endIndex = startIndex + PAGE_SIZE;
-    return data.slice(startIndex, endIndex);
-  };
 
   const checkedItems = useTableStore((state) => state.checkedItems);
   const toggleCheckbox = useTableStore((state) => state.toggleCheckbox);
@@ -200,32 +375,30 @@ const AdminMethods = () => {
     (state) => state.toggleAllCheckboxes
   );
 
-  const paginatedData = getPaginatedData(curPage);
   const columns = [
     {
       key: 'no' as keyof AdminMethodsDataProps,
       header: '순서',
     },
     {
-      key: 'type' as keyof AdminMethodsDataProps,
+      key: 'methodsName' as keyof AdminMethodsDataProps,
       header: '상품유형',
     },
     {
-      key: 'icon' as keyof AdminMethodsDataProps,
+      key: 'filePath' as keyof AdminMethodsDataProps,
       header: '아이콘',
       render: (value: string | number) => (
         <div css={tagStyle}>
           <div>
-            <Tag src={TagTest} alt='tag' />
+            <Tag src={value as string} alt='tag' />
           </div>
-          {value}
         </div>
       ),
     },
     {
       key: 'state' as keyof AdminMethodsDataProps,
       header: '상태',
-      render: () => (
+      render: (_: string | number, row: AdminMethodsDataProps) => (
         <Button
           label='방식수정'
           shape='round'
@@ -233,7 +406,7 @@ const AdminMethods = () => {
           color='primary'
           border={true}
           width={80}
-          handleClick={openModifyModal}
+          handleClick={() => openModifyModal(row.no)}
         />
       ),
     },
@@ -252,28 +425,51 @@ const AdminMethods = () => {
   const openAddModal = () => {
     addModal.openModal('add', 648);
   };
-  const openModifyModal = () => {
-    modModal.openModal('modify', 648);
+
+  const openModifyModal = (id: number) => {
+    const methodToModify = data?.content?.find((method) => method.id === id);
+    if (methodToModify) {
+      setSelectedMethod(methodToModify); // 상태로 전달
+      modModal.openModal('modify', 648);
+    } else {
+      alert('수정할 데이터를 찾을 수 없습니다.');
+    }
   };
 
+  const params: MethodsParameterProps = {
+    page: curPage,
+  };
+
+  const { data, refetch } = useGetAdminMethods(params, fetch);
+  const totalPage = data?.totalPages || 0;
+  const totalElement = data?.totalElement || 0;
+
+  const methods: AdminMethodsDataProps[] =
+    data?.content?.map((stock) => ({
+      no: stock.id,
+      methodsName: stock.name,
+      filePath: stock.filePath,
+    })) || [];
+
   useEffect(() => {
-    // 순서를 기준으로
-    const sortedData = [...adminMethods].sort((a, b) => b.no - a.no);
-    const arrangedData = sortedData.map((item, index) => ({
-      ...item,
-      no: index + 1,
-    }));
-    setData(arrangedData);
+    if (fetch) {
+      refetch();
+      setFetch(false);
+    }
+  }, [fetch, refetch]);
 
-    const pages = Math.ceil(arrangedData.length / PAGE_SIZE);
-    setTotalPage(pages);
-  }, []);
-
+  useEffect(() => {
+    if (checkedItems.length > 0) {
+      setDelDisabled(false);
+    } else {
+      setDelDisabled(true);
+    }
+  }, [checkedItems]);
   return (
     <div css={methodsWrapperStyle}>
       <div css={methodsInfoStyle}>
         <p>
-          총 <span>15개</span>의 매매방식이 있습니다.
+          총 <span>{totalElement}개</span>의 매매방식이 있습니다.
         </p>
         <div className='manage-btn'>
           <Button width={80} label='등록' handleClick={openAddModal} />
@@ -282,19 +478,18 @@ const AdminMethods = () => {
             color='black'
             label='삭제'
             handleClick={openDeleteModal}
+            disabled={delDisabled}
           />
         </div>
       </div>
       <div css={methodsTableStyle}>
         <Table
-          data={paginatedData}
+          data={methods}
           columns={columns}
           hasCheckbox={true}
           checkedItems={checkedItems}
           handleCheckboxChange={toggleCheckbox}
-          handleHeaderCheckboxChange={() =>
-            toggleAllCheckboxes(paginatedData.length)
-          }
+          handleHeaderCheckboxChange={() => toggleAllCheckboxes(methods.length)}
         />
       </div>
       <div css={methodsPaginationStyle}>
@@ -305,11 +500,31 @@ const AdminMethods = () => {
         />
       </div>
       <Modal
-        content={<DelModal toggleAllCheckBoxes={toggleAllCheckboxes} />}
+        content={
+          <DelModal
+            checkedItems={checkedItems}
+            methods={methods}
+            setFetch={setFetch}
+            toggleAllCheckBoxes={toggleAllCheckboxes}
+          />
+        }
         id='delete'
       />
-      <Modal content={<AddModal />} id='add' />
-      <Modal content={<ModModal />} id='modify' />
+      <Modal
+        content={<AddModal setFetch={setFetch} methods={methods} />}
+        id='add'
+      />
+      <Modal
+        content={
+          <ModModal
+            methods={methods}
+            setFetch={setFetch}
+            toggleAllCheckBoxes={toggleAllCheckboxes}
+            selectedMethod={selectedMethod}
+          />
+        }
+        id='modify'
+      />
     </div>
   );
 };
@@ -451,7 +666,7 @@ const addModalStyle = css`
 
       &:nth-of-type(1) {
         width: 240px;
-        margin-top: 30px;
+        margin-top: 32px;
       }
 
       &:nth-of-type(2) {
@@ -460,16 +675,16 @@ const addModalStyle = css`
 
       div {
         display: flex;
+
+        p {
+          color: ${COLOR.TEXT_BLACK};
+          height: 24px;
+          margin: 0;
+        }
       }
 
       p {
-        &:nth-of-type(1) {
-          margin-bottom: 8px;
-        }
-        &:last-child {
-          margin-bottom: 24px;
-          color: ${COLOR.POINT};
-        }
+        color: ${COLOR.POINT};
       }
     }
   }
@@ -480,6 +695,17 @@ const addModalStyle = css`
     gap: 16px;
     padding-top: 32px;
     border-top: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
+  }
+`;
+
+const thumbnailStyle = css`
+  display: flex;
+  align-itmes: center;
+  gap: 8px;
+
+  img {
+    width: 48px;
+    height: 20px;
   }
 `;
 

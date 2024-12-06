@@ -63,9 +63,87 @@ export interface PaginatedResponse {
   content: UserData[];
 }
 
+export interface MethodsPaginatedResponse {
+  currentPage: number;
+  pageSize: number;
+  totalElement: number;
+  totalPages: number;
+  content: MethodsData[];
+}
+
 export interface UpDateUserRole {
   memberId: number[];
   hasManagerRights: boolean;
+}
+
+export interface MethodsData {
+  id: number;
+  name: string;
+  filePath: string;
+}
+
+export interface MethodsParameterProps {
+  page: number;
+}
+
+export interface MethodsPostRequestDtoProps {
+  name: string;
+  checkDupl: boolean;
+}
+
+export interface MethodsPostRequestProps {
+  methodPostRequestDto: MethodsPostRequestDtoProps;
+  file: File;
+}
+
+export interface MethodsPutRequestDtoProps {
+  id: number | undefined;
+  name: string;
+  checkDuplicate: boolean;
+}
+
+export interface MethodsPutRequestProps {
+  methodPutRequestDto: MethodsPutRequestDtoProps;
+  file: File;
+}
+
+export interface StocksPaginatedResponse {
+  currentPage: number;
+  pageSize: number;
+  totalElement: number;
+  totalPages: number;
+  content: StocksData[];
+}
+
+export interface StocksData {
+  id: number;
+  name: string;
+  filePath: string;
+}
+
+export interface StocksParameterProps {
+  page: number;
+}
+
+export interface StocksPostRequestDtoProps {
+  name: string;
+  checkDuplicate: boolean;
+}
+
+export interface StocksPostRequestProps {
+  stockPostRequestDto: StocksPostRequestDtoProps;
+  file: File;
+}
+
+export interface StocksPutRequestDtoProps {
+  id: number | undefined;
+  name: string;
+  checkDuplicate: boolean;
+}
+
+export interface StocksPutRequestProps {
+  stockPutRequestDto: StocksPutRequestDtoProps;
+  file: File;
 }
 
 // 회원 목록 조회 API
@@ -223,6 +301,91 @@ export const rejectAdminStrategy = async (rejectData: {
   return response.data;
 };
 
+export const getAdminStocks = async (params: StocksParameterProps) => {
+  const response = await axiosInstance.get(
+    `/v1/admin/stocklist/${params.page}`
+  );
+
+  return response.data.data;
+};
+
+// 종목 저장 API
+export const createAdminStocks = async (params: StocksPostRequestProps) => {
+  const formData = new FormData();
+
+  formData.append(
+    'stockPostRequestDto',
+    JSON.stringify(params.stockPostRequestDto)
+  );
+  formData.append('file', params.file);
+
+  const response = await axiosInstance.post(`/v1/admin/stock`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  return response.data;
+};
+
+// 종목 삭제 API
+export const deleteAdminStocks = async (ids: number[]) => {
+  const response = await axiosInstance.delete(`/v1/admin/stock`, {
+    data: { stockIdList: ids }, // body
+  });
+
+  return response.data;
+};
+
+// 종목 수정 API
+export const updateAdminStocks = async (params: StocksPutRequestProps) => {
+  const formData = new FormData();
+
+  formData.append(
+    'stockPutRequestDto',
+    JSON.stringify(params.stockPutRequestDto)
+  );
+  formData.append('file', params.file);
+
+  const response = await axiosInstance.patch(`/v1/admin/stock`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  return response.data;
+};
+
+// 매매방식 조회 API
+export const getAdminMethods = async (params: MethodsParameterProps) => {
+  const response = await axiosInstance.get(`/v1/admin/methodlist`, {
+    params: {
+      page: params.page,
+    },
+  });
+
+  return response.data.data;
+};
+
+// 매매방식 등록 API
+export const createAdminMethods = async (params: MethodsPostRequestProps) => {
+  const formData = new FormData();
+
+  formData.append(
+    'methodPostRequestDto',
+    JSON.stringify(params.methodPostRequestDto)
+  );
+  formData.append('file', params.file);
+
+  const response = await axiosInstance.post(`/v1/admin/method`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  return response.data;
+};
+
 // 관리자 문의 조회 API
 export const getInquiryList = async (
   page: number,
@@ -253,9 +416,37 @@ export const deleteInquiryList = async (
   return response.data;
 };
 
+//매매방식 삭제 API
+export const deleteAdminMethods = async (ids: number[]) => {
+  const response = await axiosInstance.delete(`/v1/admin/method`, {
+    data: { methodIdList: ids },
+  });
+
+  return response.data;
+};
+
 // 관리자 문의 상세조회 API
 export const getAdminInquiryDetail = async (qnaId: number) => {
   const response = await axiosInstance.get(`/v1/admin/qna/${qnaId}`);
+
+  return response.data;
+};
+
+//매매방식 수정 API
+export const updateAdminMethods = async (params: MethodsPutRequestProps) => {
+  const formData = new FormData();
+
+  formData.append(
+    'methodPutRequestDto',
+    JSON.stringify(params.methodPutRequestDto)
+  );
+  formData.append('file', params.file);
+
+  const response = await axiosInstance.put(`/v1/admin/method`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
 
   return response.data;
 };
