@@ -22,7 +22,7 @@ const Notices = () => {
   const [searchValue, setSearchValue] = useState('');
   const [curPage, setCurPage] = useState<number>(0);
   const [data, setData] = useState<NoticesStrategyDataProps[]>([]);
-  const [filteredData, setFilteredData] = useState<NoticesStrategyDataProps[]>(
+  const [_filteredData, setFilteredData] = useState<NoticesStrategyDataProps[]>(
     []
   );
   const [totalPage, setTotalPage] = useState(0);
