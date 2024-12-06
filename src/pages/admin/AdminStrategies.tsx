@@ -8,18 +8,14 @@ import SelectBox from '@/components/SelectBox';
 import Table, { ColumnProps } from '@/components/Table';
 import Tag from '@/components/Tag';
 import TextInput from '@/components/TextInput';
-import { COLOR_OPACITY } from '@/constants/color';
+import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { useGetAdminStrategyList } from '@/hooks/useAdminApi';
 
 type OpenStatusTypes = 'PUBLIC' | 'PRIVATE';
+type ApprovalStatusTypes = '요청 전' | '승인' | '반려' | '승인 요청';
+
 interface AdminStrategyDataProps {
-  // no: number;
-  // traderName: string;
-  // strategyName: string;
-  // enrollDate: string;
-  // isOn: boolean;
-  // staged: string;
   strategyId: number;
   strategyName: string;
   traderName: string;
@@ -28,7 +24,7 @@ interface AdminStrategyDataProps {
   methodId: string;
   methodIconPath: string;
   stockList: StockListProps;
-  approvalStatusCode: string; //TODO: 단계 뭐뭐있는지?
+  approvalStatusCode: ApprovalStatusTypes; //TODO: 단계 뭐뭐있는지?
 }
 
 interface StockListProps {
@@ -138,6 +134,11 @@ const AdminStrategies = () => {
     {
       key: 'approvalStatusCode' as keyof AdminStrategyDataProps,
       header: '승인단계',
+      render: (_, item) => (
+        <p css={approvalStatusStyle(item.approvalStatusCode)}>
+          {item.approvalStatusCode}
+        </p>
+      ),
     },
     {
       key: 'state' as keyof AdminStrategyDataProps,
@@ -307,4 +308,13 @@ const tagStyle = css`
   }
 `;
 
+const approvalStatusStyle = (approvalStatusCode: ApprovalStatusTypes) => css`
+  color: ${approvalStatusCode === '반려'
+    ? COLOR.ERROR_RED
+    : approvalStatusCode === '승인'
+      ? COLOR.CHECK_GREEN
+      : approvalStatusCode === '요청 전'
+        ? COLOR.GRAY700
+        : COLOR.TEXT_BLACK};
+`;
 export default AdminStrategies;
