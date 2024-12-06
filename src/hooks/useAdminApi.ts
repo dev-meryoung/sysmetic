@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   approveAdminStrategy,
+  createAdminMethods,
   createAdminStocks,
   deleteAdminStocks,
   getAdminMethods,
@@ -58,4 +59,9 @@ export const useGetAdminMethods = (
     queryKey: ['adminMethods', params],
     queryFn: () => getAdminMethods(params),
     enabled: !!enabled,
+  });
+
+export const useCreateAdminMethods = () =>
+  useMutation({
+    mutationFn: createAdminMethods,
   });

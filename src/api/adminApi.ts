@@ -57,6 +57,16 @@ export interface MethodsParameterProps {
   page: number;
 }
 
+export interface MethodsPostRequestDtoProps {
+  name: string;
+  checkDupl: boolean;
+}
+
+export interface MethodsPostRequestProps {
+  methodPostRequestDto: MethodsPostRequestDtoProps;
+  file: File;
+}
+
 // 회원 목록 조회 API
 export const getAdminUserList = async () => {};
 
@@ -178,4 +188,23 @@ export const getAdminMethods = async (params: MethodsParameterProps) => {
   });
 
   return response.data.data;
+};
+
+// 매매방식 등록 API
+export const createAdminMethods = async (params: MethodsPostRequestProps) => {
+  const formData = new FormData();
+
+  formData.append(
+    'methodPostRequestDto',
+    JSON.stringify(params.methodPostRequestDto)
+  );
+  formData.append('file', params.file);
+
+  const response = await axiosInstance.post(`/v1/admin/method`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  return response.data;
 };

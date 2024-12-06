@@ -1,8 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
 import { css } from '@emotion/react';
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 import { MethodsParameterProps } from '@/api';
-import TagTest from '@/assets/images/test-tag.jpg';
 import Button from '@/components/Button';
 import IconButton from '@/components/IconButton';
 import Modal from '@/components/Modal';
@@ -12,8 +17,7 @@ import Tag from '@/components/Tag';
 import TextInput from '@/components/TextInput';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
-import { useGetAdminMethods } from '@/hooks/useAdminApi';
-import adminMethods from '@/mocks/adminMethods.json';
+import { useCreateAdminMethods, useGetAdminMethods } from '@/hooks/useAdminApi';
 import useModalStore from '@/stores/useModalStore';
 import { useTableStore } from '@/stores/useTableStore';
 
@@ -21,6 +25,11 @@ interface AdminMethodsDataProps {
   no: number;
   methodsName: string;
   filePath: string;
+}
+
+interface AddModalProps {
+  setFetch: Dispatch<SetStateAction<boolean>>;
+  methods: AdminMethodsDataProps[];
 }
 
 interface DelModalProps {
@@ -57,10 +66,70 @@ const DelModal: React.FC<DelModalProps> = ({ toggleAllCheckBoxes }) => {
   );
 };
 
-const AddModal = () => {
+const AddModal: React.FC<AddModalProps> = ({ setFetch, methods }) => {
   const addModal = useModalStore();
   const [methodsValue, setMethodsValue] = useState('');
   const [iconValue, setIconValue] = useState('');
+  const [iconImg, setIconImg] = useState('');
+  const [isDuplicated, setIsDuplicated] = useState(false);
+
+  const handleOpenFileExplorer = () => {
+    const fileInput = document.getElementById('file-input');
+    fileInput?.click();
+  };
+
+  const checkDuplicate = (value: string) => {
+    const isDuplicate = methods.some((method) => method.methodsName === value);
+    setIsDuplicated(isDuplicate);
+  };
+
+  const handleMethodsChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setMethodsValue(e.target.value);
+    checkDuplicate(e.target.value);
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const imageUrl = reader.result as string;
+        setIconImg(imageUrl);
+        setIconValue(imageUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const { mutate: createAdminMethodsMutation } = useCreateAdminMethods();
+
+  const handleCreateClick = () => {
+    const fileInput = document.getElementById('file-input') as HTMLInputElement;
+    const file = fileInput?.files?.[0];
+
+    if (!file) {
+      alert('파일을 첨부해주세요.');
+      return;
+    }
+
+    const formData = {
+      methodPostRequestDto: {
+        name: methodsValue,
+        checkDupl: !isDuplicated,
+      },
+      file,
+    };
+
+    createAdminMethodsMutation(formData, {
+      onSuccess: () => {
+        addModal.closeModal('add');
+        setFetch(true);
+      },
+      onError: (error) => {
+        console.error('등록 실패', error);
+      },
+    });
+  };
 
   return (
     <div css={addModalStyle}>
@@ -78,12 +147,15 @@ const AddModal = () => {
               <TextInput
                 width={224}
                 value={methodsValue}
-                handleChange={(e) => setMethodsValue(e.target.value)}
+                handleChange={handleMethodsChange}
               />
-              <p>1글자 이상 입력하세요.</p>
+              {/* <p>1글자 이상 입력하세요.</p> */}
             </td>
             <td>
-              <p>등록아이콘</p>
+              <div css={thumbnailStyle}>
+                <p>등록아이콘</p>
+                {iconImg && <img src={iconImg} alt='미리보기' />}
+              </div>
               <div>
                 <TextInput
                   width={302}
@@ -95,10 +167,17 @@ const AddModal = () => {
                   iconBgSize='lg'
                   iconSize='md'
                   IconComponent={AddPhotoAlternateOutlinedIcon}
-                  handleClick={() => console.log('클릭')}
+                  handleClick={handleOpenFileExplorer}
+                />
+                <input
+                  id='file-input'
+                  type='file'
+                  accept='image/jpg,image/jpeg,image/png'
+                  style={{ display: 'none' }}
+                  onChange={handleFileChange}
                 />
               </div>
-              <p>jp(e)g, png 형식의 파일만 첨부 가능합니다.</p>
+              {/* <p>jp(e)g, png 형식의 파일만 첨부 가능합니다.</p> */}
             </td>
           </tr>
         </tbody>
@@ -110,11 +189,7 @@ const AddModal = () => {
           label='취소'
           handleClick={() => addModal.closeModal('add')}
         />
-        <Button
-          width={120}
-          label='등록하기'
-          handleClick={() => console.log('click')}
-        />
+        <Button width={120} label='등록하기' handleClick={handleCreateClick} />
       </div>
     </div>
   );
@@ -330,7 +405,10 @@ const AdminMethods = () => {
         content={<DelModal toggleAllCheckBoxes={toggleAllCheckboxes} />}
         id='delete'
       />
-      <Modal content={<AddModal />} id='add' />
+      <Modal
+        content={<AddModal setFetch={setFetch} methods={methods} />}
+        id='add'
+      />
       <Modal content={<ModModal />} id='modify' />
     </div>
   );
@@ -473,7 +551,7 @@ const addModalStyle = css`
 
       &:nth-of-type(1) {
         width: 240px;
-        margin-top: 30px;
+        margin-top: 32px;
       }
 
       &:nth-of-type(2) {
@@ -482,16 +560,16 @@ const addModalStyle = css`
 
       div {
         display: flex;
+
+        p {
+          color: ${COLOR.TEXT_BLACK};
+          height: 24px;
+          margin: 0;
+        }
       }
 
       p {
-        &:nth-of-type(1) {
-          margin-bottom: 8px;
-        }
-        &:last-child {
-          margin-bottom: 24px;
-          color: ${COLOR.POINT};
-        }
+        color: ${COLOR.POINT};
       }
     }
   }
@@ -502,6 +580,17 @@ const addModalStyle = css`
     gap: 16px;
     padding-top: 32px;
     border-top: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
+  }
+`;
+
+const thumbnailStyle = css`
+  display: flex;
+  align-itmes: center;
+  gap: 8px;
+
+  img {
+    width: 48px;
+    height: 20px;
   }
 `;
 
