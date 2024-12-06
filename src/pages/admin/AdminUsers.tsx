@@ -1,4 +1,4 @@
-import { useState, useEffect, SetStateAction, Dispatch } from 'react';
+import { useState, useEffect, SetStateAction } from 'react';
 import { css } from '@emotion/react';
 import SearchIcon from '@mui/icons-material/Search';
 import { AdminUserData, RoleCodeTypes } from '@/api';
@@ -30,10 +30,6 @@ interface UsersTableProps {
   tel: string;
 }
 
-interface DelConfirmModalProps {
-  setIsConfirm: Dispatch<React.SetStateAction<boolean>>;
-}
-
 const SearchOptions = [
   { label: '전체', value: 'ALL' },
   { label: '이메일', value: 'EMAIL' },
@@ -48,30 +44,6 @@ const GradeOptions = [
   { label: '탈퇴', value: 'resign' },
 ];
 
-const DelConfirmModal: React.FC<DelConfirmModalProps> = ({ setIsConfirm }) => {
-  const delConfirmModal = useModalStore();
-
-  const handleModalDelClick = () => {
-    setIsConfirm(true);
-    delConfirmModal.closeModal('del-confirm');
-  };
-
-  return (
-    <div css={ModalStyle}>
-      <p>정말 해당 회원을 탈퇴시키겠습니까?</p>
-      <div className='del-confirm-btn'>
-        <Button
-          width={120}
-          border={true}
-          label='아니오'
-          handleClick={() => delConfirmModal.closeModal('del-confirm')}
-        />
-        <Button width={120} label='예' handleClick={handleModalDelClick} />
-      </div>
-    </div>
-  );
-};
-
 const AdminUsers = () => {
   const [tab, setTab] = useState(0);
   const [value, setValue] = useState('');
@@ -79,19 +51,8 @@ const AdminUsers = () => {
   const [selectedFilter, setSelectedFilter] = useState('');
   const [selectedGrade, setSelectedGrade] = useState('');
   const [curPage, setCurPage] = useState(0);
-  const [fetch, setFetch] = useState(true);
-  const [isDisabled, setIsDisabled] = useState(true);
-  const [hasManagerRights, setHasManagerRights] = useState(false);
-  //모달
-  const delConfirmModal = useModalStore();
-  const [isDelConfirm, setIsDelConfirm] = useState(false);
-  //체크박스
-  const checkedItems = useTableStore((state) => state.checkedItems);
-  const toggleCheckbox = useTableStore((state) => state.toggleCheckbox);
-  const toggleAllCheckboxes = useTableStore(
-    (state) => state.toggleAllCheckboxes
-  );
 
+  const [fetch, setFetch] = useState(true);
   //회원목록 가져오기
   const params: AdminUserData = {
     role:
@@ -103,7 +64,6 @@ const AdminUsers = () => {
 
   const { data, refetch } = useGetAdminUserList(params, fetch);
   const totalPage = data?.totalPages || 0;
-
   const users: UsersTableProps[] =
     data?.content?.map((user) => ({
       no: user.id,
@@ -115,6 +75,35 @@ const AdminUsers = () => {
       birth: user.birth,
       tel: user.phoneNumber,
     })) || [];
+
+  const [isDisabled, setIsDisabled] = useState(true);
+  const [hasManagerRights, setHasManagerRights] = useState(false);
+  //모달
+  const delConfirmModal = useModalStore();
+  //체크박스
+  const checkedItems = useTableStore((state) => state.checkedItems);
+  const toggleCheckbox = useTableStore((state) => state.toggleCheckbox);
+  const toggleAllCheckboxes = useTableStore(
+    (state) => state.toggleAllCheckboxes
+  );
+  const selectedUserIds = checkedItems.map((index) => users[index].no);
+  // 회원 강제 탈퇴
+  const { mutate: deleteAdminUser } = useDeleteAdminUser();
+
+  const handleModalDelClick = () => {
+    deleteAdminUser(selectedUserIds, {
+      onSuccess: (data) => {
+        if (data?.code === 200) {
+          setFetch(true);
+          toggleAllCheckboxes(0);
+        }
+      },
+      onError: (error) => {
+        console.error('회원 탈퇴 중 오류 발생', error);
+      },
+    });
+    delConfirmModal.closeModal('del-confirm');
+  };
 
   const handleFilterChange = (value: string) => {
     setSelectedFilter(value);
@@ -201,8 +190,6 @@ const AdminUsers = () => {
     toggleAllCheckboxes(0);
   };
 
-  // 회원 강제 탈퇴
-  const { mutate: deleteAdminUser } = useDeleteAdminUser();
   // 회원 등급 변경
   const { mutate: updateAdminUserRoleMutation } = useUpdateAdminUserRole();
 
@@ -212,41 +199,25 @@ const AdminUsers = () => {
 
     if (selectedGrade === 'resign') {
       delConfirmModal.openModal('del-confirm');
-      if (isDelConfirm) {
-        deleteAdminUser(selectedUserIds, {
-          onSuccess: (data) => {
-            if (data?.code === 200) {
-              setFetch(true);
-              toggleAllCheckboxes(0);
-              setIsDelConfirm(false);
-            }
-          },
-          onError: (error) => {
-            console.error('회원 탈퇴 중 오류 발생', error);
-          },
-        });
+    } else {
+      const params = {
+        memberId: selectedUserIds,
+        hasManagerRights,
+      };
 
-        return;
-      }
+      updateAdminUserRoleMutation(params, {
+        onSuccess: (data) => {
+          if (data?.code === 200) {
+            console.log('업데이트 성공');
+          }
+          setFetch(true);
+          toggleAllCheckboxes(0);
+        },
+        onError: (error) => {
+          console.error('회원 등급 변경 중 오류 발생!', error);
+        },
+      });
     }
-
-    const params = {
-      memberId: selectedUserIds,
-      hasManagerRights,
-    };
-
-    updateAdminUserRoleMutation(params, {
-      onSuccess: (data) => {
-        if (data?.code === 200) {
-          console.log('성공');
-        }
-        setFetch(true);
-        toggleAllCheckboxes(0);
-      },
-      onError: (error) => {
-        console.error('회원 등급 변경 중 오류 발생!', error);
-      },
-    });
   };
 
   useEffect(() => {
@@ -335,7 +306,24 @@ const AdminUsers = () => {
         />
       </div>
       <Modal
-        content={<DelConfirmModal setIsConfirm={setIsDelConfirm} />}
+        content={
+          <div css={ModalStyle}>
+            <p>정말 해당 회원을 탈퇴시키겠습니까?</p>
+            <div className='del-confirm-btn'>
+              <Button
+                width={120}
+                border={true}
+                label='아니오'
+                handleClick={() => delConfirmModal.closeModal('del-confirm')}
+              />
+              <Button
+                width={120}
+                label='예'
+                handleClick={handleModalDelClick}
+              />
+            </div>
+          </div>
+        }
         id='del-confirm'
       />
     </div>
