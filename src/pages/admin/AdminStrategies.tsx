@@ -109,13 +109,18 @@ const AdminStrategies = () => {
     {
       key: 'strategyName' as keyof AdminStrategyDataProps,
       header: '전략명',
-      render: (
-        value: string | number | undefined | boolean | StockListProps
-      ) => (
+      render: (_, item) => (
         <div css={tagStyle}>
-          <div>
-            <Tag src={value as string} alt='tag' />
+          <div className='tag'>
+            <Tag src={item?.methodIconPath || ''} />
+            {item?.stockList?.stockIconPath &&
+              item?.stockList?.stockIconPath.map(
+                (stock: string, index: number) => (
+                  <Tag key={index} src={stock || ''} alt='tag' />
+                )
+              )}
           </div>
+          {item.strategyName}
         </div>
       ),
     },
@@ -295,6 +300,11 @@ const tagStyle = css`
   flex-direction: column;
   gap: 12px;
   align-items: flex-start;
+
+  .tag {
+    display: flex;
+    gap: 4px;
+  }
 `;
 
 export default AdminStrategies;
