@@ -20,9 +20,9 @@ const PAGE_SIZE = 10;
 
 const Notices = () => {
   const [searchValue, setSearchValue] = useState('');
-  const [curPage, setCurPage] = useState(0);
+  const [curPage, setCurPage] = useState<number>(0);
   const [data, setData] = useState<NoticesStrategyDataProps[]>([]);
-  const [filteredData, setFilteredData] = useState<NoticesStrategyDataProps[]>(
+  const [_filteredData, setFilteredData] = useState<NoticesStrategyDataProps[]>(
     []
   );
   const [totalPage, setTotalPage] = useState(0);
@@ -36,13 +36,14 @@ const Notices = () => {
   const noticeMutation = useGetNoticeList(params);
 
   useEffect(() => {
+    const total = noticeMutation.data?.data?.totalElement;
     const fetchedData = noticeMutation.data?.data?.content;
 
     if (Array.isArray(fetchedData)) {
       const sortedData = [...fetchedData].sort((a, b) => b.no - a.no);
       setData(sortedData);
       setFilteredData(sortedData);
-      setTotalPage(Math.ceil(sortedData.length / PAGE_SIZE));
+      setTotalPage(Math.ceil(total / PAGE_SIZE));
     } else {
       setData([]);
       setFilteredData([]);
@@ -70,11 +71,6 @@ const Notices = () => {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') handleSearch();
-  };
-
-  const getPaginatedData = () => {
-    const startIndex = curPage * PAGE_SIZE;
-    return filteredData.slice(startIndex, startIndex + PAGE_SIZE);
   };
 
   const columns: ColumnProps<NoticesStrategyDataProps>[] = [
@@ -117,7 +113,7 @@ const Notices = () => {
         <SearchIcon css={iconStyle} onClick={handleSearch} />{' '}
       </div>
       <div css={noticesListStyle}>
-        <Table data={getPaginatedData()} columns={columns} />
+        <Table data={data} columns={columns} />
       </div>
       <div css={noticesPaginationStyle}>
         <Pagination

@@ -5,6 +5,7 @@ export interface GetAdminNoticeListData {
   page?: number;
   searchType?: string;
   searchText?: string;
+  isOpen?: boolean;
 }
 
 export interface GetAdminNoticeData {
@@ -12,6 +13,18 @@ export interface GetAdminNoticeData {
   page?: number;
   searchType?: string;
   searchText?: string;
+}
+
+export interface UpdateAdminNoticeData {
+  noticeId?: string;
+  noticeTitle: string;
+  noticeContent: string;
+  isOpen?: boolean;
+}
+
+export interface UpdateAdminNoticeStatusData {
+  noticeId?: string;
+  isOpen?: boolean;
 }
 
 export interface DeleteInquiryListRequest {
@@ -47,15 +60,26 @@ export const getAdminNotice = async (params: GetAdminNoticeData) => {
 };
 
 // 공지사항 수정 API
-export const updateAdminNotice = async (noticeId: string) => {
-  const response = await axiosInstance.put(`/v1/admin/notice/${noticeId}`);
+export const updateAdminNotice = async (
+  formData: FormData,
+  noticeId: string
+) => {
+  const response = await axiosInstance.put(
+    `/v1/admin/notice/${noticeId}`,
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
+  );
   return response.data;
 };
 
 // 공지사항 삭제 API
 export const deleteAdminNotice = async (noticeId: string) => {
-  const response = await axiosInstance.delete(`/v1/admin/notice/${noticeId}`);
-  return response.data;
+  const response = await axiosInstance.delete(`/v1/admin/notice/${noticeId}`); // RESTful 형식에 맞게 수정
+  return response.data; // 서버에서 반환하는 데이터
 };
 
 // 공지사항 목록에서 개별 공개여부 수정 API
@@ -67,14 +91,21 @@ export const updateAdminNoticeStatus = async (noticeId: string) => {
 };
 
 // 공지사항 등록 API
-export const createAdminNotice = async () => {
-  const response = await axiosInstance.put(`/v1/admin/notice`);
+export const createAdminNotice = async (formData: FormData) => {
+  const response = await axiosInstance.post(`/v1/admin/notice`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return response.data;
 };
 
 // 공지사항 목록 삭제 API
-export const deleteAdminNoticeList = async () => {
-  const response = await axiosInstance.delete(`/v1/admin/notice`);
+export const deleteAdminNoticeList = async (noticeIds: number[]) => {
+  const payload = { noticeIds };
+  const response = await axiosInstance.delete(`/v1/admin/notice`, {
+    data: payload,
+  });
   return response.data;
 };
 

@@ -64,11 +64,11 @@ const NoticesDetail = () => {
       const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = blobUrl;
-      link.download = fileName; // 파일 이름 설정
+      link.download = fileName;
       document.body.appendChild(link);
       link.click();
       link.remove();
-      window.URL.revokeObjectURL(blobUrl); // 메모리 정리
+      window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
       console.error('다운로드 실패:', error);
     }
@@ -81,7 +81,6 @@ const NoticesDetail = () => {
     }
     data.fileDtoList.forEach((file) => {
       if (file.url) {
-        // fileName을 file.name으로 설정
         downloadFile(file.url, file.name);
       }
     });
