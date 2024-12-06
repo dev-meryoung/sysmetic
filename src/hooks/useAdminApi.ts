@@ -7,6 +7,7 @@ import {
   rejectAdminStrategy,
   StocksPaginatedResponse,
   StocksParameterProps,
+  updateAdminStocks,
 } from '@/api';
 
 export const useApproveAdminStrategy = () =>
@@ -39,4 +40,9 @@ export const useCreateAdminStocks = () =>
 export const useDeleteAdminStocks = () =>
   useMutation({
     mutationFn: deleteAdminStocks,
+  });
+
+export const useUpdateAdminStocks = () =>
+  useMutation({
+    mutationFn: updateAdminStocks,
   });

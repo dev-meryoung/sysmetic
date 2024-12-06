@@ -28,6 +28,17 @@ export interface StocksPostRequestProps {
   file: File;
 }
 
+export interface StocksPutRequestDtoProps {
+  id: number | undefined;
+  name: string;
+  checkDuplicate: boolean;
+}
+
+export interface StocksPutRequestProps {
+  stockPutRequestDto: StocksPutRequestDtoProps;
+  file: File;
+}
+
 // 회원 목록 조회 API
 export const getAdminUserList = async () => {};
 
@@ -115,7 +126,26 @@ export const createAdminStocks = async (params: StocksPostRequestProps) => {
 // 종목 삭제 API
 export const deleteAdminStocks = async (ids: number[]) => {
   const response = await axiosInstance.delete(`/v1/admin/stock`, {
-    data: { stockIdList: ids },
+    data: { stockIdList: ids }, // body
+  });
+
+  return response.data;
+};
+
+// 종목 수정 API
+export const updateAdminStocks = async (params: StocksPutRequestProps) => {
+  const formData = new FormData();
+
+  formData.append(
+    'stockPutRequestDto',
+    JSON.stringify(params.stockPutRequestDto)
+  );
+  formData.append('file', params.file);
+
+  const response = await axiosInstance.patch(`/v1/admin/stock`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
   });
 
   return response.data;

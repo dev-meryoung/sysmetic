@@ -7,7 +7,7 @@ import {
 } from 'react';
 import { css } from '@emotion/react';
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
-import { StocksParameterProps } from '@/api';
+import { StocksData, StocksParameterProps } from '@/api';
 import Button from '@/components/Button';
 import IconButton from '@/components/IconButton';
 import Modal from '@/components/Modal';
@@ -21,6 +21,7 @@ import {
   useCreateAdminStocks,
   useDeleteAdminStocks,
   useGetAdminStocks,
+  useUpdateAdminStocks,
 } from '@/hooks/useAdminApi';
 import useModalStore from '@/stores/useModalStore';
 import { useTableStore } from '@/stores/useTableStore';
@@ -42,6 +43,13 @@ interface AddModalProps {
   setFetch: Dispatch<SetStateAction<boolean>>;
   stocks: AdminStocksDataProps[];
   toggleAllCheckBoxes: (value: number) => void;
+}
+
+interface ModModalProps {
+  stocks: AdminStocksDataProps[];
+  setFetch: Dispatch<SetStateAction<boolean>>;
+  toggleAllCheckBoxes: (value: number) => void;
+  selectedStock: StocksData | null;
 }
 
 //? 삭제 모달
@@ -96,6 +104,7 @@ const AddModal: React.FC<AddModalProps> = ({
   const [iconValue, setIconValue] = useState('');
   const [profileImg, setProfileImg] = useState('');
   const [isDuplicated, setIsDuplicated] = useState(false);
+
   const handleOpenFileExplorer = () => {
     const fileInput = document.getElementById('file-input');
     fileInput?.click();
@@ -220,10 +229,78 @@ const AddModal: React.FC<AddModalProps> = ({
 };
 
 //? 수정 모달
-const ModModal = () => {
+const ModModal: React.FC<ModModalProps> = ({
+  stocks,
+  selectedStock,
+  setFetch,
+}) => {
   const modModal = useModalStore();
-  const [stocksValue, setStocksValue] = useState('');
-  const [iconValue, setIconValue] = useState('');
+  const [stocksValue, setStocksValue] = useState(selectedStock?.name || '');
+  const [iconValue, setIconValue] = useState(selectedStock?.filePath || '');
+  const [iconImg, setIconImg] = useState(selectedStock?.filePath || '');
+  const [isDuplicated, setIsDuplicated] = useState(false);
+
+  useEffect(() => {
+    if (iconValue) {
+      setIconImg(iconValue); // iconValue와 iconImg 동기화
+    }
+  }, [iconValue]);
+
+  const handleOpenFileExplorer = () => {
+    const fileInput = document.getElementById('file-input');
+    fileInput?.click();
+  };
+
+  const checkDuplicate = (value: string) => {
+    const isDuplicate = stocks.some((stock) => stock.stocksName === value);
+    setIsDuplicated(isDuplicate);
+  };
+
+  const handleStocksChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setStocksValue(e.target.value);
+    checkDuplicate(e.target.value);
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const imageUrl = reader.result as string;
+        setIconImg(imageUrl);
+        setIconValue(imageUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  const { mutate: updateAdminStocksMutation } = useUpdateAdminStocks();
+
+  const handleUpdateClick = () => {
+    const fileInput = document.getElementById('file-input') as HTMLInputElement;
+    const file = fileInput?.files?.[0];
+    // if(!selectedStock) return;
+    if (!file) return;
+
+    const formData = {
+      stockPutRequestDto: {
+        id: selectedStock?.id,
+        name: stocksValue,
+        checkDuplicate: !isDuplicated,
+      },
+      file,
+    };
+
+    updateAdminStocksMutation(formData, {
+      onSuccess: (data) => {
+        console.log('종목 수정 성공!');
+        setFetch(true);
+        modModal.closeModal('modify');
+      },
+      onError: (error) => {
+        console.error('종목 수정 중 오류 발생', error);
+      },
+    });
+  };
 
   return (
     <div css={addModalStyle}>
@@ -241,27 +318,40 @@ const ModModal = () => {
               <TextInput
                 width={224}
                 value={stocksValue}
-                handleChange={(e) => setStocksValue(e.target.value)}
+                handleChange={handleStocksChange}
               />
-              <p>1글자 이상 입력하세요.</p>
+              {/* <p>1글자 이상 입력하세요.</p> */}
             </td>
             <td>
-              <p>등록아이콘</p>
+              <div css={thumbnailStyle}>
+                <p>등록아이콘</p>
+                {iconImg && <img src={iconImg} alt='미리보기' />}
+              </div>
               <div>
                 <TextInput
                   width={302}
                   value={iconValue}
-                  handleChange={(e) => setIconValue(e.target.value)}
+                  handleChange={(e) => {
+                    setIconValue(e.target.value);
+                    setIconImg(e.target.value);
+                  }}
                 />
                 <IconButton
                   color='white'
                   iconBgSize='lg'
                   iconSize='md'
                   IconComponent={AddPhotoAlternateOutlinedIcon}
-                  handleClick={() => console.log('클릭')}
+                  handleClick={handleOpenFileExplorer}
                 />
               </div>
-              <p>jp(e)g, png 형식의 파일만 첨부 가능합니다.</p>
+              <input
+                id='file-input'
+                type='file'
+                accept='image/jpg,image/jpeg,image/png'
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+              />
+              {/* <p>jp(e)g, png 형식의 파일만 첨부 가능합니다.</p> */}
             </td>
           </tr>
         </tbody>
@@ -273,17 +363,14 @@ const ModModal = () => {
           label='취소'
           handleClick={() => modModal.closeModal('modify')}
         />
-        <Button
-          width={120}
-          label='등록하기'
-          handleClick={() => console.log('click')}
-        />
+        <Button width={120} label='등록하기' handleClick={handleUpdateClick} />
       </div>
     </div>
   );
 };
 
 const AdminStocks = () => {
+  const [selectedStock, setSelectedStock] = useState<StocksData | null>(null);
   //버튼 on/off
   const [delDisabled, setDelDisabled] = useState(true);
   //테이블 관련
@@ -311,7 +398,7 @@ const AdminStocks = () => {
     {
       key: 'state' as keyof AdminStocksDataProps,
       header: '상태',
-      render: () => (
+      render: (value: string | number, row: AdminStocksDataProps) => (
         <Button
           label='수정'
           shape='round'
@@ -319,7 +406,7 @@ const AdminStocks = () => {
           color='primary'
           border={true}
           width={80}
-          handleClick={openModifyModal}
+          handleClick={() => openModifyModal(row.no)}
         />
       ),
     },
@@ -365,8 +452,14 @@ const AdminStocks = () => {
     addModal.openModal('add', 648);
   };
 
-  const openModifyModal = () => {
-    modModal.openModal('modify', 648);
+  const openModifyModal = (id: number) => {
+    const stockToModify = data?.content?.find((stock) => stock.id === id);
+    if (stockToModify) {
+      setSelectedStock(stockToModify); // 상태로 전달
+      modModal.openModal('modify', 648);
+    } else {
+      alert('수정할 데이터를 찾을 수 없습니다.');
+    }
   };
 
   const handlePaginationClick = (value: SetStateAction<number>) => {
@@ -444,7 +537,17 @@ const AdminStocks = () => {
         }
         id='add'
       />
-      <Modal content={<ModModal />} id='modify' />
+      <Modal
+        content={
+          <ModModal
+            stocks={stocks}
+            setFetch={setFetch}
+            toggleAllCheckBoxes={toggleAllCheckboxes}
+            selectedStock={selectedStock}
+          />
+        }
+        id='modify'
+      />
     </div>
   );
 };
