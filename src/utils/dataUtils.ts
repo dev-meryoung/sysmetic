@@ -29,3 +29,6 @@ export const formatYearMonth = (date: string) => {
   const [year, month] = date.split('-');
   return `${year}. ${month}.`;
 };
+
+// T뒤에 제거해주는 날짜 함수
+export const extractDate = (dateTime: string) => dateTime?.split('T')[0];

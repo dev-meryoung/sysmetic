@@ -510,6 +510,7 @@ const smScoreCardStyle = css`
   .sm-score-card:nth-of-type(2),
   .sm-score-card:nth-of-type(3) {
     flex-direction: column;
+    justify-content: space-between;
 
     .card-btm {
       background-color: ${COLOR_OPACITY.POINT100_OPACITY70};

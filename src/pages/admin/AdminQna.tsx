@@ -1,110 +1,250 @@
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { css } from '@emotion/react';
-import TagTest from '@/assets/images/test-tag.jpg';
+import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
+import Loading from '@/components/Loading';
 import Modal from '@/components/Modal';
 import Pagination from '@/components/Pagination';
 import SelectBox from '@/components/SelectBox';
 import TabButton from '@/components/TabButton';
-import Table from '@/components/Table';
+import Table, { ColumnProps } from '@/components/Table';
 import Tag from '@/components/Tag';
 import TextInput from '@/components/TextInput';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
-import qna from '@/mocks/qna.json';
+import { PATH } from '@/constants/path';
+import { useDeleteInquiryList, useGetInquiryList } from '@/hooks/useAdminApi';
 import useModalStore from '@/stores/useModalStore';
 import { useTableStore } from '@/stores/useTableStore';
+import { extractDate } from '@/utils/dataUtils';
 
 interface AdminQnaDataProps {
-  no: number;
-  traderName: string;
+  ranking?: number;
+  cycle: string;
+  inquirerNickname: string;
+  inquiryId: number;
+  inquiryRegistrationDate: string;
+  inquiryStatus: string;
+  methodIconPath: string;
+  methodId: number;
+  statusCode: number;
+  stockList: StockListProps;
+  strategyId: number;
   strategyName: string;
-  date: string;
-  author: string;
-  state: string;
+  traderId: number;
+  traderNickname: string;
+  state?: string;
+}
+
+interface StockListProps {
+  stockIconPath: string[];
 }
 
 const SearchOption = [
+  { label: '전략명', value: 'strategy' },
   { label: '트레이더', value: 'trader' },
-  { label: '작성자', value: 'investor' },
+  { label: '작성자', value: 'inquirer' },
 ];
 
-const PAGE_SIZE = 10;
+const DelModal = ({
+  inquiryIdList,
+  inquiryListDataRefetch,
+}: {
+  inquiryIdList: number[];
+  inquiryListDataRefetch: () => void;
+}) => {
+  const { closeModal } = useModalStore();
+  const deleteCompleteModal = useModalStore();
+  const { toggleAllCheckboxes } = useTableStore();
 
-const DelModal = () => (
-  <div css={ModalStyle}>
-    <p>해당 전략을 삭제하시겠습니까?</p>
-    <div className='btn'>
-      <Button
-        width={120}
-        border={true}
-        label='아니오'
-        handleClick={() => console.log('아니오')}
-      />
-      <Button
-        width={120}
-        label='예'
-        handleClick={() => console.log('아니오')}
-      />
+  const { mutate: deleteInquiryListMutation } = useDeleteInquiryList();
+
+  const handleInquiryIdListDelete = () => {
+    deleteInquiryListMutation(
+      { inquiryIdList },
+      {
+        onSuccess: async () => {
+          inquiryListDataRefetch();
+          toggleAllCheckboxes(0);
+          closeModal('inquiry-delete-modal');
+          deleteCompleteModal.openModal('delete-inquiry-complete-modal');
+        },
+        onError: (error) => {
+          console.error('Strategy deletion failed:', error);
+          alert(`삭제에 실패했습니다: ${error.message}`);
+        },
+      }
+    );
+  };
+
+  return (
+    <div css={ModalStyle}>
+      <p>해당 전략을 삭제하시겠습니까?</p>
+      <div className='btn'>
+        <Button
+          width={120}
+          border={true}
+          label='아니오'
+          handleClick={() => closeModal('inquiry-delete-modal')}
+        />
+        <Button
+          width={120}
+          label='예'
+          handleClick={handleInquiryIdListDelete}
+        />
+      </div>
     </div>
-  </div>
+  );
+};
+const DelCompleteModal = () => (
+  <div css={ModalStyle}>해당 전략이 삭제되었습니다.</div>
+);
+
+const CheckModalContent = () => (
+  <div css={checkModalStyle}>삭제할 전략을 선택해주세요.</div>
 );
 
 const AdminQna = () => {
+  const navigate = useNavigate();
+  const deleteModal = useModalStore();
+  const checkModal = useModalStore();
+
   const [tab, setTab] = useState(0);
   const [value, setValue] = useState('');
+  const [searchText, setSearchText] = useState('');
   const [selectiedOption, setSelectedOption] = useState('');
-  const [curPage, setCurPage] = useState(0);
-  const [data, setData] = useState<AdminQnaDataProps[]>([]);
-  //페이지네이션
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalElement, setTotalElement] = useState(0);
+  const [tableData, setTableData] = useState<AdminQnaDataProps[]>([]);
   const [totalPage, setTotalPage] = useState(0);
-  const getPaginatedData = (page: number) => {
-    const startIndex = page * PAGE_SIZE;
-    const endIndex = startIndex + PAGE_SIZE;
-    return data.slice(startIndex, endIndex);
+  const [pageSize, setPageSize] = useState(0);
+  const checkedItems = useTableStore((state) => state.checkedItems);
+  const toggleCheckbox = useTableStore((state) => state.toggleCheckbox);
+  const toggleAllCheckboxes = useTableStore(
+    (state) => state.toggleAllCheckboxes
+  );
+
+  const getTabValue = (currentTab: number) => {
+    switch (currentTab) {
+      case 0:
+        return 'all';
+      case 1:
+        return 'unclosed';
+      case 2:
+        return 'closed';
+      default:
+        return 'all';
+    }
   };
+
+  const {
+    data: InquiryListData,
+    refetch: inquiryListDataRefetch,
+    isLoading,
+  } = useGetInquiryList(0, getTabValue(tab), selectiedOption, searchText);
+
   const handleOptionChange = (value: string) => {
     setSelectedOption(value);
   };
 
-  const paginatedData = getPaginatedData(curPage);
-  const columns = [
+  const getSelectedInquiryIdList = () => {
+    const selectedInquiryIdList = checkedItems
+      .map((index) => tableData[index]?.inquiryId)
+      .filter((inquiryId) => inquiryId !== undefined);
+
+    return selectedInquiryIdList;
+  };
+
+  const inquiryIdList = getSelectedInquiryIdList();
+
+  const handleDeleteInquiryList = () => {
+    if (checkedItems?.length > 0) {
+      deleteModal.openModal('inquiry-delete-modal', 336);
+    } else {
+      checkModal.openModal('check-inquiry-modal', 336);
+    }
+  };
+
+  const handleTabChange: Dispatch<SetStateAction<number>> = (newTab) => {
+    if (typeof newTab === 'function') {
+      setTab(newTab);
+    } else {
+      setTab(newTab);
+      setSearchText('');
+      setValue('');
+    }
+  };
+
+  useEffect(() => {
+    setTableData(InquiryListData?.data?.content || []);
+    setTotalPage(InquiryListData?.data?.totalPages || 0);
+    setTotalElement(InquiryListData?.data?.totalElement || 0);
+    setPageSize(InquiryListData?.data?.pageSize || 0);
+  }, [InquiryListData]);
+
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [tab]);
+
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [searchText]);
+
+  const columns: ColumnProps<AdminQnaDataProps>[] = [
     {
-      key: 'no' as keyof AdminQnaDataProps,
+      key: 'ranking',
       header: '순서',
+      render: (_, __, rowIndex) => {
+        const ranking = currentPage * pageSize + (rowIndex + 1);
+        return ranking;
+      },
     },
     {
-      key: 'traderName' as keyof AdminQnaDataProps,
+      key: 'traderNickname',
       header: '트레이더',
     },
     {
-      key: 'strategyName' as keyof AdminQnaDataProps,
+      key: 'strategyName',
       header: '전략명',
-      render: (value: string | number) => (
+      render: (_, item) => (
         <div css={tagStyle}>
-          <div>
-            <Tag src={TagTest} alt='tag' />
+          <div className='tag'>
+            <Tag src={item?.methodIconPath || ''} />
+            {item?.stockList?.stockIconPath &&
+              item?.stockList?.stockIconPath.map(
+                (stock: string, index: number) => (
+                  <Tag key={index} src={stock || ''} alt='tag' />
+                )
+              )}
           </div>
-          {value}
+          {item.strategyName}
         </div>
       ),
     },
     {
-      key: 'date' as keyof AdminQnaDataProps,
+      key: 'inquiryRegistrationDate',
       header: '문의날짜',
+      render: (_, item) => (
+        <span>{extractDate(item.inquiryRegistrationDate)}</span>
+      ),
     },
     {
-      key: 'author' as keyof AdminQnaDataProps,
+      key: 'inquirerNickname',
       header: '작성자',
     },
     {
-      key: 'state' as keyof AdminQnaDataProps,
+      key: 'inquiryStatus',
       header: '상태',
+      render: (_, item) => (
+        <span css={inquiryStatusStyle(item.inquiryStatus)}>
+          {item.inquiryStatus === 'unclosed' ? '답변대기' : '답변완료'}
+        </span>
+      ),
     },
     {
-      key: 'status' as keyof AdminQnaDataProps,
+      key: 'state',
       header: '관리',
-      render: () => (
+      render: (_, item) => (
         <Button
           label='상세보기'
           shape='round'
@@ -112,36 +252,13 @@ const AdminQna = () => {
           color='primary'
           border={true}
           width={80}
-          handleClick={() => {}}
+          handleClick={() =>
+            navigate(PATH.ADMIN_QNA_DETAIL(String(item.inquiryId)))
+          }
         />
       ),
     },
   ];
-
-  const checkedItems = useTableStore((state) => state.checkedItems);
-  const toggleCheckbox = useTableStore((state) => state.toggleCheckbox);
-  const toggleAllCheckboxes = useTableStore(
-    (state) => state.toggleAllCheckboxes
-  );
-
-  useEffect(() => {
-    console.log(selectiedOption);
-  }, [selectiedOption]);
-
-  useEffect(() => {
-    // 순서를 기준으로
-    const sortedData = [...qna].sort((a, b) => b.no - a.no);
-    const arrangedData = sortedData.map((item, index) => ({
-      ...item,
-      no: index + 1,
-    }));
-    setData(arrangedData);
-
-    const pages = Math.ceil(arrangedData.length / PAGE_SIZE);
-    setTotalPage(pages);
-  }, []);
-  //모달
-  const deleteModal = useModalStore();
 
   return (
     <div css={adminQnaWrapperStyle}>
@@ -156,7 +273,7 @@ const AdminQna = () => {
         <TabButton
           tabs={['전체', '답변대기', '답변완료']}
           currentTab={tab}
-          handleTabChange={setTab}
+          handleTabChange={handleTabChange}
           shape='round'
         />
       </div>
@@ -164,49 +281,92 @@ const AdminQna = () => {
         <SelectBox
           color='skyblue'
           options={SearchOption}
+          value={selectiedOption}
           handleChange={handleOptionChange}
         />
         <TextInput
-          placeholder='전략명'
+          placeholder='검색어를 입력해주세요.'
           color='skyblue'
           value={value}
+          handleKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              setSearchText(value);
+            }
+          }}
           handleChange={(e) => setValue(e.target.value)}
         />
       </div>
       <div css={adminQnaInfoStyle}>
         <p>
-          총 <span>40개</span>의 문의가 있습니다.
+          총 <span>{totalElement}</span>의 문의가 있습니다.
         </p>
         <Button
           width={80}
           color='black'
           label='삭제'
-          handleClick={() => deleteModal.openModal('delete')}
+          handleClick={handleDeleteInquiryList}
         />
       </div>
       <div css={adminQnaListStyle}>
         <Table
-          data={paginatedData}
+          data={tableData}
           columns={columns}
-          hasCheckbox={true}
+          hasCheckbox={tableData?.length > 0}
           checkedItems={checkedItems}
           handleCheckboxChange={toggleCheckbox}
           handleHeaderCheckboxChange={() =>
-            toggleAllCheckboxes(paginatedData.length)
+            toggleAllCheckboxes(tableData?.length || 0)
           }
         />
+        {isLoading ? (
+          <div css={loadingStyle}>
+            <Loading />
+          </div>
+        ) : searchText ? (
+          InquiryListData?.data?.content?.length > 0 ? (
+            <div css={adminQnaPaginationStyle}>
+              <Pagination
+                totalPage={totalPage}
+                currentPage={currentPage}
+                handlePageChange={setCurrentPage}
+              />
+            </div>
+          ) : (
+            <span css={emptyContents}>검색결과가 없습니다.</span>
+          )
+        ) : InquiryListData?.data?.content?.length > 0 ? (
+          <div css={adminQnaPaginationStyle}>
+            <Pagination
+              totalPage={totalPage}
+              currentPage={currentPage}
+              handlePageChange={setCurrentPage}
+            />
+          </div>
+        ) : (
+          <span css={emptyContents}>문의가 없습니다.</span>
+        )}
       </div>
-      <div css={adminQnaPaginationStyle}>
-        <Pagination
-          totalPage={totalPage}
-          currentPage={curPage}
-          handlePageChange={setCurPage}
-        />
-      </div>
-      <Modal content={<DelModal />} id='delete' />
+      <Modal
+        content={
+          <DelModal
+            inquiryIdList={inquiryIdList}
+            inquiryListDataRefetch={inquiryListDataRefetch}
+          />
+        }
+        id='inquiry-delete-modal'
+      />
+      <Modal
+        content={<DelCompleteModal />}
+        id='delete-inquiry-complete-modal'
+      />
+      <Modal content={<CheckModalContent />} id='check-inquiry-modal' />
     </div>
   );
 };
+
+const inquiryStatusStyle = (inquiryStatus: string) => css`
+  color: ${inquiryStatus === 'unclosed' ? 'initial' : COLOR.CHECK_GREEN};
+`;
 
 const adminQnaWrapperStyle = css`
   display: flex;
@@ -226,6 +386,19 @@ const adminQnaHeaderStyle = css`
   h5 {
     letter-spacing: -0.48px;
   }
+`;
+
+const loadingStyle = css`
+  width: 100%;
+  height: 100vh;
+  padding: 100px;
+`;
+
+const emptyContents = css`
+  padding: 32px;
+  border-radius: 4px;
+  background: ${COLOR.GRAY100};
+  text-align: center;
 `;
 
 const adminQnaTabStyle = css`
@@ -260,7 +433,18 @@ const adminQnaInfoStyle = css`
   }
 `;
 
+const checkModalStyle = css`
+  display: flex;
+  margin-top: 8px;
+  gap: 24px;
+  padding: 16px;
+`;
+
 const adminQnaListStyle = css`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
   table > thead > tr > th {
     padding: 0;
     height: 48px;
@@ -305,6 +489,11 @@ const tagStyle = css`
   flex-direction: column;
   gap: 12px;
   align-items: flex-start;
+
+  .tag {
+    display: flex;
+    gap: 4px;
+  }
 `;
 
 const ModalStyle = css`

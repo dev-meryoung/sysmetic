@@ -255,6 +255,7 @@ const MyInterestList = () => {
 
   const handleFolderClick = (folder: FolderProps) => {
     if (!isEditingMode && folder.name !== '') {
+      setCurrentPage(0);
       setIsSelectedFolder({
         folderName: folder.name,
         folderId: folder.id,
@@ -428,6 +429,17 @@ const MyInterestList = () => {
       refetchStrategies();
     }
   }, [strategyData, isSelectedFolder, refetchStrategies]);
+
+  useEffect(() => {
+    if (folders.length > 0 && !isEditingMode) {
+      const firstFolder = folders[0];
+      setIsSelectedFolder({
+        folderName: firstFolder.name,
+        folderId: firstFolder.id,
+        isEmpty: firstFolder.isEmpty,
+      });
+    }
+  }, [folders, isEditingMode]);
 
   const columns: ColumnProps<MyInterestListDataProps>[] = [
     {
