@@ -67,6 +67,17 @@ export interface MethodsPostRequestProps {
   file: File;
 }
 
+export interface MethodsPutRequestDtoProps {
+  id: number | undefined;
+  name: string;
+  checkDuplicate: boolean;
+}
+
+export interface MethodsPutRequestProps {
+  methodPutRequestDto: MethodsPutRequestDtoProps;
+  file: File;
+}
+
 // 회원 목록 조회 API
 export const getAdminUserList = async () => {};
 
@@ -213,6 +224,25 @@ export const createAdminMethods = async (params: MethodsPostRequestProps) => {
 export const deleteAdminMethods = async (ids: number[]) => {
   const response = await axiosInstance.delete(`/v1/admin/method`, {
     data: { methodIdList: ids },
+  });
+
+  return response.data;
+};
+
+//매매방식 수정 API
+export const updateAdminMethods = async (params: MethodsPutRequestProps) => {
+  const formData = new FormData();
+
+  formData.append(
+    'methodPutRequestDto',
+    JSON.stringify(params.methodPutRequestDto)
+  );
+  formData.append('file', params.file);
+
+  const response = await axiosInstance.put(`/v1/admin/method`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
   });
 
   return response.data;

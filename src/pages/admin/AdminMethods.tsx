@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import { css } from '@emotion/react';
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
-import { MethodsParameterProps } from '@/api';
+import { MethodsData, MethodsParameterProps } from '@/api';
 import Button from '@/components/Button';
 import IconButton from '@/components/IconButton';
 import Modal from '@/components/Modal';
@@ -21,6 +21,7 @@ import {
   useCreateAdminMethods,
   useDeleteAdminMethods,
   useGetAdminMethods,
+  useUpdateAdminMethods,
 } from '@/hooks/useAdminApi';
 import useModalStore from '@/stores/useModalStore';
 import { useTableStore } from '@/stores/useTableStore';
@@ -41,6 +42,13 @@ interface DelModalProps {
   methods: AdminMethodsDataProps[];
   setFetch: Dispatch<SetStateAction<boolean>>;
   toggleAllCheckBoxes: (value: number) => void;
+}
+
+interface ModModalProps {
+  methods: AdminMethodsDataProps[];
+  setFetch: Dispatch<SetStateAction<boolean>>;
+  toggleAllCheckBoxes: (value: number) => void;
+  selectedMethod: MethodsData | null;
 }
 
 const DelModal: React.FC<DelModalProps> = ({
@@ -212,10 +220,78 @@ const AddModal: React.FC<AddModalProps> = ({ setFetch, methods }) => {
   );
 };
 
-const ModModal = () => {
+const ModModal: React.FC<ModModalProps> = ({
+  methods,
+  selectedMethod,
+  setFetch,
+}) => {
   const modModal = useModalStore();
-  const [methodsValue, setMethodsValue] = useState('');
-  const [iconValue, setIconValue] = useState('');
+  const [methodsValue, setMethodsValue] = useState(selectedMethod?.name || '');
+  const [iconValue, setIconValue] = useState(selectedMethod?.filePath || '');
+  const [iconImg, setIconImg] = useState(selectedMethod?.filePath || '');
+  const [isDuplicated, setIsDuplicated] = useState(false);
+
+  useEffect(() => {
+    if (iconValue) {
+      setIconImg(iconValue); // iconValue와 iconImg 동기화
+    }
+  }, [iconValue]);
+
+  const handleOpenFileExplorer = () => {
+    const fileInput = document.getElementById('file-input');
+    fileInput?.click();
+  };
+
+  const checkDuplicate = (value: string) => {
+    const isDuplicate = methods.some((method) => method.methodsName === value);
+    setIsDuplicated(isDuplicate);
+  };
+
+  const handleMethodsChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setMethodsValue(e.target.value);
+    checkDuplicate(e.target.value);
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const imageUrl = reader.result as string;
+        setIconImg(imageUrl);
+        setIconValue(imageUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  const { mutate: updateAdminMethodsMutation } = useUpdateAdminMethods();
+
+  const handleUpdateClick = () => {
+    const fileInput = document.getElementById('file-input') as HTMLInputElement;
+    const file = fileInput?.files?.[0];
+    if (!selectedMethod) return;
+    if (!file) return;
+
+    const formData = {
+      methodPutRequestDto: {
+        id: selectedMethod?.id,
+        name: methodsValue,
+        checkDuplicate: !isDuplicated,
+      },
+      file,
+    };
+
+    updateAdminMethodsMutation(formData, {
+      onSuccess: (data) => {
+        console.log('종목 수정 성공!', data);
+        setFetch(true);
+        modModal.closeModal('modify');
+      },
+      onError: (error) => {
+        console.error('종목 수정 중 오류 발생', error);
+      },
+    });
+  };
 
   return (
     <div css={addModalStyle}>
@@ -233,27 +309,40 @@ const ModModal = () => {
               <TextInput
                 width={224}
                 value={methodsValue}
-                handleChange={(e) => setMethodsValue(e.target.value)}
+                handleChange={handleMethodsChange}
               />
-              <p>1글자 이상 입력하세요.</p>
+              {/* <p>1글자 이상 입력하세요.</p> */}
             </td>
             <td>
-              <p>등록아이콘</p>
+              <div css={thumbnailStyle}>
+                <p>등록아이콘</p>
+                {iconImg && <img src={iconImg} alt='미리보기' />}
+              </div>
               <div>
                 <TextInput
                   width={302}
                   value={iconValue}
-                  handleChange={(e) => setIconValue(e.target.value)}
+                  handleChange={(e) => {
+                    setIconValue(e.target.value);
+                    setIconImg(e.target.value);
+                  }}
                 />
                 <IconButton
                   color='white'
                   iconBgSize='lg'
                   iconSize='md'
                   IconComponent={AddPhotoAlternateOutlinedIcon}
-                  handleClick={() => console.log('클릭')}
+                  handleClick={handleOpenFileExplorer}
                 />
               </div>
-              <p>jp(e)g, png 형식의 파일만 첨부 가능합니다.</p>
+              <input
+                id='file-input'
+                type='file'
+                accept='image/jpg,image/jpeg,image/png'
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+              />
+              {/* <p>jp(e)g, png 형식의 파일만 첨부 가능합니다.</p> */}
             </td>
           </tr>
         </tbody>
@@ -265,29 +354,20 @@ const ModModal = () => {
           label='취소'
           handleClick={() => modModal.closeModal('modify')}
         />
-        <Button
-          width={120}
-          label='등록하기'
-          handleClick={() => console.log('click')}
-        />
+        <Button width={120} label='등록하기' handleClick={handleUpdateClick} />
       </div>
     </div>
   );
 };
 
 const AdminMethods = () => {
+  const [selectedMethod, setSelectedMethod] = useState<MethodsData | null>(
+    null
+  );
   const [delDisabled, setDelDisabled] = useState(true);
   const [fetch, setFetch] = useState(true);
   //테이블 관련
   const [curPage, setCurPage] = useState(0);
-  // const [data, setData] = useState<AdminMethodsDataProps[]>([]);
-  //페이지네이션 관련
-  // const [totalPage, setTotalPage] = useState(0);
-  // const getPaginatedData = (page: number) => {
-  //   const startIndex = page * PAGE_SIZE;
-  //   const endIndex = startIndex + PAGE_SIZE;
-  //   return data.slice(startIndex, endIndex);
-  // };
 
   const checkedItems = useTableStore((state) => state.checkedItems);
   const toggleCheckbox = useTableStore((state) => state.toggleCheckbox);
@@ -295,8 +375,6 @@ const AdminMethods = () => {
     (state) => state.toggleAllCheckboxes
   );
 
-  // const [imgIcon, setImgIcon] = useState('');
-  // const paginatedData = getPaginatedData(curPage);
   const columns = [
     {
       key: 'no' as keyof AdminMethodsDataProps,
@@ -320,7 +398,7 @@ const AdminMethods = () => {
     {
       key: 'state' as keyof AdminMethodsDataProps,
       header: '상태',
-      render: () => (
+      render: (_: string | number, row: AdminMethodsDataProps) => (
         <Button
           label='방식수정'
           shape='round'
@@ -328,7 +406,7 @@ const AdminMethods = () => {
           color='primary'
           border={true}
           width={80}
-          handleClick={openModifyModal}
+          handleClick={() => openModifyModal(row.no)}
         />
       ),
     },
@@ -347,22 +425,16 @@ const AdminMethods = () => {
   const openAddModal = () => {
     addModal.openModal('add', 648);
   };
-  const openModifyModal = () => {
-    modModal.openModal('modify', 648);
+
+  const openModifyModal = (id: number) => {
+    const methodToModify = data?.content?.find((method) => method.id === id);
+    if (methodToModify) {
+      setSelectedMethod(methodToModify); // 상태로 전달
+      modModal.openModal('modify', 648);
+    } else {
+      alert('수정할 데이터를 찾을 수 없습니다.');
+    }
   };
-
-  // useEffect(() => {
-  //   // 순서를 기준으로
-  //   const sortedData = [...adminMethods].sort((a, b) => b.no - a.no);
-  //   const arrangedData = sortedData.map((item, index) => ({
-  //     ...item,
-  //     no: index + 1,
-  //   }));
-  //   setData(arrangedData);
-
-  //   const pages = Math.ceil(arrangedData.length / PAGE_SIZE);
-  //   setTotalPage(pages);
-  // }, []);
 
   const params: MethodsParameterProps = {
     page: curPage,
@@ -442,7 +514,17 @@ const AdminMethods = () => {
         content={<AddModal setFetch={setFetch} methods={methods} />}
         id='add'
       />
-      <Modal content={<ModModal />} id='modify' />
+      <Modal
+        content={
+          <ModModal
+            methods={methods}
+            setFetch={setFetch}
+            toggleAllCheckBoxes={toggleAllCheckboxes}
+            selectedMethod={selectedMethod}
+          />
+        }
+        id='modify'
+      />
     </div>
   );
 };
