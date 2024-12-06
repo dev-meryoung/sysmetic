@@ -13,6 +13,10 @@ import {
   ResetPasswordData,
   sendEmailCodeForPassword,
   checkNickname,
+  checkEmailCode,
+  CheckEmailCodeData,
+  register,
+  sendEmailCode,
 } from '@/api';
 import { PATH } from '@/constants/path';
 import useAuthStore from '@/stores/useAuthStore';
@@ -27,7 +31,7 @@ export const useLogin = () => {
       try {
         const authData = await checkAuth();
         setAuthState(authData.data);
-        navigate(PATH.ROOT);
+        navigate(-1);
       } catch {
         resetAuthState();
       }
@@ -48,6 +52,26 @@ export const useLogout = () => {
   });
 };
 
+export const useCheckNickname = () =>
+  useMutation({
+    mutationFn: checkNickname,
+  });
+
+export const useSignUp = () =>
+  useMutation({
+    mutationFn: register,
+  });
+
+export const useSendAuthCode = () =>
+  useMutation({
+    mutationFn: sendEmailCode,
+  });
+
+export const useCheckEmailCode = () =>
+  useMutation({
+    mutationFn: (emailData: CheckEmailCodeData) => checkEmailCode(emailData),
+  });
+
 export const useFindEmail = () =>
   useMutation({
     mutationFn: (findEmailData: FindEmailData) => findEmail(findEmailData),
@@ -60,16 +84,13 @@ export const useSendEmailCodeForPassword = () =>
 
 export const useCheckEmailCodeForPassword = () =>
   useMutation({
-    mutationFn: (checkEmailCodeForPasswordData: CheckEmailCodeForPasswordData) =>
-      checkEmailCodeForPassword(checkEmailCodeForPasswordData),
+    mutationFn: (
+      checkEmailCodeForPasswordData: CheckEmailCodeForPasswordData
+    ) => checkEmailCodeForPassword(checkEmailCodeForPasswordData),
   });
 
 export const useReset = () =>
   useMutation({
-    mutationFn: (resetPasswordData: ResetPasswordData) => resetPassword(resetPasswordData),
-  });
-
-export const useCheckNickname = () =>
-  useMutation({
-    mutationFn: checkNickname,
+    mutationFn: (resetPasswordData: ResetPasswordData) =>
+      resetPassword(resetPasswordData),
   });

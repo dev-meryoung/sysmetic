@@ -34,7 +34,7 @@ const TextArea: React.FC<TextAreaProps> = ({
     placeholder={placeholder}
     value={value}
     maxLength={maxLength}
-    disabled={disabled}
+    readOnly={disabled}
     onChange={handleChange}
   />
 );

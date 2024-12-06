@@ -10,6 +10,7 @@ type IconButtonColorTypes =
   | 'point'
   | 'white'
   | 'gray'
+  | 'realGray'
   | 'black';
 
 interface IconProps {
@@ -34,6 +35,7 @@ const iconButtonColors = {
   white: { color: COLOR.WHITE, hoverColor: COLOR.GRAY100 },
   black: { color: COLOR.BLACK, hoverColor: COLOR.GRAY800 },
   gray: { color: COLOR.GRAY600, hoverColor: COLOR.GRAY800 },
+  realGray: { color: COLOR.GRAY, hoverColor: COLOR.GRAY700 },
 };
 
 const iconSizes = {
@@ -82,7 +84,7 @@ const iconButtonStyle = (
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  border: none;
+  border: ${color === COLOR.WHITE ? `1px solid ${COLOR.GRAY200}` : 'none'};
   background-color: ${shape === 'none' ? 'transparent' : color};
   outline: none;
   width: ${bgSize}px;

@@ -1,42 +1,38 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { css } from '@emotion/react';
-import { useNavigate } from 'react-router-dom';
-import ProfileImageTest from '@/assets/images/test-profile.png';
+import { useNavigate, useParams } from 'react-router-dom';
 import Button from '@/components/Button';
 import ProfileImage from '@/components/ProfileImage';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+import useAuthStore from '@/stores/useAuthStore';
 
 const Profile: React.FC = () => {
   const navigate = useNavigate();
-  const [phoneNumber, setPhoneNumber] = useState<string>('');
+  const { userId: paramUserId } = useParams<{ userId: string }>();
+  const {
+    isLoggedIn,
+    email,
+    nickname,
+    profileImage,
+    phoneNumber,
+    memberId,
+    name,
+  } = useAuthStore();
 
-  const handleEditBtn = () => {
-    navigate(PATH.MYPAGE_PROFILE_EDIT());
-  };
-  const handlePwBtn = () => {
-    navigate(PATH.MYPAGE_PASSWORD());
-  };
-  const handleOtpBtn = () => {
-    navigate(PATH.MYPAGE_OPT());
-  };
-  const handleWithdrawBtn = () => {
-    navigate(PATH.MYPAGE_WITHDRAW);
-  };
+  const userId =
+    paramUserId && !isNaN(Number(paramUserId)) ? Number(paramUserId) : memberId;
 
-  function maskPhoneNumber(phone: string): string {
-    return phone.replace(/(\d{2})$/, '**');
-  }
-
-  // 나중에 API 받으면 수정
   useEffect(() => {
-    const fetchPhoneNumber = async () => {
-      const mockPhoneNumber = '010-0000-0000';
-      setPhoneNumber(mockPhoneNumber);
-    };
-    fetchPhoneNumber();
-  }, []);
+    if (!isLoggedIn) {
+      navigate(PATH.SIGN_IN, { replace: true });
+    }
+  }, [isLoggedIn, navigate]);
+
+  if (!userId) {
+    return null;
+  }
 
   return (
     <div css={wrapperStyle}>
@@ -46,7 +42,9 @@ const Profile: React.FC = () => {
             <span>계정 정보</span>
             <Button
               label='변경하기'
-              handleClick={handleEditBtn}
+              handleClick={() =>
+                navigate(PATH.MYPAGE_PROFILE_EDIT(String(userId)))
+              }
               color='primary'
               size='md'
               width={80}
@@ -56,28 +54,28 @@ const Profile: React.FC = () => {
           <div css={profileInfoStyle}>
             <div className='profile-img'>
               <ProfileImage
-                src={ProfileImageTest}
+                src={profileImage || '/default-profile.png'}
                 alt='profileImage'
                 size='xxl'
               />
             </div>
             <div className='user-name-email'>
               <div css={userName}>
-                <span>홍길동</span>
+                <span>{name}</span>
               </div>
               <div css={userEmailStyle}>
                 <span>계정(이메일)</span>
-                <span>fastcampus@sysmatic.com</span>
+                <span>{email}</span>
               </div>
             </div>
             <div className='user-nickname-hp'>
               <div css={userNicknameStyle}>
                 <span>닉네임</span>
-                <span>패스트캠퍼스</span>
+                <span>{nickname}</span>
               </div>
               <div css={useHpStyle}>
                 <span>전화번호</span>
-                <span>{maskPhoneNumber(phoneNumber)}</span>
+                <span>{phoneNumber}</span>
               </div>
             </div>
           </div>
@@ -89,7 +87,7 @@ const Profile: React.FC = () => {
             <span>비밀번호</span>
             <Button
               label='변경하기'
-              handleClick={handlePwBtn}
+              handleClick={() => navigate(PATH.MYPAGE_PASSWORD(String(userId)))}
               color='primary'
               size='md'
               width={80}
@@ -104,7 +102,7 @@ const Profile: React.FC = () => {
             <span>정보수신동의</span>
             <Button
               label='변경하기'
-              handleClick={handleOtpBtn}
+              handleClick={() => navigate(PATH.MYPAGE_OPT(String(userId)))}
               color='primary'
               size='md'
               width={80}
@@ -116,7 +114,7 @@ const Profile: React.FC = () => {
       <div css={withdrawBtnStyle}>
         <Button
           label='회원탈퇴'
-          handleClick={handleWithdrawBtn}
+          handleClick={() => navigate(PATH.MYPAGE_WITHDRAW)}
           color='gray200'
           size='sm'
           width={96}

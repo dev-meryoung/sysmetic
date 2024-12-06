@@ -2,84 +2,166 @@ import { useState } from 'react';
 import { css } from '@emotion/react';
 import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
 import { useNavigate } from 'react-router-dom';
-import ProfileImageTest from '@/assets/images/test-profile.png';
 import Button from '@/components/Button';
+import Modal from '@/components/Modal';
 import ProfileImage from '@/components/ProfileImage';
 import TextInput from '@/components/TextInput';
 import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+import { useCheckNickname } from '@/hooks/useAuthApi';
+import { useUpdateUser } from '@/hooks/useUserApi';
+import useAuthStore from '@/stores/useAuthStore';
+import useModalStore from '@/stores/useModalStore';
 
 type InputStateTypes = 'normal' | 'warn';
 
 const ProfileEdit: React.FC = () => {
-  const [nickname, setNickname] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const {
+    memberId: userId,
+    nickname: storeNickname,
+    profileImage: storeProfileImage,
+    phoneNumber: storePhoneNumber,
+  } = useAuthStore();
+  const [nickname, setNickname] = useState(storeNickname || '');
+  const [profileImage, setProfileImage] = useState<File | null>(null);
   const [nicknameStatus, setNicknameStatus] =
     useState<InputStateTypes>('normal');
+  const [phoneNumber, setPhoneNumber] = useState(storePhoneNumber || '');
   const [phoneStatus, setPhoneStatus] = useState<InputStateTypes>('normal');
-  const [showMessage, setShowMessage] = useState(false);
+  const [isNicknameChecked, setIsNicknameChecked] = useState(false);
   const navigate = useNavigate();
+  const { openModal } = useModalStore();
 
-  const handleChange = (
-    value: string,
-    setValue: React.Dispatch<React.SetStateAction<string>>,
-    setStatus: React.Dispatch<React.SetStateAction<InputStateTypes>>
-  ) => {
-    setValue(value);
-    setStatus(value.length < 6 ? 'warn' : 'normal');
-  };
+  const { mutate: checkNickname } = useCheckNickname();
+  const { mutate: updateUser } = useUpdateUser();
 
-  const handleCheckNicknameBtn = () => {
-    if (nickname.trim() === '') {
-      setShowMessage(true);
-    } else {
-      setShowMessage(false);
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setProfileImage(file);
     }
   };
 
-  const handleBtn = () => {
-    navigate(PATH.MYPAGE_PROFILE());
+  const handleNicknameCheck = () => {
+    if (!/^[가-힣0-9]{3,10}$/.test(nickname.trim())) {
+      setNicknameStatus('warn');
+      return;
+    }
+
+    checkNickname(nickname, {
+      onSuccess: () => {
+        setIsNicknameChecked(true);
+        setNicknameStatus('normal');
+      },
+      onError: () => {
+        setNicknameStatus('warn');
+      },
+    });
+  };
+
+  const handleNicknameChange = (value: string) => {
+    setNickname(value);
+    setIsNicknameChecked(false);
+    setNicknameStatus('normal');
+  };
+
+  const handlePhoneChange = (value: string) => {
+    const numbersOnly = value.replace(/[^0-9]/g, '');
+    setPhoneNumber(numbersOnly);
+    const isValid = /^010\d{8}$/.test(numbersOnly);
+    setPhoneStatus(isValid ? 'normal' : 'warn');
+    if (!isValid && value.length >= 11) {
+      openModal('error-message');
+    }
+  };
+
+  const handleComplete = () => {
+    if (
+      nicknameStatus === 'warn' ||
+      phoneStatus === 'warn' ||
+      !isNicknameChecked
+    ) {
+      openModal('update-confirm');
+      return;
+    }
+
+    const formData = new FormData();
+
+    formData.append(
+      'memberPatchInfoRequestDto',
+      JSON.stringify({
+        userId,
+        phoneNumber,
+        nickname,
+        nicknameDuplCheck: true,
+      })
+    );
+
+    if (profileImage) {
+      formData.append('file', profileImage);
+    }
+
+    updateUser({
+      formData,
+      userId,
+    });
+    navigate(PATH.MYPAGE_PROFILE(String(userId)));
   };
 
   return (
     <div css={wrapperStyle}>
       <div css={indexStyle}>
         <div css={titleStyle}>계정정보 변경</div>
-        <div css={descriptionStyle}>계정정보 변경 페이지입니다!</div>
+        <div css={descriptionStyle}>계정정보 변경 페이지입니다.</div>
       </div>
 
       <div css={editWrapperStyle}>
         <span css={textStyle}>프로필 이미지 설정</span>
         <div css={profileImgStyle}>
-          <ProfileImage src={ProfileImageTest} alt='profileImage' size='xxl' />
-          <div css={iconWrapperStyle}>
-            <CameraAltOutlinedIcon css={iconStyle} />
-          </div>
+          <label css={labelStyle}>
+            <ProfileImage
+              src={
+                profileImage
+                  ? URL.createObjectURL(profileImage)
+                  : storeProfileImage
+              }
+              alt='profileImage'
+              size='xxl'
+            />
+            <div css={iconWrapperStyle}>
+              <CameraAltOutlinedIcon css={iconStyle} />
+            </div>
+            <input
+              type='file'
+              accept='image/*'
+              onChange={handleImageChange}
+              css={fileInputStyle}
+            />
+          </label>
         </div>
 
-        <div className='input-section' css={inputSectionStyle}>
+        <div css={inputSectionStyle}>
           <div>
             <span>닉네임</span>
             <div className='input-row'>
               <TextInput
                 value={nickname}
+                handleChange={(e) => handleNicknameChange(e.target.value)}
                 status={nicknameStatus}
-                handleChange={(e) =>
-                  handleChange(e.target.value, setNickname, setNicknameStatus)
-                }
               />
               <Button
                 label='중복확인'
-                handleClick={handleCheckNicknameBtn}
+                handleClick={handleNicknameCheck}
                 color='primary'
                 size='md'
                 width={80}
                 shape='square'
+                disabled={isNicknameChecked}
               />
             </div>
-            {showMessage && (
-              <span className='message'>중복된 닉네임입니다.</span>
+            {nicknameStatus === 'warn' && (
+              <span className='error-message'>중복된 닉네임입니다.</span>
             )}
           </div>
 
@@ -88,12 +170,15 @@ const ProfileEdit: React.FC = () => {
             <div className='input-row'>
               <TextInput
                 value={phoneNumber}
+                handleChange={(e) => handlePhoneChange(e.target.value)}
                 status={phoneStatus}
-                handleChange={(e) =>
-                  handleChange(e.target.value, setPhoneNumber, setPhoneStatus)
-                }
               />
             </div>
+            {phoneStatus === 'warn' && (
+              <span className='error-message'>
+                "-"를 제외한 유효한 휴대번호를 입력해주세요.
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -101,7 +186,7 @@ const ProfileEdit: React.FC = () => {
       <div css={buttonStyle}>
         <Button
           label='이전'
-          handleClick={handleBtn}
+          handleClick={() => navigate(PATH.MYPAGE_PROFILE(String(userId)))}
           color='primaryOpacity10'
           size='md'
           shape='square'
@@ -110,13 +195,21 @@ const ProfileEdit: React.FC = () => {
         />
         <Button
           label='수정완료'
-          handleClick={handleBtn}
+          handleClick={handleComplete}
           color='primary'
           size='md'
           shape='square'
           width={120}
         />
       </div>
+      <Modal
+        id='update-confirm'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>계정정보 변경에 실패했습니다.</p>
+          </div>
+        }
+      />
     </div>
   );
 };
@@ -163,6 +256,50 @@ const editWrapperStyle = css`
   margin-bottom: 40px;
 `;
 
+const profileImgStyle = css`
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  object-fit: cover;
+`;
+
+const labelStyle = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+`;
+
+const iconWrapperStyle = css`
+  position: absolute;
+  bottom: 0;
+  left: 80px;
+  background-color: ${COLOR.GRAY};
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: ${COLOR.GRAY700};
+  }
+`;
+
+const iconStyle = css`
+  font-size: 24px;
+  color: ${COLOR.BLACK};
+`;
+
+const fileInputStyle = css`
+  display: none;
+`;
+
 const inputSectionStyle = css`
   span {
     display: block;
@@ -178,37 +315,17 @@ const inputSectionStyle = css`
     width: 100%;
   }
 
-  .message {
+  .error-message {
     color: ${COLOR.POINT};
     margin-top: 8px;
     font-size: ${FONT_SIZE.TEXT_SM};
   }
-`;
 
-const profileImgStyle = css`
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-`;
-
-const iconWrapperStyle = css`
-  position: absolute;
-  bottom: 0;
-  left: 80px;
-  background-color: ${COLOR.GRAY400};
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-`;
-
-const iconStyle = css`
-  font-size: 24px;
-  color: ${COLOR.BLACK};
+  .success-message {
+    color: ${COLOR.CHECK_GREEN};
+    margin-top: 8px;
+    font-size: ${FONT_SIZE.TEXT_SM};
+  }
 `;
 
 const buttonStyle = css`
@@ -216,4 +333,19 @@ const buttonStyle = css`
   display: flex;
   align-items: center;
   gap: 16px;
+`;
+
+const modalContentStyle = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+`;
+
+const modalTextStyle = css`
+  font-size: ${FONT_SIZE.TEXT_LG};
+  text-align: center;
+  margin-top: 32px;
+  margin-bottom: 24px;
 `;

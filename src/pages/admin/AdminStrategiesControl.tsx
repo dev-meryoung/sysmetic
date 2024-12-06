@@ -1,26 +1,71 @@
-import { useState } from 'react';
 import { css } from '@emotion/react';
-import { ContentCopy, FavoriteBorder } from '@mui/icons-material';
-import tempImage from '@/assets/images/test-profile.png';
+import { FavoriteBorder } from '@mui/icons-material';
 import Button from '@/components/Button';
 import Calendar from '@/components/Calendar';
 import Checkbox from '@/components/Checkbox';
+import Modal from '@/components/Modal';
 import Pagination from '@/components/Pagination';
 import ProfileImage from '@/components/ProfileImage';
-import SelectBox from '@/components/SelectBox';
 import TabButton from '@/components/TabButton';
+import TextInput from '@/components/TextInput';
 import Toggle from '@/components/Toggle';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
-import commentMockData from '@/mocks/comment.json';
-import weeklyMockData from '@/mocks/strategy-weekly.json';
+import useAdminStrategiesControl from '@/hooks/useAdminStrategiesControl';
+import {
+  formatCurrency,
+  formatDate,
+  formatPercent,
+  formatYearMonth,
+} from '@/utils/dataUtils';
 
 const TAB_BUTTONS = ['기본정보', '일간분석', '월간분석', '실계좌정보'];
+const CYCLE_OPTIONS = [
+  { label: '데이', value: 'D' },
+  { label: '포지션', value: 'P' },
+];
+const STATUS_CODES = {
+  PRIVATE: ['요청 전', COLOR.GRAY700],
+  REQUEST: ['요청됨', COLOR.BLACK],
+  PUBLIC: ['승인', COLOR.CHECK_GREEN],
+  RETURN: ['반려', COLOR.ERROR_RED],
+};
 
 const AdminStrategiesControl = () => {
-  const [currentTab, setCurrentTab] = useState<number>(0);
-  const [dailyPage, setDailyPage] = useState<number>(0);
-  const [accountPage, setAccountPage] = useState<number>(0);
+  const {
+    openModal,
+    closeModal,
+    currentTab,
+    setCurrentTab,
+    dailyPage,
+    setDailyPage,
+    monthlyPage,
+    setMonthlyPage,
+    accountPage,
+    setAccountPage,
+    stockOptions,
+    status,
+    rejectReason,
+    setRejectReason,
+    dailyStartDate,
+    setDailyStartDate,
+    dailyEndDate,
+    setDailyEndDate,
+    dailyTotalPage,
+    monthlyStartYearMonth,
+    setMonthlyStartYearMonth,
+    monthlyEndYearMonth,
+    setMonthlyEndYearMonth,
+    monthlyTotalPage,
+    accountTotalPage,
+    strategyInfo,
+    strategyDaily,
+    strategyMonthly,
+    strategyAccount,
+    handleApproveButton,
+    handleRejectButton,
+    handleDeleteStrategyButton,
+  } = useAdminStrategiesControl();
 
   const conditionalRender: Record<(typeof TAB_BUTTONS)[number], JSX.Element> = {
     기본정보: (
@@ -28,57 +73,66 @@ const AdminStrategiesControl = () => {
         <div className='form-box'>
           <div className='form-item'>
             <span>전략명</span>
-            <span>전략명 내용</span>
+            <span>{strategyInfo?.name}</span>
           </div>
           <div className='form-item'>
             <span>매매방식</span>
-            <span>매매방식 내용</span>
+            <span>{strategyInfo?.methodName}</span>
           </div>
           <div className='form-item'>
             <span>주기</span>
-            <span>주기 내용</span>
+            <span>
+              {
+                CYCLE_OPTIONS.find(
+                  (option) => option.value === strategyInfo?.cycle
+                )?.label
+              }
+            </span>
           </div>
           <div className='form-item'>
-            <span>운용 종목</span>
+            <span>운용종목</span>
             <div className='options'>
-              <Checkbox
-                checked={true}
-                handleChange={() => {}}
-                label='해외 주식'
-              />
-              <Checkbox
-                checked={true}
-                handleChange={() => {}}
-                label='해외 주식'
-              />
-              <Checkbox
-                checked={true}
-                handleChange={() => {}}
-                label='해외 주식'
-              />
-              <Checkbox
-                checked={true}
-                handleChange={() => {}}
-                label='해외 주식'
-              />
+              {stockOptions.map((option) => (
+                <Checkbox
+                  key={option.value}
+                  checked={
+                    strategyInfo?.stockList.stockIds.includes(
+                      +option.value
+                    ) as boolean
+                  }
+                  handleChange={() => {}}
+                  label={option.label}
+                />
+              ))}
             </div>
           </div>
           <div className='form-item form-item-top'>
             <span>전략소개</span>
-            <span>
-              전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용전략소개내용
-            </span>
+            <span>{strategyInfo?.content}</span>
           </div>
           <div className='form-item form-item-last'>
             <span>제안서</span>
-            <span>제안서파일.pdf</span>
+            {strategyInfo?.fileWithInfoResponse ? (
+              <a
+                href={strategyInfo?.fileWithInfoResponse.url}
+                target='_blank'
+                download={strategyInfo?.fileWithInfoResponse.originalName}
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
+                {strategyInfo?.fileWithInfoResponse.originalName}
+              </a>
+            ) : (
+              '-'
+            )}
           </div>
         </div>
         <div className='button-box'>
           <Button
             label='삭제'
             color='black'
-            handleClick={() => {}}
+            handleClick={() => {
+              openModal('delete', 400);
+            }}
             width={80}
           />
         </div>
@@ -87,15 +141,15 @@ const AdminStrategiesControl = () => {
     일간분석: (
       <div css={dailyBoxStyle}>
         <div className='action-box'>
-          <Calendar type='periodDate' />
-          <div className='buttons'>
-            <SelectBox
-              placeholder='파일 선택'
-              options={[]}
-              handleChange={() => {}}
-            />
-            <Button label='다운로드' width={80} handleClick={() => {}} />
-          </div>
+          <Calendar
+            type='periodDate'
+            periodProps={{
+              startDate: dailyStartDate,
+              setStartDate: setDailyStartDate,
+              endDate: dailyEndDate,
+              setEndDate: setDailyEndDate,
+            }}
+          />
         </div>
         <div className='table-box'>
           <table className='table'>
@@ -106,22 +160,33 @@ const AdminStrategiesControl = () => {
                 <th>입출금</th>
                 <th>일 손익</th>
                 <th>일 손익률</th>
-                <th>누적손익</th>
-                <th>누적손익률</th>
+                <th>누적 손익</th>
+                <th>누적 손익률</th>
               </tr>
             </thead>
             <tbody>
-              {weeklyMockData.map((row) => (
-                <tr key={row.id}>
-                  <td>{row.date}</td>
-                  <td>{row.principal}</td>
-                  <td>{row.depositWithdraw}</td>
-                  <td>{row.dailyProfit}</td>
-                  <td>{row.dailyProfitRate}</td>
-                  <td>{row.cumulativeProfit}</td>
-                  <td>{row.cumulativeProfitRate}</td>
+              {strategyDaily?.content && strategyDaily.content.length > 0 ? (
+                strategyDaily.content.map((daily) => (
+                  <tr key={daily.dailyId}>
+                    <td>{formatDate(daily.date)}</td>
+                    <td>{formatCurrency(daily.principal)}</td>
+                    <td>{formatCurrency(daily.depositWithdrawalAmount)}</td>
+                    <td>{formatCurrency(daily.profitLossAmount)}</td>
+                    <td>{formatPercent(daily.profitLossRate)}</td>
+                    <td>{formatCurrency(daily.accumulatedProfitLossAmount)}</td>
+                    <td>{formatPercent(daily.accumulatedProfitLossRate)}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={8}
+                    style={{ textAlign: 'center', padding: '64px' }}
+                  >
+                    <div>해당하는 데이터가 없습니다.</div>
+                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
           <span className='explanation'>
@@ -129,25 +194,29 @@ const AdminStrategiesControl = () => {
             날까지의 일간분석 데이터를 토대로 계산됩니다.
           </span>
         </div>
-        <Pagination
-          currentPage={dailyPage}
-          totalPage={5}
-          handlePageChange={setDailyPage}
-        />
+        {strategyDaily?.content && strategyDaily.content.length > 0 ? (
+          <Pagination
+            currentPage={dailyPage}
+            totalPage={+dailyTotalPage}
+            handlePageChange={setDailyPage}
+          />
+        ) : (
+          ''
+        )}
       </div>
     ),
     월간분석: (
       <div css={monthlyBoxStyle}>
         <div className='action-box'>
-          <Calendar type='periodMonth' />
-          <div className='buttons'>
-            <SelectBox
-              placeholder='파일 선택'
-              options={[]}
-              handleChange={() => {}}
-            />
-            <Button label='다운로드' width={80} handleClick={() => {}} />
-          </div>
+          <Calendar
+            type='periodMonth'
+            periodProps={{
+              startDate: monthlyStartYearMonth,
+              setStartDate: setMonthlyStartYearMonth,
+              endDate: monthlyEndYearMonth,
+              setEndDate: setMonthlyEndYearMonth,
+            }}
+          />
         </div>
         <div className='table-box'>
           <table className='table'>
@@ -158,22 +227,36 @@ const AdminStrategiesControl = () => {
                 <th>입출금</th>
                 <th>월 손익</th>
                 <th>월 손익률</th>
-                <th>누적손익</th>
-                <th>누적손익률</th>
+                <th>누적 손익</th>
+                <th>누적 손익률</th>
               </tr>
             </thead>
             <tbody>
-              {weeklyMockData.map((row) => (
-                <tr key={row.id}>
-                  <td>{row.date}</td>
-                  <td>{row.principal}</td>
-                  <td>{row.depositWithdraw}</td>
-                  <td>{row.dailyProfit}</td>
-                  <td>{row.dailyProfitRate}</td>
-                  <td>{row.cumulativeProfit}</td>
-                  <td>{row.cumulativeProfitRate}</td>
+              {strategyMonthly?.content &&
+              strategyMonthly.content.length > 0 ? (
+                strategyMonthly.content.map((monthly) => (
+                  <tr key={monthly.monthId}>
+                    <td>{formatYearMonth(monthly.yearMonth)}</td>
+                    <td>{formatCurrency(monthly.averagePrincipal)}</td>
+                    <td>{formatCurrency(monthly.depositWithdrawalAmount)}</td>
+                    <td>{formatCurrency(monthly.profitLossAmount)}</td>
+                    <td>{formatPercent(monthly.profitLossRate)}</td>
+                    <td>
+                      {formatCurrency(monthly.accumulatedProfitLossAmount)}
+                    </td>
+                    <td>{formatPercent(monthly.accumulatedProfitLossRate)}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={8}
+                    style={{ textAlign: 'center', padding: '64px' }}
+                  >
+                    <div>해당하는 데이터가 없습니다.</div>
+                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
           <span className='explanation'>
@@ -181,30 +264,49 @@ const AdminStrategiesControl = () => {
             날까지의 일간분석 데이터를 토대로 계산됩니다.
           </span>
         </div>
-        <Pagination
-          currentPage={dailyPage}
-          totalPage={5}
-          handlePageChange={setDailyPage}
-        />
+        {strategyMonthly?.content && strategyMonthly.content.length > 0 && (
+          <Pagination
+            currentPage={monthlyPage}
+            totalPage={+monthlyTotalPage}
+            handlePageChange={setMonthlyPage}
+          />
+        )}
       </div>
     ),
     실계좌정보: (
       <div css={accountBoxStyle}>
         <div className='account-box'>
-          {commentMockData.map((n) => (
-            <div className='account' key={n.nickname}>
-              <img src={tempImage} />
-              <span>
-                실계좌정보의제목실계좌정보의제목실계좌정보의제목실계좌정보의제목실계좌정보의제목
-              </span>
+          {strategyAccount?.content && strategyAccount.content.length > 0 ? (
+            strategyAccount.content.map((account) => (
+              <div className='account' key={account.accountImageId}>
+                <img
+                  src={account.imageUrl}
+                  onClick={() =>
+                    window.open(
+                      account.imageUrl,
+                      '_blank',
+                      'noopener,noreferrer'
+                    )
+                  }
+                />
+                <span>{account.title}</span>
+              </div>
+            ))
+          ) : (
+            <div
+              style={{ textAlign: 'center', width: '100%', padding: '64px' }}
+            >
+              해당하는 데이터가 없습니다.
             </div>
-          ))}
+          )}
         </div>
-        <Pagination
-          currentPage={accountPage}
-          totalPage={5}
-          handlePageChange={setAccountPage}
-        />
+        {strategyAccount?.content && strategyAccount.content.length > 0 && (
+          <Pagination
+            currentPage={accountPage}
+            totalPage={+accountTotalPage}
+            handlePageChange={setAccountPage}
+          />
+        )}
       </div>
     ),
   };
@@ -218,53 +320,56 @@ const AdminStrategiesControl = () => {
       <div css={traderBoxStyle}>
         <div className='left-box'>
           <div className='trader-box'>
-            <ProfileImage />
-            <span>트레이더명</span>
+            <ProfileImage src={strategyInfo?.traderProfileImage} />
+            <span>{strategyInfo?.traderNickname}</span>
           </div>
           <div className='count-box'>
             <span>관심수</span>
             <div>
               <FavoriteBorder sx={{ color: COLOR.POINT, fontSize: '20px' }} />
-              <span>1000</span>
-            </div>
-          </div>
-          <div className='count-box'>
-            <span>전략수</span>
-            <div>
-              <ContentCopy sx={{ color: COLOR.POINT, fontSize: '20px' }} />
-              <span>1000</span>
+              <span>{strategyInfo?.followerCount}</span>
             </div>
           </div>
         </div>
         <div className='right-box'>
           <div className='row-box'>
             <span>전략공개</span>
-            <Toggle checked={false} disabled={true} handleChange={() => {}} />
+            <Toggle
+              checked={status === 'PUBLIC'}
+              disabled={true}
+              handleChange={() => {}}
+            />
           </div>
           <div className='row-box'>
             <span>승인단계</span>
-            <span style={{ height: 20 }}>승인요청</span>
+            <span css={statusStyle(status)}>
+              {STATUS_CODES[status as keyof typeof STATUS_CODES][0]}
+            </span>
           </div>
-          <div className='buttons'>
-            <Button
-              label='승인'
-              color='primary'
-              shape='round'
-              size='xs'
-              width={80}
-              border={true}
-              handleClick={() => {}}
-            />
-            <Button
-              label='반려'
-              color='point'
-              shape='round'
-              size='xs'
-              width={80}
-              border={true}
-              handleClick={() => {}}
-            />
-          </div>
+          {status === 'REQUEST' ? (
+            <div className='buttons'>
+              <Button
+                label='승인'
+                color='primary'
+                shape='round'
+                size='xs'
+                width={80}
+                border={true}
+                handleClick={() => openModal('approve', 400)}
+              />
+              <Button
+                label='반려'
+                color='point'
+                shape='round'
+                size='xs'
+                width={80}
+                border={true}
+                handleClick={() => openModal('reject', 440)}
+              />
+            </div>
+          ) : (
+            ''
+          )}
         </div>
       </div>
       <div css={strategyBoxStyle}>
@@ -276,6 +381,85 @@ const AdminStrategiesControl = () => {
         />
         {conditionalRender[TAB_BUTTONS[currentTab]]}
       </div>
+      <Modal
+        id='approve'
+        content={
+          <div css={modalStyle}>
+            <span>해당 전략을 승인하시겠습니까?</span>
+            <div className='buttons'>
+              <Button
+                label='아니오'
+                handleClick={() => {
+                  closeModal('approve');
+                }}
+                width={120}
+                border={true}
+              />
+              <Button
+                label='예'
+                handleClick={() => handleApproveButton()}
+                width={120}
+              />
+            </div>
+          </div>
+        }
+      />
+      <Modal
+        id='reject'
+        content={
+          <div css={modalStyle}>
+            <span className='text'>해당 전략을 반려하시겠습니까?</span>
+            <div className='input-box'>
+              <span>반려사유</span>
+              <TextInput
+                value={rejectReason}
+                handleChange={(e) => {
+                  setRejectReason(e.target.value);
+                }}
+              />
+            </div>
+            <div className='buttons'>
+              <Button
+                label='아니오'
+                handleClick={() => {
+                  closeModal('reject');
+                  setRejectReason('');
+                }}
+                width={120}
+                border={true}
+              />
+              <Button
+                label='예'
+                handleClick={() => handleRejectButton()}
+                width={120}
+              />
+            </div>
+          </div>
+        }
+      />
+      <Modal
+        id='delete'
+        content={
+          <div css={modalStyle}>
+            <span>해당 전략을 삭제하시겠습니까?</span>
+            <div className='buttons'>
+              <Button
+                label='아니오'
+                handleClick={() => {
+                  closeModal('delete');
+                }}
+                width={120}
+                border={true}
+              />
+              <Button
+                label='예'
+                handleClick={() => handleDeleteStrategyButton()}
+                width={120}
+              />
+            </div>
+          </div>
+        }
+      />
     </div>
   );
 };
@@ -363,6 +547,11 @@ const traderBoxStyle = css`
   }
 `;
 
+const statusStyle = (status: string) => css`
+  height: 20px;
+  color: ${STATUS_CODES[status as keyof typeof STATUS_CODES][1]};
+`;
+
 const strategyBoxStyle = css`
   width: 100%;
   height: 100%;
@@ -424,7 +613,7 @@ const formBoxStyle = css`
     }
 
     .form-item-top {
-      align-items: flex-start;
+      align-items: center;
     }
 
     .form-item-last {
@@ -643,6 +832,43 @@ const accountBoxStyle = css`
         line-height: 24px;
       }
     }
+  }
+`;
+
+const modalStyle = css`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 8px;
+  line-height: 24px;
+  gap: 24px;
+
+  .text {
+    text-align: center;
+    font-weight: ${FONT_WEIGHT.MEDIUM};
+  }
+
+  .input-box {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    margin-bottom: 16px;
+
+    span {
+      width: 360px;
+      font-size: ${FONT_SIZE.TEXT_SM};
+      text-align: left;
+    }
+  }
+
+  .buttons {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
   }
 `;
 

@@ -56,8 +56,6 @@ const SignIn = () => {
         { email, password, rememberMe },
         {
           onError: () => {
-            setEmailError(true);
-            setPasswordError(true);
             openModal('update-confirm');
           },
         }

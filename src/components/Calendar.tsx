@@ -1,12 +1,14 @@
 import { css } from '@emotion/react';
 import { CalendarTodayOutlined } from '@mui/icons-material';
-import { COLOR } from '@/constants/color';
+import { COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE } from '@/constants/font';
 
 type CalendarActionTypes = 'date' | 'month' | 'periodDate' | 'periodMonth';
+type CalendarSizeTypes = 'mini' | 'default';
 
 interface CalendarProps {
   type: CalendarActionTypes;
+  size?: CalendarSizeTypes;
   dateProps?: {
     date: string;
     setDate: React.Dispatch<React.SetStateAction<string>>;
@@ -21,6 +23,7 @@ interface CalendarProps {
 
 const Calendar: React.FC<CalendarProps> = ({
   type,
+  size = 'default',
   dateProps,
   periodProps,
 }) => {
@@ -37,8 +40,7 @@ const Calendar: React.FC<CalendarProps> = ({
         const start = new Date(value);
         const end = new Date(endDate);
         if (start > end) {
-          // Modal 컴포넌트 구현 후 수정 예정
-          alert('시작 날짜는 종료 날짜보다 이전이어야 합니다.');
+          setStartDate(endDate);
           return;
         }
       }
@@ -53,8 +55,7 @@ const Calendar: React.FC<CalendarProps> = ({
         const start = new Date(startDate);
         const end = new Date(value);
         if (end < start) {
-          // Modal 컴포넌트 구현 후 수정 예정
-          alert('종료 날짜는 시작 날짜보다 이후여야 합니다.');
+          setEndDate(startDate);
           return;
         }
       }
@@ -63,22 +64,22 @@ const Calendar: React.FC<CalendarProps> = ({
   };
 
   const renderSingleInput = (inputType: string) => (
-    <div css={calendarWrapperStyle}>
+    <div css={calendarWrapperStyle(size)}>
       <input
-        css={calendarStyle}
+        css={calendarStyle(size)}
         type={inputType}
         value={dateProps?.date || ''}
         onChange={(e) => handleDateChange(e.target.value)}
       />
-      <CalendarTodayOutlined css={calendarIconStyle} />
+      {size === 'mini' ? '' : <CalendarTodayOutlined css={calendarIconStyle} />}
     </div>
   );
 
   const renderPeriodInput = (inputType: string) => (
     <div css={periodWrapperStyle}>
-      <div css={calendarWrapperStyle}>
+      <div css={calendarWrapperStyle(size)}>
         <input
-          css={calendarStyle}
+          css={calendarStyle(size)}
           type={inputType}
           value={periodProps?.startDate || ''}
           onChange={(e) => handleStartDateChange(e.target.value)}
@@ -86,9 +87,9 @@ const Calendar: React.FC<CalendarProps> = ({
         <CalendarTodayOutlined css={calendarIconStyle} />
       </div>
       <span css={hyphenStyle}>~</span>
-      <div css={calendarWrapperStyle}>
+      <div css={calendarWrapperStyle(size)}>
         <input
-          css={calendarStyle}
+          css={calendarStyle(size)}
           type={inputType}
           value={periodProps?.endDate || ''}
           onChange={(e) => handleEndDateChange(e.target.value)}
@@ -117,26 +118,28 @@ const periodWrapperStyle = css`
   align-items: center;
 `;
 
-const calendarWrapperStyle = css`
+const calendarWrapperStyle = (size: CalendarSizeTypes) => css`
   position: relative;
-  width: 146px;
+  width: ${size === 'mini' ? '112px' : '146px'};
   height: 48px;
-  border: 1px solid ${COLOR.GRAY};
+  border: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
   border-radius: 4px;
   overflow: hidden;
+  box-sizing: border-box;
 `;
 
-const calendarStyle = css`
+const calendarStyle = (size: CalendarSizeTypes) => css`
   display: flex;
   justify-content: center;
   align-content: center;
   position: relative;
   width: 100%;
-  height: 100%;
-  padding: 16px 16px 16px 8px;
+  height: 48px;
+  padding: ${size === 'mini' ? '0 0 0 16px' : '16px 16px 16px 8px'};
   border: none;
   font-family: 'Pretendard Variable';
   font-size: ${FONT_SIZE.TEXT_SM};
+  box-sizing: border-box;
 
   ::-webkit-calendar-picker-indicator {
     position: absolute;

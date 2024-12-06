@@ -1,24 +1,35 @@
 import { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation, useParams } from 'react-router-dom';
 import TabButton from '@/components/TabButton';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+import useAuthStore from '@/stores/useAuthStore';
 
 const MyPageLayout = () => {
   const [tab, setTab] = useState<number>(0);
   const navigate = useNavigate();
   const location = useLocation();
+  const { userId: paramUserId } = useParams<{ userId: string }>();
+  const { memberId, roleCode } = useAuthStore();
+  const userId =
+    paramUserId && !isNaN(Number(paramUserId)) ? Number(paramUserId) : memberId;
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     if (location.pathname === PATH.MYPAGE) {
       setTab(0);
-    } else if (location.pathname.startsWith(PATH.MYPAGE_PROFILE())) {
+    } else if (
+      location.pathname.startsWith(PATH.MYPAGE_PROFILE(String(userId)))
+    ) {
       setTab(1);
-    } else if (location.pathname.startsWith(PATH.MYPAGE_QNA())) {
+    } else if (location.pathname.startsWith(PATH.MYPAGE_QNA(String(userId)))) {
       setTab(2);
     }
-  }, [location.pathname]);
+  }, [location.pathname, userId]);
 
   const handleTabChange: React.Dispatch<React.SetStateAction<number>> = (
     index
@@ -30,39 +41,38 @@ const MyPageLayout = () => {
         navigate(PATH.MYPAGE);
         break;
       case 1:
-        navigate(PATH.MYPAGE_PROFILE());
+        navigate(PATH.MYPAGE_PROFILE(String(userId)));
         break;
       case 2:
-        navigate(PATH.MYPAGE_QNA());
+        navigate(PATH.MYPAGE_QNA(String(userId)));
         break;
       default:
         break;
     }
   };
 
-  const discriptionTab = () => {
-    switch (tab) {
-      case 0:
-        return '내 투자 전략 목록 확인!';
-      case 1:
-        return '내 정보 확인!';
-      case 2:
-        return '상담문의 목록 확인!';
+  const tabs = (() => {
+    switch (roleCode) {
+      case 'USER':
+        return ['내관심전략', '내정보수정', '상담문의'];
       default:
-        return '';
+        return ['내투자전략', '내정보수정', '상담문의'];
     }
-  };
+  })();
 
   return (
     <div css={wrapperStyle}>
       <div css={indexStyle}>
         <div css={titleStyle}>마이페이지</div>
-        <div css={textStyle}>{discriptionTab()}</div>
+        <div css={textStyle}>
+          시스메틱 마이페이지에서는 내관심전략 관리, 개인정보 수정, 상담 문의 등
+          <br /> 다양한 서비스를 편리하게 이용하실 수 있습니다.
+        </div>
       </div>
       <div css={tabBtnStyle}>
         <TabButton
           shape='round'
-          tabs={['내관심전략', '내정보수정', '상담문의']}
+          tabs={tabs}
           currentTab={tab}
           handleTabChange={handleTabChange}
         />
@@ -102,6 +112,7 @@ const textStyle = css`
   margin-top: 16px;
   font-size: ${FONT_SIZE.TEXT_MD};
   font-weight: ${FONT_WEIGHT.REGULAR};
+  line-height: 160%;
 `;
 
 const tabBtnStyle = css`

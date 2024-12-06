@@ -12,12 +12,15 @@ interface AuthConfig {
   nickname: string;
   roleCode: RoleCodeTypes;
   profileImage: string | null;
+  totalFollowerCount: number;
+  totalStrategyCount: number;
 }
 
 interface AuthStateProps extends AuthConfig {
   setAuthState: (authData: AuthConfig) => void;
   resetAuthState: () => void;
   initializeAuth: () => Promise<void>;
+  isAuthInitialized: boolean;
 }
 
 const resetState = (set: Function) => {
@@ -30,6 +33,9 @@ const resetState = (set: Function) => {
     nickname: '',
     roleCode: '',
     profileImage: null,
+    totalFollowerCount: 0,
+    totalStrategyCount: 0,
+    isAuthInitialized: true,
   });
   localStorage.removeItem('token');
 };
@@ -44,6 +50,9 @@ const updateState = (set: Function, authData: AuthConfig) => {
     nickname: authData.nickname,
     roleCode: authData.roleCode,
     profileImage: authData.profileImage,
+    totalFollowerCount: authData.totalFollowerCount,
+    totalStrategyCount: authData.totalStrategyCount,
+    isAuthInitialized: true,
   });
 };
 
@@ -56,6 +65,9 @@ const useAuthStore = create<AuthStateProps>((set) => ({
   nickname: '',
   roleCode: '',
   profileImage: null,
+  totalFollowerCount: 0,
+  totalStrategyCount: 0,
+  isAuthInitialized: false,
 
   setAuthState: (authData) => updateState(set, authData),
 
@@ -71,6 +83,8 @@ const useAuthStore = create<AuthStateProps>((set) => ({
       } catch {
         resetState(set);
       }
+    } else {
+      set({ isAuthInitialized: true });
     }
   },
 }));

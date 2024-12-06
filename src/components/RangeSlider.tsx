@@ -28,11 +28,14 @@ const RangeSlider = ({
 
   const getPercentage = (value: number) => ((value - min) / (max - min)) * 100;
 
-  const getValueFromPosition = (position: number) => {
-    const percentage = position / (sliderRef.current?.clientWidth || 1);
-    const value = percentage * (max - min) + min;
-    return Math.round(value / step) * step;
-  };
+  const getValueFromPosition = useCallback(
+    (position: number): number => {
+      const percentage = position / (sliderRef.current?.clientWidth || 1);
+      const value = percentage * (max - min) + min;
+      return Math.round(value / step) * step;
+    },
+    [sliderRef, min, max, step]
+  );
 
   const handleMouseDown = (type: 'min' | 'max') => {
     setIsDragging(type);
@@ -70,7 +73,7 @@ const RangeSlider = ({
         return newValues;
       });
     },
-    [isDragging, step, min, max, handleChange]
+    [isDragging, step, min, max, handleChange, getValueFromPosition]
   );
 
   useEffect(() => {
