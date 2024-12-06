@@ -102,9 +102,7 @@ export const getInquiryListTrader = async (params: GetInquiryData) => {
 
 // 질문자 문의 등록 화면 조회 API
 export const getCreateInquiry = async (strategyId: number) => {
-  const response = await axiosInstance.get(
-    `/v1/strategy/${strategyId}/qna`
-  );
+  const response = await axiosInstance.get(`/v1/strategy/${strategyId}/qna`);
   return response.data;
 };
 
@@ -118,12 +116,23 @@ export const getInquiryListUser = async (params: GetInquiryData) => {
 export const getEditInquiry = async (params: GetInquiryDetailData) => {
   const { qnaId, ...queryParams } = params;
 
-  const response = await axiosInstance.get(
-    `/v1/member/qna/${qnaId}/modify`,
-    {
-      params: queryParams,
-    }
-  );
+  const response = await axiosInstance.get(`/v1/member/qna/${qnaId}/modify`, {
+    params: queryParams,
+  });
+  return response.data;
+};
+
+// 메인페이지 조회 API
+export const getMainPage = async () => {
+  const response = await axiosInstance.get('/v1/main/info');
+
+  return response.data;
+};
+
+// 메인페이지 차트 정보 조회 API
+export const getMainPageChart = async () => {
+  const response = await axiosInstance.get('/v1/main/analysis');
+
   return response.data;
 };
 
@@ -137,7 +146,9 @@ export const getNoticeList = async (getNoticeListData: GetNoticeListData) => {
 };
 
 // 공지사항 상세 조회 API
-export const getNoticeDetail = async (getNoticeDetailData: GetNoticeDetailData) => {
+export const getNoticeDetail = async (
+  getNoticeDetailData: GetNoticeDetailData
+) => {
   const { noticeId, ...params } = getNoticeDetailData;
   const response = await axiosInstance.get(`/v1/notice/${noticeId}`, {
     params,

@@ -1,7 +1,6 @@
 import { css } from '@emotion/react';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { useNavigate } from 'react-router-dom';
-import tempImage from '@/assets/images/test-profile.png';
 import Button from '@/components/Button';
 import Chart from '@/components/Chart';
 import ProfileImage from '@/components/ProfileImage';
@@ -9,100 +8,58 @@ import VerticalCarousel from '@/components/VerticalCarousel';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+import { useGetMainPage, useGetMainPageChart } from '@/hooks/useCommonApi';
+import useCountMotion from '@/hooks/useCountMotion';
 import Footer from '@/layouts/Footer';
 import Header from '@/layouts/Header';
-import chartData from '@/mocks/chart.json';
+import getColorStyleBasedOnValue from '@/utils/tableUtils';
 
 const Home = () => {
   const navigate = useNavigate();
 
-  const parsedChartData = chartData as {
-    data1: [number, number][];
-    data2: [number, number][];
+  const { data: mainData } = useGetMainPage();
+  const { data: mainPageChartData } = useGetMainPageChart();
+
+  const responseData = {
+    smScoreTopStrategyName:
+      mainPageChartData?.data?.smScoreTopStrategyName || '',
+    averageStandardAmount: mainPageChartData?.data?.averageStandardAmount || [],
+    accumulatedProfitLossRate:
+      mainPageChartData?.data?.accumulatedProfitLossRate || [],
+    xaxisAverageStandardAmount:
+      mainPageChartData?.data?.xaxisAverageStandardAmount || [],
+    xaxisAccumulatedProfitLossRate:
+      mainPageChartData?.data?.xaxisAccumulatedProfitLossRate || [],
   };
 
-  // 시스메틱 인기 트레이더 랭킹 정보
-  const mock = [
-    {
-      rangking: 1,
-      name: '부자아빠',
-      image: { tempImage },
-      rateOfReturn: '293,485,280',
-      likes: 100,
-    },
-    {
-      rangking: 2,
-      name: '시스메틱',
-      image: { tempImage },
-      rateOfReturn: '293,485,280',
-      likes: 1002,
-    },
-    {
-      rangking: 3,
-      name: '냠냠',
-      image: { tempImage },
-      rateOfReturn: '293,485,280',
-      likes: 10020,
-    },
-  ];
+  const chartData = {
+    data1: responseData.xaxisAverageStandardAmount.map(
+      (date: number, index: number) => [
+        new Date(date).getTime(),
+        responseData.averageStandardAmount[index] !== null &&
+        responseData.averageStandardAmount[index] !== undefined
+          ? Math.round(responseData.averageStandardAmount[index])
+          : null,
+      ]
+    ),
+    data2: responseData.xaxisAccumulatedProfitLossRate.map(
+      (date: number, index: number) => [
+        new Date(date).getTime(),
+        responseData.accumulatedProfitLossRate[index] !== null &&
+        responseData.accumulatedProfitLossRate[index] !== undefined
+          ? Number(responseData.accumulatedProfitLossRate[index].toFixed(2))
+          : null,
+      ]
+    ),
+  };
 
-  // 시스메틱 현황 정보
-  const mock2 = [
-    {
-      count: '4,986',
-      title: '트레이더 수',
-      unit: '명',
-    },
-    {
-      count: '3,986',
-      title: '투자 전략 공유',
-      unit: '개',
-    },
-  ];
+  const animatedValue1 = useCountMotion({
+    end: mainData?.data?.totalTraderCount ?? 0,
+  });
 
-  // SM SCORE 랭킹 TOP 5정보
-  const mock3 = [
-    {
-      rangking: 1,
-      name: '부자아빠',
-      strategyName: 'ETF레버리지/인버스',
-      image: { tempImage },
-      comparedPreviousDay: '+250%',
-      cumulativeReturn: '+24%',
-    },
-    {
-      rangking: 2,
-      name: '시스메틱',
-      strategyName: 'ETF레버리지/인버스',
-      image: { tempImage },
-      comparedPreviousDay: '+250%',
-      cumulativeReturn: '+24%',
-    },
-    {
-      rangking: 3,
-      name: '냠냠',
-      strategyName: 'ETF레버리지/인버스',
-      image: { tempImage },
-      comparedPreviousDay: '+278%',
-      cumulativeReturn: '+24%',
-    },
-    {
-      rangking: 4,
-      name: '시루',
-      strategyName: 'ETF레버리지/인버스',
-      image: { tempImage },
-      comparedPreviousDay: '+25%',
-      cumulativeReturn: '+23%',
-    },
-    {
-      rangking: 5,
-      name: '햄버거',
-      strategyName: 'ETF레버리지/인버스',
-      image: { tempImage },
-      comparedPreviousDay: '+222%',
-      cumulativeReturn: '+14%',
-    },
-  ];
+  const animatedValue2 = useCountMotion({
+    end: mainData?.data?.totalStrategyCount ?? 0,
+  });
 
   return (
     <section css={wrapperStyle}>
@@ -128,24 +85,24 @@ const Home = () => {
           <section css={cardStyle}>
             <h6 className='line-text'>시스메틱 인기 트레이더 랭킹</h6>
             <div className='card-wrapper'>
-              {mock.map((item, index) => (
-                <div className='ranking-card' key={index}>
+              {mainData?.data?.rankedTrader.map((trader, index) => (
+                <div className='ranking-card' key={trader.id}>
                   <span className='ranking-num'>{index + 1}</span>
                   <div className='ranking-card-top'>
                     <ProfileImage
                       size='lg'
                       alt='트레이더 이미지'
-                      src={tempImage}
+                      src={trader.traderProfileImage}
                     />
-                    <span>{item.name}</span>
+                    <span>{trader.nickname}</span>
                   </div>
                   <div className='ranking-card-btm'>
                     <div className='likes-area'>
                       <FavoriteBorderIcon />
-                      {item.likes}
+                      {trader.followerCount}
                     </div>
                     <div className='price-area'>
-                      <h3>{item.rateOfReturn}</h3>
+                      <h3>{trader.accumProfitLossRate}</h3>
                       <h6>원</h6>
                     </div>
                   </div>
@@ -158,11 +115,12 @@ const Home = () => {
               label='투자자 가입하기'
               width={160}
               handleClick={() => {
-                navigate(PATH.SIGN_UP_TYPE());
+                navigate(PATH.SIGN_UP);
               }}
             />
             <Button
               label='전략목록 보기'
+              color='primaryOpacity10'
               border={true}
               width={160}
               handleClick={() => {
@@ -190,15 +148,20 @@ const Home = () => {
           <section css={cardStyle}>
             <h6 className='line-text'>시스메틱 현황</h6>
             <div className='card-wrapper'>
-              {mock2.map((item, index) => (
-                <div className='ranking-card' key={index}>
-                  <div className='current-situation'>
-                    <span>{item.count}</span>
-                    <h5>{item.unit}</h5>
-                  </div>
-                  <h6 className='situation-title'>{item.title}</h6>
+              <section className='ranking-card'>
+                <div className='current-situation'>
+                  <span>{animatedValue1}</span>
+                  <h5>명</h5>
                 </div>
-              ))}
+                <h6 className='situation-title'>트레이더 수</h6>
+              </section>
+              <section className='ranking-card'>
+                <div className='current-situation'>
+                  <span>{animatedValue2}</span>
+                  <h5>개</h5>
+                </div>
+                <h6 className='situation-title'>투자 전략 공유</h6>
+              </section>
             </div>
           </section>
           <div css={btnStyle}>
@@ -206,12 +169,13 @@ const Home = () => {
               label='트레이더 가입하기'
               width={160}
               handleClick={() => {
-                navigate(PATH.SIGN_UP_TYPE());
+                navigate(PATH.SIGN_UP);
               }}
             />
             <Button
               label='트레이더 목록보기'
               border={true}
+              color='primaryOpacity10'
               width={160}
               handleClick={() => {
                 navigate(PATH.TRADERS);
@@ -236,7 +200,7 @@ const Home = () => {
                 평균을 확인할 수 있습니다.
               </span>
               <Chart
-                chartData={parsedChartData}
+                chartData={chartData}
                 name={[
                   'Sysmetic Traders 통합기준가',
                   'SM Score 1위: ETF레버리지/인버스',
@@ -262,28 +226,36 @@ const Home = () => {
             </span>
           </div>
           <section css={smScoreCardStyle}>
-            {mock3.map((item, index) => (
-              <div className='sm-score-card' key={index}>
+            {mainData?.data?.smScoreTopFives.map((strategy, index) => (
+              <div className='sm-score-card' key={strategy.id}>
                 <div className='card-top'>
                   <h5 className='num'>{index + 1}</h5>
                   <div>
                     <ProfileImage
                       size='lg'
                       alt='트레이더 이미지'
-                      src={tempImage}
+                      src={strategy.traderProfileImage}
                     />
-                    <span>{item.name}</span>
+                    <span>{strategy.nickname}</span>
                   </div>
-                  <h5>{item.strategyName}</h5>
+                  <h5>{strategy.name}</h5>
                 </div>
                 <div className='card-btm'>
                   <div className='card-btm-option'>
-                    <h6>전일대비</h6>
-                    <h5>{item.comparedPreviousDay}</h5>
+                    <h6>SM Score</h6>
+                    <h5 style={getColorStyleBasedOnValue(strategy.smScore)}>
+                      {strategy.smScore}%
+                    </h5>
                   </div>
                   <div className='card-btm-option'>
-                    <h6>누적 수익률</h6>
-                    <h5>{item.cumulativeReturn}</h5>
+                    <h6>누적 손익률</h6>
+                    <h5
+                      style={getColorStyleBasedOnValue(
+                        strategy.accumulatedProfitLossRate
+                      )}
+                    >
+                      {strategy.accumulatedProfitLossRate}%
+                    </h5>
                   </div>
                 </div>
               </div>
@@ -472,6 +444,7 @@ const smScoreCardStyle = css`
     position: relative;
     flex: 1 1 calc(33.33% - 20px);
     box-sizing: border-box;
+    background-color: ${COLOR.WHITE};
     border: 1px solid ${COLOR_OPACITY.POINT_OPACITY30};
     border-radius: 20px;
     overflow: hidden;
@@ -496,6 +469,15 @@ const smScoreCardStyle = css`
         gap: 16px;
       }
     }
+
+    .card-top:nth-last-of-type(1) {
+      padding: 32px 64px;
+    }
+
+    .card-top:nth-last-of-type(2) {
+      padding: 32px 64px;
+    }
+
     .card-btm {
       padding: 40px 32px;
       display: flex;
@@ -510,10 +492,6 @@ const smScoreCardStyle = css`
         h6 {
           font-weight: ${FONT_WEIGHT.REGULAR};
         }
-
-        h5 {
-          color: ${COLOR.ERROR_RED};
-        }
       }
     }
   }
@@ -524,7 +502,7 @@ const smScoreCardStyle = css`
     justify-content: space-between;
 
     .card-btm-option {
-      width: 200px;
+      gap: 64px;
     }
   }
 
@@ -532,6 +510,7 @@ const smScoreCardStyle = css`
   .sm-score-card:nth-of-type(2),
   .sm-score-card:nth-of-type(3) {
     flex-direction: column;
+    justify-content: space-between;
 
     .card-btm {
       background-color: ${COLOR_OPACITY.POINT100_OPACITY70};

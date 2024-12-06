@@ -15,6 +15,7 @@ export interface GetAdminNoticeData {
   searchText?: string;
 }
 
+
 export interface UpdateAdminNoticeData {
   noticeId?: string;
   noticeTitle: string;
@@ -25,6 +26,9 @@ export interface UpdateAdminNoticeData {
 export interface UpdateAdminNoticeStatusData {
   noticeId?: string;
   isOpen?: boolean;
+
+export interface DeleteInquiryListRequest {
+  inquiryIdList: number[];
 }
 
 // 회원 목록 조회 API
@@ -147,6 +151,50 @@ export const rejectAdminStrategy = async (rejectData: {
       },
     }
   );
+
+  return response.data;
+};
+
+// 관리자 문의 조회 API
+export const getInquiryList = async (
+  page: number,
+  closed: string,
+  searchType: string,
+  searchText: string
+) => {
+  const response = await axiosInstance.get('/v1/admin/qna', {
+    params: {
+      page,
+      closed,
+      searchType,
+      searchText,
+    },
+  });
+
+  return response.data;
+};
+
+// 관리자 문의 목록 삭제 API
+export const deleteInquiryList = async (
+  requestData: DeleteInquiryListRequest
+) => {
+  const response = await axiosInstance.delete('/v1/admin/qna', {
+    data: requestData,
+  });
+
+  return response.data;
+};
+
+// 관리자 문의 상세조회 API
+export const getAdminInquiryDetail = async (qnaId: number) => {
+  const response = await axiosInstance.get(`/v1/admin/qna/${qnaId}`);
+
+  return response.data;
+};
+
+// 관리자 문의 특정 삭제 API
+export const deleteDetailInquiry = async (qnaId: number) => {
+  const response = await axiosInstance.delete(`/v1/admin/qna/${qnaId}`);
 
   return response.data;
 };

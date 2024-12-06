@@ -56,14 +56,36 @@ interface DeleteInterestModalProps {
   traderStrategRefetch: () => void;
 }
 
-const SignupnModalContent = () => (
-  <div css={modalStyle}>
-    투자자 회원가입이 필요한 서비스 입니다.
-    <br />
-    회원가입을 진행해주세요.
-  </div>
-);
+const SignupnModalContent = () => {
+  const { closeModal } = useModalStore();
+  const navigate = useNavigate();
 
+  return (
+    <div css={modalStyle}>
+      투자자 회원가입이 필요한 서비스 입니다.
+      <br />
+      회원가입을 진행해주세요.
+      <div className='btn-area'>
+        <Button
+          label='취소'
+          border={true}
+          width={120}
+          handleClick={() => {
+            closeModal('sign-up-modal-01');
+          }}
+        />
+        <Button
+          label='회원가입하기'
+          width={120}
+          handleClick={() => {
+            navigate(PATH.SIGN_UP);
+            closeModal('sign-up-modal-01');
+          }}
+        />
+      </div>
+    </div>
+  );
+};
 const CheckLoginModalContent = () => {
   const { closeModal } = useModalStore();
   const navigate = useNavigate();
@@ -607,6 +629,7 @@ const modalStyle = css`
   gap: 24px;
   line-height: 160%;
   padding-top: 8px;
+  text-align: center;
 
   .btn-area {
     display: flex;

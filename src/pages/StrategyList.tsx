@@ -749,12 +749,10 @@ export const StrategyList = () => {
         <Table data={tableData} columns={columns} />
         {isNotFound ? (
           <div css={emptyContents}>결과가 없습니다.</div>
-        ) : resultMessage ? (
+        ) : resultMessage && tableData?.length <= 0 ? (
           <div css={emptyContents}>{resultMessage}</div>
-        ) : (
-          ''
-        )}
-        {!isNotFound && !resultMessage && (
+        ) : null}
+        {tableData?.length > 0 && (
           <Pagination
             totalPage={pageInfo.totalPages}
             currentPage={pageInfo.currentPage}
