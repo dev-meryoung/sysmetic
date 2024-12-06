@@ -191,7 +191,11 @@ const AdminStrategies = () => {
         </p>
       </div>
       <div css={startegytableStyle}>
-        <Table data={tableData} columns={columns} />
+        {totalElement > 0 ? (
+          <Table data={tableData} columns={columns} />
+        ) : (
+          <div className='no-data'> 전략이 존재하지 않습니다.</div>
+        )}
       </div>
       <div css={strategyPaginationStyle}>
         <Pagination
@@ -287,6 +291,17 @@ const startegytableStyle = css`
     &:nth-of-type(7) {
       width: 120px;
     }
+  }
+
+  .no-data {
+    height: 80px;
+    background-color: ${COLOR.GRAY100};
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: ${FONT_SIZE.TEXT_LG};
   }
 `;
 
