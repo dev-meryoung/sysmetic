@@ -2,15 +2,23 @@ import { useState } from 'react';
 import { css } from '@emotion/react';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CloseIcon from '@mui/icons-material/Close';
-import CropOriginalIcon from '@mui/icons-material/CropOriginal';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
+import Modal from '@/components/Modal';
 import RadioButton from '@/components/RadioButton';
 import TextArea from '@/components/TextArea';
 import TextInput from '@/components/TextInput';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
+import { useCreateAdminNotice } from '@/hooks/useAdminApi';
+import useModalStore from '@/stores/useModalStore';
+
+interface FileDto {
+  name: string;
+  size: string;
+  file: File;
+}
 
 const options = [
   { label: '공개', value: 'unclosed' },
@@ -18,47 +26,129 @@ const options = [
 ];
 
 const AdminNoticesAdd = () => {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const { openModal } = useModalStore();
+  const [noticeTitle, setNoticeTitle] = useState('');
+  const [noticeContent, setNoticeContent] = useState('');
   const [isChecked, setIsChecked] = useState('closed');
+  const [attachedFiles, setAttachedFiles] = useState<FileDto[]>([]);
   const navigate = useNavigate();
 
+  const createMutation = useCreateAdminNotice();
+
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(e.target.value);
+    if (e.target.value.length <= 100) {
+      setNoticeTitle(e.target.value);
+    }
   };
+
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setContent(e.target.value);
+    if (e.target.value.length <= 1000) {
+      setNoticeContent(e.target.value);
+    }
   };
 
-  // 나중에 정확한 경로로 변경
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = event.target;
+    if (files && files.length > 0) {
+      const fileArray = Array.from(files).map((file) => ({
+        name: file.name,
+        size: `${(file.size / 1024).toFixed(2)} KB`,
+        file,
+      }));
+
+      setAttachedFiles((prev) => [...prev, ...fileArray]);
+    }
+  };
+
+  const handleFileRemove = (index: number) => {
+    setAttachedFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmitBtn = () => {
+    if (!noticeTitle.trim() || !noticeContent.trim()) {
+      openModal('error-input');
+      return;
+    }
+
+    const MAX_SINGLE_FILE_SIZE = 20 * 1024 * 1024;
+    const MAX_TOTAL_FILE_SIZE = 40 * 1024 * 1024;
+
+    const totalFileSize = attachedFiles.reduce(
+      (total, file) => total + file.file.size,
+      0
+    );
+
+    if (
+      attachedFiles.some((file) => file.file.size > MAX_SINGLE_FILE_SIZE) ||
+      totalFileSize > MAX_TOTAL_FILE_SIZE
+    ) {
+      openModal('file-size-error');
+      return;
+    }
+
+    const formData = new FormData();
+
+    const noticeSaveRequestDto = {
+      noticeTitle,
+      noticeContent,
+      isOpen: isChecked === 'unclosed',
+    };
+    formData.append(
+      'NoticeSaveRequestDto',
+      JSON.stringify(noticeSaveRequestDto)
+    );
+
+    attachedFiles.forEach((fileDto) => {
+      formData.append('fileList', fileDto.file);
+    });
+
+    attachedFiles.forEach((fileDto) => {
+      if (fileDto.file.type.startsWith('image/')) {
+        formData.append('imageList', fileDto.file);
+      }
+    });
+
+    createMutation.mutate(formData, {
+      onSuccess: () => {
+        navigate(PATH.ADMIN_NOTICES);
+      },
+      onError: () => {
+        openModal('error-submit');
+      },
+    });
+  };
+
   const handleGoList = () => {
-    navigate(PATH.ADMIN_NOTICES);
-  };
-
-  const handleSubmit = () => {
     navigate(PATH.ADMIN_NOTICES);
   };
 
   return (
     <div css={noticesDetailWrapperStyle}>
       <div css={noticesDetailHeaderStyle}>
-        <h1>공지 수정</h1>
+        <h1>공지 작성</h1>
       </div>
       <div css={inputStyle}>
         <TextInput
-          value={title}
+          value={noticeTitle}
           placeholder='제목을 입력하세요'
           handleChange={handleTitleChange}
           fullWidth
         />
       </div>
       <div css={textAreaIconStyle}>
-        <CropOriginalIcon />
-        <AttachFileIcon />
+        <label>
+          <AttachFileIcon />
+          <input
+            type='file'
+            multiple
+            onChange={handleFileChange}
+            style={{ display: 'none' }}
+          />
+        </label>
       </div>
       <div>
         <TextArea
-          value={content}
+          value={noticeContent}
           placeholder='내용을 입력하세요'
           handleChange={handleContentChange}
           fullWidth
@@ -68,26 +158,25 @@ const AdminNoticesAdd = () => {
         <div css={noticesFileStyle}>
           <div className='file-title'>
             <p>
-              첨부파일 <span>2</span>개<span>(1.2MB)</span>
+              첨부파일 <span>{attachedFiles.length}</span>개
             </p>
             <p className='point'>
               *파일 1개당 최대 첨부용량 20MB, 전체 파일 최대 첨부용량 40MB
-              게시판
             </p>
           </div>
           <div css={noticesFileDivStyle}>
-            <div className='file-content'>
-              <p>
-                시스메틱 특약 변경 대비표1.pdf<span>(1.2MB)</span>
-              </p>
-              <CloseIcon css={iconStyle} />
-            </div>
-            <div className='file-content'>
-              <p>
-                시스메틱 특약 변경 대비표2.pdf<span>(1.2MB)</span>
-              </p>
-              <CloseIcon css={iconStyle} />
-            </div>
+            {attachedFiles.map((file, index) => (
+              <div key={index} className='file-content'>
+                <p>
+                  {file.name}
+                  <span>({file.size})</span>
+                </p>
+                <CloseIcon
+                  css={iconStyle}
+                  onClick={() => handleFileRemove(index)}
+                />
+              </div>
+            ))}
           </div>
           <div css={radioBtnStyle}>
             <p>공개설정</p>
@@ -112,14 +201,40 @@ const AdminNoticesAdd = () => {
           border
         />
         <Button
-          label='수정완료'
+          label='게시글 등록'
           color='primary'
           shape='square'
           width={120}
           size='lg'
-          handleClick={handleSubmit}
+          handleClick={handleSubmitBtn}
         />
       </div>
+
+      <Modal
+        id='error-input'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>제목, 내용을 입력하세요.</p>
+          </div>
+        }
+      />
+      <Modal
+        id='error-submit'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>공지 등록에 실패했습니다.</p>
+          </div>
+        }
+      />
+
+      <Modal
+        id='file-size-error'
+        content={
+          <div css={modalContentStyle}>
+            <p css={modalTextStyle}>최대 파일 용량에 맞춰 업로드해주세요.</p>
+          </div>
+        }
+      />
     </div>
   );
 };
@@ -249,5 +364,20 @@ const radioBtnStyle = css`
     transform: translateY(32%);
     font-weight: ${FONT_WEIGHT.BOLD};
   }
+`;
+
+const modalContentStyle = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+`;
+
+const modalTextStyle = css`
+  font-size: ${FONT_SIZE.TEXT_LG};
+  text-align: center;
+  margin-top: 32px;
+  margin-bottom: 24px;
 `;
 export default AdminNoticesAdd;

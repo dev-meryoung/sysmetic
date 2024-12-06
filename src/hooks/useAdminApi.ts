@@ -48,13 +48,19 @@ export const useGetAdminNotice = (params: GetAdminNoticeData) =>
 // 공지사항 수정 API
 export const useUpdateAdminNotice = () =>
   useMutation({
-    mutationFn: (noticeId: string) => updateAdminNotice(noticeId),
+    mutationFn: ({
+      formData,
+      noticeId,
+    }: {
+      formData: FormData;
+      noticeId: string;
+    }) => updateAdminNotice(formData, noticeId),
   });
 
 // 공지사항 삭제 API
 export const useDeleteAdminNotice = () =>
   useMutation({
-    mutationFn: (noticeId: string) => deleteAdminNotice(noticeId),
+    mutationFn: deleteAdminNotice,
   });
 
 // 공지사항 목록에서 개별 공개여부 수정 API
@@ -66,13 +72,13 @@ export const useUpdateAdminNoticeStatus = () =>
 // 공지사항 등록 API
 export const useCreateAdminNotice = () =>
   useMutation({
-    mutationFn: () => createAdminNotice(),
+    mutationFn: (formData: FormData) => createAdminNotice(formData),
   });
 
 // 공지사항 목록 삭제 API
 export const useDeleteAdminNoticeList = () =>
   useMutation({
-    mutationFn: () => deleteAdminNoticeList(),
+    mutationFn: ({ ids }: { ids: number[] }) => deleteAdminNoticeList(ids),
   });
 
 // 공지사항 수정 화면 조회 API

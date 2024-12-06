@@ -47,25 +47,14 @@ const MyPageLayout = () => {
     }
   };
 
-  const discriptionTab = () => {
-    switch (tab) {
-      case 0:
-        return '시스메틱 마이페이지에서는 내 관심 전략 관리, 개인정보 수정, 상담 문의 등 다양한 서비스를 편리하게 이용하실 수 있습니다.';
-      case 1:
-        return '시스메틱 마이페이지에서는 내 관심 전략 관리, 개인정보 수정, 상담 문의 등 다양한 서비스를 편리하게 이용하실 수 있습니다.';
-      case 2:
-        return '시스메틱 마이페이지에서는 내 관심 전략 관리, 개인정보 수정, 상담 문의 등 다양한 서비스를 편리하게 이용하실 수 있습니다.';
-
-      default:
-        return '';
-    }
-  };
-
   return (
     <div css={wrapperStyle}>
       <div css={indexStyle}>
         <div css={titleStyle}>마이페이지</div>
-        <div css={textStyle}>{discriptionTab()}</div>
+        <div css={textStyle}>
+          시스메틱 마이페이지에서는 내관심전략 관리, 개인정보 수정, 상담 문의 등
+          <br /> 다양한 서비스를 편리하게 이용하실 수 있습니다.
+        </div>
       </div>
       <div css={tabBtnStyle}>
         <TabButton
@@ -110,6 +99,7 @@ const textStyle = css`
   margin-top: 16px;
   font-size: ${FONT_SIZE.TEXT_MD};
   font-weight: ${FONT_WEIGHT.REGULAR};
+  line-height: 160%;
 `;
 
 const tabBtnStyle = css`
