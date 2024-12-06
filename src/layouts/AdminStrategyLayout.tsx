@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import { Outlet } from 'react-router-dom';
 import TabButton from '@/components/TabButton';
@@ -7,6 +7,10 @@ import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 
 const AdminStrategyLayout = () => {
   const [tab, setTab] = useState(0);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <>

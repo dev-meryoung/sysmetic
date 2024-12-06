@@ -13,6 +13,10 @@ const StrategyListLayout = () => {
   const [currentTab, setCurrentTab] = useState(0);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     if (location.pathname.includes('/traders')) {
       setCurrentTab(1);
     } else {
