@@ -192,7 +192,7 @@ const AddInterestModalContent = ({
 
   return (
     <div css={addInteresmodalStyle}>
-      <span>관심 등록</span>
+      <span>관심등록</span>
       <RadioButton
         options={folderOptions}
         name='folder-radio'
@@ -624,7 +624,7 @@ export const StrategyList = () => {
         <div css={buttonStyle}>
           {item.isFollow && (
             <Button
-              label={'관심 취소'}
+              label={'관심취소'}
               shape='round'
               size='xs'
               color='point'
@@ -644,7 +644,7 @@ export const StrategyList = () => {
           )}
           {!item.isFollow && (
             <Button
-              label={'관심 등록'}
+              label={'관심등록'}
               shape='round'
               size='xs'
               color='point'

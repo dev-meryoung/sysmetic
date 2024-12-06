@@ -142,7 +142,7 @@ const MyStrategyEdit = () => {
             />
           </div>
           <div className='form-item'>
-            <span>운용 종목</span>
+            <span>운용종목</span>
             {stockOptions.map((option: { label: string; value: string }) => (
               <Checkbox
                 key={option.value}
@@ -229,7 +229,7 @@ const MyStrategyEdit = () => {
             </span>
           </div>
           <div className='form-item'>
-            <span>운용 종목</span>
+            <span>운용종목</span>
             <div className='options'>
               {stockOptions.map((option) => (
                 <Checkbox
@@ -327,8 +327,8 @@ const MyStrategyEdit = () => {
                 <th>입출금</th>
                 <th>일 손익</th>
                 <th>일 손익률</th>
-                <th>누적손익</th>
-                <th>누적손익률</th>
+                <th>누적 손익</th>
+                <th>누적 손익률</th>
                 <th>관리</th>
               </tr>
             </thead>

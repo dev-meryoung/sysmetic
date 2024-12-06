@@ -11,7 +11,7 @@ const MyPageLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { userId: paramUserId } = useParams<{ userId: string }>();
-  const { memberId } = useAuthStore();
+  const { memberId, roleCode } = useAuthStore();
   const userId =
     paramUserId && !isNaN(Number(paramUserId)) ? Number(paramUserId) : memberId;
 
@@ -51,6 +51,15 @@ const MyPageLayout = () => {
     }
   };
 
+  const tabs = (() => {
+    switch (roleCode) {
+      case 'USER':
+        return ['내관심전략', '내정보수정', '상담문의'];
+      default:
+        return ['내투자전략', '내정보수정', '상담문의'];
+    }
+  })();
+
   return (
     <div css={wrapperStyle}>
       <div css={indexStyle}>
@@ -63,7 +72,7 @@ const MyPageLayout = () => {
       <div css={tabBtnStyle}>
         <TabButton
           shape='round'
-          tabs={['내관심전략', '내정보수정', '상담문의']}
+          tabs={tabs}
           currentTab={tab}
           handleTabChange={handleTabChange}
         />

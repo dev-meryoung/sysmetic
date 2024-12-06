@@ -15,7 +15,6 @@ export interface GetAdminNoticeData {
   searchText?: string;
 }
 
-
 export interface UpdateAdminNoticeData {
   noticeId?: string;
   noticeTitle: string;
@@ -25,7 +24,7 @@ export interface UpdateAdminNoticeData {
 
 export interface UpdateAdminNoticeStatusData {
   noticeId?: string;
-  isOpen?: boolean; 
+  isOpen?: boolean;
 }
 
 export interface DeleteInquiryListRequest {

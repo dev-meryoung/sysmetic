@@ -73,7 +73,7 @@ const StrategyAdd = () => {
             />
           </div>
           <div className='form-item'>
-            <span>운용 종목</span>
+            <span>운용종목</span>
             {stockOptions.map((option: { label: string; value: string }) => (
               <Checkbox
                 key={option.value}

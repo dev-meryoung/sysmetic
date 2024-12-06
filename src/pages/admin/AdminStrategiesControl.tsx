@@ -90,7 +90,7 @@ const AdminStrategiesControl = () => {
             </span>
           </div>
           <div className='form-item'>
-            <span>운용 종목</span>
+            <span>운용종목</span>
             <div className='options'>
               {stockOptions.map((option) => (
                 <Checkbox
@@ -160,8 +160,8 @@ const AdminStrategiesControl = () => {
                 <th>입출금</th>
                 <th>일 손익</th>
                 <th>일 손익률</th>
-                <th>누적손익</th>
-                <th>누적손익률</th>
+                <th>누적 손익</th>
+                <th>누적 손익률</th>
               </tr>
             </thead>
             <tbody>
@@ -227,8 +227,8 @@ const AdminStrategiesControl = () => {
                 <th>입출금</th>
                 <th>월 손익</th>
                 <th>월 손익률</th>
-                <th>누적손익</th>
-                <th>누적손익률</th>
+                <th>누적 손익</th>
+                <th>누적 손익률</th>
               </tr>
             </thead>
             <tbody>
