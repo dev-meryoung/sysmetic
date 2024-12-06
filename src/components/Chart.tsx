@@ -262,7 +262,7 @@ const Chart: React.FC<ChartDataProps> = ({
       <HighchartsReact
         highcharts={Highcharts}
         options={options}
-        containerProps={{ style: { width: '100%', height: 'auto' } }}
+        containerProps={{ style: { width: '90%', height: 'auto' } }}
       />
       <section css={buttonWrapperStyle}>
         {dateFilter.map((filter) => (

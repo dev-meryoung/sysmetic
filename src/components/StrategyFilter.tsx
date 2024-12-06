@@ -41,13 +41,13 @@ export const TAB_FILTERS: Record<number, FilterProps[]> = {
   0: [
     {
       id: 'methods',
-      label: '운용 방식',
+      label: '매매방식',
       type: 'checkbox',
       options: [],
     },
     {
       id: 'cycle',
-      label: '운용 주기',
+      label: '주기',
       type: 'checkbox',
       options: [
         { value: 'D', label: '데이' },
@@ -56,13 +56,13 @@ export const TAB_FILTERS: Record<number, FilterProps[]> = {
     },
     {
       id: 'stockNames',
-      label: '운용 종목',
+      label: '운용종목',
       type: 'checkbox',
       options: [],
     },
     {
       id: 'period',
-      label: '운용 기간',
+      label: '운용기간',
       type: 'radio',
       options: [
         { value: 'ALL', label: '전체' },

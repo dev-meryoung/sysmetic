@@ -282,6 +282,42 @@ const strategyListWrapperStyle = css`
   gap: 24px;
   padding-bottom: 105px;
 
+  table > thead > tr > th {
+    &:nth-of-type(1) {
+      width: 80px;
+      display: flex;
+      justify-content: center;
+    }
+    &:nth-of-type(2) {
+      width: 80px;
+    }
+    &:nth-of-type(3) {
+      width: 202px;
+    }
+    &:nth-of-type(4) {
+      width: 280px;
+    }
+    &:nth-of-type(5) {
+      width: 196px;
+    }
+    &:nth-of-type(6) {
+      width: 120px;
+    }
+    &:nth-of-type(7) {
+      width: 120px;
+    }
+    &:nth-of-type(8) {
+      width: 120px;
+    }
+  }
+
+  table > tbody > tr > td {
+    &:nth-of-type(1) div {
+      display: flex;
+      justify-content: center;
+    }
+  }
+
   .table-info {
     display: flex;
     align-items: center;

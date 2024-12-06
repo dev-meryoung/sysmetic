@@ -29,6 +29,7 @@ import {
 } from '@/hooks/useStrategyApi';
 import useModalStore from '@/stores/useModalStore';
 import { useTableStore } from '@/stores/useTableStore';
+import getColorStyleBasedOnValue from '@/utils/tableUtils';
 
 interface MyInterestListDataProps {
   ranking?: number;
@@ -48,7 +49,7 @@ interface MyInterestListDataProps {
   };
   followerCount: number;
   accumulatedProfitRatio: number;
-  smscore: number;
+  smScore: number;
   mdd: number;
   actions?: ReactNode;
 }
@@ -115,6 +116,7 @@ const DeleteSingleStrategyModalContent = ({
   ) => Promise<QueryObserverResult<any, Error>>;
 }) => {
   const { closeModal } = useModalStore();
+  const { toggleAllCheckboxes } = useTableStore();
   const deleteSingleStrategyMutation = useDeleteInterestStrategy();
 
   const handleSingleStrategyDelete = () => {
@@ -122,6 +124,7 @@ const DeleteSingleStrategyModalContent = ({
       { strategyId: [singleStrategy] },
       {
         onSuccess: () => {
+          toggleAllCheckboxes(0);
           closeModal('delete-single-strategy-modal');
           refetchStrategies();
         },
@@ -134,7 +137,7 @@ const DeleteSingleStrategyModalContent = ({
 
   return (
     <div css={modalStyle}>
-      해당전략을 삭제하시겠습니까?
+      해당전략을 관심취소 하시겠습니까?
       <div className='btn-area'>
         <Button
           label='아니오'
@@ -479,15 +482,47 @@ const MyInterestList = () => {
     {
       key: 'accumulatedProfitRatio',
       header: '누적 손익률',
-      render: (_, item) => <span>{item.accumulatedProfitRatio}</span>,
+      render: (_, item) => {
+        const itemValue = item.accumulatedProfitRatio;
+
+        const colorStyle = getColorStyleBasedOnValue(itemValue);
+
+        return (
+          <div css={fontStyle} style={colorStyle}>
+            {itemValue}%
+          </div>
+        );
+      },
     },
     {
       key: 'mdd',
       header: 'MDD',
+      render: (_, item) => {
+        const itemValue = item.mdd;
+
+        const colorStyle = getColorStyleBasedOnValue(itemValue);
+
+        return (
+          <div css={fontStyle} style={colorStyle}>
+            {itemValue}%
+          </div>
+        );
+      },
     },
     {
-      key: 'smscore',
+      key: 'smScore',
       header: 'SM Score',
+      render: (_, item) => {
+        const itemValue = item.smScore;
+
+        const colorStyle = getColorStyleBasedOnValue(itemValue);
+
+        return (
+          <div css={fontStyle} style={colorStyle}>
+            {itemValue}%
+          </div>
+        );
+      },
     },
     {
       key: 'actions',
@@ -495,7 +530,7 @@ const MyInterestList = () => {
       render: (_, item) => (
         <div css={buttonStyle}>
           <Button
-            label='관심 취소'
+            label='관심취소'
             shape='round'
             size='xs'
             color='point'
@@ -733,6 +768,10 @@ const folderWrapper = css`
   display: flex;
   gap: 20px;
   width: 100%;
+`;
+
+const fontStyle = css`
+  font-weight: ${FONT_WEIGHT.BOLD};
 `;
 
 const folderBtnWrapperStyle = css`

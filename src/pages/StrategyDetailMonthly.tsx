@@ -80,8 +80,8 @@ const StrategyDetailMonthly = () => {
                 <th>입출금</th>
                 <th>월 손익</th>
                 <th>월 손익률</th>
-                <th>누적손익</th>
-                <th>누적손익률</th>
+                <th>누적 손익</th>
+                <th>누적 손익률</th>
               </tr>
             </thead>
             <tbody>

@@ -41,7 +41,7 @@ const TabButton: React.FC<TabButtonProps> = ({
             <button
               key={idx}
               className={`tab-button ${shape} ${currentTab === idx ? 'active' : ''}`}
-              css={tabBtnStyle}
+              css={tabBtnStyle(currentTab + 1)}
               onClick={() => handleTabClick(idx)}
             >
               {tab}
@@ -65,7 +65,7 @@ const tabWrapperStyle = (shape: ButtonShapeType) => css`
   width: 100%;
 `;
 
-const tabBtnStyle = css`
+const tabBtnStyle = (tabIndex: number) => css`
   color: ${COLOR.GRAY700};
   width: 90px;
   height: 48px;
@@ -104,7 +104,7 @@ const tabBtnStyle = css`
         display: block;
         position: absolute;
         bottom: -1px;
-        right: 0;
+        left: ${tabIndex * 90}px;
         width: calc(100% - 90px);
         height: 1px;
         background-color: ${COLOR.PRIMARY100};

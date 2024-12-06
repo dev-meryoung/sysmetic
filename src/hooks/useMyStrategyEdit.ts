@@ -232,7 +232,7 @@ const useMyStrategyEdit = () => {
     }
 
     if (stocks.length === 0) {
-      errors.push('운용 종목');
+      errors.push('운용종목');
     }
 
     if (isInvalidInput(content)) {

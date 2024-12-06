@@ -51,13 +51,13 @@ const StrategyDetail = () => {
         </tbody>
         <tbody>
           <tr>
-            <td>누적손익금</td>
+            <td>누적 손익금</td>
             <td>
               {formatCurrencyNoneSpace(
                 strategyStatistics?.accumulatedProfitLossAmount as number
               )}
             </td>
-            <td>최대 누적손익금</td>
+            <td>최대 누적 손익금</td>
             <td>
               {formatCurrencyNoneSpace(
                 strategyStatistics?.maximumAccumulatedProfitLossAmount as number
@@ -65,13 +65,13 @@ const StrategyDetail = () => {
             </td>
           </tr>
           <tr>
-            <td>누적손익률</td>
+            <td>누적 손익률</td>
             <td>
               {formatPercent(
                 strategyStatistics?.accumulatedProfitLossRate as number
               )}
             </td>
-            <td>최대 누적손익률</td>
+            <td>최대 누적 손익률</td>
             <td>
               {formatPercent(
                 strategyStatistics?.maximumAccumulatedProfitLossRate as number
@@ -157,7 +157,7 @@ const StrategyDetail = () => {
           <tr>
             <td>총 매매 일수</td>
             <td>{strategyStatistics?.totalTradingDays}</td>
-            <td>현재 연속 손익일수</td>
+            <td>현재 연속 손익 일수</td>
             <td>{strategyStatistics?.currentContinuousProfitLossDays}</td>
           </tr>
           <tr>
