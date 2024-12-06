@@ -23,7 +23,6 @@ import {
   PaginatedResponse,
   updateAdminUserRole,
   UpDateUserRole,
-  approveAdminStrategy,
   createAdminMethods,
   createAdminStocks,
   deleteAdminMethods,
@@ -98,6 +97,7 @@ export const useDeleteAdminMethods = () =>
 export const useUpdateAdminMethods = () =>
   useMutation({
     mutationFn: updateAdminMethods,
+  });
 
 // 공지사항 목록 조회 API
 export const useGetAdminNoticeList = (params: GetAdminNoticeListData) =>

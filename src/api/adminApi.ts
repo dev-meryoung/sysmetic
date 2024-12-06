@@ -382,7 +382,7 @@ export const createAdminMethods = async (params: MethodsPostRequestProps) => {
       'Content-Type': 'multipart/form-data',
     },
   });
-  
+
   return response.data;
 };
 
@@ -421,7 +421,10 @@ export const deleteAdminMethods = async (ids: number[]) => {
   const response = await axiosInstance.delete(`/v1/admin/method`, {
     data: { methodIdList: ids },
   });
-  
+
+  return response.data;
+};
+
 // 관리자 문의 상세조회 API
 export const getAdminInquiryDetail = async (qnaId: number) => {
   const response = await axiosInstance.get(`/v1/admin/qna/${qnaId}`);
@@ -444,7 +447,9 @@ export const updateAdminMethods = async (params: MethodsPutRequestProps) => {
       'Content-Type': 'multipart/form-data',
     },
   });
-}
+
+  return response.data;
+};
 
 // 관리자 문의 특정 삭제 API
 export const deleteDetailInquiry = async (qnaId: number) => {
