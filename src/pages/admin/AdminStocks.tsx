@@ -291,7 +291,7 @@ const ModModal: React.FC<ModModalProps> = ({
     };
 
     updateAdminStocksMutation(formData, {
-      onSuccess: (data) => {
+      onSuccess: () => {
         console.log('종목 수정 성공!');
         setFetch(true);
         modModal.closeModal('modify');
@@ -398,7 +398,7 @@ const AdminStocks = () => {
     {
       key: 'state' as keyof AdminStocksDataProps,
       header: '상태',
-      render: (value: string | number, row: AdminStocksDataProps) => (
+      render: (_: string | number, row: AdminStocksDataProps) => (
         <Button
           label='수정'
           shape='round'
