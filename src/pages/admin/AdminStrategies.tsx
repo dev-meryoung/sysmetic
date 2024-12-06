@@ -5,25 +5,41 @@ import TagTest from '@/assets/images/test-tag.jpg';
 import Button from '@/components/Button';
 import Pagination from '@/components/Pagination';
 import SelectBox from '@/components/SelectBox';
-import Table from '@/components/Table';
+import Table, { ColumnProps } from '@/components/Table';
 import Tag from '@/components/Tag';
 import TextInput from '@/components/TextInput';
 import { COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
-import adminStrategies from '@/mocks/adminStrategies.json';
+import { useGetAdminStrategyList } from '@/hooks/useAdminApi';
 
+type OpenStatusTypes = 'PUBLIC' | 'PRIVATE';
 interface AdminStrategyDataProps {
-  no: number;
-  traderName: string;
+  // no: number;
+  // traderName: string;
+  // strategyName: string;
+  // enrollDate: string;
+  // isOn: boolean;
+  // staged: string;
+  strategyId: number;
   strategyName: string;
-  enrollDate: string;
-  isOn: boolean;
-  staged: string;
+  traderName: string;
+  openStatusCode: OpenStatusTypes;
+  strategyCreateDate: string;
+  methodId: string;
+  methodIconPath: string;
+  stockList: StockListProps;
+  approvalStatusCode: string; //TODO: 단계 뭐뭐있는지?
+}
+
+interface StockListProps {
+  stockIds: number[];
+  stockNames: string[];
+  stockIconPath: string[];
 }
 
 const StatusOption = [
-  { label: '공개', value: 'on' },
-  { label: '비공개', value: 'off' },
+  { label: '공개', value: 'PUBLIC' },
+  { label: '비공개', value: 'PRIVATE' },
 ];
 
 const StagedOption = [
@@ -33,17 +49,26 @@ const StagedOption = [
   { label: '승인요청', value: 'staging' },
 ];
 
-const PAGE_SIZE = 10;
-
 const AdminStrategies = () => {
+  // 필드 관련
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedStaged, setSelectedStaged] = useState('');
   const [value, SetValue] = useState('');
   //테이블 관련
   const [curPage, setCurPage] = useState(0);
-  const [data, setData] = useState<AdminStrategyDataProps[]>([]);
-  //페이지네이션 관련
   const [totalPage, setTotalPage] = useState(0);
+  const [totalElement, setTotalElement] = useState(0);
+  // const [pageSize, setPageSize] = useState(0);
+  const [tableData, setTableData] = useState<AdminStrategyDataProps[]>([]);
+  //데이터 관련
+
+  const params = {
+    ...(selectedStatus && { openStatus: selectedStatus }),
+    ...(selectedStaged && { approvalStatus: selectedStaged }),
+    ...(value && { keyword: value }),
+    page: curPage,
+  };
+  const { data } = useGetAdminStrategyList(params);
 
   const handleStatusChange = (value: string) => {
     setSelectedStatus(value);
@@ -65,30 +90,16 @@ const AdminStrategies = () => {
     console.log(selectedStaged);
   }, [selectedStaged]);
 
-  const getPaginatedData = (page: number) => {
-    const startIndex = page * PAGE_SIZE;
-    const endIndex = startIndex + PAGE_SIZE;
-    return data.slice(startIndex, endIndex);
-  };
-
-  const paginatedData = getPaginatedData(curPage);
-
   useEffect(() => {
-    // 순서를 기준으로
-    const sortedData = [...adminStrategies].sort((a, b) => b.no - a.no);
-    const arrangedData = sortedData.map((item, index) => ({
-      ...item,
-      no: index + 1,
-    }));
-    setData(arrangedData);
+    setTableData(data?.data?.content || []);
+    setTotalPage(data?.data?.totalPages || 0);
+    setTotalElement(data?.data?.totalElement || 0);
+    // setPageSize(data?.data?.pageSize || 0);
+  }, [data]);
 
-    const pages = Math.ceil(arrangedData.length / PAGE_SIZE);
-    setTotalPage(pages);
-  }, []);
-
-  const columns = [
+  const columns: ColumnProps<AdminStrategyDataProps>[] = [
     {
-      key: 'no' as keyof AdminStrategyDataProps,
+      key: 'strategyId' as keyof AdminStrategyDataProps,
       header: '순서',
     },
     {
@@ -98,25 +109,29 @@ const AdminStrategies = () => {
     {
       key: 'strategyName' as keyof AdminStrategyDataProps,
       header: '전략명',
-      render: (value: string | number | undefined | boolean) => (
+      render: (
+        value: string | number | undefined | boolean | StockListProps
+      ) => (
         <div css={tagStyle}>
           <div>
-            <Tag src={TagTest} alt='tag' />
+            <Tag src={value as string} alt='tag' />
           </div>
-          {value}
         </div>
       ),
     },
     {
-      key: 'enrollDate' as keyof AdminStrategyDataProps,
+      key: 'strategyCreateDate' as keyof AdminStrategyDataProps,
       header: '전략등록일자',
+      render: (_, item) => item.strategyCreateDate.substring(0, 10),
     },
     {
-      key: 'isOn' as keyof AdminStrategyDataProps,
+      key: 'openStatusCode' as keyof AdminStrategyDataProps,
       header: '공개여부',
+      render: (_, item) =>
+        item.openStatusCode === 'PRIVATE' ? '공개' : '비공개',
     },
     {
-      key: 'staged' as keyof AdminStrategyDataProps,
+      key: 'approvalStatusCode' as keyof AdminStrategyDataProps,
       header: '승인단계',
     },
     {
@@ -166,11 +181,11 @@ const AdminStrategies = () => {
       </div>
       <div css={strategyInfoStyle}>
         <p>
-          총 <span>40개</span>의 전략이 검색되었습니다.
+          총 <span>{totalElement}개</span>의 전략이 검색되었습니다.
         </p>
       </div>
       <div css={startegytableStyle}>
-        <Table data={paginatedData} columns={columns} />
+        <Table data={tableData} columns={columns} />
       </div>
       <div css={strategyPaginationStyle}>
         <Pagination
