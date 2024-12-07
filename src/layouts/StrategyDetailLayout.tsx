@@ -118,8 +118,8 @@ const StrategyDetailLayout = () => {
       PATH.STRATEGIES_DETAIL_ACCOUNT(strategyId),
     ];
 
-    navigate(pathArr[currentTab]);
-  }, [currentTab, navigate]);
+    navigate(pathArr[currentTab], { replace: true });
+  }, [currentTab]);
 
   useEffect(() => {
     if (strategyAnalysis) {
@@ -156,7 +156,7 @@ const StrategyDetailLayout = () => {
   }, [strategyAnalysis, graphOption1, graphOption2]);
 
   useEffect(() => {
-    if (strategyInfoIsError) navigate(PATH.NOT_FOUND);
+    if (strategyInfoIsError) navigate(PATH.STRATEGIES_LIST);
   }, [strategyInfo, strategyInfoIsError]);
 
   useEffect(() => {
@@ -587,7 +587,9 @@ const StrategyDetailLayout = () => {
                                 typeof value === 'number'
                                   ? value < 0
                                     ? COLOR.PRIMARY400
-                                    : COLOR.POINT
+                                    : value === 0
+                                      ? 'inherit'
+                                      : COLOR.POINT
                                   : 'inherit',
                             }}
                           >
