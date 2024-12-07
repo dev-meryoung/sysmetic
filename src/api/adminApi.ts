@@ -475,3 +475,10 @@ export const deleteDetailInquiry = async (qnaId: number) => {
 
   return response.data;
 };
+
+// 관리자 메인 조회 API
+export const getAdminMain = async () => {
+  const response = await axiosInstance.get(`/v1/admin/main`);
+
+  return response.data;
+};

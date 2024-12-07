@@ -37,6 +37,7 @@ import {
   updateAdminStocks,
   AdminStrategyDtoProps,
   getAdminStrategyList,
+  getAdminMain,
 } from '@/api';
 
 export const useApproveAdminStrategy = () =>
@@ -221,4 +222,11 @@ export const useGetAdminStrategyList = (params: AdminStrategyDtoProps) =>
   useQuery({
     queryKey: ['adminStrategyList', params],
     queryFn: () => getAdminStrategyList(params),
+  });
+
+// 관리자 메인 조회
+export const useGetAdminMain = () =>
+  useQuery({
+    queryKey: ['adminMain'],
+    queryFn: () => getAdminMain(),
   });
