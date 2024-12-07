@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import Loading from '@/components/Loading';
 import Pagination from '@/components/Pagination';
@@ -10,6 +11,7 @@ import Tag from '@/components/Tag';
 import TextInput from '@/components/TextInput';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
+import { PATH } from '@/constants/path';
 import { useGetAdminStrategyList } from '@/hooks/useAdminApi';
 
 export type OpenStatusTypes = 'PUBLIC' | 'PRIVATE';
@@ -46,6 +48,7 @@ const StagedOption = [
 ];
 
 const AdminStrategies = () => {
+  const navigate = useNavigate();
   // 필드 관련
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedStaged, setSelectedStaged] = useState('');
@@ -146,7 +149,7 @@ const AdminStrategies = () => {
     {
       key: 'state' as keyof AdminStrategyDataProps,
       header: '상태',
-      render: () => (
+      render: (_, item) => (
         <div css={buttonStyle}>
           <Button
             label='상세관리'
@@ -155,7 +158,9 @@ const AdminStrategies = () => {
             color='primary'
             border={true}
             width={80}
-            handleClick={() => {}}
+            handleClick={() =>
+              navigate(PATH.ADMIN_STRATEGIES_CONTROL(String(item.strategyId)))
+            }
           />
         </div>
       ),
