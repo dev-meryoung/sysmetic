@@ -112,32 +112,31 @@ const AdminNoticesAdd = () => {
     );
 
     attachedFiles.forEach((fileDtoList) => {
-      formData.append('fileList', fileDtoList.file);
+      if (fileDtoList.file.type.startsWith('image/')) {
+        formData.append('imageDtoList', fileDtoList.file);
+      } else {
+        formData.append('fileList', fileDtoList.file);
+      }
     });
 
     createMutation.mutate(formData, {
       onSuccess: () => {
         navigate(PATH.ADMIN_NOTICES);
       },
-      onError: () => {
+      onError: (error) => {
+        console.error('Submission error:', error);
         openModal('error-submit');
       },
     });
   };
 
   const renderContent = (content: string) => {
-    const lines = content.split('\n');
-    return lines.map((line, index) => {
-      const imageRegex = /!\[image]\((.+)\)/;
-      const match = line.match(imageRegex);
+    const imageRegex = /!\[image]\((.+)\)/g;
+    const images = [...content.matchAll(imageRegex)];
 
-      if (match) {
-        const imageUrl = match[1];
-        return (
-          <img key={index} src={imageUrl} alt='Uploaded' css={imageStyle} />
-        );
-      }
-      return <p key={index}>{line}</p>;
+    return images.map((match, index) => {
+      const imageUrl = match[1];
+      return <img key={index} src={imageUrl} alt='Uploaded' css={imageStyle} />;
     });
   };
 

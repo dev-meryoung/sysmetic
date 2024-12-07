@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CloseIcon from '@mui/icons-material/Close';
+import ImageIcon from '@mui/icons-material/Image';
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
@@ -29,10 +30,10 @@ const AdminNoticeEdit = () => {
   const [existingFiles, setExistingFiles] = useState<any[]>([]);
   const [newFiles, setNewFiles] = useState<File[]>([]);
   const [deleteFileIds, setDeleteFileIds] = useState<number[]>([]);
+  const [deleteImageIds, setDeleteImageIds] = useState<number[]>([]);
   const { noticeId } = useParams<{ noticeId: string }>();
   const navigate = useNavigate();
   const { openModal } = useModalStore();
-  const [deleteImageIds, setDeleteImageIds] = useState<number[]>([]);
 
   const { data: noticeData, isError } = useGetAdminNoticeEdit(String(noticeId));
 
@@ -57,11 +58,20 @@ const AdminNoticeEdit = () => {
     setContent(e.target.value);
   };
 
-  const handleFileChange = ({
-    target: { files },
-  }: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = e.target;
     if (files) {
       setNewFiles((prev) => [...prev, ...Array.from(files)]);
+    }
+  };
+
+  const handleImageInsert = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = e.target;
+    if (files && files[0]) {
+      const file = files[0];
+      const imageUrl = URL.createObjectURL(file);
+      setContent((prev) => `${prev}\n![image](${imageUrl})`);
+      e.target.value = '';
     }
   };
 
@@ -118,6 +128,30 @@ const AdminNoticeEdit = () => {
     );
   };
 
+  const renderContent = (content: string) => {
+    const imageRegex = /!\[image]\((.+)\)/g;
+    const images = [...content.matchAll(imageRegex)];
+
+    return images.map((match, index) => {
+      const imageUrl = match[1];
+      return (
+        <img
+          key={index}
+          src={imageUrl}
+          alt='Uploaded'
+          css={css`
+            max-width: 150px;
+            max-height: 100px;
+            height: auto;
+            margin: 8px 0;
+            object-fit: cover;
+            border: 1px solid ${COLOR.GRAY100};
+          `}
+        />
+      );
+    });
+  };
+
   return (
     <div css={noticesDetailWrapperStyle}>
       <div css={noticesDetailHeaderStyle}>
@@ -132,6 +166,15 @@ const AdminNoticeEdit = () => {
         />
       </div>
       <div css={textAreaIconStyle}>
+        <label>
+          <ImageIcon />
+          <input
+            type='file'
+            accept='image/*'
+            onChange={handleImageInsert}
+            style={{ display: 'none' }}
+          />
+        </label>
         <label>
           <AttachFileIcon />
           <input
@@ -149,6 +192,7 @@ const AdminNoticeEdit = () => {
           handleChange={handleContentChange}
           fullWidth
         />
+        <div css={noticesContentStyle}>{renderContent(content)}</div>
       </div>
       <div css={noticesDetailMainStyle}>
         <div css={noticesFileStyle}>
@@ -211,7 +255,6 @@ const AdminNoticeEdit = () => {
           handleClick={handleSubmit}
         />
       </div>
-
       <Modal
         id='error-load'
         content={
@@ -268,6 +311,11 @@ const noticesDetailHeaderStyle = css`
   }
 `;
 
+const noticesContentStyle = css`
+  padding-top: 16px;
+  white-space: pre-line;
+`;
+
 const noticesDetailMainStyle = css`
   padding: 40px 0 24px;
 `;
@@ -276,28 +324,6 @@ const noticesFileStyle = css`
   display: flex;
   flex-direction: column;
   gap: 14px;
-
-  .file-title {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 4px;
-
-    p:first-child {
-      font-weight: ${FONT_WEIGHT.BOLD};
-    }
-
-    span:last-child {
-      margin-left: 8px;
-      font-size: ${FONT_SIZE.TEXT_SM};
-      color: ${COLOR_OPACITY.BLACK_OPACITY30};
-    }
-  }
-
-  .point {
-    color: ${COLOR.POINT};
-    text-align: right;
-  }
 `;
 
 const noticesFileDivStyle = css`
@@ -336,15 +362,8 @@ const iconStyle = css`
 
 const textAreaIconStyle = css`
   display: flex;
-  justify-content: flex-start;
-  margin-bottom: 8px;
-  padding-left: 16px;
   gap: 16px;
-  font-size: 20px;
-
-  svg {
-    font-size: inherit;
-  }
+  margin-bottom: 8px;
 `;
 
 const btnStyle = css`
@@ -354,17 +373,12 @@ const btnStyle = css`
   gap: 16px;
 `;
 
-const inputStyle = css`
-  margin-bottom: 40px;
-`;
-
 const radioBtnStyle = css`
   display: flex;
   gap: 16px;
   margin-top: 12px;
 
   p {
-    transform: translateY(32%);
     font-weight: ${FONT_WEIGHT.BOLD};
   }
 `;
@@ -382,6 +396,10 @@ const modalTextStyle = css`
   text-align: center;
   margin-top: 32px;
   margin-bottom: 24px;
+`;
+
+const inputStyle = css`
+  margin-bottom: 40px;
 `;
 
 export default AdminNoticeEdit;
