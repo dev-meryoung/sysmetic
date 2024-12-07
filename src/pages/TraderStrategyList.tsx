@@ -551,11 +551,15 @@ const TraderStrategyList = () => {
           <h5>트레이더 전략정보</h5>
         </div>
         <Table data={tableData || []} columns={columns} />
-        <Pagination
-          totalPage={totalPage}
-          currentPage={currentPage}
-          handlePageChange={setCurrentPage}
-        />
+        {tableData?.length > 0 ? (
+          <Pagination
+            totalPage={totalPage}
+            currentPage={currentPage}
+            handlePageChange={setCurrentPage}
+          />
+        ) : (
+          <span css={emptyContents}>트레이더의 전략 정보가 없습니다.</span>
+        )}
       </section>
     </div>
   );
@@ -645,6 +649,37 @@ const tableWrapperStyle = css`
   flex-direction: column;
   gap: 29px;
 
+  table > thead > tr > th {
+    &:nth-of-type(1) {
+      width: 80px;
+    }
+    &:nth-of-type(2) {
+      width: 202px;
+    }
+    &:nth-of-type(3) {
+      width: 280px;
+    }
+    &:nth-of-type(4) {
+      width: 120px;
+    }
+    &:nth-of-type(5) {
+      width: 120px;
+    }
+    &:nth-of-type(6) {
+      width: 120px;
+    }
+    &:nth-of-type(7) {
+      width: 120px;
+    }
+  }
+
+  table > tbody > tr > td {
+    &:nth-of-type(2) div {
+      display: flex;
+      justify-content: center;
+    }
+  }
+
   .title-area {
     position: relative;
     padding: 28px 0;
@@ -724,6 +759,13 @@ const addInteresmodalStyle = css`
 
 const fontStyle = css`
   font-weight: ${FONT_WEIGHT.BOLD};
+`;
+
+const emptyContents = css`
+  padding: 32px;
+  border-radius: 4px;
+  background: ${COLOR.GRAY100};
+  text-align: center;
 `;
 
 export default TraderStrategyList;
