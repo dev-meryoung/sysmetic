@@ -156,7 +156,7 @@ const StrategyDetailLayout = () => {
   }, [strategyAnalysis, graphOption1, graphOption2]);
 
   useEffect(() => {
-    if (strategyInfoIsError) navigate(PATH.NOT_FOUND);
+    if (strategyInfoIsError) navigate(PATH.STRATEGIES_LIST);
   }, [strategyInfo, strategyInfoIsError]);
 
   useEffect(() => {

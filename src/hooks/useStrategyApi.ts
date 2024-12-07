@@ -535,18 +535,23 @@ export const useDeleteTraderAddStrategyList = () => {
 };
 
 export const useGetStrategyInfo = (strategyId: string) => {
-  const { data, isSuccess, refetch } = useQuery<GetStrategyInfoResponse, Error>(
-    {
-      queryKey: ['strategyInfo'],
-      queryFn: () => getStrategyInfo(strategyId),
-      refetchOnWindowFocus: false,
-      retry: 0,
-    }
-  );
+  const {
+    data,
+    isSuccess,
+    isError: queryError,
+    refetch,
+  } = useQuery<GetStrategyInfoResponse, Error>({
+    queryKey: ['strategyInfo'],
+    queryFn: () => getStrategyInfo(strategyId),
+    refetchOnWindowFocus: false,
+    retry: 0,
+  });
+
+  const isResponseError = isSuccess && data?.code !== 200;
 
   return {
     data: isSuccess && data?.code === 200 ? data.data : undefined,
-    isError: isSuccess && data?.code !== 200,
+    isError: queryError || isResponseError,
     refetch,
   };
 };
