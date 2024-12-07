@@ -16,7 +16,7 @@ const Admin = () => {
   const [curTab, setCurTab] = useState(0);
   const navigate = useNavigate();
 
-  const { data, refetch, isLoading } = useGetAdminMain();
+  const { data, isLoading } = useGetAdminMain();
 
   const runReport = data?.data?.runReportResponseDto || {};
   const memberCount = data?.data?.memberCount || {};
