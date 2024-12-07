@@ -199,30 +199,34 @@ const AdminQnaDetail = () => {
         <div css={adminQContentStyle}>
           <p>{data?.inquiryContent}</p>
         </div>
-        <div css={adminATitleStyle}>
-          <div className='answer'>
-            <div className='title'>
-              <SubdirectoryArrowRightOutlinedIcon css={iconStyle} />
-              <h6>{data?.answerTitle}</h6>
+        {data?.answerTitle && (
+          <>
+            <div css={adminATitleStyle}>
+              <div className='answer'>
+                <div className='title'>
+                  <SubdirectoryArrowRightOutlinedIcon css={iconStyle} />
+                  <h6>{data?.answerTitle}</h6>
+                </div>
+                <div className='info'>
+                  <p>작성일</p>
+                  <p>
+                    {inquiryDetailData?.data?.answerRegistrationDate &&
+                      formatYearMonthFromDateTime(
+                        inquiryDetailData?.data?.answerRegistrationDate
+                      )}
+                  </p>
+                </div>
+              </div>
+              <div className='profile'>
+                <ProfileImage src={data?.traderProfileImagePath} />
+                <p>{data?.traderNickname}</p>
+              </div>
             </div>
-            <div className='info'>
-              <p>작성일</p>
-              <p>
-                {inquiryDetailData?.data?.answerRegistrationDate &&
-                  formatYearMonthFromDateTime(
-                    inquiryDetailData?.data?.answerRegistrationDate
-                  )}
-              </p>
+            <div css={adminQContentStyle}>
+              <p>{data?.answerContent}</p>
             </div>
-          </div>
-          <div className='profile'>
-            <ProfileImage src={data?.traderProfileImagePath} />
-            <p>{data?.traderNickname}</p>
-          </div>
-        </div>
-        <div css={adminQContentStyle}>
-          <p>{data?.answerContent}</p>
-        </div>
+          </>
+        )}
       </div>
       <div css={adminQnaNavStyle}>
         {data?.previousId && (
