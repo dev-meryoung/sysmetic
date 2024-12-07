@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import Button from '@/components/Button';
+import Loading from '@/components/Loading';
 import Pagination from '@/components/Pagination';
 import SelectBox from '@/components/SelectBox';
 import Table, { ColumnProps } from '@/components/Table';
@@ -12,7 +13,7 @@ import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { useGetAdminStrategyList } from '@/hooks/useAdminApi';
 
 export type OpenStatusTypes = 'PUBLIC' | 'PRIVATE';
-export type ApprovalStatusTypes = '요청 전' | '승인' | '반려' | '승인 요청';
+export type ApprovalStatusTypes = '승인요청' | '승인' | '반려' | '요청 전';
 
 interface AdminStrategyDataProps {
   strategyId: number;
@@ -38,10 +39,10 @@ const StatusOption = [
 ];
 
 const StagedOption = [
-  { label: '승인', value: '승인' },
-  { label: '반려', value: '반려' },
-  { label: '요청 전', value: '요청 전' },
-  { label: '승인 요청', value: '승인 요청' },
+  { label: '승인', value: 'SA002' },
+  { label: '반려', value: 'SA003' },
+  { label: '요청 전', value: 'SA000' },
+  { label: '승인 요청', value: 'SA001' },
 ];
 
 const AdminStrategies = () => {
@@ -49,21 +50,22 @@ const AdminStrategies = () => {
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedStaged, setSelectedStaged] = useState('');
   const [value, SetValue] = useState('');
+  const [searchStatus, setSearchStatus] = useState('');
+  const [searchStaged, setSearchStaged] = useState('');
   const [searchKeyword, setSearchKeyword] = useState('');
   //테이블 관련
   const [curPage, setCurPage] = useState(0);
   const [totalPage, setTotalPage] = useState(0);
   const [totalElement, setTotalElement] = useState(0);
-  // const [pageSize, setPageSize] = useState(0);
   const [tableData, setTableData] = useState<AdminStrategyDataProps[]>([]);
   //데이터 관련
   const params = {
-    ...(selectedStatus && { openStatus: selectedStatus }),
-    ...(selectedStaged && { approvalStatus: selectedStaged }),
+    ...(searchStatus && { openStatus: searchStatus }),
+    ...(searchStaged && { approvalStatus: searchStaged }),
     ...(searchKeyword && { keyword: searchKeyword }),
     page: curPage,
   };
-  const { data, refetch } = useGetAdminStrategyList(params);
+  const { data, refetch, isLoading } = useGetAdminStrategyList(params);
 
   const handleStatusChange = (value: string) => {
     setSelectedStatus(value);
@@ -75,6 +77,8 @@ const AdminStrategies = () => {
 
   const handleIconClick = () => {
     setSearchKeyword(value);
+    setSearchStatus(selectedStatus);
+    setSearchStaged(selectedStaged);
     refetch();
   };
 
@@ -90,7 +94,6 @@ const AdminStrategies = () => {
     setTableData(data?.data?.content || []);
     setTotalPage(data?.data?.totalPages || 0);
     setTotalElement(data?.data?.totalElement || 0);
-    // setPageSize(data?.data?.pageSize || 0);
   }, [data]);
 
   const columns: ColumnProps<AdminStrategyDataProps>[] = [
@@ -191,7 +194,11 @@ const AdminStrategies = () => {
         </p>
       </div>
       <div css={startegytableStyle}>
-        {totalElement > 0 ? (
+        {isLoading ? (
+          <div css={loadingStyle}>
+            <Loading />
+          </div>
+        ) : totalElement > 0 ? (
           <Table data={tableData} columns={columns} />
         ) : (
           <div className='no-data'> 전략이 존재하지 않습니다.</div>
@@ -324,12 +331,19 @@ const tagStyle = css`
 `;
 
 const approvalStatusStyle = (approvalStatusCode: ApprovalStatusTypes) => css`
-  color: ${approvalStatusCode === '반려'
-    ? COLOR.ERROR_RED
+  color: ${approvalStatusCode === '승인요청'
+    ? COLOR.TEXT_BLACK
     : approvalStatusCode === '승인'
       ? COLOR.CHECK_GREEN
-      : approvalStatusCode === '요청 전'
-        ? COLOR.GRAY700
-        : COLOR.TEXT_BLACK};
+      : approvalStatusCode === '반려'
+        ? COLOR.ERROR_RED
+        : COLOR.GRAY700};
 `;
+
+const loadingStyle = css`
+  width: 100%;
+  height: 100vh;
+  padding: 100px;
+`;
+
 export default AdminStrategies;
