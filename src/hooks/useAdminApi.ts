@@ -179,10 +179,15 @@ export const useDeleteInquiryList = () => {
 };
 
 // 관리자 문의 상세조회
-export const useGetAdminInquiryDetail = (qnaId: number) =>
+export const useGetAdminInquiryDetail = (
+  qnaId: number,
+  closed: string,
+  searchType: string,
+  searchText: string
+) =>
   useQuery({
-    queryKey: ['adminInquiryDetail', qnaId],
-    queryFn: () => getAdminInquiryDetail(qnaId),
+    queryKey: ['adminInquiryDetail', qnaId, closed, searchType, searchText],
+    queryFn: () => getAdminInquiryDetail(qnaId, closed, searchType, searchText),
   });
 
 // 관리자 문의 특정 삭제 API

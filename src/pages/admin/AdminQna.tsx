@@ -18,7 +18,7 @@ import { PATH } from '@/constants/path';
 import { useDeleteInquiryList, useGetInquiryList } from '@/hooks/useAdminApi';
 import useModalStore from '@/stores/useModalStore';
 import { useTableStore } from '@/stores/useTableStore';
-import { extractDate } from '@/utils/dataUtils';
+import { formatYearMonthFromDateTime } from '@/utils/dataUtils';
 
 interface AdminQnaDataProps {
   ranking?: number;
@@ -199,7 +199,7 @@ const AdminQna = () => {
 
   useEffect(() => {
     inquiryListDataRefetch();
-  }, [currentPage]);
+  }, [currentPage, inquiryListDataRefetch]);
 
   const columns: ColumnProps<AdminQnaDataProps>[] = [
     {
@@ -239,7 +239,7 @@ const AdminQna = () => {
       key: 'inquiryRegistrationDate',
       header: '문의날짜',
       render: (_, item) => (
-        <span>{extractDate(item.inquiryRegistrationDate)}</span>
+        <span>{formatYearMonthFromDateTime(item.inquiryRegistrationDate)}</span>
       ),
     },
     {
@@ -267,7 +267,13 @@ const AdminQna = () => {
           border={true}
           width={80}
           handleClick={() =>
-            navigate(PATH.ADMIN_QNA_DETAIL(String(item.inquiryId)))
+            navigate(PATH.ADMIN_QNA_DETAIL(String(item.inquiryId)), {
+              state: {
+                closed: item.inquiryStatus,
+                searchType: selectiedOption,
+                searchText,
+              },
+            })
           }
         />
       ),
@@ -304,7 +310,7 @@ const AdminQna = () => {
           value={value}
           handleKeyDown={(e) => {
             if (e.key === 'Enter') {
-              setSearchText(value);
+              setSearchText(value.trim());
             }
           }}
           handleChange={(e) => setValue(e.target.value)}
