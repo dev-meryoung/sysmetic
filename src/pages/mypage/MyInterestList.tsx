@@ -8,6 +8,8 @@ import {
 } from '@tanstack/react-query';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import dayIcon from '@/assets/images/day-icon.png';
+import positionIcon from '@/assets/images/position-icon.png';
 import Button from '@/components/Button';
 import Loading from '@/components/Loading';
 import Modal from '@/components/Modal';
@@ -30,7 +32,6 @@ import {
 import useModalStore from '@/stores/useModalStore';
 import { useTableStore } from '@/stores/useTableStore';
 import getColorStyleBasedOnValue from '@/utils/tableUtils';
-
 interface MyInterestListDataProps {
   ranking?: number;
   id: number;
@@ -40,7 +41,7 @@ interface MyInterestListDataProps {
   traderProfileImage: string;
   methodId: number;
   methodIconPath: string;
-  stockIconPath: string | null;
+  stockIconPath: string[] | null;
   cycle: string;
   stockList: {
     stockIds: number[];
@@ -239,7 +240,8 @@ const MyInterestList = () => {
     isEmpty: false,
   });
 
-  const { data: folderListData } = useGetUserFolderList();
+  const { data: folderListData, refetch: folderListRefetch } =
+    useGetUserFolderList();
   const { mutate: createFolderMutation } = useCreatFolder();
   const { mutate: updateFolderNameMutation } = useUpdateFolderName();
   const { mutate: checkFolderMutation } =
@@ -305,6 +307,7 @@ const MyInterestList = () => {
                             : folder
                         )
                       );
+                      folderListRefetch();
                       setEditingFolderId(null);
                       setTempFolderName('');
                     });
@@ -468,12 +471,11 @@ const MyInterestList = () => {
         <div css={tagStyle}>
           <div className='tag'>
             <Tag src={item?.methodIconPath || ''} alt='tag' />
-            {item?.stockList?.stockIconPath &&
-              item?.stockList?.stockIconPath.map(
-                (stock: string, index: number) => (
-                  <Tag key={index} src={stock} alt='tag' />
-                )
-              )}
+            <Tag src={item?.cycle === 'D' ? dayIcon : positionIcon} />
+            {item?.stockIconPath &&
+              item?.stockIconPath.map((stock: string, index: number) => (
+                <Tag key={index} src={stock} alt='tag' />
+              ))}
           </div>
           <span>{item.strategyName}</span>
         </div>
@@ -489,7 +491,7 @@ const MyInterestList = () => {
 
         return (
           <div css={fontStyle} style={colorStyle}>
-            {itemValue}%
+            {itemValue || 0}%
           </div>
         );
       },
@@ -504,7 +506,7 @@ const MyInterestList = () => {
 
         return (
           <div css={fontStyle} style={colorStyle}>
-            {itemValue}%
+            {itemValue || 0}%
           </div>
         );
       },
@@ -519,7 +521,7 @@ const MyInterestList = () => {
 
         return (
           <div css={fontStyle} style={colorStyle}>
-            {itemValue}%
+            {itemValue || 0}%
           </div>
         );
       },
@@ -904,10 +906,6 @@ const tableStyle = css`
     }
     &:nth-of-type(4) {
       text-align: left;
-      img {
-        width: ${FONT_SIZE.TEXT_MD};
-        height: ${FONT_SIZE.TEXT_MD};
-      }
     }
   }
 

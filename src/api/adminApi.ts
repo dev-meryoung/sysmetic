@@ -417,8 +417,19 @@ export const deleteAdminMethods = async (ids: number[]) => {
 };
 
 // 관리자 문의 상세조회 API
-export const getAdminInquiryDetail = async (qnaId: number) => {
-  const response = await axiosInstance.get(`/v1/admin/qna/${qnaId}`);
+export const getAdminInquiryDetail = async (
+  qnaId: number,
+  closed: string,
+  searchType: string,
+  searchText: string
+) => {
+  const response = await axiosInstance.get(`/v1/admin/qna/${qnaId}`, {
+    params: {
+      closed,
+      searchType,
+      searchText,
+    },
+  });
 
   return response.data;
 };
