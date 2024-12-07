@@ -118,8 +118,8 @@ const StrategyDetailLayout = () => {
       PATH.STRATEGIES_DETAIL_ACCOUNT(strategyId),
     ];
 
-    navigate(pathArr[currentTab]);
-  }, [currentTab, navigate]);
+    navigate(pathArr[currentTab], { replace: true });
+  }, [currentTab]);
 
   useEffect(() => {
     if (strategyAnalysis) {
