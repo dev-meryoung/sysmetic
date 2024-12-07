@@ -2,10 +2,13 @@ import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import dayIcon from '@/assets/images/day-icon.png';
+import positionIcon from '@/assets/images/position-icon.png';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
 import Pagination from '@/components/Pagination';
 import Table, { ColumnProps } from '@/components/Table';
+import Tag from '@/components/Tag';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
@@ -16,19 +19,24 @@ import {
 import useModalStore from '@/stores/useModalStore';
 import { useTableStore } from '@/stores/useTableStore';
 import getColorStyleBasedOnValue from '@/utils/tableUtils';
-
 interface MyStrategyListDataProps {
   ranking?: number;
   traderId: number;
   traderNickname: string;
   strategyId: number;
   methodId: number;
+  stockList: {
+    stockIds: number[];
+    stockNames: string[];
+    stockIconPath?: string[];
+  };
   cycle: string;
   name: string;
   mdd: number;
   smScore: number;
   accumulatedProfitLossRate: number;
   followerCount?: number;
+  methodIconPath: string;
   strategy?: any;
 }
 
@@ -153,6 +161,21 @@ const MyStrategyList = () => {
     {
       key: 'name',
       header: '전략명',
+      render: (_, item) => (
+        <div css={tagStyle}>
+          <div className='tag'>
+            <Tag src={item?.methodIconPath || ''} alt='tag' />
+            <Tag src={item?.cycle === 'D' ? dayIcon : positionIcon} />
+            {item?.stockList?.stockIconPath &&
+              item?.stockList?.stockIconPath.map(
+                (stock: string, index: number) => (
+                  <Tag key={index} src={stock} alt='tag' />
+                )
+              )}
+          </div>
+          <span>{item.name}</span>
+        </div>
+      ),
     },
     {
       key: 'accumulatedProfitLossRate',
@@ -375,6 +398,18 @@ const buttonStyle = css`
       background: ${COLOR_OPACITY.PRIMARY_OPACITY10};
       transition: 0.3s;
     }
+  }
+`;
+
+const tagStyle = css`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+
+  .tag {
+    display: flex;
+    gap: 4px;
   }
 `;
 

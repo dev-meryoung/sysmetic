@@ -8,6 +8,8 @@ import {
 import { css } from '@emotion/react';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { useNavigate } from 'react-router-dom';
+import dayIcon from '@/assets/images/day-icon.png';
+import positionIcon from '@/assets/images/position-icon.png';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
 import Pagination from '@/components/Pagination';
@@ -561,12 +563,18 @@ export const StrategyList = () => {
         <div css={tagStyle}>
           <div className='tag'>
             <Tag src={item?.methodIconPath || ''} alt='tag' />
-            {item?.stockList?.stockIconPath &&
-              item?.stockList?.stockIconPath.map(
-                (stock: string, index: number) => (
+            <Tag src={item?.cycle === 'D' ? dayIcon : positionIcon} />
+            {currentTab === 1
+              ? item?.stockIconPath &&
+                item?.stockIconPath.map((stock: string, index: number) => (
                   <Tag key={index} src={stock} alt='tag' />
-                )
-              )}
+                ))
+              : item?.stockList?.stockIconPath &&
+                item.stockList.stockIconPath.map(
+                  (stock: string, index: number) => (
+                    <Tag key={index} src={stock} alt='tag' />
+                  )
+                )}
           </div>
           {item.name}
         </div>

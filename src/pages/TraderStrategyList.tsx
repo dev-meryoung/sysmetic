@@ -3,6 +3,8 @@ import { css } from '@emotion/react';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import { useNavigate } from 'react-router-dom';
+import dayIcon from '@/assets/images/day-icon.png';
+import positionIcon from '@/assets/images/position-icon.png';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
 import Pagination from '@/components/Pagination';
@@ -372,6 +374,7 @@ const TraderStrategyList = () => {
         <div css={tagStyle}>
           <div className='tag'>
             <Tag src={item?.methodIconPath || ''} alt='tag' />
+            <Tag src={item?.cycle === 'D' ? dayIcon : positionIcon} />
             {item?.stockList?.stockIconPath &&
               item?.stockList?.stockIconPath.map(
                 (stock: string, index: number) => (

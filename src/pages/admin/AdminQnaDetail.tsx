@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import SubdirectoryArrowRightOutlinedIcon from '@mui/icons-material/SubdirectoryArrowRightOutlined';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import dayIcon from '@/assets/images/day-icon.png';
+import positionIcon from '@/assets/images/position-icon.png';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
 import ProfileImage from '@/components/ProfileImage';
@@ -169,7 +171,8 @@ const AdminQnaDetail = () => {
         <div css={adminQStrategyStyle}>
           <div className='strategyName'>
             <div className='tag'>
-              <Tag src={data?.methodIconPath || ''} />
+              {data?.methodIconPath && <Tag src={data?.methodIconPath || ''} />}
+              <Tag src={data?.cycle === 'D' ? dayIcon : positionIcon} />
               {data?.stockList?.stockIconPath &&
                 data?.stockList?.stockIconPath.map(
                   (stock: string, index: number) => (
