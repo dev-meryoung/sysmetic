@@ -3,6 +3,7 @@ import { css } from '@emotion/react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
+import Tag from '@/components/Tag';
 import TextArea from '@/components/TextArea';
 import TextInput from '@/components/TextInput';
 import { COLOR } from '@/constants/color';
@@ -80,14 +81,16 @@ const QnaQuestion = () => {
       </div>
       <div css={strategyBoxStyle}>
         <div className='strategy-box'>
-          <div className='tags'>
-            <span>
-              <img
-                src={strategyData?.methodIconPath}
-                alt='method icon'
-                css={iconStyle}
-              />
-            </span>
+          <div className='tags' css={tagStyle}>
+            {strategyData.methodIconPath && (
+              <Tag src={strategyData.methodIconPath} alt='method icon' />
+            )}
+            {Array.isArray(strategyData.stockList?.stockIconPath) &&
+              strategyData.stockList?.stockIconPath.map(
+                (stock: string, idx: number) => (
+                  <Tag key={idx} src={stock} alt='stock icon' />
+                )
+              )}
           </div>
           <span>{strategyData?.strategyName}</span>
         </div>
@@ -187,6 +190,11 @@ const strategyBoxStyle = css`
     align-items: center;
     gap: 16px;
   }
+`;
+
+const tagStyle = css`
+  display: flex;
+  gap: 4px;
 `;
 
 const inputBoxStyle = css`

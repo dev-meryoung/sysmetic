@@ -77,10 +77,12 @@ const ProfileEdit: React.FC = () => {
   };
 
   const handleComplete = () => {
+    const isSameNickname = nickname.trim() === storeNickname?.trim();
+
     if (
       nicknameStatus === 'warn' ||
       phoneStatus === 'warn' ||
-      !isNicknameChecked
+      (!isSameNickname && !isNicknameChecked)
     ) {
       openModal('update-confirm');
       return;
@@ -94,7 +96,7 @@ const ProfileEdit: React.FC = () => {
         userId,
         phoneNumber,
         nickname,
-        nicknameDuplCheck: true,
+        nicknameDuplCheck: !isSameNickname,
       })
     );
 

@@ -14,6 +14,8 @@ interface AuthConfig {
   profileImage: string | null;
   totalFollowerCount: number;
   totalStrategyCount: number;
+  receiveInfoConsent: boolean;
+  receiveMarketingConsent: boolean;
 }
 
 interface AuthStateProps extends AuthConfig {
@@ -35,6 +37,8 @@ const resetState = (set: Function) => {
     profileImage: null,
     totalFollowerCount: 0,
     totalStrategyCount: 0,
+    receiveInfoConsent: false,
+    receiveMarketingConsent: false,
     isAuthInitialized: true,
   });
   localStorage.removeItem('token');
@@ -52,6 +56,8 @@ const updateState = (set: Function, authData: AuthConfig) => {
     profileImage: authData.profileImage,
     totalFollowerCount: authData.totalFollowerCount,
     totalStrategyCount: authData.totalStrategyCount,
+    receiveInfoConsent: authData.receiveInfoConsent,
+    receiveMarketingConsent: authData.receiveMarketingConsent,
     isAuthInitialized: true,
   });
 };
@@ -67,6 +73,8 @@ const useAuthStore = create<AuthStateProps>((set) => ({
   profileImage: null,
   totalFollowerCount: 0,
   totalStrategyCount: 0,
+  receiveInfoConsent: false,
+  receiveMarketingConsent: false,
   isAuthInitialized: false,
 
   setAuthState: (authData) => updateState(set, authData),

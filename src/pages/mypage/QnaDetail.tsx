@@ -3,6 +3,7 @@ import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRig
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
+import Tag from '@/components/Tag';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
@@ -27,7 +28,10 @@ const QnaDetail = () => {
   const userInquiryId = paramUserId ? Number(paramUserId) : 0;
   const { qnaId: paramQnaId } = useParams<{ qnaId: string }>();
   const qnaInquiryId = paramQnaId ? Number(paramQnaId) : 0;
-
+  const { previousId: paramPreviousId } = useParams<{ previousId: string }>();
+  const previousId = paramPreviousId ? Number(paramPreviousId) : 0;
+  const { nextId: paramNextId } = useParams<{ nextId: string }>();
+  const nextId = paramNextId ? Number(paramNextId) : 0;
   const deleteMutation = useDeleteInquiry();
 
   const userQuery = useGetInquiryDetailUser(
@@ -147,10 +151,23 @@ const QnaDetail = () => {
             {qnaData.strategyName ? (
               <>
                 <div css={tagsAndTitleStyle}>
-                  <span>
-                    <img src={qnaData.methodIconPath} alt='' css={iconStyle} />
-                  </span>
-                  <div css={strategyTextStyle}>{qnaData.strategyName}</div>
+                  <div css={tagContainerStyle}>
+                    {qnaData.methodIconPath && (
+                      <Tag src={qnaData.methodIconPath} alt='method icon' />
+                    )}
+                    {Array.isArray(qnaData.stockList?.stockIconPath) &&
+                      qnaData.stockList?.stockIconPath.map(
+                        (stock: string, idx: number) => (
+                          <Tag key={idx} src={stock} alt='stock icon' />
+                        )
+                      )}
+                  </div>
+                  <Link
+                    to={PATH.STRATEGIES_DETAIL(qnaData.strategyId)}
+                    css={strategyTextStyle}
+                  >
+                    {qnaData.strategyName}
+                  </Link>
                 </div>
                 <div css={profileStyle}>
                   <img
@@ -158,7 +175,6 @@ const QnaDetail = () => {
                     alt='method icon'
                     css={profileImgStyle}
                   />
-
                   <span css={nicknameStyle}>{qnaData.traderNickname}</span>
                 </div>
               </>
@@ -187,9 +203,9 @@ const QnaDetail = () => {
                     <div css={answerProfileStyle}>
                       <span>
                         <img
-                          src={qnaData.methodIconPath}
+                          src={qnaData.traderProfileImagePath}
                           alt=''
-                          css={iconStyle}
+                          css={profileImgStyle}
                         />
                       </span>
                       <span css={nicknameStyle}>{qnaData.traderNickname}</span>
@@ -206,10 +222,7 @@ const QnaDetail = () => {
               <div css={listItemStyle}>
                 <span css={stepperStyle}>이전</span>
                 <Link
-                  to={PATH.MYPAGE_QNA_DETAIL(
-                    String(userInquiryId),
-                    String(qnaInquiryId - 1)
-                  )}
+                  to={`/mypage/${qnaData.userId}/qna/${qnaData.previousId}`}
                   css={listItemTilteStyle}
                 >
                   {qnaData.previousTitle}
@@ -220,10 +233,7 @@ const QnaDetail = () => {
               <div css={listItemStyle}>
                 <span css={stepperStyle}>다음</span>
                 <Link
-                  to={PATH.MYPAGE_QNA_DETAIL(
-                    String(userInquiryId),
-                    String(qnaInquiryId + 1)
-                  )}
+                  to={`/mypage/${qnaData.userId}/qna/${qnaData.nextId}`}
                   css={listItemTilteStyle}
                 >
                   {qnaData.nextTitle}
@@ -247,7 +257,7 @@ const QnaDetail = () => {
             content={
               <div css={modalContentStyle}>
                 <p css={modalTextStyle}>
-                  답변이 존재할 시 새로운 답변을 달 수 없습니다.
+                  답변이 존재할 시 문의를 수정할 수 없습니다.
                 </p>
               </div>
             }
@@ -384,15 +394,18 @@ const tagsAndTitleStyle = css`
   flex-direction: column;
 `;
 
-// const tagStyle = css`
-//   display: flex;
-//   gap: 8px;
-// `;
-
 const strategyTextStyle = css`
   margin-top: 16px;
   font-size: ${FONT_SIZE.TEXT_MD};
   font-weight: ${FONT_WEIGHT.REGULAR};
+  text-decoration: none;
+  font-color: ${COLOR.TEXT_BLACK};
+`;
+
+const tagContainerStyle = css`
+  display: flex;
+  align-items: center;
+  gap: 4px;
 `;
 
 const profileStyle = css`

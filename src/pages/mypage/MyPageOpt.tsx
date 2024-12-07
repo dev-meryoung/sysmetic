@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Button from '@/components/Button';
@@ -13,7 +13,8 @@ import useModalStore from '@/stores/useModalStore';
 
 const MypageOpt: React.FC = () => {
   const [checkboxStates, setCheckboxStates] = useState([false, false]);
-  const { memberId } = useAuthStore();
+  const { memberId, receiveInfoConsent, receiveMarketingConsent } =
+    useAuthStore();
   const { userId: paramUserId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
   const { openModal } = useModalStore();
@@ -22,9 +23,14 @@ const MypageOpt: React.FC = () => {
     paramUserId && !isNaN(Number(paramUserId)) ? Number(paramUserId) : memberId;
   const updateOpt = useUpdateOpt();
 
-  if (!userId) {
-    return null;
-  }
+  useEffect(() => {
+    if (
+      receiveInfoConsent !== undefined &&
+      receiveMarketingConsent !== undefined
+    ) {
+      setCheckboxStates([receiveInfoConsent, receiveMarketingConsent]);
+    }
+  }, [receiveInfoConsent, receiveMarketingConsent]);
 
   const handleCheckboxChange = (index: number) => {
     setCheckboxStates((prev) =>
@@ -33,18 +39,22 @@ const MypageOpt: React.FC = () => {
   };
 
   const handleComplete = () => {
-    const [receiveInfoConsent, receiveMarketingConsent] = checkboxStates;
+    const [updatedReceiveInfoConsent, updatedReceiveMarketingConsent] =
+      checkboxStates;
 
     updateOpt.mutate(
       {
         userId,
-        updateOptData: {
-          receiveInfoConsent,
-          receiveMarketingConsent,
-        },
+        receiveInfoConsent: updatedReceiveInfoConsent,
+        receiveMarketingConsent: updatedReceiveMarketingConsent,
       },
       {
         onSuccess: () => {
+          useAuthStore.setState({
+            receiveInfoConsent: updatedReceiveInfoConsent,
+            receiveMarketingConsent: updatedReceiveMarketingConsent,
+          });
+
           navigate(PATH.MYPAGE_PROFILE(String(userId)));
         },
         onError: () => {
@@ -53,6 +63,10 @@ const MypageOpt: React.FC = () => {
       }
     );
   };
+
+  if (!userId) {
+    return null;
+  }
 
   return (
     <div css={wrapperStyle}>
