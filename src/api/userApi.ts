@@ -16,6 +16,7 @@ export interface UpdatePasswordData {
 }
 
 export interface UpdateOptData {
+  userId: number;
   receiveInfoConsent: boolean;
   receiveMarketingConsent: boolean;
 }
@@ -49,12 +50,9 @@ export const updatePassword = async (PasswordData: UpdatePasswordData) => {
 };
 
 // 회원 정보성 수신동의 변경 API
-export const updateOpt = async (
-  userId: number,
-  updateOptData: UpdateOptData
-) => {
+export const updateOpt = async (updateOptData: UpdateOptData) => {
   const response = await axiosInstance.patch(
-    `/v1/member/consent/${userId}`,
+    `/v1/member/consent/${updateOptData.userId}`,
     updateOptData,
     {
       headers: {

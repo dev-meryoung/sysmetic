@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom';
 import Pagination from '@/components/Pagination';
 import SelectBox from '@/components/SelectBox';
 import Table, { ColumnProps } from '@/components/Table';
+import Tag from '@/components/Tag';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
@@ -21,7 +22,10 @@ interface QnaListDataProps {
   strategyName: string;
   inquiryRegistrationDate: string;
   inquiryStatus: string;
-  methodIconPath: string;
+  methodIconPath?: string;
+  stockList?: {
+    stockIconPath?: string[];
+  };
 }
 
 const strategyOptions = [
@@ -84,7 +88,7 @@ const QnaList = () => {
     {
       key: 'inquiryTitle',
       header: '제목',
-      render: (value, item) => (
+      render: (_, item) => (
         <div css={questionContainerStyle}>
           <div css={questionTitleStyle}>
             <Link
@@ -94,7 +98,7 @@ const QnaList = () => {
               )}
               css={linkStyle}
             >
-              {value}
+              {item.inquiryTitle}
             </Link>
           </div>
         </div>
@@ -103,19 +107,16 @@ const QnaList = () => {
     {
       key: 'strategyName',
       header: '전략명',
-      render: (value, item) => (
+      render: (_, item) => (
         <div css={strategyStyle}>
-          {item.methodIconPath !== null &&
-            item.methodIconPath !== undefined && (
-              <span>
-                <img
-                  src={item.methodIconPath}
-                  alt='method icon'
-                  css={iconStyle}
-                />
-              </span>
-            )}
-          <span>{value}</span>
+          <div className='tag'>
+            {item.methodIconPath && <Tag src={item.methodIconPath} alt='tag' />}
+            {Array.isArray(item?.stockList?.stockIconPath) &&
+              item.stockList.stockIconPath.map((stock: string, index: number) => (
+                <Tag key={index} src={stock || ''} alt='tag' />
+              ))}
+          </div>
+          <span>{item.strategyName}</span>
         </div>
       ),
     },
@@ -128,9 +129,9 @@ const QnaList = () => {
     {
       key: 'inquiryStatus',
       header: '진행상태',
-      render: (value) => (
-        <span css={value === 'closed' ? successStyle : waitingStyle}>
-          {statusMap[value] || ''}
+      render: (_, item) => (
+        <span css={item.inquiryStatus === 'closed' ? successStyle : waitingStyle}>
+          {statusMap[item.inquiryStatus] || ''}
         </span>
       ),
     },

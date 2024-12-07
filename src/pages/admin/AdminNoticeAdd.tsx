@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { css } from '@emotion/react';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CloseIcon from '@mui/icons-material/Close';
+import ImageIcon from '@mui/icons-material/Image';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
@@ -57,6 +58,17 @@ const AdminNoticesAdd = () => {
       }));
 
       setAttachedFiles((prev) => [...prev, ...fileArray]);
+      event.target.value = '';
+    }
+  };
+
+  const handleImageInsert = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = event.target;
+    if (files && files[0]) {
+      const file = files[0];
+      const imageUrl = URL.createObjectURL(file);
+      setNoticeContent((prev) => `${prev}\n![image](${imageUrl})`);
+      event.target.value = '';
     }
   };
 
@@ -88,23 +100,22 @@ const AdminNoticesAdd = () => {
 
     const formData = new FormData();
 
-    const noticeSaveRequestDto = {
+    const noticeModifyRequestDto = {
       noticeTitle,
       noticeContent,
       isOpen: isChecked === 'unclosed',
     };
+
     formData.append(
       'NoticeSaveRequestDto',
-      JSON.stringify(noticeSaveRequestDto)
+      JSON.stringify(noticeModifyRequestDto)
     );
 
-    attachedFiles.forEach((fileDto) => {
-      formData.append('fileList', fileDto.file);
-    });
-
-    attachedFiles.forEach((fileDto) => {
-      if (fileDto.file.type.startsWith('image/')) {
-        formData.append('imageList', fileDto.file);
+    attachedFiles.forEach((fileDtoList) => {
+      if (fileDtoList.file.type.startsWith('image/')) {
+        formData.append('imageDtoList', fileDtoList.file);
+      } else {
+        formData.append('fileList', fileDtoList.file);
       }
     });
 
@@ -112,11 +123,31 @@ const AdminNoticesAdd = () => {
       onSuccess: () => {
         navigate(PATH.ADMIN_NOTICES);
       },
-      onError: () => {
+      onError: (error) => {
+        console.error('Submission error:', error);
         openModal('error-submit');
       },
     });
   };
+
+  const renderContent = (content: string) => {
+    const imageRegex = /!\[image]\((.+)\)/g;
+    const images = [...content.matchAll(imageRegex)];
+
+    return images.map((match, index) => {
+      const imageUrl = match[1];
+      return <img key={index} src={imageUrl} alt='Uploaded' css={imageStyle} />;
+    });
+  };
+
+  const imageStyle = css`
+    max-width: 150px;
+    max-height: 100px;
+    height: auto;
+    margin: 8px 0;
+    object-fit: cover;
+    border: 1px solid ${COLOR.GRAY100};
+  `;
 
   const handleGoList = () => {
     navigate(PATH.ADMIN_NOTICES);
@@ -137,6 +168,15 @@ const AdminNoticesAdd = () => {
       </div>
       <div css={textAreaIconStyle}>
         <label>
+          <ImageIcon />
+          <input
+            type='file'
+            accept='image/*'
+            onChange={handleImageInsert}
+            style={{ display: 'none' }}
+          />
+        </label>
+        <label>
           <AttachFileIcon />
           <input
             type='file'
@@ -153,6 +193,7 @@ const AdminNoticesAdd = () => {
           handleChange={handleContentChange}
           fullWidth
         />
+        <div css={noticesContentStyle}>{renderContent(noticeContent)}</div>
       </div>
       <div css={noticesDetailMainStyle}>
         <div css={noticesFileStyle}>
@@ -189,7 +230,6 @@ const AdminNoticesAdd = () => {
           </div>
         </div>
       </div>
-
       <div css={btnStyle}>
         <Button
           label='이전'
@@ -209,7 +249,6 @@ const AdminNoticesAdd = () => {
           handleClick={handleSubmitBtn}
         />
       </div>
-
       <Modal
         id='error-input'
         content={
@@ -226,7 +265,6 @@ const AdminNoticesAdd = () => {
           </div>
         }
       />
-
       <Modal
         id='file-size-error'
         content={
@@ -265,8 +303,13 @@ const noticesDetailHeaderStyle = css`
   }
 `;
 
+const noticesContentStyle = css`
+  padding-top: 16px;
+  white-space: pre-line;
+`;
+
 const noticesDetailMainStyle = css`
-  padding: 40px 0 24px;
+  padding-top: 16px;
 `;
 
 const noticesFileStyle = css`
@@ -380,4 +423,5 @@ const modalTextStyle = css`
   margin-top: 32px;
   margin-bottom: 24px;
 `;
+
 export default AdminNoticesAdd;

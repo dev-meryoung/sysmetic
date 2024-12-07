@@ -34,6 +34,8 @@ interface NoticesDataProps {
   previousWriteDate?: string;
   nextTitle?: string;
   nextWriteDate?: string;
+  previousId?: string;
+  nextId?: string;
   fileDtoList?: FileDto[];
 }
 
@@ -44,7 +46,6 @@ const AdminNoticesDetail = () => {
   const { noticeId: paramNoticeId } = useParams<{ noticeId: string }>();
   const noticeId = paramNoticeId ? Number(paramNoticeId) : 0;
   const [data, setData] = useState<NoticesDataProps>({ fileDtoList: [] });
-
   const params = { noticeId: String(noticeId) };
   const getNoticeMutation = useGetAdminNotice(params);
 
@@ -129,10 +130,6 @@ const AdminNoticesDetail = () => {
     );
   }
 
-  const handleToggle = () => {
-    setToggleOn((prev) => !prev);
-  };
-
   return (
     <div css={noticesDetailWrapperStyle}>
       <div css={noticesDetailHeaderStyle}>
@@ -178,7 +175,7 @@ const AdminNoticesDetail = () => {
             </div>
             <div className='right-section'>
               <span className='toggle-text'>공개여부</span>
-              <Toggle checked={toggleOn} handleChange={handleToggle} />
+              <Toggle checked={toggleOn} handleChange={() => {}} />
               <p className='hits'>
                 조회수 <span>{data.hits}</span>
               </p>
@@ -186,8 +183,35 @@ const AdminNoticesDetail = () => {
           </div>
         </div>
         <div css={noticesContentStyle}>
-          <p>{data.noticeContent}</p>
+          {data.noticeContent?.split('\n').map((line, index) => {
+            const imageRegex = /!\[image]\((.+)\)/;
+            const match = line.match(imageRegex);
+
+            if (match) {
+              const imageUrl = match[1];
+              return (
+                <img
+                  key={index}
+                  src={imageUrl}
+                  alt='Uploaded Image'
+                  css={css`
+                    max-width: 100%;
+                    height: auto;
+                    margin: 8px 0;
+                  `}
+                />
+              );
+            }
+
+            return (
+              <span key={index}>
+                {line}
+                <br />
+              </span>
+            );
+          })}
         </div>
+
         {data.fileDtoList && data.fileDtoList.length > 0 && (
           <div css={noticesFileStyle}>
             <div className='file-title'>
@@ -230,7 +254,7 @@ const AdminNoticesDetail = () => {
             <div>
               <p>이전</p>
               <span>
-                <Link to={`/notices/${Number(noticeId) - 1}`} css={linkStyle}>
+                <Link to={`/admin/notices/${data.previousId}`} css={linkStyle}>
                   {data.previousTitle}
                 </Link>
               </span>
@@ -243,7 +267,7 @@ const AdminNoticesDetail = () => {
             <div>
               <p>다음</p>
               <p>
-                <Link to={`/notices/${Number(noticeId) + 1}`} css={linkStyle}>
+                <Link to={`/admin/notices/${data.nextId}`} css={linkStyle}>
                   {data.nextTitle}
                 </Link>
               </p>
@@ -270,14 +294,14 @@ const AdminNoticesDetail = () => {
             <div css={modalButtonWrapperStyle}>
               <Button
                 label='아니오'
-                handleClick={() => closeModal('delete-confirm')} // 모달 닫기
+                handleClick={() => closeModal('delete-confirm')}
                 color='primaryOpacity10'
                 border
               />
               <Button
                 label='예'
                 handleClick={() => {
-                  closeModal('delete-confirm'); // 모달 닫기
+                  closeModal('delete-confirm');
                   deleteMutation.mutate(String(noticeId), {
                     onSuccess: () => {
                       navigate(PATH.ADMIN_NOTICES);
@@ -366,6 +390,8 @@ const noticesTitleStyle = css`
 const noticesContentStyle = css`
   padding: 24px 24px 64px;
   min-height: 280px;
+  white-space: pre-line;
+  word-break: break-word;
 `;
 const noticesFileStyle = css`
   display: flex;

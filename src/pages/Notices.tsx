@@ -22,7 +22,7 @@ const Notices = () => {
   const [searchValue, setSearchValue] = useState('');
   const [curPage, setCurPage] = useState<number>(0);
   const [data, setData] = useState<NoticesStrategyDataProps[]>([]);
-  const [_filteredData, setFilteredData] = useState<NoticesStrategyDataProps[]>(
+  const [filteredData, setFilteredData] = useState<NoticesStrategyDataProps[]>(
     []
   );
   const [totalPage, setTotalPage] = useState(0);
@@ -110,10 +110,10 @@ const Notices = () => {
           handleChange={handleChange}
           handleKeyDown={handleKeyDown}
         />
-        <SearchIcon css={iconStyle} onClick={handleSearch} />{' '}
+        <SearchIcon css={iconStyle} onClick={handleSearch} />
       </div>
       <div css={noticesListStyle}>
-        <Table data={data} columns={columns} />
+        <Table data={filteredData} columns={columns} />
       </div>
       <div css={noticesPaginationStyle}>
         <Pagination
