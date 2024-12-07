@@ -206,26 +206,17 @@ export const getAdminNotice = async (params: GetAdminNoticeData) => {
 };
 
 // 공지사항 수정 API
-export const updateAdminNotice = async (
-  formData: FormData,
-  noticeId: string
-) => {
-  const response = await axiosInstance.put(
-    `/v1/admin/notice/${noticeId}`,
-    formData,
-    {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    }
-  );
-  return response.data;
-};
+export const updateAdminNotice = async (formData: FormData, noticeId: string) =>
+  axiosInstance.put(`/v1/admin/notice/${noticeId}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
 
 // 공지사항 삭제 API
 export const deleteAdminNotice = async (noticeId: string) => {
-  const response = await axiosInstance.delete(`/v1/admin/notice/${noticeId}`); // RESTful 형식에 맞게 수정
-  return response.data; // 서버에서 반환하는 데이터
+  const response = await axiosInstance.delete(`/v1/admin/notice/${noticeId}`);
+  return response.data;
 };
 
 // 공지사항 목록에서 개별 공개여부 수정 API

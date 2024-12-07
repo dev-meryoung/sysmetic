@@ -44,13 +44,10 @@ export const useUpdatePassword = () =>
 // 수신 동의 상태 변경
 export const useUpdateOpt = () =>
   useMutation({
-    mutationFn: async ({
-      userId,
-      updateOptData,
-    }: {
-      userId: number;
-      updateOptData: UpdateOptData;
-    }) => updateOpt(userId, updateOptData),
+    mutationFn: async (updateOptData: UpdateOptData) => {
+      const response = await updateOpt(updateOptData);
+      return response;
+    },
   });
 
 // 회원 탈퇴

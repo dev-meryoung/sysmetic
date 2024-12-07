@@ -32,21 +32,21 @@ interface NoticesAdminDataProps {
 }
 
 const selectBoxOptions = [
-  { label: '제목', value: 'noticeTitle' },
-  { label: '내용', value: 'noticeContent' },
-  { label: '제목+내용', value: 'titleAndContent' },
-  { label: '작성자', value: 'writeNickname' },
+  { label: '내용', value: 'content' },
+  { label: '제목+내용', value: 'titleContent' },
+  { label: '작성자', value: 'writer' },
 ];
 
 const PAGE_SIZE = 10;
 
 const AdminNotices = () => {
   const [searchValue, setSearchValue] = useState('');
+  const [searchType, setSearchType] = useState('');
+  const [selectBoxValue, setSelectBoxValue] = useState('');
+  const [searchText, setSearchText] = useState('');
   const [curPage, setCurPage] = useState<number>(0);
   const [data, setData] = useState<NoticesAdminDataProps[]>([]);
-  const [_filteredData, setFilteredData] = useState<NoticesAdminDataProps[]>(
-    []
-  );
+  const [filteredData, setFilteredData] = useState<NoticesAdminDataProps[]>([]);
   const [totalPage, setTotalPage] = useState(0);
   const navigate = useNavigate();
   const { openModal, closeModal } = useModalStore();
@@ -63,10 +63,12 @@ const AdminNotices = () => {
   };
 
   const { noticeId } = useParams<{ noticeId: string }>();
+
   const params = {
     noticeId,
     page: curPage,
-    searchText: searchValue,
+    searchType,
+    searchText,
   };
 
   const noticeGetListMutation = useGetAdminNoticeList(params);
@@ -80,14 +82,13 @@ const AdminNotices = () => {
       const sortedData = [...fetchedData].sort((a, b) => b.no - a.no);
       setData(sortedData);
       setFilteredData(sortedData);
-
-      const calculatedTotalPage = Math.ceil(total / PAGE_SIZE);
-      setTotalPage(calculatedTotalPage);
     } else {
       setData([]);
       setFilteredData([]);
-      setTotalPage(1);
     }
+
+    const calculatedTotalPage = Math.ceil(total / PAGE_SIZE);
+    setTotalPage(calculatedTotalPage || 1);
   }, [noticeGetListMutation.data]);
 
   const handleStatusChange = (index: number, newValue: boolean) => {
@@ -102,6 +103,9 @@ const AdminNotices = () => {
     );
 
     noticeUpdateStatusMutation.mutate(String(noticeId), {
+      onSuccess: () => {
+        noticeGetListMutation.refetch();
+      },
       onError: () => {
         setData((prevData) =>
           prevData.map((item, idx) =>
@@ -112,23 +116,22 @@ const AdminNotices = () => {
     });
   };
 
-  const count = data.length;
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(e.target.value);
-  };
+  const count = noticeGetListMutation.data?.data?.totalElement;
 
   const handleSearch = () => {
-    const filtered = data.filter((item) =>
-      item.noticeTitle?.toLowerCase().includes(searchValue.trim().toLowerCase())
-    );
-    setFilteredData(filtered);
+    setSearchType(selectBoxValue);
+    setSearchText(searchValue.trim().toLowerCase());
     setCurPage(0);
-    setTotalPage(Math.ceil(filtered.length / PAGE_SIZE));
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') handleSearch();
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(e.target.value);
   };
 
   const handleWrite = () => {
@@ -159,9 +162,9 @@ const AdminNotices = () => {
       onSuccess: () => {
         closeModal('delete-confirm');
         noticeGetListMutation.refetch();
+        useTableStore.setState({ checkedItems: [] });
       },
-      onError: (error) => {
-        console.error('삭제 실패:', error);
+      onError: () => {
         openModal('error-delete');
       },
     });
@@ -249,11 +252,12 @@ const AdminNotices = () => {
         <div css={searchStyle}>
           <SelectBox
             options={selectBoxOptions}
-            placeholder='선택'
-            handleChange={() => {}}
+            placeholder='제목'
+            handleChange={(value) => setSelectBoxValue(value)}
             color='skyblue'
             width={177}
           />
+
           <TextInput
             value={searchValue}
             handleChange={handleChange}
@@ -292,7 +296,7 @@ const AdminNotices = () => {
 
       <div css={noticesListStyle}>
         <Table
-          data={data}
+          data={filteredData}
           columns={columns}
           hasCheckbox={true}
           checkedItems={checkedItems}
