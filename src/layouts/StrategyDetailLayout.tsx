@@ -587,7 +587,9 @@ const StrategyDetailLayout = () => {
                                 typeof value === 'number'
                                   ? value < 0
                                     ? COLOR.PRIMARY400
-                                    : COLOR.POINT
+                                    : value === 0
+                                      ? 'inherit'
+                                      : COLOR.POINT
                                   : 'inherit',
                             }}
                           >
