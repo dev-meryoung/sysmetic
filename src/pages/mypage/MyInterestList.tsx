@@ -487,11 +487,11 @@ const MyInterestList = () => {
       render: (_, item) => {
         const itemValue = item.accumulatedProfitRatio;
 
-        const colorStyle = getColorStyleBasedOnValue(itemValue);
+        const { text, style } = getColorStyleBasedOnValue(itemValue);
 
         return (
-          <div css={fontStyle} style={colorStyle}>
-            {itemValue || 0}%
+          <div css={fontStyle} style={style}>
+            {text || 0}
           </div>
         );
       },
@@ -502,11 +502,11 @@ const MyInterestList = () => {
       render: (_, item) => {
         const itemValue = item.mdd;
 
-        const colorStyle = getColorStyleBasedOnValue(itemValue);
+        const { text, style } = getColorStyleBasedOnValue(itemValue);
 
         return (
-          <div css={fontStyle} style={colorStyle}>
-            {itemValue || 0}%
+          <div css={fontStyle} style={style}>
+            {text || 0}
           </div>
         );
       },
@@ -517,11 +517,11 @@ const MyInterestList = () => {
       render: (_, item) => {
         const itemValue = item.smScore;
 
-        const colorStyle = getColorStyleBasedOnValue(itemValue);
+        const { text, style } = getColorStyleBasedOnValue(itemValue);
 
         return (
-          <div css={fontStyle} style={colorStyle}>
-            {itemValue || 0}%
+          <div css={fontStyle} style={style}>
+            {text || 0}
           </div>
         );
       },
