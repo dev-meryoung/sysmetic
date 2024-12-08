@@ -36,6 +36,7 @@ const EmailOptions = [
   { label: 'naver.com', value: 'naver' },
   { label: 'gmail.com', value: 'gmail' },
   { label: 'hanmail.net', value: 'hanmail' },
+  { label: 'daum.net', value: 'daum' },
   { label: 'nate.com', value: 'nate' },
   { label: 'hotmail.com', value: 'hotmail' },
 ];
@@ -54,6 +55,7 @@ interface AuthModalProps {
   email: string;
   setSuccessEmailAuth: Dispatch<React.SetStateAction<boolean>>;
 }
+
 const AuthModal: React.FC<AuthModalProps> = ({
   email,
   setSuccessEmailAuth,
@@ -136,6 +138,13 @@ const AuthSuccessModal = () => (
   </div>
 );
 
+const SignUpFailureModal = () => (
+  <div css={AuthSuccessModalStyle}>
+    <p>회원가입에 실패했습니다.</p>
+    <p>필수 입력사항을 다시한번 확인해주세요.</p>
+  </div>
+);
+
 const SignUpForm = () => {
   // 입력 폼
   const [id, setId] = useState('');
@@ -150,6 +159,7 @@ const SignUpForm = () => {
   const age = new Date().getFullYear() - new Date(date).getFullYear() < 14;
   // 모달 변수
   const authModal = useModalStore();
+  const errModal = useModalStore();
   // 버튼 상태
   const [checkIdDisabled, setCheckIdDisabled] = useState(true);
   const [idAuthBtnDisabled, setIdAuthBtnDisabled] = useState(true);
@@ -169,7 +179,7 @@ const SignUpForm = () => {
   const { type } = useParams();
   const navigate = useNavigate();
   // 이메일 인증
-  const [parsedEmail, setParsedEmail] = useState('');
+  // const [parsedEmail, setParsedEmail] = useState('');
 
   //status 관련 (인풋창 border 색상)
   const [idStatus, setIdStatus] = useState<InputStateTypes>('normal');
@@ -239,10 +249,7 @@ const SignUpForm = () => {
 
     const registerData = {
       roleCode: type === 'investor' ? 'USER' : 'TRADER',
-      email:
-        selectedEmail === 'daum' || 'hanmail'
-          ? `${id}@${selectedEmail}.net`
-          : `${id}@${selectedEmail}.com`,
+      email: `${id}@${selectedEmail}.com`,
       password: pw,
       rewritePassword: checkPw,
       name,
@@ -261,8 +268,8 @@ const SignUpForm = () => {
       onSuccess: () => {
         navigate(PATH.SIGN_UP_DONE(type));
       },
-      onError: (error) => {
-        console.error('회원가입 실패', error);
+      onError: () => {
+        errModal.openModal('signUp-err');
       },
     });
   };
@@ -341,13 +348,8 @@ const SignUpForm = () => {
   const { mutate: AuthCodeMutation } = useSendAuthCode();
   const handleOpenAuthModal = () => {
     if (idStatus === 'pass' && selectedEmail && successId) {
-      if (selectedEmail === 'daum' || 'hanmail') {
-        setParsedEmail(`${id}@${selectedEmail}.net`);
-      } else {
-        setParsedEmail(`${id}@${selectedEmail}.com`);
-      }
-
-      AuthCodeMutation(parsedEmail, {
+      const email = `${id}@${selectedEmail}.com`;
+      AuthCodeMutation(email, {
         onSuccess: () => {
           authModal.openModal('auth', 360);
         },
@@ -639,17 +641,14 @@ const SignUpForm = () => {
       <Modal
         content={
           <AuthModal
-            email={
-              selectedEmail === 'daum' || 'hanmail'
-                ? `${id}@${selectedEmail}.net`
-                : `${id}@${selectedEmail}.com`
-            }
+            email={`${id}@${selectedEmail}.com`}
             setSuccessEmailAuth={setSuccessEmailAuth}
           />
         }
         id='auth'
       />
       <Modal content={<AuthSuccessModal />} id='success' />
+      <Modal content={<SignUpFailureModal />} id='signUp-err' />
     </div>
   );
 };
@@ -830,8 +829,10 @@ const AuthModalStyle = css`
 
 const AuthSuccessModalStyle = css`
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  line-height: 160%;
 
   padding: 8px 16px;
   font-size: ${FONT_SIZE.TEXT_MD};
