@@ -37,9 +37,7 @@ const EmailOptions = [
   { label: 'gmail.com', value: 'gmail' },
   { label: 'hanmail.net', value: 'hanmail' },
   { label: 'nate.com', value: 'nate' },
-  { label: 'yahoo.com', value: 'yahoo' },
-  { label: 'empal.com', value: 'empal' },
-  { label: 'test.com', value: 'test' },
+  { label: 'hotmail.com', value: 'hotmail' },
 ];
 
 const REGEX = {
@@ -170,6 +168,8 @@ const SignUpForm = () => {
   // 라우팅 관련
   const { type } = useParams();
   const navigate = useNavigate();
+  // 이메일 인증
+  const [parsedEmail, setParsedEmail] = useState('');
 
   //status 관련 (인풋창 border 색상)
   const [idStatus, setIdStatus] = useState<InputStateTypes>('normal');
@@ -239,7 +239,10 @@ const SignUpForm = () => {
 
     const registerData = {
       roleCode: type === 'investor' ? 'USER' : 'TRADER',
-      email: `${id}@${selectedEmail}.com`,
+      email:
+        selectedEmail === 'daum' || 'hanmail'
+          ? `${id}@${selectedEmail}.net`
+          : `${id}@${selectedEmail}.com`,
       password: pw,
       rewritePassword: checkPw,
       name,
@@ -247,12 +250,9 @@ const SignUpForm = () => {
       birth: date,
       phoneNumber: phoneNum,
       receiveInfoConsent: isFirstChecked,
-      infoConsentDate: new Date().toISOString().slice(0, 19).replace('Z', ''),
+      infoConsentDate: new Date().toISOString().slice(0, -1) + '+00:00',
       receiveMarketingConsent: isSecondChecked,
-      marketingConsentDate: new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace('Z', ''),
+      marketingConsentDate: new Date().toISOString().slice(0, -1) + '+00:00',
     };
 
     formData.append('registerResponseDto', JSON.stringify(registerData));
@@ -261,8 +261,8 @@ const SignUpForm = () => {
       onSuccess: () => {
         navigate(PATH.SIGN_UP_DONE(type));
       },
-      onError: () => {
-        console.log('회원가입 실패');
+      onError: (error) => {
+        console.error('회원가입 실패', error);
       },
     });
   };
@@ -341,8 +341,13 @@ const SignUpForm = () => {
   const { mutate: AuthCodeMutation } = useSendAuthCode();
   const handleOpenAuthModal = () => {
     if (idStatus === 'pass' && selectedEmail && successId) {
-      const email = `${id}@${selectedEmail}.com`;
-      AuthCodeMutation(email, {
+      if (selectedEmail === 'daum' || 'hanmail') {
+        setParsedEmail(`${id}@${selectedEmail}.net`);
+      } else {
+        setParsedEmail(`${id}@${selectedEmail}.com`);
+      }
+
+      AuthCodeMutation(parsedEmail, {
         onSuccess: () => {
           authModal.openModal('auth', 360);
         },
@@ -634,7 +639,11 @@ const SignUpForm = () => {
       <Modal
         content={
           <AuthModal
-            email={`${id}@${selectedEmail}.com`}
+            email={
+              selectedEmail === 'daum' || 'hanmail'
+                ? `${id}@${selectedEmail}.net`
+                : `${id}@${selectedEmail}.com`
+            }
             setSuccessEmailAuth={setSuccessEmailAuth}
           />
         }

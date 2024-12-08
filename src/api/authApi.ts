@@ -107,7 +107,10 @@ export const checkEmail = async (
   selectedEmail: string
 ): Promise<number> => {
   try {
-    const email = `${id}@${selectedEmail}.com`;
+    const email =
+      selectedEmail === 'daum' || 'hanmail'
+        ? `${id}@${selectedEmail}.net`
+        : `${id}@${selectedEmail}.com`;
     const response = await axiosInstance.get(
       `v1/auth/check-duplicate-email?email=${email}`,
       {
