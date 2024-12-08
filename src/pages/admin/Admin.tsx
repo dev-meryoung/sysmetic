@@ -48,7 +48,11 @@ const Admin = () => {
   }, [tab]);
 
   if (isLoading) {
-    return <Loading />;
+    return (
+      <div css={loadingStyle}>
+        <Loading />
+      </div>
+    );
   }
 
   const DonutChart = () => {
@@ -490,6 +494,15 @@ const chartDataStyle = css`
     height: 14px;
     background-color: ${COLOR.PRIMARY600};
   }
+`;
+
+const loadingStyle = css`
+  width: 100%;
+  height: 100vh;
+  background-color: ${COLOR_OPACITY.PRIMARY100_OPACITY30};
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 export default Admin;
