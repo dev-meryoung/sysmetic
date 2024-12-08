@@ -43,7 +43,7 @@ const EmailOptions = [
 ];
 
 const REGEX = {
-  ID_REGEX: /^[a-zA-Z\d_]+$/,
+  ID_REGEX: /^[a-zA-Z\d\.\/%\+\-]+$/,
   PW_REGEX:
     /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,20}$/,
   NAME_REGEX: /^[가-힣]{1,10}$/,
@@ -75,7 +75,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
       setAuthCodeStatus('pass');
     } else {
       setAuthCodeStatus('warn');
-      setMessage('6자리의 영문 대문자, 숫자만 조합하여 사용');
+      setMessage('6자리의 영문 대문자, 숫자만 입력해주세요.');
     }
   };
 
@@ -489,12 +489,12 @@ const SignUpForm = () => {
           </div>
           <p>
             {idStatus === 'warn' &&
-              '영문, 숫자, 특수문자 중 1개 이상 조합하여 사용'}
-            {idStatus === 'pass' && !selectedEmail && '이메일을 선택해주세요.'}
+              '영문, 숫자, 특수문자(_, ., %, +, -)만 입력해주세요.'}
+            {idStatus === 'pass' && !selectedEmail && '도메인을 선택해주세요.'}
             {idStatus === 'pass' &&
               selectedEmail &&
               (isExist ? (
-                '중복된 이메일입니다.'
+                '중복된 이메일입니다. 다른 이메일을 입력해주세요.'
               ) : (
                 <span className='success-msg'>{emailMessage}</span>
               ))}
@@ -512,7 +512,7 @@ const SignUpForm = () => {
             handleChange={handlePwInputChange}
           />
           {pwStatus === 'warn' && (
-            <p>6~20자의 영문, 숫자, 특수문자를 모두 조합하여 사용</p>
+            <p>6~20자의 영문, 숫자, 특수문자를 모두 입력해주세요.</p>
           )}
         </div>
         <div className='input-form'>
@@ -547,11 +547,10 @@ const SignUpForm = () => {
             />
           </div>
           <p>
-            {nicknameStatus === 'warn' &&
-              '3~10자의 한글, 숫자 중 1개 이상 조합하여 사용'}
+            {nicknameStatus === 'warn' && '3~10자의 한글, 숫자만 입력해주세요.'}
             {nicknameStatus === 'pass' &&
               (isNicknameExist ? (
-                '중복된 닉네임입니다.'
+                '중복된 닉네임입니다. 다른 닉네임을 입력해주세요.'
               ) : (
                 <span className='success-msg'>{nicknameMessage}</span>
               ))}
@@ -567,7 +566,7 @@ const SignUpForm = () => {
             value={name}
             handleChange={handleNameInputChange}
           />
-          {nameStatus === 'warn' && <p>1~10자의 한글만 조합하여 사용</p>}
+          {nameStatus === 'warn' && <p>1~10자의 한글만 입력해주세요.</p>}
         </div>
         <div className='input-form'>
           <p>
@@ -589,7 +588,7 @@ const SignUpForm = () => {
             handleChange={handlePhoneInputChange}
           />
           {phoneNumStatus === 'warn' && (
-            <p>010으로 시작하는 11자의 숫자만 조합하여 사용 ('-' 제외)</p>
+            <p>010으로 시작하는 11자의 숫자만 입력해주세요. ('-' 제외)</p>
           )}
         </div>
         <div className='img-form'>
