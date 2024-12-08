@@ -92,7 +92,7 @@ const SignFindPw = () => {
       { email: formData.email, authCode: formData.verificationCode },
       {
         onSuccess: (response) => {
-          if (response?.isValid) {
+          if (response?.code === 200) {
             setShowResetSection(true);
             setMessages({ ...messages, verificationCodeError: '' });
             setStatuses({ ...statuses, verificationCode: 'normal' });
@@ -140,8 +140,8 @@ const SignFindPw = () => {
 
     if (isPasswordValid && isPasswordMatch) {
       resetMutation.mutate({
-        emailAuthCode: formData.verificationCode,
         email: formData.email,
+        authCode: formData.verificationCode,
         password: formData.password,
         rewritePassword: formData.checkPassword,
       });
