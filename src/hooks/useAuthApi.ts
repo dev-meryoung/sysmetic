@@ -59,7 +59,7 @@ export const useCheckNickname = () =>
 
 export const useSignUp = () =>
   useMutation({
-    mutationFn: register,
+    mutationFn: (registerFormData: FormData) => register(registerFormData),
   });
 
 export const useSendAuthCode = () =>
