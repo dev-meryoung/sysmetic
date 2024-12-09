@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
 import { useNavigate, useParams } from 'react-router-dom';
+import dayIcon from '@/assets/images/day-icon.png';
+import positionIcon from '@/assets/images/position-icon.png';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
 import Tag from '@/components/Tag';
@@ -128,6 +130,10 @@ const QnaAnswer = () => {
                     <Tag key={idx} src={tag.iconPath} alt={tag.name} />
                   )
                 )}
+                <Tag
+                  src={inquiryData.cycle === 'D' ? dayIcon : positionIcon}
+                  alt='Cycle Icon'
+                />
                 {Array.isArray(inquiryData.stockList?.stockIconPath) &&
                   inquiryData.stockList?.stockIconPath.map(
                     (stock: string, idx: number) => (

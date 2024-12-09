@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { css } from '@emotion/react';
 import { useNavigate, useParams } from 'react-router-dom';
+import dayIcon from '@/assets/images/day-icon.png';
+import positionIcon from '@/assets/images/position-icon.png';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
 import Tag from '@/components/Tag';
@@ -84,6 +86,14 @@ const QnaQuestion = () => {
           <div className='tags' css={tagStyle}>
             {strategyData.methodIconPath && (
               <Tag src={strategyData.methodIconPath} alt='method icon' />
+            )}
+            {strategyData.cycle && (
+              <Tag
+                src={strategyData.cycle === 'D' ? dayIcon : positionIcon}
+                alt={
+                  strategyData.cycle === 'D' ? 'day cycle' : 'position cycle'
+                }
+              />
             )}
             {Array.isArray(strategyData.stockList?.stockIconPath) &&
               strategyData.stockList?.stockIconPath.map(
