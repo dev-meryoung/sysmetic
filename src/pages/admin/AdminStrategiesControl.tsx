@@ -603,7 +603,9 @@ const formBoxStyle = css`
 
       .options {
         display: flex;
-        gap: 8px;
+        flex-wrap: wrap;
+        width: 1000px;
+        gap: 16px;
       }
 
       .file-box {

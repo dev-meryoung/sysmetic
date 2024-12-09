@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
 import { useNavigate, useParams } from 'react-router-dom';
+import dayIcon from '@/assets/images/day-icon.png';
+import positionIcon from '@/assets/images/position-icon.png';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
-import ProfileImage from '@/components/ProfileImage';
 import Tag from '@/components/Tag';
 import TextArea from '@/components/TextArea';
 import TextInput from '@/components/TextInput';
@@ -121,15 +122,33 @@ const QnaAnswer = () => {
           <div css={strategyWrapperStyle}>
             <div css={tagsAndTitleStyle}>
               <div css={tagStyle}>
-                <Tag src='default-tag.png' alt='tag' />
+                {inquiryData.methodIconPath && (
+                  <Tag src={inquiryData.methodIconPath} alt='Method Icon' />
+                )}
+                {inquiryData.tags?.map(
+                  (tag: { iconPath: string; name: string }, idx: number) => (
+                    <Tag key={idx} src={tag.iconPath} alt={tag.name} />
+                  )
+                )}
+                <Tag
+                  src={inquiryData.cycle === 'D' ? dayIcon : positionIcon}
+                  alt='Cycle Icon'
+                />
+                {Array.isArray(inquiryData.stockList?.stockIconPath) &&
+                  inquiryData.stockList?.stockIconPath.map(
+                    (stock: string, idx: number) => (
+                      <Tag key={idx} src={stock} alt='Stock Icon' />
+                    )
+                  )}
               </div>
+
               <div css={strategyTextStyle}>{inquiryData.strategyName}</div>
             </div>
             <div css={profileStyle}>
-              <ProfileImage
-                src='default-profile.png'
-                alt='profileImg'
-                size='md'
+              <img
+                src={inquiryData.traderProfileImagePath}
+                alt='method icon'
+                css={profileImgStyle}
               />
               <span css={nicknameStyle}>{inquiryData.traderNickname}</span>
             </div>
@@ -363,4 +382,11 @@ const modalTextStyle = css`
   text-align: center;
   margin-top: 32px;
   margin-bottom: 24px;
+`;
+
+const profileImgStyle = css`
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
 `;
