@@ -11,6 +11,7 @@ export interface GetInquiryDetailData {
   sort?: string;
   closed?: string;
   page?: number;
+  traderProfileImage?: string;
   methodIconPath?: string;
   stockList?: {
     stockIds: number[];

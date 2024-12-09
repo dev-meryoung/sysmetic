@@ -140,10 +140,10 @@ const QnaAnswer = () => {
               <div css={strategyTextStyle}>{inquiryData.strategyName}</div>
             </div>
             <div css={profileStyle}>
-              <ProfileImage
-                src='default-profile.png'
-                alt='profileImg'
-                size='md'
+              <img
+                src={inquiryData.traderProfileImagePath}
+                alt='method icon'
+                css={profileImgStyle}
               />
               <span css={nicknameStyle}>{inquiryData.traderNickname}</span>
             </div>
@@ -377,4 +377,11 @@ const modalTextStyle = css`
   text-align: center;
   margin-top: 32px;
   margin-bottom: 24px;
+`;
+
+const profileImgStyle = css`
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
 `;
