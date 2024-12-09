@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import Loading from '@/components/Loading';
 import TabButton from '@/components/TabButton';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
-import { FONT_SIZE } from '@/constants/font';
+import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 import { useGetAdminMain } from '@/hooks/useAdminApi';
 
@@ -19,6 +19,7 @@ const Admin = () => {
   const { data, isLoading } = useGetAdminMain();
 
   const runReport = data?.data?.runReportResponseDto || {};
+  const runReportUrls = data?.data?.runReportResponseDto.topVisitedUrls || {};
   const memberCount = data?.data?.memberCount || {};
   const strategyCount = data?.data?.strategyCount || {};
   const inquiryCount = data?.data?.adminInquiryResponseDto || {};
@@ -36,7 +37,7 @@ const Admin = () => {
   };
 
   const handleNoticeClick = () => {
-    navigate(PATH.ADMIN_NOTICES_DETAIL(notices.noticeId));
+    navigate(PATH.ADMIN_NOTICES_DETAIL(notices[0].noticeId));
   };
 
   const handleTabClick = (value: SetStateAction<number>) => {
@@ -191,9 +192,14 @@ const Admin = () => {
           <div className='home-url-items'>
             <p>가장 많이 들른 URL</p>
             <div className='url'>
-              <p>1. www.naver.com</p>
-              <p>2. www.daum.net</p>
-              <p>3. www.google.com</p>
+              {Object.keys(runReportUrls)
+                .slice(0, 3)
+                .map((url, idx) => (
+                  <p key={url}>
+                    {idx + 1}. sysmetic.kr{url}
+                    <span>{runReportUrls[url]}</span>
+                  </p>
+                ))}
             </div>
           </div>
         </div>
@@ -452,6 +458,11 @@ const homeStyle = css`
       p {
         color: ${COLOR.TEXT_BLACK};
         font-size: ${FONT_SIZE.TEXT_MD};
+
+        span {
+          font-weight: ${FONT_WEIGHT.BOLD};
+          padding-left: 16px;
+        }
       }
     }
   }
