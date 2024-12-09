@@ -1,4 +1,10 @@
-import React, { useEffect, useState, ChangeEvent, Dispatch } from 'react';
+import React, {
+  useEffect,
+  useState,
+  ChangeEvent,
+  Dispatch,
+  useRef,
+} from 'react';
 import { css } from '@emotion/react';
 import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -153,7 +159,8 @@ const SignUpForm = () => {
   const [nickname, setNickname] = useState('');
   const [name, setName] = useState('');
   const [phoneNum, setPhoneNum] = useState('');
-  const [profileImg, setProfileImg] = useState('');
+  const [profileImg, setProfileImg] = useState<File | null>(null);
+  const [profileFile, setProfileFile] = useState('');
   const [date, setDate] = useState('');
   const [selectedEmail, setSelectedEmail] = useState('');
   const age = new Date().getFullYear() - new Date(date).getFullYear() < 14;
@@ -178,8 +185,6 @@ const SignUpForm = () => {
   // 라우팅 관련
   const { type } = useParams();
   const navigate = useNavigate();
-  // 이메일 인증
-  // const [parsedEmail, setParsedEmail] = useState('');
 
   //status 관련 (인풋창 border 색상)
   const [idStatus, setIdStatus] = useState<InputStateTypes>('normal');
@@ -190,46 +195,24 @@ const SignUpForm = () => {
   const [nameStatus, setNameStatus] = useState<InputStateTypes>('normal');
   const [phoneNumStatus, setPhoneNumStatus] =
     useState<InputStateTypes>('normal');
+  const fileRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
     if (file) {
+      setProfileImg(file);
+
       const reader = new FileReader();
+
       reader.onload = () => {
         if (reader.result) {
-          setProfileImg(reader.result as string);
+          setProfileFile(reader.result.toString());
         }
       };
+
       reader.readAsDataURL(file);
     }
-  };
-
-  // 파일 탐색기 열기
-  const handleOpenFileExplorer = () => {
-    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-    const fileInput = document.createElement('input');
-
-    fileInput.type = 'file';
-    fileInput.accept = 'image/jpg,image/jpeg,image/png,image/gif';
-
-    fileInput.addEventListener('change', (e: Event) => {
-      const input = e.target as HTMLInputElement;
-      if (input.files && input.files.length > 0) {
-        const file = input.files[0];
-        if (file.size > MAX_FILE_SIZE) {
-          alert(
-            '5MB 이하의 jp(e)g, png, gif 형식의 이미지만 설정할 수 있습니다.'
-          );
-          return;
-        }
-
-        handleFileChange({
-          target: input,
-        } as ChangeEvent<HTMLInputElement>);
-      }
-    });
-
-    fileInput.click();
   };
 
   const handleEmailChange = (value: string) => {
@@ -600,8 +583,15 @@ const SignUpForm = () => {
         </div>
         <div className='img-form'>
           <p>프로필 이미지 설정</p>
-          <div className='img-div' onClick={handleOpenFileExplorer}>
-            <ProfileImage size='xxl' alt='profile' src={profileImg} />
+          <div className='img-div' onClick={() => fileRef.current?.click()}>
+            <ProfileImage size='xxl' alt='profile' src={profileFile} />
+            <input
+              ref={fileRef}
+              type='file'
+              accept='image/*'
+              onChange={handleFileChange}
+              css={fileInputStyle}
+            />
             <CameraAltOutlinedIcon className='icon' css={iconStyle} />
           </div>
         </div>
@@ -836,6 +826,10 @@ const AuthSuccessModalStyle = css`
 
   padding: 8px 16px;
   font-size: ${FONT_SIZE.TEXT_MD};
+`;
+
+const fileInputStyle = css`
+  display: none;
 `;
 
 export default SignUpForm;
