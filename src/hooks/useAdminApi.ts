@@ -35,6 +35,9 @@ import {
   StocksParameterProps,
   updateAdminMethods,
   updateAdminStocks,
+  AdminStrategyDtoProps,
+  getAdminStrategyList,
+  getAdminMain,
 } from '@/api';
 
 export const useApproveAdminStrategy = () =>
@@ -217,4 +220,18 @@ export const useUpdateAdminUserRole = () =>
 export const useDeleteAdminUser = () =>
   useMutation({
     mutationFn: async (membersId: number[]) => deleteAdminUser(membersId),
+  });
+
+// 관리자 전략목록 조회
+export const useGetAdminStrategyList = (params: AdminStrategyDtoProps) =>
+  useQuery({
+    queryKey: ['adminStrategyList', params],
+    queryFn: () => getAdminStrategyList(params),
+  });
+
+// 관리자 메인 조회
+export const useGetAdminMain = () =>
+  useQuery({
+    queryKey: ['adminMain'],
+    queryFn: () => getAdminMain(),
   });
