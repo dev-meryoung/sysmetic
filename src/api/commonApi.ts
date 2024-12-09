@@ -11,6 +11,7 @@ export interface GetInquiryDetailData {
   sort?: string;
   closed?: string;
   page?: number;
+  methodIconPath?: string;
 }
 
 export interface CreateAnswerData {

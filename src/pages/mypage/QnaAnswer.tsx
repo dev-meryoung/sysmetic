@@ -121,8 +121,16 @@ const QnaAnswer = () => {
           <div css={strategyWrapperStyle}>
             <div css={tagsAndTitleStyle}>
               <div css={tagStyle}>
-                <Tag src='default-tag.png' alt='tag' />
+                {inquiryData.methodIconPath && (
+                  <Tag src={inquiryData.methodIconPath} alt='Method Icon' />
+                )}
+                {inquiryData.tags?.map(
+                  (tag: { iconPath: string; name: string }, idx: number) => (
+                    <Tag key={idx} src={tag.iconPath} alt={tag.name} />
+                  )
+                )}
               </div>
+
               <div css={strategyTextStyle}>{inquiryData.strategyName}</div>
             </div>
             <div css={profileStyle}>
