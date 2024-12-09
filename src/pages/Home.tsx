@@ -12,6 +12,7 @@ import { useGetMainPage, useGetMainPageChart } from '@/hooks/useCommonApi';
 import useCountMotion from '@/hooks/useCountMotion';
 import Footer from '@/layouts/Footer';
 import Header from '@/layouts/Header';
+import { formatPercent } from '@/utils/dataUtils';
 import getColorStyleBasedOnValue from '@/utils/tableUtils';
 
 const Home = () => {
@@ -102,8 +103,7 @@ const Home = () => {
                       {trader.followerCount}
                     </div>
                     <div className='price-area'>
-                      <h3>{Number(trader.accumProfitLossRate).toFixed(0)}</h3>
-                      <h6>원</h6>
+                      <h3>{formatPercent(trader.accumProfitLossRate)}</h3>
                     </div>
                   </div>
                 </div>

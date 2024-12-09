@@ -16,6 +16,7 @@ import {
   useGetAdminUserList,
   useUpdateAdminUserRole,
 } from '@/hooks/useAdminApi';
+import useAuthStore from '@/stores/useAuthStore';
 import useModalStore from '@/stores/useModalStore';
 import { useTableStore } from '@/stores/useTableStore';
 
@@ -53,6 +54,9 @@ const AdminUsers = () => {
   const [curPage, setCurPage] = useState(0);
 
   const [fetch, setFetch] = useState(true);
+  //현재 유저정보 가져오기
+  const curUser = useAuthStore();
+  const curUserGrade = curUser.roleCode;
   //회원목록 가져오기
   const params: AdminUserData = {
     role:
@@ -226,12 +230,14 @@ const AdminUsers = () => {
 
   // 변경버튼 on/off
   useEffect(() => {
-    if (checkedItems.length > 0 && selectedGrade) {
-      setIsDisabled(false);
-    } else {
-      setIsDisabled(true);
+    if (curUserGrade === 'ADMIN') {
+      if (checkedItems.length > 0 && selectedGrade) {
+        setIsDisabled(false);
+      } else {
+        setIsDisabled(true);
+      }
     }
-  }, [checkedItems, selectedGrade]);
+  }, [checkedItems, selectedGrade, curUserGrade]);
 
   return (
     <div css={adminWrapperStyle}>

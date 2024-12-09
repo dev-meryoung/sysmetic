@@ -409,6 +409,8 @@ const tagStyle = css`
 
   .tag {
     display: flex;
+    flex-wrap: wrap;
+    align-items: center;
     gap: 4px;
   }
 `;
