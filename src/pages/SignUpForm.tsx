@@ -224,11 +224,14 @@ const SignUpForm = () => {
   };
 
   const { mutate: signUpMutation } = useSignUp();
+
   const handleNextBtnClick = () => {
     const formData = new FormData();
     if (profileImg) {
       formData.append('file', profileImg);
     }
+
+    const currentDate = new Date().toISOString().split('.')[0];
 
     const registerData = {
       roleCode: type === 'investor' ? 'USER' : 'TRADER',
@@ -240,9 +243,9 @@ const SignUpForm = () => {
       birth: date,
       phoneNumber: phoneNum,
       receiveInfoConsent: isFirstChecked,
-      infoConsentDate: new Date().toISOString().slice(0, -1) + '+00:00',
+      infoConsentDate: currentDate,
       receiveMarketingConsent: isSecondChecked,
-      marketingConsentDate: new Date().toISOString().slice(0, -1) + '+00:00',
+      marketingConsentDate: currentDate,
     };
 
     formData.append('registerResponseDto', JSON.stringify(registerData));
