@@ -12,6 +12,11 @@ export interface GetInquiryDetailData {
   closed?: string;
   page?: number;
   methodIconPath?: string;
+  stockList?: {
+    stockIds: number[];
+    stockNames: string[];
+    stockIconPath: string[];
+  };
 }
 
 export interface CreateAnswerData {

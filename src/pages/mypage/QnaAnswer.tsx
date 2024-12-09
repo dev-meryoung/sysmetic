@@ -129,6 +129,12 @@ const QnaAnswer = () => {
                     <Tag key={idx} src={tag.iconPath} alt={tag.name} />
                   )
                 )}
+                {Array.isArray(inquiryData.stockList?.stockIconPath) &&
+                  inquiryData.stockList?.stockIconPath.map(
+                    (stock: string, idx: number) => (
+                      <Tag key={idx} src={stock} alt='Stock Icon' />
+                    )
+                  )}
               </div>
 
               <div css={strategyTextStyle}>{inquiryData.strategyName}</div>
