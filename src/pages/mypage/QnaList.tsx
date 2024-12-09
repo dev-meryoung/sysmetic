@@ -112,9 +112,11 @@ const QnaList = () => {
           <div className='tag'>
             {item.methodIconPath && <Tag src={item.methodIconPath} alt='tag' />}
             {Array.isArray(item?.stockList?.stockIconPath) &&
-              item.stockList.stockIconPath.map((stock: string, index: number) => (
-                <Tag key={index} src={stock || ''} alt='tag' />
-              ))}
+              item.stockList.stockIconPath.map(
+                (stock: string, index: number) => (
+                  <Tag key={index} src={stock || ''} alt='tag' />
+                )
+              )}
           </div>
           <span>{item.strategyName}</span>
         </div>
@@ -130,7 +132,9 @@ const QnaList = () => {
       key: 'inquiryStatus',
       header: '진행상태',
       render: (_, item) => (
-        <span css={item.inquiryStatus === 'closed' ? successStyle : waitingStyle}>
+        <span
+          css={item.inquiryStatus === 'closed' ? successStyle : waitingStyle}
+        >
           {statusMap[item.inquiryStatus] || ''}
         </span>
       ),
@@ -246,12 +250,6 @@ const strategyStyle = css`
     display: flex;
     gap: 4px;
   }
-`;
-
-const iconStyle = css`
-  width: 16px;
-  height: 16px;
-  object-fit: cover;
 `;
 
 const countStyle = css`

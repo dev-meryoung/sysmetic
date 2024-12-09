@@ -28,10 +28,6 @@ const QnaDetail = () => {
   const userInquiryId = paramUserId ? Number(paramUserId) : 0;
   const { qnaId: paramQnaId } = useParams<{ qnaId: string }>();
   const qnaInquiryId = paramQnaId ? Number(paramQnaId) : 0;
-  const { previousId: paramPreviousId } = useParams<{ previousId: string }>();
-  const previousId = paramPreviousId ? Number(paramPreviousId) : 0;
-  const { nextId: paramNextId } = useParams<{ nextId: string }>();
-  const nextId = paramNextId ? Number(paramNextId) : 0;
   const deleteMutation = useDeleteInquiry();
 
   const userQuery = useGetInquiryDetailUser(
@@ -516,12 +512,6 @@ const modalButtonWrapperStyle = css`
   justify-content: space-between;
   width: 100%;
   gap: 16px;
-`;
-
-const iconStyle = css`
-  width: 16px;
-  height: 16px;
-  object-fit: cover;
 `;
 
 const profileImgStyle = css`

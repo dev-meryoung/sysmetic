@@ -226,12 +226,6 @@ const modalTextStyle = css`
   margin-bottom: 24px;
 `;
 
-const iconStyle = css`
-  width: 16px;
-  height: 16px;
-  object-fit: cover;
-`;
-
 const profileImgStyle = css`
   width: 50px;
   height: 50px;
