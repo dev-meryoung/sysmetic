@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { css } from '@emotion/react';
 import { Link, useParams } from 'react-router-dom';
+import dayIcon from '@/assets/images/day-icon.png';
+import positionIcon from '@/assets/images/position-icon.png';
 import Pagination from '@/components/Pagination';
 import SelectBox from '@/components/SelectBox';
 import Table, { ColumnProps } from '@/components/Table';
@@ -22,8 +24,13 @@ interface QnaListDataProps {
   strategyName: string;
   inquiryRegistrationDate: string;
   inquiryStatus: string;
-  methodIconPath?: string;
-  stockList?: {
+  methodId: number;
+  methodIconPath: string;
+  stockIconPath: string[] | null;
+  cycle: string;
+  stockList: {
+    stockIds: number[];
+    stockNames: string[];
     stockIconPath?: string[];
   };
 }
@@ -111,6 +118,7 @@ const QnaList = () => {
         <div css={strategyStyle}>
           <div className='tag'>
             {item.methodIconPath && <Tag src={item.methodIconPath} alt='tag' />}
+            {item.methodIconPath && <Tag src={item?.cycle === 'D' ? dayIcon : positionIcon} />}
             {Array.isArray(item?.stockList?.stockIconPath) &&
               item.stockList.stockIconPath.map(
                 (stock: string, index: number) => (

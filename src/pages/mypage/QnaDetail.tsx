@@ -1,6 +1,8 @@
 import { css } from '@emotion/react';
 import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import dayIcon from '@/assets/images/day-icon.png';
+import positionIcon from '@/assets/images/position-icon.png';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
 import Tag from '@/components/Tag';
@@ -151,6 +153,14 @@ const QnaDetail = () => {
                     {qnaData.methodIconPath && (
                       <Tag src={qnaData.methodIconPath} alt='method icon' />
                     )}
+                    {qnaData.cycle && (
+                      <Tag
+                        src={qnaData.cycle === 'D' ? dayIcon : positionIcon}
+                        alt={
+                          qnaData.cycle === 'D' ? 'day cycle' : 'position cycle'
+                        }
+                      />
+                    )}
                     {Array.isArray(qnaData.stockList?.stockIconPath) &&
                       qnaData.stockList?.stockIconPath.map(
                         (stock: string, idx: number) => (
@@ -158,6 +168,7 @@ const QnaDetail = () => {
                         )
                       )}
                   </div>
+
                   <Link
                     to={PATH.STRATEGIES_DETAIL(qnaData.strategyId)}
                     css={strategyTextStyle}

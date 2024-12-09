@@ -12,11 +12,14 @@ export interface GetInquiryDetailData {
   closed?: string;
   page?: number;
   traderProfileImage?: string;
+  methodId?: number;
   methodIconPath?: string;
+  stockIconPath?: string[] | null;
+  cycle?: string;
   stockList?: {
     stockIds: number[];
     stockNames: string[];
-    stockIconPath: string[];
+    stockIconPath?: string[];
   };
 }
 
