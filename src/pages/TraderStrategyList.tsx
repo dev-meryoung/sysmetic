@@ -669,7 +669,7 @@ const tableWrapperStyle = css`
       width: 120px;
     }
     &:nth-of-type(7) {
-      width: 120px;
+      width: 100px;
     }
   }
 
@@ -735,6 +735,7 @@ const tagStyle = css`
   .tag {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 4px;
   }
 `;

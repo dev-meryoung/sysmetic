@@ -865,6 +865,7 @@ const tagStyle = css`
   .tag {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 4px;
   }
 `;
@@ -885,7 +886,7 @@ const tableStyle = css`
       width: 340px;
     }
     &:nth-of-type(4) {
-      width: 196px;
+      width: 130px;
     }
     &:nth-of-type(5) {
       width: 120px;

@@ -512,6 +512,8 @@ const tagStyle = css`
 
   .tag {
     display: flex;
+    align-items: center;
+    flex-wrap: wrap;
     gap: 4px;
   }
 `;
