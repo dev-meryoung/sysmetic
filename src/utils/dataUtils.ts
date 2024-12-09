@@ -30,5 +30,11 @@ export const formatYearMonth = (date: string) => {
   return `${year}. ${month}.`;
 };
 
-// T뒤에 제거해주는 날짜 함수
+// 'T' 뒤 제거해주는 날짜 함수
 export const extractDate = (dateTime: string) => dateTime?.split('T')[0];
+
+// 'T' 뒤 제거 후 'YYYY. MM.' 형식으로 포맷
+export const formatYearMonthFromDateTime = (dateTime: string) => {
+  const date = extractDate(dateTime);
+  return formatDate(date);
+};

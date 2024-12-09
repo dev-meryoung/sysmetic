@@ -35,13 +35,15 @@ const SignIn = () => {
       setter('');
 
   const validateEmail = (value: string) => {
-    setEmail(value);
-    setEmailError(!emailRegEx.test(value));
+    const trimmedValue = value.trim();
+    setEmail(trimmedValue);
+    setEmailError(!emailRegEx.test(trimmedValue));
   };
 
   const validatePassword = (value: string) => {
-    setPassword(value);
-    setPasswordError(!passwordRegEx.test(value));
+    const trimmedValue = value.trim();
+    setPassword(trimmedValue);
+    setPasswordError(!passwordRegEx.test(trimmedValue));
   };
 
   const handleSignIn = () => {
