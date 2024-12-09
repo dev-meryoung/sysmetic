@@ -183,11 +183,11 @@ const MyStrategyList = () => {
       render: (_, item) => {
         const itemValue = item.accumulatedProfitLossRate;
 
-        const colorStyle = getColorStyleBasedOnValue(itemValue);
+        const { text, style } = getColorStyleBasedOnValue(itemValue);
 
         return (
-          <div css={fontStyle} style={colorStyle}>
-            {itemValue}%
+          <div css={fontStyle} style={style}>
+            {text}
           </div>
         );
       },
@@ -198,11 +198,11 @@ const MyStrategyList = () => {
       render: (_, item) => {
         const itemValue = item.mdd;
 
-        const colorStyle = getColorStyleBasedOnValue(itemValue);
+        const { text, style } = getColorStyleBasedOnValue(itemValue);
 
         return (
-          <div css={fontStyle} style={colorStyle}>
-            {itemValue}%
+          <div css={fontStyle} style={style}>
+            {text}
           </div>
         );
       },
@@ -213,11 +213,11 @@ const MyStrategyList = () => {
       render: (_, item) => {
         const itemValue = item.smScore;
 
-        const colorStyle = getColorStyleBasedOnValue(itemValue);
+        const { text, style } = getColorStyleBasedOnValue(itemValue);
 
         return (
-          <div css={fontStyle} style={colorStyle}>
-            {itemValue}%
+          <div css={fontStyle} style={style}>
+            {text}
           </div>
         );
       },

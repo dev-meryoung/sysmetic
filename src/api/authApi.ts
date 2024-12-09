@@ -22,8 +22,8 @@ export interface CheckEmailCodeForPasswordData {
 }
 
 export interface ResetPasswordData {
-  emailAuthCode: string;
   email: string;
+  authCode: string;
   password: string;
   rewritePassword: string;
 }

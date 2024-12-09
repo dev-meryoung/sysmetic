@@ -33,17 +33,21 @@ const DetailCard: React.FC<DetailCardProps> = ({
     return 'GREEN';
   };
 
+  const valueLength = parseFloat(value.toFixed(2)).toString().length;
+  const TagSize = valueLength > 6 ? 'h3' : valueLength > 5 ? 'h2' : 'h1';
+  const RenderTag = TagSize as keyof JSX.IntrinsicElements;
+
   return (
     <div css={detailCardStyle(getColor(value, type))}>
       <span className='title'>{title}</span>
       <div className='value'>
         {type === 'DEFAULT' ? (
           <>
-            <h1>{parseFloat(motionValue.toFixed(2))}</h1>
+            <RenderTag>{parseFloat(motionValue.toFixed(2))}</RenderTag>
             <span>%</span>
           </>
         ) : (
-          <h1>{`${parseFloat(motionValue.toFixed(2))}:1`}</h1>
+          <RenderTag>{`${parseFloat(motionValue.toFixed(2))}:1`}</RenderTag>
         )}
       </div>
     </div>
