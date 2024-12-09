@@ -20,6 +20,7 @@ const PAGE_SIZE = 10;
 
 const Notices = () => {
   const [searchValue, setSearchValue] = useState('');
+  const [searchText, setSearchText] = useState('');
   const [curPage, setCurPage] = useState<number>(0);
   const [data, setData] = useState<NoticesStrategyDataProps[]>([]);
   const [filteredData, setFilteredData] = useState<NoticesStrategyDataProps[]>(
@@ -30,7 +31,7 @@ const Notices = () => {
   const params = {
     noticeId,
     page: curPage,
-    searchText: searchValue,
+    searchText: searchText.trim().toLowerCase(),
   };
 
   const noticeMutation = useGetNoticeList(params);
@@ -61,6 +62,7 @@ const Notices = () => {
   };
 
   const handleSearch = () => {
+    setSearchText(searchValue);
     const filtered = data.filter((item) =>
       item.noticeTitle?.toLowerCase().includes(searchValue.trim().toLowerCase())
     );
@@ -173,7 +175,7 @@ const noticesListStyle = css`
   border-top: 2px solid ${COLOR.PRIMARY600};
 
   th {
-    display: none; 
+    display: none;
   }
   thead {
     background-color: transparent;
@@ -187,9 +189,10 @@ const noticesListStyle = css`
     }
     &:last-of-type {
       display: flex;
-      justify-content: flex-end; 
+      justify-content: flex-end;
       align-items: center;
     }
+  }
 `;
 
 const noticesPaginationStyle = css`
