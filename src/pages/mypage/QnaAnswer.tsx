@@ -3,7 +3,6 @@ import { css } from '@emotion/react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
-import ProfileImage from '@/components/ProfileImage';
 import Tag from '@/components/Tag';
 import TextArea from '@/components/TextArea';
 import TextInput from '@/components/TextInput';
