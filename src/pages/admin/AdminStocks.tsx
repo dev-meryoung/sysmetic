@@ -182,7 +182,6 @@ const AddModal: React.FC<AddModalProps> = ({
                 value={stocksValue}
                 handleChange={handleStocksChange}
               />
-              {/* <p>1글자 이상 입력하세요.</p> */}
             </td>
             <td>
               <div css={thumbnailStyle}>
@@ -210,7 +209,6 @@ const AddModal: React.FC<AddModalProps> = ({
                 style={{ display: 'none' }}
                 onChange={handleFileChange}
               />
-              {/* <p>jp(e)g, png 형식의 파일만 첨부 가능합니다.</p> */}
             </td>
           </tr>
         </tbody>
@@ -727,7 +725,6 @@ const thumbnailStyle = css`
   gap: 8px;
 
   img {
-    width: 48px;
     height: 20px;
   }
 `;
