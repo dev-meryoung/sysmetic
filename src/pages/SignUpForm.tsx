@@ -7,6 +7,8 @@ import React, {
 } from 'react';
 import { css } from '@emotion/react';
 import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { useNavigate, useParams } from 'react-router-dom';
 import { checkEmail } from '@/api/authApi';
 import Button from '@/components/Button';
@@ -197,6 +199,10 @@ const SignUpForm = () => {
     useState<InputStateTypes>('normal');
   const fileRef = useRef<HTMLInputElement>(null);
 
+  //아이콘
+  const [showPw, setShowPw] = useState(false);
+  const [showCheckPw, setShowCheckPw] = useState(false);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
 
@@ -382,6 +388,23 @@ const SignUpForm = () => {
     });
   };
 
+  //비밀번호 보기/숨기기
+  const handleShowPw = () => {
+    if (!showPw) {
+      setShowPw(true);
+    } else {
+      setShowPw(false);
+    }
+  };
+
+  const handleShowCheckPw = () => {
+    if (!showCheckPw) {
+      setShowCheckPw(true);
+    } else {
+      setShowCheckPw(false);
+    }
+  };
+
   useEffect(() => {
     setIsDisabled(
       !(
@@ -498,12 +521,27 @@ const SignUpForm = () => {
             비밀번호
             <Dot />
           </p>
-          <TextInput
-            status={pwStatus}
-            type='password'
-            value={pw}
-            handleChange={handlePwInputChange}
-          />
+          <div css={pwInputStyle}>
+            <TextInput
+              iconNum='single'
+              status={pwStatus}
+              type={showPw ? 'text' : 'password'}
+              value={pw}
+              handleChange={handlePwInputChange}
+            />
+            {showPw ? (
+              <VisibilityOffOutlinedIcon
+                css={pwIconStyle}
+                onClick={handleShowPw}
+              />
+            ) : (
+              <VisibilityOutlinedIcon
+                css={pwIconStyle}
+                onClick={handleShowPw}
+              />
+            )}
+          </div>
+
           {pwStatus === 'warn' && (
             <p>
               6~20자의 영대/소문자, 숫자, 특수문자를 모두 포함하여 입력해주세요.
@@ -515,12 +553,25 @@ const SignUpForm = () => {
             비밀번호 확인
             <Dot />
           </p>
-          <TextInput
-            status={checkPwStatus}
-            type='password'
-            value={checkPw}
-            handleChange={handleCheckPwInputChange}
-          />
+          <div css={pwInputStyle}>
+            <TextInput
+              status={checkPwStatus}
+              type={showCheckPw ? 'text' : 'password'}
+              value={checkPw}
+              handleChange={handleCheckPwInputChange}
+            />
+            {showCheckPw ? (
+              <VisibilityOffOutlinedIcon
+                css={pwIconStyle}
+                onClick={handleShowCheckPw}
+              />
+            ) : (
+              <VisibilityOutlinedIcon
+                css={pwIconStyle}
+                onClick={handleShowCheckPw}
+              />
+            )}
+          </div>
           {checkPw !== pw && <p>비밀번호가 일치하지 않습니다.</p>}
         </div>
         <div className='input-form'>
@@ -835,6 +886,21 @@ const AuthSuccessModalStyle = css`
 
 const fileInputStyle = css`
   display: none;
+`;
+
+const pwInputStyle = css`
+  position: relative;
+  width: 360px;
+`;
+
+const pwIconStyle = css`
+  position: absolute;
+  font-size: ${FONT_SIZE.TITLE_SM};
+  right: 1.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0;
+  cursor: pointer;
 `;
 
 export default SignUpForm;
