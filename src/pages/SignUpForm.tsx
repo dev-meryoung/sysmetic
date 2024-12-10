@@ -50,7 +50,7 @@ const EmailOptions = [
 const REGEX = {
   ID_REGEX: /^[a-zA-Z\d\.\/%\+\-]+$/,
   PW_REGEX:
-    /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,20}$/,
+    /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,20}$/,
   NAME_REGEX: /^[가-힣]{1,10}$/,
   NICKNAME_REGEX: /^[가-힣\d]{3,10}$/,
   PHONE_REGEX: /^010\d{8}$/,
@@ -505,7 +505,9 @@ const SignUpForm = () => {
             handleChange={handlePwInputChange}
           />
           {pwStatus === 'warn' && (
-            <p>6~20자의 영문, 숫자, 특수문자를 모두 입력해주세요.</p>
+            <p>
+              6~20자의 영대/소문자, 숫자, 특수문자를 모두 포함하여 입력해주세요.
+            </p>
           )}
         </div>
         <div className='input-form'>
