@@ -8,6 +8,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
 
     steps:
     # 1. 리포지토리 체크아웃
@@ -41,24 +44,24 @@ jobs:
         PATH: ${{ secrets.EC2_PATH }}                # EC2 서버의 배포 경로
       run: |
         # SSH 키 설정
-        mkdir -p ~/.ssh
-        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        mkdir -p ~/.ssh &&
+        echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa &&
         chmod 600 ~/.ssh/id_rsa
 
         # 임시 디렉토리 생성 및 빌드 파일 업로드
-        ssh -i ~/.ssh/id_rsa $USER@$HOST "mkdir -p $PATH-temp"
-        scp -i ~/.ssh/id_rsa -r dist/* $USER@$HOST:$PATH-temp
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $USER@$HOST "mkdir -p $PATH-temp"
+        scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r dist/* $USER@$HOST:$PATH-temp
 
         # 기존 폴더 백업 및 교체
-        ssh -i ~/.ssh/id_rsa $USER@$HOST "
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $USER@$HOST "
           mv $PATH $PATH-backup-$(date +%Y%m%d%H%M%S) || true &&
           mv $PATH-temp $PATH
         "
 
         # 파일 권한 설정
-        ssh -i ~/.ssh/id_rsa $USER@$HOST "sudo chown -R www-data:www-data $PATH"
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $USER@$HOST "sudo chown -R www-data:www-data $PATH"
 
         # 오래된 백업 삭제
-        ssh -i ~/.ssh/id_rsa $USER@$HOST "
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $USER@$HOST "
           find $PATH-backup-* -type d -mtime +7 -exec rm -rf {} +
         "
