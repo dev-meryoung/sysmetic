@@ -17,13 +17,19 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    # 2. Node.js 설치 및 설정
+    # 2. 필수 도구 설치
+    - name: Install required tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y openssh-client
+
+    # 3. Node.js 설치 및 설정
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '18'
 
-    # 3. 프로젝트 빌드
+    # 4. 프로젝트 빌드
     - name: Install dependencies and build
       env:
         VITE_API_URL: ${{ secrets.VITE_API_URL }}  # GitHub Secrets에서 API URL 가져오기
@@ -35,7 +41,7 @@ jobs:
         npm ci
         npm run build
 
-    # 4. EC2 서버로 배포
+    # 5. EC2 서버로 배포
     - name: Deploy to EC2
       env:
         SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}  # EC2 접속을 위한 SSH Key
