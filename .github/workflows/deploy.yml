@@ -59,7 +59,7 @@ jobs:
         "
 
         # 파일 권한 설정
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $USER@$HOST "sudo chown -R www-data:www-data $DEPLOY_PATH"
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $USER@$HOST "sudo chown -R nginx:nginx $DEPLOY_PATH"
 
         # 오래된 백업 삭제
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $USER@$HOST "
