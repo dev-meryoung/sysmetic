@@ -17,57 +17,51 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    # 2. 필수 도구 설치
-    - name: Install required tools
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y openssh-client
-
-    # 3. Node.js 설치 및 설정
+    # 2. Node.js 설치 및 설정
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '18'
 
-    # 4. 프로젝트 빌드
+    # 3. 프로젝트 빌드
     - name: Install dependencies and build
       env:
-        VITE_API_URL: ${{ secrets.VITE_API_URL }}  # GitHub Secrets에서 API URL 가져오기
+        VITE_API_URL: ${{ secrets.VITE_API_URL }}
       run: |
         # Vite용 .env 파일 생성
         echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" > .env
-        
+
         # 의존성 설치 및 빌드
         npm ci
         npm run build
 
-    # 5. EC2 서버로 배포
+    # 4. EC2 서버로 배포
     - name: Deploy to EC2
       env:
-        SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}  # EC2 접속을 위한 SSH Key
-        USER: ${{ secrets.EC2_USER }}                # EC2 사용자 이름
-        HOST: ${{ secrets.EC2_HOST }}                # EC2 서버 호스트
-        PATH: ${{ secrets.EC2_PATH }}                # EC2 서버의 배포 경로
+        SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+        USER: ${{ secrets.EC2_USER }}
+        HOST: ${{ secrets.EC2_HOST }}
+        DEPLOY_PATH: ${{ secrets.EC2_PATH }}
       run: |
         # SSH 키 설정
-        mkdir -p ~/.ssh &&
-        echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa &&
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
 
         # 임시 디렉토리 생성 및 빌드 파일 업로드
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $USER@$HOST "mkdir -p $PATH-temp"
-        scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r dist/* $USER@$HOST:$PATH-temp
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $USER@$HOST "mkdir -p $DEPLOY_PATH-temp"
+        scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r dist/* $USER@$HOST:$DEPLOY_PATH-temp
 
         # 기존 폴더 백업 및 교체
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $USER@$HOST "
-          mv $PATH $PATH-backup-$(date +%Y%m%d%H%M%S) || true &&
-          mv $PATH-temp $PATH
+          mv $DEPLOY_PATH $DEPLOY_PATH-backup-$(date +%Y%m%d%H%M%S) || true &&
+          mv $DEPLOY_PATH-temp $DEPLOY_PATH
         "
 
         # 파일 권한 설정
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $USER@$HOST "sudo chown -R www-data:www-data $PATH"
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $USER@$HOST "sudo chown -R www-data:www-data $DEPLOY_PATH"
 
         # 오래된 백업 삭제
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $USER@$HOST "
-          find $PATH-backup-* -type d -mtime +7 -exec rm -rf {} +
+          find $DEPLOY_PATH-backup-* -type d -mtime +7 -exec rm -rf {} +
         "
