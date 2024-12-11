@@ -282,8 +282,7 @@ const ModModal: React.FC<ModModalProps> = ({
     };
 
     updateAdminMethodsMutation(formData, {
-      onSuccess: (data) => {
-        console.log('종목 수정 성공!', data);
+      onSuccess: () => {
         setFetch(true);
         modModal.closeModal('modify');
       },
@@ -311,7 +310,6 @@ const ModModal: React.FC<ModModalProps> = ({
                 value={methodsValue}
                 handleChange={handleMethodsChange}
               />
-              {/* <p>1글자 이상 입력하세요.</p> */}
             </td>
             <td>
               <div css={thumbnailStyle}>
@@ -342,7 +340,6 @@ const ModModal: React.FC<ModModalProps> = ({
                 style={{ display: 'none' }}
                 onChange={handleFileChange}
               />
-              {/* <p>jp(e)g, png 형식의 파일만 첨부 가능합니다.</p> */}
             </td>
           </tr>
         </tbody>
@@ -704,7 +701,6 @@ const thumbnailStyle = css`
   gap: 8px;
 
   img {
-    width: 48px;
     height: 20px;
   }
 `;

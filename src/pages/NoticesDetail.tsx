@@ -25,13 +25,14 @@ interface NoticesDataProps {
   previousWriteDate?: string;
   nextTitle?: string;
   nextWriteDate?: string;
+  previousId?: string;
+  nextId?: string;
   fileDtoList?: FileDto[];
 }
 const NoticesDetail = () => {
   const { noticeId: paramNoticeId } = useParams<{ noticeId: string }>();
   const noticeId = paramNoticeId ? Number(paramNoticeId) : 0;
   const [data, setData] = useState<NoticesDataProps>({ fileDtoList: [] });
-
   const params = { noticeId: String(noticeId) };
   const getNoticeMutation = useGetNoticeDetail(params);
   const navigate = useNavigate();
@@ -163,7 +164,7 @@ const NoticesDetail = () => {
             <div>
               <p>이전</p>
               <span>
-                <Link to={`/notices/${Number(noticeId) - 1}`} css={linkStyle}>
+                <Link to={`/notices/${data.previousId}`} css={linkStyle}>
                   {data.previousTitle}
                 </Link>
               </span>
@@ -176,7 +177,7 @@ const NoticesDetail = () => {
             <div>
               <p>다음</p>
               <p>
-                <Link to={`/notices/${Number(noticeId) + 1}`} css={linkStyle}>
+                <Link to={`/notices/${data.nextId}`} css={linkStyle}>
                   {data.nextTitle}
                 </Link>
               </p>

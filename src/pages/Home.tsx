@@ -12,6 +12,7 @@ import { useGetMainPage, useGetMainPageChart } from '@/hooks/useCommonApi';
 import useCountMotion from '@/hooks/useCountMotion';
 import Footer from '@/layouts/Footer';
 import Header from '@/layouts/Header';
+import { formatPercent } from '@/utils/dataUtils';
 import getColorStyleBasedOnValue from '@/utils/tableUtils';
 
 const Home = () => {
@@ -102,8 +103,7 @@ const Home = () => {
                       {trader.followerCount}
                     </div>
                     <div className='price-area'>
-                      <h3>{trader.accumProfitLossRate}</h3>
-                      <h6>원</h6>
+                      <h3>{formatPercent(trader.accumProfitLossRate)}</h3>
                     </div>
                   </div>
                 </div>
@@ -243,19 +243,21 @@ const Home = () => {
                 <div className='card-btm'>
                   <div className='card-btm-option'>
                     <h6>SM Score</h6>
-                    <h5 style={getColorStyleBasedOnValue(strategy.smScore)}>
-                      {strategy.smScore}%
-                    </h5>
+                    {(() => {
+                      const { text, style } = getColorStyleBasedOnValue(
+                        strategy.smScore
+                      );
+                      return <h5 style={style}>{text}</h5>;
+                    })()}
                   </div>
                   <div className='card-btm-option'>
                     <h6>누적 손익률</h6>
-                    <h5
-                      style={getColorStyleBasedOnValue(
+                    {(() => {
+                      const { text, style } = getColorStyleBasedOnValue(
                         strategy.accumulatedProfitLossRate
-                      )}
-                    >
-                      {strategy.accumulatedProfitLossRate}%
-                    </h5>
+                      );
+                      return <h5 style={style}>{text}</h5>;
+                    })()}
                   </div>
                 </div>
               </div>
@@ -470,14 +472,6 @@ const smScoreCardStyle = css`
       }
     }
 
-    .card-top:nth-last-of-type(1) {
-      padding: 32px 64px;
-    }
-
-    .card-top:nth-last-of-type(2) {
-      padding: 32px 64px;
-    }
-
     .card-btm {
       padding: 40px 32px;
       display: flex;
@@ -491,6 +485,7 @@ const smScoreCardStyle = css`
 
         h6 {
           font-weight: ${FONT_WEIGHT.REGULAR};
+          min-width: 96px;
         }
       }
     }
@@ -503,6 +498,11 @@ const smScoreCardStyle = css`
 
     .card-btm-option {
       gap: 64px;
+    }
+
+    .card-top {
+      padding: 32px 0 32px 64px;
+      align-items: flex-start;
     }
   }
 

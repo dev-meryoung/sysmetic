@@ -1,49 +1,74 @@
 import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import TagTest from '@/assets/images/test-tag.jpg';
+import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
+import Loading from '@/components/Loading';
 import Pagination from '@/components/Pagination';
 import SelectBox from '@/components/SelectBox';
-import Table from '@/components/Table';
+import Table, { ColumnProps } from '@/components/Table';
 import Tag from '@/components/Tag';
 import TextInput from '@/components/TextInput';
-import { COLOR_OPACITY } from '@/constants/color';
+import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
-import adminStrategies from '@/mocks/adminStrategies.json';
+import { PATH } from '@/constants/path';
+import { useGetAdminStrategyList } from '@/hooks/useAdminApi';
+
+export type OpenStatusTypes = 'PUBLIC' | 'PRIVATE';
+export type ApprovalStatusTypes = '승인요청' | '승인' | '반려' | '요청 전';
 
 interface AdminStrategyDataProps {
-  no: number;
-  traderName: string;
+  strategyId: number;
   strategyName: string;
-  enrollDate: string;
-  isOn: boolean;
-  staged: string;
+  traderName: string;
+  openStatusCode: OpenStatusTypes;
+  strategyCreateDate: string;
+  methodId: string;
+  methodIconPath: string;
+  stockList: StockListProps;
+  approvalStatusCode: ApprovalStatusTypes; //TODO: 단계 뭐뭐있는지?
+}
+
+interface StockListProps {
+  stockIds: number[];
+  stockNames: string[];
+  stockIconPath: string[];
 }
 
 const StatusOption = [
-  { label: '공개', value: 'on' },
-  { label: '비공개', value: 'off' },
+  { label: '공개', value: 'PUBLIC' },
+  { label: '비공개', value: 'PRIVATE' },
 ];
 
 const StagedOption = [
-  { label: '승인', value: 'approval' },
-  { label: '반려', value: 'companion' },
-  { label: '요청전', value: 'unstaged' },
-  { label: '승인요청', value: 'staging' },
+  { label: '승인', value: 'SA002' },
+  { label: '반려', value: 'SA003' },
+  { label: '요청 전', value: 'SA000' },
+  { label: '승인 요청', value: 'SA001' },
 ];
 
-const PAGE_SIZE = 10;
-
 const AdminStrategies = () => {
+  const navigate = useNavigate();
+  // 필드 관련
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedStaged, setSelectedStaged] = useState('');
   const [value, SetValue] = useState('');
+  const [searchStatus, setSearchStatus] = useState('');
+  const [searchStaged, setSearchStaged] = useState('');
+  const [searchKeyword, setSearchKeyword] = useState('');
   //테이블 관련
   const [curPage, setCurPage] = useState(0);
-  const [data, setData] = useState<AdminStrategyDataProps[]>([]);
-  //페이지네이션 관련
   const [totalPage, setTotalPage] = useState(0);
+  const [totalElement, setTotalElement] = useState(0);
+  const [tableData, setTableData] = useState<AdminStrategyDataProps[]>([]);
+  //데이터 관련
+  const params = {
+    ...(searchStatus && { openStatus: searchStatus }),
+    ...(searchStaged && { approvalStatus: searchStaged }),
+    ...(searchKeyword && { keyword: searchKeyword }),
+    page: curPage,
+  };
+  const { data, refetch, isLoading } = useGetAdminStrategyList(params);
 
   const handleStatusChange = (value: string) => {
     setSelectedStatus(value);
@@ -54,7 +79,10 @@ const AdminStrategies = () => {
   };
 
   const handleIconClick = () => {
-    console.log(value);
+    setSearchKeyword(value);
+    setSearchStatus(selectedStatus);
+    setSearchStaged(selectedStaged);
+    refetch();
   };
 
   useEffect(() => {
@@ -65,30 +93,15 @@ const AdminStrategies = () => {
     console.log(selectedStaged);
   }, [selectedStaged]);
 
-  const getPaginatedData = (page: number) => {
-    const startIndex = page * PAGE_SIZE;
-    const endIndex = startIndex + PAGE_SIZE;
-    return data.slice(startIndex, endIndex);
-  };
-
-  const paginatedData = getPaginatedData(curPage);
-
   useEffect(() => {
-    // 순서를 기준으로
-    const sortedData = [...adminStrategies].sort((a, b) => b.no - a.no);
-    const arrangedData = sortedData.map((item, index) => ({
-      ...item,
-      no: index + 1,
-    }));
-    setData(arrangedData);
+    setTableData(data?.data?.content || []);
+    setTotalPage(data?.data?.totalPages || 0);
+    setTotalElement(data?.data?.totalElement || 0);
+  }, [data]);
 
-    const pages = Math.ceil(arrangedData.length / PAGE_SIZE);
-    setTotalPage(pages);
-  }, []);
-
-  const columns = [
+  const columns: ColumnProps<AdminStrategyDataProps>[] = [
     {
-      key: 'no' as keyof AdminStrategyDataProps,
+      key: 'strategyId' as keyof AdminStrategyDataProps,
       header: '순서',
     },
     {
@@ -98,31 +111,45 @@ const AdminStrategies = () => {
     {
       key: 'strategyName' as keyof AdminStrategyDataProps,
       header: '전략명',
-      render: (value: string | number | undefined | boolean) => (
+      render: (_, item) => (
         <div css={tagStyle}>
-          <div>
-            <Tag src={TagTest} alt='tag' />
+          <div className='tag'>
+            <Tag src={item?.methodIconPath || ''} />
+            {item?.stockList?.stockIconPath &&
+              item?.stockList?.stockIconPath.map(
+                (stock: string, index: number) => (
+                  <Tag key={index} src={stock || ''} alt='tag' />
+                )
+              )}
           </div>
-          {value}
+          {item.strategyName}
         </div>
       ),
     },
     {
-      key: 'enrollDate' as keyof AdminStrategyDataProps,
+      key: 'strategyCreateDate' as keyof AdminStrategyDataProps,
       header: '전략등록일자',
+      render: (_, item) => item.strategyCreateDate.substring(0, 10),
     },
     {
-      key: 'isOn' as keyof AdminStrategyDataProps,
+      key: 'openStatusCode' as keyof AdminStrategyDataProps,
       header: '공개여부',
+      render: (_, item) =>
+        item.openStatusCode === 'PUBLIC' ? '공개' : '비공개',
     },
     {
-      key: 'staged' as keyof AdminStrategyDataProps,
+      key: 'approvalStatusCode' as keyof AdminStrategyDataProps,
       header: '승인단계',
+      render: (_, item) => (
+        <p css={approvalStatusStyle(item.approvalStatusCode)}>
+          {item.approvalStatusCode}
+        </p>
+      ),
     },
     {
       key: 'state' as keyof AdminStrategyDataProps,
       header: '상태',
-      render: () => (
+      render: (_, item) => (
         <div css={buttonStyle}>
           <Button
             label='상세관리'
@@ -131,7 +158,9 @@ const AdminStrategies = () => {
             color='primary'
             border={true}
             width={80}
-            handleClick={() => {}}
+            handleClick={() =>
+              navigate(PATH.ADMIN_STRATEGIES_CONTROL(String(item.strategyId)))
+            }
           />
         </div>
       ),
@@ -166,11 +195,19 @@ const AdminStrategies = () => {
       </div>
       <div css={strategyInfoStyle}>
         <p>
-          총 <span>40개</span>의 전략이 검색되었습니다.
+          총 <span>{totalElement}개</span>의 전략이 검색되었습니다.
         </p>
       </div>
       <div css={startegytableStyle}>
-        <Table data={paginatedData} columns={columns} />
+        {isLoading ? (
+          <div css={loadingStyle}>
+            <Loading />
+          </div>
+        ) : totalElement > 0 ? (
+          <Table data={tableData} columns={columns} />
+        ) : (
+          <div className='no-data'> 전략이 존재하지 않습니다.</div>
+        )}
       </div>
       <div css={strategyPaginationStyle}>
         <Pagination
@@ -267,6 +304,17 @@ const startegytableStyle = css`
       width: 120px;
     }
   }
+
+  .no-data {
+    height: 80px;
+    background-color: ${COLOR.GRAY100};
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: ${FONT_SIZE.TEXT_LG};
+  }
 `;
 
 const strategyPaginationStyle = css`
@@ -280,6 +328,27 @@ const tagStyle = css`
   flex-direction: column;
   gap: 12px;
   align-items: flex-start;
+
+  .tag {
+    display: flex;
+    gap: 4px;
+  }
+`;
+
+const approvalStatusStyle = (approvalStatusCode: ApprovalStatusTypes) => css`
+  color: ${approvalStatusCode === '승인요청'
+    ? COLOR.TEXT_BLACK
+    : approvalStatusCode === '승인'
+      ? COLOR.CHECK_GREEN
+      : approvalStatusCode === '반려'
+        ? COLOR.ERROR_RED
+        : COLOR.GRAY700};
+`;
+
+const loadingStyle = css`
+  width: 100%;
+  height: 100vh;
+  padding: 100px;
 `;
 
 export default AdminStrategies;

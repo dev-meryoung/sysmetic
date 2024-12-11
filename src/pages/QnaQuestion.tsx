@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { css } from '@emotion/react';
 import { useNavigate, useParams } from 'react-router-dom';
+import dayIcon from '@/assets/images/day-icon.png';
+import positionIcon from '@/assets/images/position-icon.png';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
+import Tag from '@/components/Tag';
 import TextArea from '@/components/TextArea';
 import TextInput from '@/components/TextInput';
 import { COLOR } from '@/constants/color';
@@ -80,14 +83,24 @@ const QnaQuestion = () => {
       </div>
       <div css={strategyBoxStyle}>
         <div className='strategy-box'>
-          <div className='tags'>
-            <span>
-              <img
-                src={strategyData?.methodIconPath}
-                alt='method icon'
-                css={iconStyle}
+          <div className='tags' css={tagStyle}>
+            {strategyData.methodIconPath && (
+              <Tag src={strategyData.methodIconPath} alt='method icon' />
+            )}
+            {strategyData.cycle && (
+              <Tag
+                src={strategyData.cycle === 'D' ? dayIcon : positionIcon}
+                alt={
+                  strategyData.cycle === 'D' ? 'day cycle' : 'position cycle'
+                }
               />
-            </span>
+            )}
+            {Array.isArray(strategyData.stockList?.stockIconPath) &&
+              strategyData.stockList?.stockIconPath.map(
+                (stock: string, idx: number) => (
+                  <Tag key={idx} src={stock} alt='stock icon' />
+                )
+              )}
           </div>
           <span>{strategyData?.strategyName}</span>
         </div>
@@ -189,6 +202,11 @@ const strategyBoxStyle = css`
   }
 `;
 
+const tagStyle = css`
+  display: flex;
+  gap: 4px;
+`;
+
 const inputBoxStyle = css`
   display: flex;
   flex-direction: column;
@@ -216,12 +234,6 @@ const modalTextStyle = css`
   text-align: center;
   margin-top: 32px;
   margin-bottom: 24px;
-`;
-
-const iconStyle = css`
-  width: 16px;
-  height: 16px;
-  object-fit: cover;
 `;
 
 const profileImgStyle = css`

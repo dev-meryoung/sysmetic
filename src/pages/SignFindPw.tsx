@@ -51,7 +51,7 @@ const SignFindPw = () => {
   const emailRegEx =
     /^[A-Za-z0-9]([-_.]?[A-Za-z0-9])*@[A-Za-z0-9]([-_.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$/i;
   const passwordRegEx =
-    /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,20}$/;
+    /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,20}$/;
 
   const handleChange =
     (field: keyof typeof formData) =>
@@ -92,7 +92,7 @@ const SignFindPw = () => {
       { email: formData.email, authCode: formData.verificationCode },
       {
         onSuccess: (response) => {
-          if (response?.isValid) {
+          if (response?.code === 200) {
             setShowResetSection(true);
             setMessages({ ...messages, verificationCodeError: '' });
             setStatuses({ ...statuses, verificationCode: 'normal' });
@@ -132,7 +132,7 @@ const SignFindPw = () => {
       ...messages,
       passwordError: isPasswordValid
         ? ''
-        : '비밀번호는 6~20자의 문자, 숫자, 특수문자를 포함해야 합니다.',
+        : '6~20자의 영대/소문자, 숫자, 특수문자를 모두 포함해야 합니다.',
       checkPasswordError: isPasswordMatch
         ? ''
         : '비밀번호가 일치하지 않습니다.',
@@ -140,8 +140,8 @@ const SignFindPw = () => {
 
     if (isPasswordValid && isPasswordMatch) {
       resetMutation.mutate({
-        emailAuthCode: formData.verificationCode,
         email: formData.email,
+        authCode: formData.verificationCode,
         password: formData.password,
         rewritePassword: formData.checkPassword,
       });

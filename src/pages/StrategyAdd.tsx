@@ -74,14 +74,16 @@ const StrategyAdd = () => {
           </div>
           <div className='form-item'>
             <span>운용종목</span>
-            {stockOptions.map((option: { label: string; value: string }) => (
-              <Checkbox
-                key={option.value}
-                checked={stocks.includes(option.value)}
-                label={option.label}
-                handleChange={() => handleCheckboxChange(option.value)}
-              />
-            ))}
+            <div className='stock-box'>
+              {stockOptions.map((option: { label: string; value: string }) => (
+                <Checkbox
+                  key={option.value}
+                  checked={stocks.includes(option.value)}
+                  label={option.label}
+                  handleChange={() => handleCheckboxChange(option.value)}
+                />
+              ))}
+            </div>
           </div>
           <div className='form-item form-item-top'>
             <span>
@@ -294,6 +296,12 @@ const addContentBoxStyle = css`
           font-size: ${FONT_SIZE.TEXT_SM};
           font-weight: ${FONT_WEIGHT.REGULAR};
         }
+      }
+
+      .stock-box {
+        display: flex;
+        flex-wrap: wrap;
+        width: 1000px;
       }
 
       .file-box {

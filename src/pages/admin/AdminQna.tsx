@@ -1,6 +1,8 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import { useNavigate } from 'react-router-dom';
+import dayIcon from '@/assets/images/day-icon.png';
+import positionIcon from '@/assets/images/position-icon.png';
 import Button from '@/components/Button';
 import Loading from '@/components/Loading';
 import Modal from '@/components/Modal';
@@ -16,7 +18,7 @@ import { PATH } from '@/constants/path';
 import { useDeleteInquiryList, useGetInquiryList } from '@/hooks/useAdminApi';
 import useModalStore from '@/stores/useModalStore';
 import { useTableStore } from '@/stores/useTableStore';
-import { extractDate } from '@/utils/dataUtils';
+import { formatYearMonthFromDateTime } from '@/utils/dataUtils';
 
 interface AdminQnaDataProps {
   ranking?: number;
@@ -141,7 +143,12 @@ const AdminQna = () => {
     data: InquiryListData,
     refetch: inquiryListDataRefetch,
     isLoading,
-  } = useGetInquiryList(0, getTabValue(tab), selectiedOption, searchText);
+  } = useGetInquiryList(
+    currentPage,
+    getTabValue(tab),
+    selectiedOption,
+    searchText
+  );
 
   const handleOptionChange = (value: string) => {
     setSelectedOption(value);
@@ -190,6 +197,10 @@ const AdminQna = () => {
     setCurrentPage(0);
   }, [searchText]);
 
+  useEffect(() => {
+    inquiryListDataRefetch();
+  }, [currentPage, inquiryListDataRefetch]);
+
   const columns: ColumnProps<AdminQnaDataProps>[] = [
     {
       key: 'ranking',
@@ -209,11 +220,14 @@ const AdminQna = () => {
       render: (_, item) => (
         <div css={tagStyle}>
           <div className='tag'>
-            <Tag src={item?.methodIconPath || ''} />
+            {item?.methodIconPath && (
+              <Tag src={item.methodIconPath} alt='methodIcon' />
+            )}
+            <Tag src={item?.cycle === 'D' ? dayIcon : positionIcon} />
             {item?.stockList?.stockIconPath &&
               item?.stockList?.stockIconPath.map(
                 (stock: string, index: number) => (
-                  <Tag key={index} src={stock || ''} alt='tag' />
+                  <Tag key={index} src={stock || ''} alt='stockIcon' />
                 )
               )}
           </div>
@@ -225,7 +239,7 @@ const AdminQna = () => {
       key: 'inquiryRegistrationDate',
       header: '문의날짜',
       render: (_, item) => (
-        <span>{extractDate(item.inquiryRegistrationDate)}</span>
+        <span>{formatYearMonthFromDateTime(item.inquiryRegistrationDate)}</span>
       ),
     },
     {
@@ -253,7 +267,13 @@ const AdminQna = () => {
           border={true}
           width={80}
           handleClick={() =>
-            navigate(PATH.ADMIN_QNA_DETAIL(String(item.inquiryId)))
+            navigate(PATH.ADMIN_QNA_DETAIL(String(item.inquiryId)), {
+              state: {
+                closed: item.inquiryStatus,
+                searchType: selectiedOption,
+                searchText,
+              },
+            })
           }
         />
       ),
@@ -290,7 +310,7 @@ const AdminQna = () => {
           value={value}
           handleKeyDown={(e) => {
             if (e.key === 'Enter') {
-              setSearchText(value);
+              setSearchText(value.trim());
             }
           }}
           handleChange={(e) => setValue(e.target.value)}
@@ -339,7 +359,7 @@ const AdminQna = () => {
             <Pagination
               totalPage={totalPage}
               currentPage={currentPage}
-              handlePageChange={setCurrentPage}
+              handlePageChange={(newPage) => setCurrentPage(newPage)}
             />
           </div>
         ) : (
@@ -492,6 +512,8 @@ const tagStyle = css`
 
   .tag {
     display: flex;
+    align-items: center;
+    flex-wrap: wrap;
     gap: 4px;
   }
 `;

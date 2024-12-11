@@ -3,6 +3,8 @@ import { css } from '@emotion/react';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import { useNavigate } from 'react-router-dom';
+import dayIcon from '@/assets/images/day-icon.png';
+import positionIcon from '@/assets/images/position-icon.png';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
 import Pagination from '@/components/Pagination';
@@ -372,6 +374,7 @@ const TraderStrategyList = () => {
         <div css={tagStyle}>
           <div className='tag'>
             <Tag src={item?.methodIconPath || ''} alt='tag' />
+            <Tag src={item?.cycle === 'D' ? dayIcon : positionIcon} />
             {item?.stockList?.stockIconPath &&
               item?.stockList?.stockIconPath.map(
                 (stock: string, index: number) => (
@@ -389,11 +392,11 @@ const TraderStrategyList = () => {
       render: (_, item) => {
         const itemValue = item.accumulatedProfitLossRate;
 
-        const colorStyle = getColorStyleBasedOnValue(itemValue);
+        const { text, style } = getColorStyleBasedOnValue(itemValue);
 
         return (
-          <div css={fontStyle} style={colorStyle}>
-            {itemValue}%
+          <div css={fontStyle} style={style}>
+            {text}
           </div>
         );
       },
@@ -404,11 +407,11 @@ const TraderStrategyList = () => {
       render: (_, item) => {
         const itemValue = item.mdd;
 
-        const colorStyle = getColorStyleBasedOnValue(itemValue);
+        const { text, style } = getColorStyleBasedOnValue(itemValue);
 
         return (
-          <div css={fontStyle} style={colorStyle}>
-            {itemValue}%
+          <div css={fontStyle} style={style}>
+            {text}
           </div>
         );
       },
@@ -419,11 +422,11 @@ const TraderStrategyList = () => {
       render: (_, item) => {
         const itemValue = item.smScore;
 
-        const colorStyle = getColorStyleBasedOnValue(itemValue);
+        const { text, style } = getColorStyleBasedOnValue(itemValue);
 
         return (
-          <div css={fontStyle} style={colorStyle}>
-            {itemValue}%
+          <div css={fontStyle} style={style}>
+            {text}
           </div>
         );
       },
@@ -548,11 +551,15 @@ const TraderStrategyList = () => {
           <h5>트레이더 전략정보</h5>
         </div>
         <Table data={tableData || []} columns={columns} />
-        <Pagination
-          totalPage={totalPage}
-          currentPage={currentPage}
-          handlePageChange={setCurrentPage}
-        />
+        {tableData?.length > 0 ? (
+          <Pagination
+            totalPage={totalPage}
+            currentPage={currentPage}
+            handlePageChange={setCurrentPage}
+          />
+        ) : (
+          <span css={emptyContents}>트레이더의 전략 정보가 없습니다.</span>
+        )}
       </section>
     </div>
   );
@@ -642,6 +649,37 @@ const tableWrapperStyle = css`
   flex-direction: column;
   gap: 29px;
 
+  table > thead > tr > th {
+    &:nth-of-type(1) {
+      width: 80px;
+    }
+    &:nth-of-type(2) {
+      width: 202px;
+    }
+    &:nth-of-type(3) {
+      width: 280px;
+    }
+    &:nth-of-type(4) {
+      width: 120px;
+    }
+    &:nth-of-type(5) {
+      width: 120px;
+    }
+    &:nth-of-type(6) {
+      width: 120px;
+    }
+    &:nth-of-type(7) {
+      width: 100px;
+    }
+  }
+
+  table > tbody > tr > td {
+    &:nth-of-type(2) div {
+      display: flex;
+      justify-content: center;
+    }
+  }
+
   .title-area {
     position: relative;
     padding: 28px 0;
@@ -697,6 +735,7 @@ const tagStyle = css`
   .tag {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 4px;
   }
 `;
@@ -721,6 +760,13 @@ const addInteresmodalStyle = css`
 
 const fontStyle = css`
   font-weight: ${FONT_WEIGHT.BOLD};
+`;
+
+const emptyContents = css`
+  padding: 32px;
+  border-radius: 4px;
+  background: ${COLOR.GRAY100};
+  text-align: center;
 `;
 
 export default TraderStrategyList;

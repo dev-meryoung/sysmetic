@@ -93,8 +93,12 @@ const inputStyle = (
         : COLOR.BLACK};
   }
 
-  &::placeholder {
+  ::placeholder {
     color: ${COLOR_OPACITY.BLACK_OPACITY30};
+  }
+
+  ::-ms-reveal {
+    display: none;
   }
 `;
 

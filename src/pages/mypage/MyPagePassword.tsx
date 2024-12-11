@@ -26,7 +26,7 @@ const MypagePassword: React.FC = () => {
 
   const navigate = useNavigate();
   const PASSWORD_REGEX =
-    /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,20}$/;
+    /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,20}$/;
 
   const { userId: paramUserId } = useParams<{ userId: string }>();
 
@@ -121,7 +121,8 @@ const MypagePassword: React.FC = () => {
             </div>
             {newPasswordStatus === 'warn' && (
               <span className='message'>
-                새 비밀번호는 영문, 숫자, 특수문자를 포함한 6~20자여야 합니다.
+                새 비밀번호는 6~20자의 영대/소문자, 숫자, 특수문자를 포함해야
+                합니다.
               </span>
             )}
           </div>

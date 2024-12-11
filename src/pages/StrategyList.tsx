@@ -8,6 +8,8 @@ import {
 import { css } from '@emotion/react';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { useNavigate } from 'react-router-dom';
+import dayIcon from '@/assets/images/day-icon.png';
+import positionIcon from '@/assets/images/position-icon.png';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
 import Pagination from '@/components/Pagination';
@@ -561,12 +563,18 @@ export const StrategyList = () => {
         <div css={tagStyle}>
           <div className='tag'>
             <Tag src={item?.methodIconPath || ''} alt='tag' />
-            {item?.stockList?.stockIconPath &&
-              item?.stockList?.stockIconPath.map(
-                (stock: string, index: number) => (
+            <Tag src={item?.cycle === 'D' ? dayIcon : positionIcon} />
+            {currentTab === 1
+              ? item?.stockIconPath &&
+                item?.stockIconPath.map((stock: string, index: number) => (
                   <Tag key={index} src={stock} alt='tag' />
-                )
-              )}
+                ))
+              : item?.stockList?.stockIconPath &&
+                item.stockList.stockIconPath.map(
+                  (stock: string, index: number) => (
+                    <Tag key={index} src={stock} alt='tag' />
+                  )
+                )}
           </div>
           {item.name}
         </div>
@@ -578,11 +586,11 @@ export const StrategyList = () => {
       render: (_, item) => {
         const itemValue = item.accumulatedProfitLossRate;
 
-        const colorStyle = getColorStyleBasedOnValue(itemValue);
+        const { text, style } = getColorStyleBasedOnValue(itemValue);
 
         return (
-          <div css={fontStyle} style={colorStyle}>
-            {itemValue}%
+          <div css={fontStyle} style={style}>
+            {text}
           </div>
         );
       },
@@ -593,11 +601,11 @@ export const StrategyList = () => {
       render: (_, item) => {
         const itemValue = item.mdd;
 
-        const colorStyle = getColorStyleBasedOnValue(itemValue);
+        const { text, style } = getColorStyleBasedOnValue(itemValue);
 
         return (
-          <div css={fontStyle} style={colorStyle}>
-            {itemValue}%
+          <div css={fontStyle} style={style}>
+            {text}
           </div>
         );
       },
@@ -608,11 +616,11 @@ export const StrategyList = () => {
       render: (_, item) => {
         const itemValue = item.smScore;
 
-        const colorStyle = getColorStyleBasedOnValue(itemValue);
+        const { text, style } = getColorStyleBasedOnValue(itemValue);
 
         return (
-          <div css={fontStyle} style={colorStyle}>
-            {itemValue}%
+          <div css={fontStyle} style={style}>
+            {text}
           </div>
         );
       },
@@ -857,6 +865,7 @@ const tagStyle = css`
   .tag {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 4px;
   }
 `;
@@ -877,7 +886,7 @@ const tableStyle = css`
       width: 340px;
     }
     &:nth-of-type(4) {
-      width: 196px;
+      width: 130px;
     }
     &:nth-of-type(5) {
       width: 120px;

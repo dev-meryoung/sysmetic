@@ -1,6 +1,14 @@
-import React, { useEffect, useState, ChangeEvent, Dispatch } from 'react';
+import React, {
+  useEffect,
+  useState,
+  ChangeEvent,
+  Dispatch,
+  useRef,
+} from 'react';
 import { css } from '@emotion/react';
 import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { useNavigate, useParams } from 'react-router-dom';
 import { checkEmail } from '@/api/authApi';
 import Button from '@/components/Button';
@@ -36,16 +44,15 @@ const EmailOptions = [
   { label: 'naver.com', value: 'naver' },
   { label: 'gmail.com', value: 'gmail' },
   { label: 'hanmail.net', value: 'hanmail' },
+  { label: 'daum.net', value: 'daum' },
   { label: 'nate.com', value: 'nate' },
-  { label: 'yahoo.com', value: 'yahoo' },
-  { label: 'empal.com', value: 'empal' },
-  { label: 'test.com', value: 'test' },
+  { label: 'hotmail.com', value: 'hotmail' },
 ];
 
 const REGEX = {
-  ID_REGEX: /^[a-zA-Z\d_]+$/,
+  ID_REGEX: /^[a-zA-Z\d\.\/%\+\-]+$/,
   PW_REGEX:
-    /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,20}$/,
+    /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,20}$/,
   NAME_REGEX: /^[가-힣]{1,10}$/,
   NICKNAME_REGEX: /^[가-힣\d]{3,10}$/,
   PHONE_REGEX: /^010\d{8}$/,
@@ -56,6 +63,7 @@ interface AuthModalProps {
   email: string;
   setSuccessEmailAuth: Dispatch<React.SetStateAction<boolean>>;
 }
+
 const AuthModal: React.FC<AuthModalProps> = ({
   email,
   setSuccessEmailAuth,
@@ -75,7 +83,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
       setAuthCodeStatus('pass');
     } else {
       setAuthCodeStatus('warn');
-      setMessage('6자리의 영문 대문자, 숫자만 조합하여 사용');
+      setMessage('6자리의 영문 대문자, 숫자만 입력해주세요.');
     }
   };
 
@@ -138,6 +146,13 @@ const AuthSuccessModal = () => (
   </div>
 );
 
+const SignUpFailureModal = () => (
+  <div css={AuthSuccessModalStyle}>
+    <p>회원가입에 실패했습니다.</p>
+    <p>필수 입력사항을 다시한번 확인해주세요.</p>
+  </div>
+);
+
 const SignUpForm = () => {
   // 입력 폼
   const [id, setId] = useState('');
@@ -146,12 +161,14 @@ const SignUpForm = () => {
   const [nickname, setNickname] = useState('');
   const [name, setName] = useState('');
   const [phoneNum, setPhoneNum] = useState('');
-  const [profileImg, setProfileImg] = useState('');
+  const [profileImg, setProfileImg] = useState<File | null>(null);
+  const [profileFile, setProfileFile] = useState('');
   const [date, setDate] = useState('');
   const [selectedEmail, setSelectedEmail] = useState('');
   const age = new Date().getFullYear() - new Date(date).getFullYear() < 14;
   // 모달 변수
   const authModal = useModalStore();
+  const errModal = useModalStore();
   // 버튼 상태
   const [checkIdDisabled, setCheckIdDisabled] = useState(true);
   const [idAuthBtnDisabled, setIdAuthBtnDisabled] = useState(true);
@@ -180,46 +197,28 @@ const SignUpForm = () => {
   const [nameStatus, setNameStatus] = useState<InputStateTypes>('normal');
   const [phoneNumStatus, setPhoneNumStatus] =
     useState<InputStateTypes>('normal');
+  const fileRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  //아이콘
+  const [showPw, setShowPw] = useState(false);
+  const [showCheckPw, setShowCheckPw] = useState(false);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
     if (file) {
+      setProfileImg(file);
+
       const reader = new FileReader();
+
       reader.onload = () => {
         if (reader.result) {
-          setProfileImg(reader.result as string);
+          setProfileFile(reader.result.toString());
         }
       };
+
       reader.readAsDataURL(file);
     }
-  };
-
-  // 파일 탐색기 열기
-  const handleOpenFileExplorer = () => {
-    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-    const fileInput = document.createElement('input');
-
-    fileInput.type = 'file';
-    fileInput.accept = 'image/jpg,image/jpeg,image/png,image/gif';
-
-    fileInput.addEventListener('change', (e: Event) => {
-      const input = e.target as HTMLInputElement;
-      if (input.files && input.files.length > 0) {
-        const file = input.files[0];
-        if (file.size > MAX_FILE_SIZE) {
-          alert(
-            '5MB 이하의 jp(e)g, png, gif 형식의 이미지만 설정할 수 있습니다.'
-          );
-          return;
-        }
-
-        handleFileChange({
-          target: input,
-        } as ChangeEvent<HTMLInputElement>);
-      }
-    });
-
-    fileInput.click();
   };
 
   const handleEmailChange = (value: string) => {
@@ -231,11 +230,14 @@ const SignUpForm = () => {
   };
 
   const { mutate: signUpMutation } = useSignUp();
+
   const handleNextBtnClick = () => {
     const formData = new FormData();
     if (profileImg) {
       formData.append('file', profileImg);
     }
+
+    const currentDate = new Date().toISOString().split('.')[0];
 
     const registerData = {
       roleCode: type === 'investor' ? 'USER' : 'TRADER',
@@ -247,12 +249,9 @@ const SignUpForm = () => {
       birth: date,
       phoneNumber: phoneNum,
       receiveInfoConsent: isFirstChecked,
-      infoConsentDate: new Date().toISOString().slice(0, 19).replace('Z', ''),
+      infoConsentDate: currentDate,
       receiveMarketingConsent: isSecondChecked,
-      marketingConsentDate: new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace('Z', ''),
+      marketingConsentDate: currentDate,
     };
 
     formData.append('registerResponseDto', JSON.stringify(registerData));
@@ -262,7 +261,7 @@ const SignUpForm = () => {
         navigate(PATH.SIGN_UP_DONE(type));
       },
       onError: () => {
-        console.log('회원가입 실패');
+        errModal.openModal('signUp-err');
       },
     });
   };
@@ -389,6 +388,23 @@ const SignUpForm = () => {
     });
   };
 
+  //비밀번호 보기/숨기기
+  const handleShowPw = () => {
+    if (!showPw) {
+      setShowPw(true);
+    } else {
+      setShowPw(false);
+    }
+  };
+
+  const handleShowCheckPw = () => {
+    if (!showCheckPw) {
+      setShowCheckPw(true);
+    } else {
+      setShowCheckPw(false);
+    }
+  };
+
   useEffect(() => {
     setIsDisabled(
       !(
@@ -489,12 +505,12 @@ const SignUpForm = () => {
           </div>
           <p>
             {idStatus === 'warn' &&
-              '영문, 숫자, 특수문자 중 1개 이상 조합하여 사용'}
-            {idStatus === 'pass' && !selectedEmail && '이메일을 선택해주세요.'}
+              '영문, 숫자, 특수문자(_, ., %, +, -)만 입력해주세요.'}
+            {idStatus === 'pass' && !selectedEmail && '도메인을 선택해주세요.'}
             {idStatus === 'pass' &&
               selectedEmail &&
               (isExist ? (
-                '중복된 이메일입니다.'
+                '중복된 이메일입니다. 다른 이메일을 입력해주세요.'
               ) : (
                 <span className='success-msg'>{emailMessage}</span>
               ))}
@@ -505,14 +521,31 @@ const SignUpForm = () => {
             비밀번호
             <Dot />
           </p>
-          <TextInput
-            status={pwStatus}
-            type='password'
-            value={pw}
-            handleChange={handlePwInputChange}
-          />
+          <div css={pwInputStyle}>
+            <TextInput
+              iconNum='single'
+              status={pwStatus}
+              type={showPw ? 'text' : 'password'}
+              value={pw}
+              handleChange={handlePwInputChange}
+            />
+            {showPw ? (
+              <VisibilityOffOutlinedIcon
+                css={pwIconStyle}
+                onClick={handleShowPw}
+              />
+            ) : (
+              <VisibilityOutlinedIcon
+                css={pwIconStyle}
+                onClick={handleShowPw}
+              />
+            )}
+          </div>
+
           {pwStatus === 'warn' && (
-            <p>6~20자의 영문, 숫자, 특수문자를 모두 조합하여 사용</p>
+            <p>
+              6~20자의 영대/소문자, 숫자, 특수문자를 모두 포함하여 입력해주세요.
+            </p>
           )}
         </div>
         <div className='input-form'>
@@ -520,12 +553,25 @@ const SignUpForm = () => {
             비밀번호 확인
             <Dot />
           </p>
-          <TextInput
-            status={checkPwStatus}
-            type='password'
-            value={checkPw}
-            handleChange={handleCheckPwInputChange}
-          />
+          <div css={pwInputStyle}>
+            <TextInput
+              status={checkPwStatus}
+              type={showCheckPw ? 'text' : 'password'}
+              value={checkPw}
+              handleChange={handleCheckPwInputChange}
+            />
+            {showCheckPw ? (
+              <VisibilityOffOutlinedIcon
+                css={pwIconStyle}
+                onClick={handleShowCheckPw}
+              />
+            ) : (
+              <VisibilityOutlinedIcon
+                css={pwIconStyle}
+                onClick={handleShowCheckPw}
+              />
+            )}
+          </div>
           {checkPw !== pw && <p>비밀번호가 일치하지 않습니다.</p>}
         </div>
         <div className='input-form'>
@@ -547,11 +593,10 @@ const SignUpForm = () => {
             />
           </div>
           <p>
-            {nicknameStatus === 'warn' &&
-              '3~10자의 한글, 숫자 중 1개 이상 조합하여 사용'}
+            {nicknameStatus === 'warn' && '3~10자의 한글, 숫자만 입력해주세요.'}
             {nicknameStatus === 'pass' &&
               (isNicknameExist ? (
-                '중복된 닉네임입니다.'
+                '중복된 닉네임입니다. 다른 닉네임을 입력해주세요.'
               ) : (
                 <span className='success-msg'>{nicknameMessage}</span>
               ))}
@@ -567,7 +612,7 @@ const SignUpForm = () => {
             value={name}
             handleChange={handleNameInputChange}
           />
-          {nameStatus === 'warn' && <p>1~10자의 한글만 조합하여 사용</p>}
+          {nameStatus === 'warn' && <p>1~10자의 한글만 입력해주세요.</p>}
         </div>
         <div className='input-form'>
           <p>
@@ -589,13 +634,20 @@ const SignUpForm = () => {
             handleChange={handlePhoneInputChange}
           />
           {phoneNumStatus === 'warn' && (
-            <p>010으로 시작하는 11자의 숫자만 조합하여 사용 ('-' 제외)</p>
+            <p>010으로 시작하는 11자의 숫자만 입력해주세요. ('-' 제외)</p>
           )}
         </div>
         <div className='img-form'>
           <p>프로필 이미지 설정</p>
-          <div className='img-div' onClick={handleOpenFileExplorer}>
-            <ProfileImage size='xxl' alt='profile' src={profileImg} />
+          <div className='img-div' onClick={() => fileRef.current?.click()}>
+            <ProfileImage size='xxl' alt='profile' src={profileFile} />
+            <input
+              ref={fileRef}
+              type='file'
+              accept='image/*'
+              onChange={handleFileChange}
+              css={fileInputStyle}
+            />
             <CameraAltOutlinedIcon className='icon' css={iconStyle} />
           </div>
         </div>
@@ -642,6 +694,7 @@ const SignUpForm = () => {
         id='auth'
       />
       <Modal content={<AuthSuccessModal />} id='success' />
+      <Modal content={<SignUpFailureModal />} id='signUp-err' />
     </div>
   );
 };
@@ -822,11 +875,32 @@ const AuthModalStyle = css`
 
 const AuthSuccessModalStyle = css`
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  line-height: 160%;
 
   padding: 8px 16px;
   font-size: ${FONT_SIZE.TEXT_MD};
+`;
+
+const fileInputStyle = css`
+  display: none;
+`;
+
+const pwInputStyle = css`
+  position: relative;
+  width: 360px;
+`;
+
+const pwIconStyle = css`
+  position: absolute;
+  font-size: ${FONT_SIZE.TITLE_SM};
+  right: 1.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0;
+  cursor: pointer;
 `;
 
 export default SignUpForm;

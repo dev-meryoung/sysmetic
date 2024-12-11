@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import SubdirectoryArrowRightOutlinedIcon from '@mui/icons-material/SubdirectoryArrowRightOutlined';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import dayIcon from '@/assets/images/day-icon.png';
+import positionIcon from '@/assets/images/position-icon.png';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
 import ProfileImage from '@/components/ProfileImage';
@@ -14,7 +16,7 @@ import {
   useGetAdminInquiryDetail,
 } from '@/hooks/useAdminApi';
 import useModalStore from '@/stores/useModalStore';
-import { extractDate } from '@/utils/dataUtils';
+import { formatYearMonthFromDateTime } from '@/utils/dataUtils';
 
 interface AdminQnaDetailDataProps {
   answerContent: string;
@@ -108,17 +110,22 @@ const DelModal = ({
 
 const AdminQnaDetail = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const deleteModal = useModalStore();
+  const location = useLocation();
+  const { state } = location;
+
   const [qnaId, setQnaId] = useState(1);
+  const closed = state?.closed;
+  const searchType = state?.searchType;
+  const searchText = state?.searchText;
 
   const [data, setData] = useState<AdminQnaDetailDataProps>();
 
   const { data: inquiryDetailData, refetch: inquiryDetailDataRefetch } =
-    useGetAdminInquiryDetail(qnaId);
+    useGetAdminInquiryDetail(qnaId, closed, searchType, searchText);
 
   useEffect(() => {
-    const urlNumber = Number(window.location.pathname.split('/').pop()) || null;
+    const urlNumber = Number(window.location.pathname.split('/').pop());
     if (urlNumber && urlNumber !== qnaId) {
       setQnaId(urlNumber);
     }
@@ -151,7 +158,11 @@ const AdminQnaDetail = () => {
           <div className='info'>
             <div>
               <p>작성일</p>
-              <p>{data?.inquiryRegistrationDate}</p>
+              <p>
+                {formatYearMonthFromDateTime(
+                  inquiryDetailData?.data?.inquiryRegistrationDate || ''
+                )}
+              </p>
             </div>
             <div>
               <p>작성자</p>
@@ -169,7 +180,8 @@ const AdminQnaDetail = () => {
         <div css={adminQStrategyStyle}>
           <div className='strategyName'>
             <div className='tag'>
-              <Tag src={data?.methodIconPath || ''} />
+              {data?.methodIconPath && <Tag src={data?.methodIconPath || ''} />}
+              <Tag src={data?.cycle === 'D' ? dayIcon : positionIcon} />
               {data?.stockList?.stockIconPath &&
                 data?.stockList?.stockIconPath.map(
                   (stock: string, index: number) => (
@@ -187,41 +199,70 @@ const AdminQnaDetail = () => {
         <div css={adminQContentStyle}>
           <p>{data?.inquiryContent}</p>
         </div>
-        <div css={adminATitleStyle}>
-          <div className='answer'>
-            <div className='title'>
-              <SubdirectoryArrowRightOutlinedIcon css={iconStyle} />
-              <h6>{data?.answerTitle}</h6>
+        {data?.answerTitle && (
+          <>
+            <div css={adminATitleStyle}>
+              <div className='answer'>
+                <div className='title'>
+                  <SubdirectoryArrowRightOutlinedIcon css={iconStyle} />
+                  <h6>{data?.answerTitle}</h6>
+                </div>
+                <div className='info'>
+                  <p>작성일</p>
+                  <p>
+                    {inquiryDetailData?.data?.answerRegistrationDate &&
+                      formatYearMonthFromDateTime(
+                        inquiryDetailData?.data?.answerRegistrationDate
+                      )}
+                  </p>
+                </div>
+              </div>
+              <div className='profile'>
+                <ProfileImage src={data?.traderProfileImagePath} />
+                <p>{data?.traderNickname}</p>
+              </div>
             </div>
-            <div className='info'>
-              <p>작성일</p>
-              <p>{extractDate(data?.answerRegistrationDate || '')}</p>
+            <div css={adminQContentStyle}>
+              <p>{data?.answerContent}</p>
             </div>
-          </div>
-          <div className='profile'>
-            <ProfileImage src={data?.traderProfileImagePath} />
-            <p>{data?.traderNickname}</p>
-          </div>
-        </div>
-        <div css={adminQContentStyle}>
-          <p>{data?.answerContent}</p>
-        </div>
+          </>
+        )}
       </div>
       <div css={adminQnaNavStyle}>
-        <Link className='back-qna' to={`/admin/qna/${data?.previousId}`}>
-          <div>
-            <p>이전</p>
-            <p>{data?.previousTitle}</p>
-          </div>
-          <p>{extractDate(data?.previousWriteDate || '')}</p>
-        </Link>
-        <Link to={`/admin/qna/${data?.nextId}`} className='next-qna'>
-          <div>
-            <p>다음</p>
-            <p>{data?.nextTitle}</p>
-          </div>
-          <p>{extractDate(data?.nextWriteDate || '')}</p>
-        </Link>
+        {data?.previousId && (
+          <button
+            className='back-qna '
+            onClick={() => {
+              if (data?.previousId) {
+                setQnaId(data.previousId);
+                navigate(`/admin/qna/${data.previousId}`);
+              }
+            }}
+          >
+            <div>
+              <p>이전</p>
+              <p>{data?.previousTitle}</p>
+            </div>
+            <p>{formatYearMonthFromDateTime(data?.previousWriteDate || '')}</p>
+          </button>
+        )}
+        {data?.nextId && (
+          <button
+            className='next-qna'
+            onClick={() => {
+              if (data?.nextId) {
+                setQnaId(data.nextId);
+                navigate(`/admin/qna/${data.nextId}`);
+              }
+            }}
+          >
+            <div>
+              <p>다음</p>
+              <p>{data?.nextTitle}</p>
+            </div>
+            <p>{formatYearMonthFromDateTime(data?.nextWriteDate || '')}</p>
+          </button>
+        )}
       </div>
       <div css={buttonStyle}>
         <Button
@@ -376,9 +417,15 @@ const adminQnaNavStyle = css`
     align-items: center;
     padding: 24px;
     height: 64px;
+    border: 0;
     border-bottom: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
+    background-color: transparent;
     text-decoration: none;
     color: inherit;
+
+    &:hover {
+      cursor: pointer;
+    }
 
     div {
       display: flex;
@@ -397,9 +444,15 @@ const adminQnaNavStyle = css`
     align-items: center;
     padding: 24px;
     height: 64px;
+    border: 0;
     border-bottom: 1px solid ${COLOR_OPACITY.BLACK_OPACITY30};
+    background-color: transparent;
     text-decoration: none;
     color: inherit;
+
+    &:hover {
+      cursor: pointer;
+    }
 
     div {
       display: flex;

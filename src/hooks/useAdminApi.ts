@@ -35,6 +35,9 @@ import {
   StocksParameterProps,
   updateAdminMethods,
   updateAdminStocks,
+  AdminStrategyDtoProps,
+  getAdminStrategyList,
+  getAdminMain,
 } from '@/api';
 
 export const useApproveAdminStrategy = () =>
@@ -179,10 +182,15 @@ export const useDeleteInquiryList = () => {
 };
 
 // 관리자 문의 상세조회
-export const useGetAdminInquiryDetail = (qnaId: number) =>
+export const useGetAdminInquiryDetail = (
+  qnaId: number,
+  closed: string,
+  searchType: string,
+  searchText: string
+) =>
   useQuery({
-    queryKey: ['adminInquiryDetail', qnaId],
-    queryFn: () => getAdminInquiryDetail(qnaId),
+    queryKey: ['adminInquiryDetail', qnaId, closed, searchType, searchText],
+    queryFn: () => getAdminInquiryDetail(qnaId, closed, searchType, searchText),
   });
 
 // 관리자 문의 특정 삭제 API
@@ -212,4 +220,18 @@ export const useUpdateAdminUserRole = () =>
 export const useDeleteAdminUser = () =>
   useMutation({
     mutationFn: async (membersId: number[]) => deleteAdminUser(membersId),
+  });
+
+// 관리자 전략목록 조회
+export const useGetAdminStrategyList = (params: AdminStrategyDtoProps) =>
+  useQuery({
+    queryKey: ['adminStrategyList', params],
+    queryFn: () => getAdminStrategyList(params),
+  });
+
+// 관리자 메인 조회
+export const useGetAdminMain = () =>
+  useQuery({
+    queryKey: ['adminMain'],
+    queryFn: () => getAdminMain(),
   });
