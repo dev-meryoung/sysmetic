@@ -29,14 +29,14 @@ const Chart: React.FC<ChartDataProps> = ({
   type = 'line',
   unit,
 }) => {
-  const [selectedFilter, setSelectedFilter] = useState('ALL');
-  const dateFilter = ['1개월', '3개월', '6개월', '1년', 'ALL'];
+  const [selectedFilter, setSelectedFilter] = useState('전체');
+  const dateFilter = ['1개월', '3개월', '6개월', '1년', '전체'];
 
   const getFilteredData = (
     data: [number, number][],
     selectedPeriod: string
   ): [number, number][] => {
-    if (selectedPeriod === 'ALL') return data;
+    if (selectedPeriod === '전체') return data;
 
     const today = new Date();
     const filterDate = new Date();
@@ -107,6 +107,7 @@ const Chart: React.FC<ChartDataProps> = ({
       },
       formatter(this: Highcharts.TooltipFormatterContextObject) {
         const date = new Date(this.x as number);
+        // getMonth()는 0부터 11까지 반환하므로, 1월~12월로 맞추기 위해 +1
         const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
         return `

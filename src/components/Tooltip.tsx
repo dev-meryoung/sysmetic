@@ -10,37 +10,53 @@ interface TooltipProps {
 }
 
 const Tooltip: React.FC<TooltipProps> = ({ text, children, width }) => (
-  <div css={tooltipStyle(width)}>
-    {children}
-    <span className='tooltip-text'>{text}</span>
+  <div css={tooltipWrapperStyle}>
+    <div css={tooltipTriggerStyle}>
+      {children}
+      <span className='tooltip-text' css={tooltipTextStyle(width)}>
+        {text}
+      </span>
+    </div>
   </div>
 );
 
-const tooltipStyle = (width: number) => css`
+const tooltipWrapperStyle = css`
   position: relative;
   display: inline-block;
-  width: fit-content;
+`;
+
+const tooltipTriggerStyle = css`
+  position: relative;
+  display: inline-block;
   cursor: pointer;
   filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.1));
 
-  .tooltip-text {
-    font-size: ${FONT_SIZE.TEXT_XS};
-    min-width: ${width}px;
-    background-color: ${COLOR.WHITE};
-    color: ${COLOR.TEXT_BLACK};
-    text-align: center;
-    border-radius: 4px;
-    padding: 16px;
-    position: absolute;
-    z-index: 1;
-    bottom: 155%;
-    left: 50%;
-    margin-left: -${width / 2}px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+  &:hover .tooltip-text {
+    opacity: 1;
+    visibility: visible;
   }
+`;
 
-  .tooltip-text::after {
+const tooltipTextStyle = (width: number) => css`
+  font-size: ${FONT_SIZE.TEXT_XS};
+  min-width: ${width}px;
+  background-color: ${COLOR.WHITE};
+  color: ${COLOR.TEXT_BLACK};
+  text-align: center;
+  border-radius: 4px;
+  padding: 12px 8px;
+  position: absolute;
+  z-index: 1;
+  bottom: 150%;
+  left: 50%;
+  margin-left: -${width / 2}px;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
+
+  &::after {
     content: '';
     position: absolute;
     top: 100%;
@@ -50,10 +66,5 @@ const tooltipStyle = (width: number) => css`
     border-right: 8px solid transparent;
     border-top: 8px solid ${COLOR.WHITE};
   }
-
-  &:hover .tooltip-text {
-    opacity: 1;
-  }
 `;
-
 export default Tooltip;

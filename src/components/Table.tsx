@@ -33,11 +33,14 @@ const Table = <T,>({
 }: TableProps<T>) => {
   const isAllChecked = checkedItems?.length === data.length;
 
+  // key: 정렬 기준이 되는 컬럼의 키값
+  // direction: 'asc'(오름차순) 또는 'desc'(내림차순)
   const [sortConfig, setSortConfig] = useState<{
     key: keyof T;
     direction: 'asc' | 'desc';
   } | null>(null);
 
+  // 테이블 헤더 클릭시 호출되는 정렬 핸들러 함수
   const handleSort = (key: keyof T) => {
     setSortConfig((prevConfig) => ({
       key,
@@ -48,6 +51,9 @@ const Table = <T,>({
     }));
   };
 
+  // sortConfig 설정에 따라 데이터를 정렬하여 반환
+  // - sortConfig가 null인 경우(sortable: false): 원본 데이터를 그대로 반환
+  // - sortConfig가 있는 경우(sortable: true): 지정된 key와 direction에 따라 데이터를 정렬하여 반환
   const sortedData = sortConfig
     ? [...data].sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) {
