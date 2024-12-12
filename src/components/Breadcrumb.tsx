@@ -23,7 +23,7 @@ const Breadcrumb: React.FC = () => {
     <div css={breadcrumbStyle}>
       <div css={linksStyle}>
         {breadcrumbData.map(({ label, path }, idx) => (
-          <React.Fragment key={label}>
+          <React.Fragment key={`${label}-${idx}`}>
             {idx > 0 && <ChevronRight sx={{ fontSize: 24 }} />}
             {path ? <Link to={path}>{label}</Link> : <span>{label}</span>}
           </React.Fragment>
