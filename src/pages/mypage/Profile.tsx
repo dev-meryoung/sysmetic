@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { css } from '@emotion/react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Button from '@/components/Button';
-import Loading from '@/components/Loading';
 import ProfileImage from '@/components/ProfileImage';
 import { COLOR, COLOR_OPACITY } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
