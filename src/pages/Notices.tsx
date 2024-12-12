@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import SearchIcon from '@mui/icons-material/Search';
 import { Link, useParams } from 'react-router-dom';
+import Loading from '@/components/Loading';
 import Pagination from '@/components/Pagination';
 import Table, { ColumnProps } from '@/components/Table';
 import TextInput from '@/components/TextInput';
@@ -9,6 +10,7 @@ import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { PATH } from '@/constants/path';
 import { useGetNoticeList } from '@/hooks/useCommonApi';
+import NotFound from '@/pages/NotFound';
 
 interface NoticesStrategyDataProps {
   noticeId?: string;
@@ -20,6 +22,7 @@ const PAGE_SIZE = 10;
 
 const Notices = () => {
   const [searchValue, setSearchValue] = useState('');
+  const [searchText, setSearchText] = useState('');
   const [curPage, setCurPage] = useState<number>(0);
   const [data, setData] = useState<NoticesStrategyDataProps[]>([]);
   const [filteredData, setFilteredData] = useState<NoticesStrategyDataProps[]>(
@@ -30,12 +33,25 @@ const Notices = () => {
   const params = {
     noticeId,
     page: curPage,
-    searchText: searchValue,
+    searchText: searchText.trim().toLowerCase(),
   };
+  const [showNotFound, setShowNotFound] = useState(false);
 
   const noticeMutation = useGetNoticeList(params);
 
   useEffect(() => {
+    if (noticeMutation.isError || !noticeMutation.data?.data?.content?.length) {
+      setShowNotFound(true);
+    } else {
+      setShowNotFound(false);
+    }
+  }, [noticeMutation.isError, noticeMutation.data]);
+
+  useEffect(() => {
+    if (noticeMutation.isLoading || noticeMutation.isError || showNotFound) {
+      return;
+    }
+
     const total = noticeMutation.data?.data?.totalElement;
     const fetchedData = noticeMutation.data?.data?.content;
 
@@ -49,7 +65,20 @@ const Notices = () => {
       setFilteredData([]);
       setTotalPage(0);
     }
-  }, [noticeMutation.data]);
+  }, [
+    noticeMutation.data,
+    noticeMutation.isLoading,
+    showNotFound,
+    noticeMutation.isError,
+  ]);
+
+  if (noticeMutation.isLoading) {
+    return <Loading />;
+  }
+
+  if (showNotFound) {
+    return <NotFound />;
+  }
 
   const formatDate = (isoDate: string | undefined): string =>
     isoDate
@@ -61,6 +90,7 @@ const Notices = () => {
   };
 
   const handleSearch = () => {
+    setSearchText(searchValue);
     const filtered = data.filter((item) =>
       item.noticeTitle?.toLowerCase().includes(searchValue.trim().toLowerCase())
     );
@@ -173,7 +203,7 @@ const noticesListStyle = css`
   border-top: 2px solid ${COLOR.PRIMARY600};
 
   th {
-    display: none; 
+    display: none;
   }
   thead {
     background-color: transparent;
@@ -187,9 +217,10 @@ const noticesListStyle = css`
     }
     &:last-of-type {
       display: flex;
-      justify-content: flex-end; 
+      justify-content: flex-end;
       align-items: center;
     }
+  }
 `;
 
 const noticesPaginationStyle = css`

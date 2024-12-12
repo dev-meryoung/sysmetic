@@ -119,8 +119,36 @@ const NoticesDetail = () => {
           </div>
         </div>
         <div css={noticesContentStyle}>
-          <p>{data.noticeContent}</p>
+          {data.noticeContent?.split('\n').map((line, index) => {
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            const parts = line.split(urlRegex);
+
+            return (
+              <p key={index}>
+                {parts.map((part, idx) => {
+                  if (urlRegex.test(part)) {
+                    return (
+                      <a
+                        key={idx}
+                        href={part}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        css={css`
+                          color: ${COLOR.PRIMARY};
+                          text-decoration: underline;
+                        `}
+                      >
+                        {part}
+                      </a>
+                    );
+                  }
+                  return part;
+                })}
+              </p>
+            );
+          })}
         </div>
+
         {data.fileDtoList && data.fileDtoList.length > 0 && (
           <div css={noticesFileStyle}>
             <div className='file-title' css={fileTitleStyle}>
@@ -254,6 +282,9 @@ const noticesTitleStyle = css`
 const noticesContentStyle = css`
   padding: 24px 24px 64px;
   min-height: 280px;
+  white-space: pre-line;
+  word-break: break-word;
+  line-height: 1.6;
 `;
 
 const noticesFileStyle = css`

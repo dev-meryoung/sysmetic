@@ -26,7 +26,7 @@ const MypagePassword: React.FC = () => {
 
   const navigate = useNavigate();
   const PASSWORD_REGEX =
-    /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,20}$/;
+    /^(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])[A-Za-z!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{6,20}$/;
 
   const { userId: paramUserId } = useParams<{ userId: string }>();
 
