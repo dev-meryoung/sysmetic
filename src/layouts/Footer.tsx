@@ -32,10 +32,8 @@ const Footer = () => {
               </div>
             </div>
             <span>
-              사업자 등록번호 : 711-86-00050 &nbsp;&nbsp; 통신판매업신고 :
-              제2020-서울 영등포-2864호 &nbsp;&nbsp; 특허출원번호 :
-              10-2016-00262203 <br /> 대표이사: 홍길동 &nbsp;&nbsp; 주소지:
-              서울시 영등포구 당산로41길 11, E동 1202 <br /> © SYSMETIC Corp.
+              문의 메일 : ceo@sysmetic.co.kr &nbsp;&nbsp; 통신판매업신고 :
+              제2020-서울 영등포-2864호 &nbsp;&nbsp; <br /> © SYSMETIC Corp.
               All Rights Reserved.
             </span>
           </div>

@@ -388,7 +388,7 @@ export const StrategyList = () => {
             }));
 
             if (data.code === 404) {
-              setResultMessage('상세 조건에 해당하는 검색 결과가 없습니다.');
+              setResultMessage('상세 조건에 해당하는 결과가 없습니다.');
             }
           },
         }
@@ -403,7 +403,7 @@ export const StrategyList = () => {
         }));
 
         if (algorithmData?.data?.code === 404) {
-          setResultMessage('상세 조건에 해당하는 검색 결과가 없습니다.');
+          setResultMessage('상세 조건에 해당하는 결과가 없습니다.');
         }
       }
     }
@@ -756,7 +756,7 @@ export const StrategyList = () => {
       <section css={tableStyle}>
         <Table data={tableData} columns={columns} />
         {isNotFound ? (
-          <div css={emptyContents}>결과가 없습니다.</div>
+          <div css={emptyContents}>검색 결과가 없습니다.</div>
         ) : resultMessage && tableData?.length <= 0 ? (
           <div css={emptyContents}>{resultMessage}</div>
         ) : null}
