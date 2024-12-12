@@ -132,7 +132,7 @@ const SignFindPw = () => {
       ...messages,
       passwordError: isPasswordValid
         ? ''
-        : '비밀번호는 6~20자의 문자, 숫자, 특수문자를 포함해야 합니다.',
+        : '6~20자의 영대/소문자, 숫자, 특수문자를 모두 포함해야 합니다.',
       checkPasswordError: isPasswordMatch
         ? ''
         : '비밀번호가 일치하지 않습니다.',

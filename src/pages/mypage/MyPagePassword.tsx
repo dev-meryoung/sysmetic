@@ -121,7 +121,8 @@ const MypagePassword: React.FC = () => {
             </div>
             {newPasswordStatus === 'warn' && (
               <span className='message'>
-                새 비밀번호는 영문, 숫자, 특수문자를 포함한 6~20자여야 합니다.
+                새 비밀번호는 6~20자의 영대/소문자, 숫자, 특수문자를 포함해야
+                합니다.
               </span>
             )}
           </div>
