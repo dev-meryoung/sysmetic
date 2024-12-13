@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { css } from '@emotion/react';
+import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
 import dayIcon from '@/assets/images/day-icon.png';
 import positionIcon from '@/assets/images/position-icon.png';
@@ -113,6 +114,7 @@ const AdminQna = () => {
 
   const [tab, setTab] = useState(0);
   const [value, setValue] = useState('');
+  const [searchType, setSearchType] = useState('');
   const [searchText, setSearchText] = useState('');
   const [selectiedOption, setSelectedOption] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
@@ -143,12 +145,7 @@ const AdminQna = () => {
     data: InquiryListData,
     refetch: inquiryListDataRefetch,
     isLoading,
-  } = useGetInquiryList(
-    currentPage,
-    getTabValue(tab),
-    selectiedOption,
-    searchText
-  );
+  } = useGetInquiryList(currentPage, getTabValue(tab), searchType, searchText);
 
   const handleOptionChange = (value: string) => {
     setSelectedOption(value);
@@ -182,6 +179,18 @@ const AdminQna = () => {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const handleSearch = () => {
+    setSearchType(selectiedOption);
+    setSearchText(value.trim());
+    setCurrentPage(0);
+  };
+
   useEffect(() => {
     setTableData(InquiryListData?.data?.content || []);
     setTotalPage(InquiryListData?.data?.totalPages || 0);
@@ -192,10 +201,6 @@ const AdminQna = () => {
   useEffect(() => {
     setCurrentPage(0);
   }, [tab]);
-
-  useEffect(() => {
-    setCurrentPage(0);
-  }, [searchText]);
 
   useEffect(() => {
     inquiryListDataRefetch();
@@ -304,17 +309,16 @@ const AdminQna = () => {
           value={selectiedOption}
           handleChange={handleOptionChange}
         />
-        <TextInput
-          placeholder='검색어를 입력해주세요.'
-          color='skyblue'
-          value={value}
-          handleKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              setSearchText(value.trim());
-            }
-          }}
-          handleChange={(e) => setValue(e.target.value)}
-        />
+        <div className='search-box'>
+          <TextInput
+            placeholder='검색어를 입력하세요'
+            color='skyblue'
+            value={value}
+            handleKeyDown={handleKeyDown}
+            handleChange={(e) => setValue(e.target.value)}
+          />
+          <SearchIcon css={searchIconStyle} onClick={handleSearch} />
+        </div>
       </div>
       <div css={adminQnaInfoStyle}>
         <p>
@@ -431,9 +435,22 @@ const adminQnaSearchStyle = css`
   align-items: center;
   gap: 16px;
   height: 120px;
-
   background-color: ${COLOR_OPACITY.PRIMARY100_OPACITY30};
   border-radius: 2px;
+
+  .search-box {
+    position: relative;
+  }
+`;
+
+const searchIconStyle = css`
+  font-size: 28px;
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: ${COLOR.GRAY600};
+  cursor: pointer;
 `;
 
 const adminQnaInfoStyle = css`

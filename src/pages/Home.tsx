@@ -438,7 +438,7 @@ const smScoreCardStyle = css`
   flex-wrap: wrap;
   gap: 20px;
   max-width: 1200px;
-  padding: 0 10px;
+  padding: 0 10px 72px 0;
   grid-template-columns: repeat(3, 1fr);
 
   .sm-score-card {

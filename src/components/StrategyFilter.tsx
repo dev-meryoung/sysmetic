@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import SearchIcon from '@mui/icons-material/Search';
 import Checkbox from '@/components/Checkbox';
 import IconButton from '@/components/IconButton';
@@ -9,10 +10,12 @@ import { COLOR } from '@/constants/color';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/font';
 import { useGetMethodAndStock } from '@/hooks/useStrategyApi';
 import { FiltersProps, AlgorithmFilters } from '@/hooks/useStrategyFilters';
+import Tooltip from './Tooltip';
 
 interface FilterOptionProps {
   value: string;
   label: string;
+  tooltip?: string;
 }
 
 interface FilterProps {
@@ -85,9 +88,21 @@ export const TAB_FILTERS: Record<number, FilterProps[]> = {
       label: '알고리즘',
       type: 'radio',
       options: [
-        { value: 'EFFICIENCY', label: '효율형 전략' },
-        { value: 'OFFENSIVE', label: '공격형 전략' },
-        { value: 'DEFENSIVE', label: '방어형 전략' },
+        {
+          value: 'EFFICIENCY',
+          label: '효율형 전략',
+          tooltip: '누적수익/MDD 큰 값으로 정렬',
+        },
+        {
+          value: 'OFFENSIVE',
+          label: '공격형 전략',
+          tooltip: '누적수익/(1-승률) 큰 값으로 정렬',
+        },
+        {
+          value: 'DEFENSIVE',
+          label: '방어형 전략',
+          tooltip: '(MDD순위 + 표준편차순위 + 승률순위) / 3',
+        },
       ],
     },
   ],
@@ -134,12 +149,32 @@ const FilterInput = ({ filter, currentValue, onChange }: FilterInputProps) => {
       const radioValue = currentValue as string;
 
       return (
-        <RadioButton
-          options={filter.options || []}
-          name={filter.id}
-          selected={radioValue || filter.options?.[0]?.value || ''}
-          handleChange={(value) => onChange(filter.id, value)}
-        />
+        <>
+          {(filter.options || []).map((option) => (
+            <div css={radioStyle} key={option.value}>
+              <RadioButton
+                options={[option]}
+                name={filter.id}
+                selected={radioValue || filter.options?.[0]?.value || ''}
+                handleChange={(value) => onChange(filter.id, value)}
+              />
+              {option.tooltip && (
+                <Tooltip
+                  text={option.tooltip || ''}
+                  width={
+                    option.value === 'EFFICIENCY'
+                      ? 180
+                      : option.value === 'OFFENSIVE'
+                        ? 190
+                        : 240
+                  }
+                >
+                  <ErrorOutlineIcon />
+                </Tooltip>
+              )}
+            </div>
+          ))}
+        </>
       );
     }
 
@@ -345,6 +380,20 @@ const filterContentStyle = css`
       min-width: 80px;
       font-weight: ${FONT_WEIGHT.BOLD};
       color: ${COLOR.BLACK};
+    }
+  }
+`;
+
+const radioStyle = css`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  svg {
+    font-size: ${FONT_SIZE.TEXT_LG};
+
+    :hover {
+      color: ${COLOR.PRIMARY};
     }
   }
 `;

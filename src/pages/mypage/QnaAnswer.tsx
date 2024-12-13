@@ -30,7 +30,10 @@ const QnaAnswer = () => {
   const navigate = useNavigate();
   const { openModal } = useModalStore();
   const { roleCode } = useAuthStore();
-
+  const dateCustom = (isoDate: string): string => {
+    const dateObj = new Date(isoDate);
+    return `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, '0')}.${String(dateObj.getDate()).padStart(2, '0')}`;
+  };
   const { userId, qnaId } = useParams<{ userId: string; qnaId: string }>();
 
   useEffect(() => {
@@ -110,7 +113,8 @@ const QnaAnswer = () => {
             <div css={dateAndWriterStyle}>
               <div css={dateStyle}>
                 <span css={dateNameStyle}>작성일</span>
-                <span>{inquiryData.inquiryRegistrationDate}</span>
+                <span>{dateCustom(inquiryData.inquiryRegistrationDate)}
+                </span>
               </div>
               <div css={writerStyle}>
                 <span css={writerNameStyle}>작성자</span>

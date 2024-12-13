@@ -31,7 +31,7 @@ export const useLogin = () => {
       try {
         const authData = await checkAuth();
         setAuthState(authData.data);
-        navigate(-1);
+        navigate(PATH.ROOT);
       } catch {
         resetAuthState();
       }

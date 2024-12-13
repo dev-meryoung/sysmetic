@@ -53,7 +53,7 @@ const useStrategyAdd = () => {
         )
       );
     }
-  }, [roleCode]);
+  }, [roleCode, methodsAndStocks]);
 
   const handleCheckboxChange = (value: string) => {
     setStocks((prev) =>

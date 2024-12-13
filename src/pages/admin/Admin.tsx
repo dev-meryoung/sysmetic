@@ -63,6 +63,12 @@ const Admin = () => {
         width: 320,
         height: 320,
       },
+      tooltip: {
+        style: {
+          fontSize: FONT_SIZE.TEXT_SM,
+          fontWeight: FONT_WEIGHT.BOLD,
+        },
+      },
       title: {
         text: `${new Date().toISOString().substring(0, 10)} 기준`,
       },

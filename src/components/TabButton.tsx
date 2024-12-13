@@ -105,7 +105,7 @@ const tabBtnStyle = (tabIndex: number) => css`
         position: absolute;
         bottom: -1px;
         left: ${tabIndex * 90}px;
-        width: calc(100% - 90px);
+        width: calc(100% - ${tabIndex * 90}px);
         height: 1px;
         background-color: ${COLOR.PRIMARY100};
       }
