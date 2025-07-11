@@ -24,14 +24,15 @@ interface TableProps<T> {
 }
 
 const Table = <T,>({
-  data,
+  data = [],
   columns,
   hasCheckbox = false,
   checkedItems,
   handleCheckboxChange,
   handleHeaderCheckboxChange,
 }: TableProps<T>) => {
-  const isAllChecked = checkedItems?.length === data.length;
+  const isAllChecked =
+    !!data && !!checkedItems && checkedItems.length === data.length;
 
   // key: 정렬 기준이 되는 컬럼의 키값
   // direction: 'asc'(오름차순) 또는 'desc'(내림차순)
