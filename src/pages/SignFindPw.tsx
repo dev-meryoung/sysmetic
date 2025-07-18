@@ -50,9 +50,7 @@ const SignFindPw = () => {
 
   const emailRegEx =
     /^[A-Za-z0-9]([-_.]?[A-Za-z0-9])*@[A-Za-z0-9]([-_.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$/i;
-  const passwordRegEx =
-    /^(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])[A-Za-z!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{6,20}$/;
-
+  const passwordRegEx = /^(?=.*[a-z])(?=.*[0-9]).{6,20}$/;
   const handleChange =
     (field: keyof typeof formData) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,7 +130,7 @@ const SignFindPw = () => {
       ...messages,
       passwordError: isPasswordValid
         ? ''
-        : '6~20자의 영대/소문자, 숫자, 특수문자를 모두 포함해야 합니다.',
+        : '6~20자의 영문 소문자, 숫자를 필수로 포함하여 입력해주세요.',
       checkPasswordError: isPasswordMatch
         ? ''
         : '비밀번호가 일치하지 않습니다.',

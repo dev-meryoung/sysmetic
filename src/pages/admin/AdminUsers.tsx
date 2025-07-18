@@ -150,14 +150,26 @@ const AdminUsers = () => {
     {
       key: 'isManager' as keyof UsersTableProps,
       header: '권한',
-      render: (value: RoleCodeTypes | string | number) =>
-        value === 'USER_MANAGER' || value === 'TRADER_MANAGER' ? '관리자' : '-',
+      render: (value: RoleCodeTypes | string | number) => {
+        if (value === 'ADMIN') return '최고';
+        if (value === 'USER_MANAGER' || value === 'TRADER_MANAGER')
+          return '일반';
+        return '-';
+      },
     },
     {
       key: 'grade' as keyof UsersTableProps,
       header: '회원등급',
-      render: (value: RoleCodeTypes | string | number) =>
-        value === 'USER' || value === 'USER_MANAGER' ? '일반회원' : '트레이더',
+      render: (value: RoleCodeTypes | string | number) => {
+        if (
+          value === 'ADMIN' ||
+          value === 'USER_MANAGER' ||
+          value === 'TRADER_MANAGER'
+        )
+          return '관리자';
+        if (value === 'TRADER') return '트레이더';
+        return '일반회원';
+      },
     },
     {
       key: 'email' as keyof UsersTableProps,

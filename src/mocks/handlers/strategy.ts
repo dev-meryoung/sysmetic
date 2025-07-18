@@ -1,5 +1,6 @@
 import { HttpResponse, http } from 'msw';
 import { Strategy, db } from '../data/database';
+import { getUserIdFromRequest } from '../utils';
 
 const createPageResponse = (
   content: any[],
@@ -38,6 +39,7 @@ const strategyHandlers = [
     const url = new URL(request.url);
     const pageNum = parseInt(url.searchParams.get('pageNum') || '0', 10);
     const pageSize = 10;
+    const userId = getUserIdFromRequest(request);
 
     const publicStrategies = db.strategies.filter(
       (s) => s.isOpen && s.isApproved === 'APPROVED'
@@ -47,9 +49,11 @@ const strategyHandlers = [
       .slice(pageNum * pageSize, (pageNum + 1) * pageSize)
       .map((s) => {
         const trader = db.users.find((u) => u.id === s.traderId);
-        const isFollow = db.interestStrategies.some(
-          (i) => i.strategyId === s.id && i.userId === 1
-        );
+        const isFollow = userId
+          ? db.interestStrategies.some(
+              (i) => i.strategyId === s.id && i.userId === userId
+            )
+          : false;
         return {
           strategyId: s.id,
           traderId: s.traderId,
@@ -86,6 +90,7 @@ const strategyHandlers = [
   http.post('*/v1/strategy/search/conditions', async ({ request }) => {
     const pageNum = parseInt(request.headers.get('pageNum') || '0', 10);
     const body = await request.json();
+    const userId = getUserIdFromRequest(request);
     const {
       methods,
       stockNames,
@@ -189,9 +194,11 @@ const strategyHandlers = [
       .slice(pageNum * pageSize, (pageNum + 1) * pageSize)
       .map((s) => {
         const trader = db.users.find((u) => u.id === s.traderId);
-        const isFollow = db.interestStrategies.some(
-          (i) => i.strategyId === s.id && i.userId === 1
-        );
+        const isFollow = userId
+          ? db.interestStrategies.some(
+              (i) => i.strategyId === s.id && i.userId === userId
+            )
+          : false;
         return {
           strategyId: s.id,
           traderId: s.traderId,
@@ -230,6 +237,7 @@ const strategyHandlers = [
     const pageNum = parseInt(url.searchParams.get('pageNum') || '0', 10);
     const algorithm = url.searchParams.get('algorithm') || 'EFFICIENCY';
     const pageSize = 10;
+    const userId = getUserIdFromRequest(request);
 
     const baseStrategies = db.strategies.filter(
       (s) => s.isOpen && s.isApproved === 'APPROVED'
@@ -256,9 +264,11 @@ const strategyHandlers = [
       .slice(pageNum * pageSize, (pageNum + 1) * pageSize)
       .map((s) => {
         const trader = db.users.find((u) => u.id === s.traderId);
-        const isFollow = db.interestStrategies.some(
-          (i) => i.strategyId === s.id && i.userId === 1
-        );
+        const isFollow = userId
+          ? db.interestStrategies.some(
+              (i) => i.strategyId === s.id && i.userId === userId
+            )
+          : false;
         return {
           strategyId: s.id,
           traderId: s.traderId,
@@ -338,6 +348,7 @@ const strategyHandlers = [
     const traderId = parseInt(url.searchParams.get('traderId') || '1', 10);
     const pageNum = parseInt(url.searchParams.get('pageNum') || '0', 10);
     const pageSize = 10;
+    const userId = getUserIdFromRequest(request);
 
     const trader = db.users.find((u) => u.id === traderId);
     const traderStrategies = db.strategies.filter(
@@ -354,9 +365,11 @@ const strategyHandlers = [
         stockList: s.stockList,
         cycle: s.cycle,
         accumulatedProfitLossRate: s.cagr,
-        isFollow: db.interestStrategies.some(
-          (i) => i.strategyId === s.id && i.userId === 1
-        ),
+        isFollow: userId
+          ? db.interestStrategies.some(
+              (i) => i.strategyId === s.id && i.userId === userId
+            )
+          : false,
         mdd: s.mdd,
         smScore: s.smScore,
       }));
@@ -390,6 +403,7 @@ const strategyHandlers = [
     const keyword = url.searchParams.get('keyword') || '';
     const pageNum = parseInt(url.searchParams.get('pageNum') || '0', 10);
     const pageSize = 10;
+    const userId = getUserIdFromRequest(request);
 
     const filtered = db.strategies.filter(
       (s) => s.name.includes(keyword) && s.isOpen && s.isApproved === 'APPROVED'
@@ -398,9 +412,11 @@ const strategyHandlers = [
       .slice(pageNum * pageSize, (pageNum + 1) * pageSize)
       .map((s) => {
         const trader = db.users.find((u) => u.id === s.traderId);
-        const isFollow = db.interestStrategies.some(
-          (i) => i.strategyId === s.id && i.userId === 1
-        );
+        const isFollow = userId
+          ? db.interestStrategies.some(
+              (i) => i.strategyId === s.id && i.userId === userId
+            )
+          : false;
         return {
           strategyId: s.id,
           traderId: s.traderId,
@@ -434,10 +450,11 @@ const strategyHandlers = [
   }),
 
   // 전략 상세 정보 조회 API
-  http.get('*/v1/strategy/detail/:strategyId', ({ params }) => {
+  http.get('*/v1/strategy/detail/:strategyId', ({ request, params }) => {
     const strategyId = parseInt(params.strategyId as string, 10);
     const strategy = db.strategies.find((s) => s.id === strategyId);
     const trader = db.users.find((u) => u.id === strategy?.traderId);
+    const userId = getUserIdFromRequest(request);
 
     if (!strategy || !trader) {
       return HttpResponse.json(
@@ -462,9 +479,11 @@ const strategyHandlers = [
       methodName: strategy.methodName,
       methodIconPath: strategy.methodIconPath,
       stockList: strategy.stockList,
-      isFollow: db.interestStrategies.some(
-        (i) => i.strategyId === strategy.id && i.userId === 1
-      ),
+      isFollow: userId
+        ? db.interestStrategies.some(
+            (i) => i.strategyId === strategy.id && i.userId === userId
+          )
+        : false,
       name: strategy.name,
       statusCode,
       cycle: strategy.cycle,
@@ -667,15 +686,26 @@ const strategyHandlers = [
 
   // 전략 댓글 등록 API
   http.post('*/v1/strategy/reply', async ({ request }) => {
+    const userId = getUserIdFromRequest(request);
+    if (!userId) {
+      return HttpResponse.json(
+        { code: 401, message: '인증이 필요합니다.' },
+        { status: 401 }
+      );
+    }
+
     const { strategyId, content } = (await request.json()) as {
       strategyId: number;
       content: string;
     };
     const newComment = {
-      id: db.comments.length + 1,
+      id:
+        db.comments.length > 0
+          ? Math.max(...db.comments.map((c) => c.id)) + 1
+          : 1,
       strategyId,
       content,
-      userId: 1,
+      userId,
       createdAt: new Date().toISOString(),
     };
     db.comments.unshift(newComment);
@@ -688,13 +718,69 @@ const strategyHandlers = [
 
   // 전략 댓글 삭제 API
   http.delete('*/v1/strategy/reply', async ({ request }) => {
+    const userId = getUserIdFromRequest(request);
+    if (!userId) {
+      return HttpResponse.json(
+        { code: 401, message: '인증이 필요합니다.' },
+        { status: 401 }
+      );
+    }
+
     const { replyId } = (await request.json()) as { replyId: number };
-    const index = db.comments.findIndex((c) => c.id === replyId);
-    if (index > -1) db.comments.splice(index, 1);
+    const commentIndex = db.comments.findIndex((c) => c.id === replyId);
+
+    if (commentIndex === -1) {
+      return HttpResponse.json(
+        { code: 404, message: '댓글을 찾을 수 없습니다.' },
+        { status: 404 }
+      );
+    }
+
+    // 본인 댓글만 삭제 가능
+    if (db.comments[commentIndex].userId !== userId) {
+      return HttpResponse.json(
+        { code: 403, message: '삭제 권한이 없습니다.' },
+        { status: 403 }
+      );
+    }
+
+    db.comments.splice(commentIndex, 1);
     return HttpResponse.json({
       code: 200,
       message: '요청이 성공했습니다.',
       data: null,
+    });
+  }),
+
+  // 문의 등록 화면 조회 API
+  http.get('*/v1/strategy/:strategyId/qna', ({ params }) => {
+    const strategyId = parseInt(params.strategyId as string, 10);
+    const strategy = db.strategies.find((s) => s.id === strategyId);
+
+    if (!strategy) {
+      return HttpResponse.json(
+        { code: 404, message: '전략을 찾을 수 없습니다.' },
+        { status: 404 }
+      );
+    }
+
+    const trader = db.users.find((u) => u.id === strategy.traderId);
+
+    const response = {
+      strategyName: strategy.name,
+      traderNickname: trader?.nickname,
+      traderProfileImagePath: trader?.profileImage,
+      methodIconPath: strategy.methodIconPath,
+      cycle: strategy.cycle,
+      stockList: {
+        stockIconPath: strategy.stockList.stockIconPath,
+      },
+    };
+
+    return HttpResponse.json({
+      code: 200,
+      message: '요청 성공',
+      data: response,
     });
   }),
 
