@@ -1,6 +1,15 @@
 import { HttpResponse, http } from 'msw';
 import { db } from '../data/database';
 
+// File을 Base64 Data URL로 변환하는 헬퍼 함수
+const toBase64 = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+  });
+
 const userHandlers = [
   // 회원 정보 수정 API
   http.patch('/v1/member/info/:userId', async ({ params, request }) => {
@@ -8,7 +17,7 @@ const userHandlers = [
     const formData = await request.formData();
     const nickname = formData.get('nickname') as string;
     const phoneNumber = formData.get('phoneNumber') as string;
-    // const file = formData.get('file') as File; // 파일 처리 로직은 필요시 추가
+    const file = formData.get('file') as File;
 
     const user = db.users.find((u) => u.id === userId);
 
@@ -22,7 +31,12 @@ const userHandlers = [
     // 닉네임, 전화번호 업데이트
     if (nickname) user.nickname = nickname;
     if (phoneNumber) user.phoneNumber = phoneNumber;
-    // 프로필 이미지 URL은 이 예제에서 변경하지 않음 (필요시 로직 추가)
+
+    // 프로필 이미지 업데이트 (업로드된 파일 사용)
+    if (file) {
+      const dataUrl = await toBase64(file);
+      user.profileImage = dataUrl;
+    }
 
     console.log(`[MSW] 회원 정보 수정 완료 (userId: ${userId}):`, user);
 

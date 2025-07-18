@@ -1,5 +1,6 @@
 import { HttpResponse, http } from 'msw';
 import { db } from '../data/database';
+import { getUserIdFromRequest } from '../utils';
 
 const createPageResponse = (
   content: any[],
@@ -249,7 +250,14 @@ const commonHandlers = [
     const pageNum = parseInt(url.searchParams.get('page') || '0', 10);
     const closed = url.searchParams.get('closed'); // 'true' or 'false'
     const pageSize = 10;
-    const userId = 1; // 임시 사용자 ID
+    const userId = getUserIdFromRequest(request);
+
+    if (!userId) {
+      return HttpResponse.json(
+        { code: 401, message: '인증이 필요합니다.' },
+        { status: 401 }
+      );
+    }
 
     let userInquiries = db.inquiries.filter((i) => i.userId === userId);
 
@@ -261,15 +269,16 @@ const commonHandlers = [
     const content = userInquiries
       .slice(pageNum * pageSize, (pageNum + 1) * pageSize)
       .map((i) => {
-        const randomStrategy = db.strategies[i.id % db.strategies.length];
-        const trader = db.users.find((u) => u.id === randomStrategy.traderId);
+        const strategy = db.strategies.find((s) => s.id === i.strategyId);
         return {
           inquiryId: i.id,
           inquiryTitle: i.title,
-          inquiryStatus: i.isAnswered,
+          inquiryStatus: i.isAnswered ? 'closed' : 'unclosed',
           inquiryRegistrationDate: i.createdAt,
-          strategyName: randomStrategy.name,
-          traderNickname: trader?.nickname,
+          strategyName: strategy?.name,
+          methodIconPath: strategy?.methodIconPath,
+          cycle: strategy?.cycle,
+          stockList: strategy?.stockList,
         };
       });
 
@@ -292,14 +301,21 @@ const commonHandlers = [
     const pageNum = parseInt(url.searchParams.get('page') || '0', 10);
     const closed = url.searchParams.get('closed');
     const pageSize = 10;
-    const traderId = 2; // 임시 트레이더 ID
+    const traderId = getUserIdFromRequest(request);
+
+    if (!traderId) {
+      return HttpResponse.json(
+        { code: 401, message: '인증이 필요합니다.' },
+        { status: 401 }
+      );
+    }
 
     const traderStrategyIds = db.strategies
       .filter((s) => s.traderId === traderId)
       .map((s) => s.id);
-    // 문의 DB에 strategyId가 없으므로, 임의로 트레이더의 전략에 달린 문의인 것처럼 필터링
+
     let traderInquiries = db.inquiries.filter((i) =>
-      traderStrategyIds.includes(i.id % db.strategies.length)
+      traderStrategyIds.includes(i.strategyId)
     );
 
     if (closed) {
@@ -313,12 +329,17 @@ const commonHandlers = [
       .slice(pageNum * pageSize, (pageNum + 1) * pageSize)
       .map((i) => {
         const user = db.users.find((u) => u.id === i.userId);
+        const strategy = db.strategies.find((s) => s.id === i.strategyId);
         return {
           inquiryId: i.id,
           inquiryTitle: i.title,
-          inquiryStatus: i.isAnswered,
+          inquiryStatus: i.isAnswered ? 'closed' : 'unclosed',
           inquiryRegistrationDate: i.createdAt,
           inquirerNickname: user?.nickname,
+          strategyName: strategy?.name,
+          methodIconPath: strategy?.methodIconPath,
+          cycle: strategy?.cycle,
+          stockList: strategy?.stockList,
         };
       });
 
@@ -341,6 +362,14 @@ const commonHandlers = [
       inquiryTitle: string;
       inquiryContent: string;
     };
+    const userId = getUserIdFromRequest(request);
+    if (!userId) {
+      return HttpResponse.json(
+        { code: 401, message: '인증이 필요합니다.' },
+        { status: 401 }
+      );
+    }
+
     const newInquiry = {
       id:
         db.inquiries.length > 0
@@ -349,7 +378,7 @@ const commonHandlers = [
       strategyId: Number(params.strategyId),
       title: inquiryTitle,
       content: inquiryContent,
-      userId: 1, // 임시 사용자
+      userId,
       createdAt: new Date().toISOString(),
       isAnswered: false,
       answer: null,
@@ -358,6 +387,138 @@ const commonHandlers = [
     return HttpResponse.json({
       code: 200,
       message: '문의가 등록되었습니다.',
+      data: null,
+    });
+  }),
+
+  // 질문자 문의 상세 조회
+  http.get('*/v1/member/qna/:qnaId', ({ params }) => {
+    const qnaId = parseInt(params.qnaId as string, 10);
+    const inquiry = db.inquiries.find((i) => i.id === qnaId);
+
+    if (!inquiry) {
+      return HttpResponse.json(
+        { code: 404, message: '문의를 찾을 수 없습니다.' },
+        { status: 404 }
+      );
+    }
+
+    const strategy = db.strategies.find((s) => s.id === inquiry.strategyId);
+    const trader = db.users.find((u) => u.id === strategy?.traderId);
+    const inquirer = db.users.find((u) => u.id === inquiry.userId);
+
+    const response = {
+      inquiryId: inquiry.id,
+      inquiryTitle: inquiry.title,
+      inquiryContent: inquiry.content,
+      inquiryRegistrationDate: inquiry.createdAt,
+      inquiryStatus: inquiry.isAnswered ? 'closed' : 'unclosed',
+      inquirerNickname: inquirer?.nickname,
+      answerTitle: inquiry.answer ? `RE: ${inquiry.title}` : null,
+      answerContent: inquiry.answer?.content,
+      answerRegistrationDate: inquiry.answer?.answeredAt,
+      strategyId: strategy?.id,
+      strategyName: strategy?.name,
+      traderNickname: trader?.nickname,
+      traderProfileImagePath: trader?.profileImage,
+      methodIconPath: strategy?.methodIconPath,
+      cycle: strategy?.cycle,
+      stockList: strategy?.stockList,
+    };
+
+    return HttpResponse.json({
+      code: 200,
+      message: '요청 성공',
+      data: response,
+    });
+  }),
+
+  // 트레이더 문의 상세 조회
+  http.get('*/v1/trader/qna/:qnaId', ({ params }) => {
+    const qnaId = parseInt(params.qnaId as string, 10);
+    const inquiry = db.inquiries.find((i) => i.id === qnaId);
+
+    if (!inquiry) {
+      return HttpResponse.json(
+        { code: 404, message: '문의를 찾을 수 없습니다.' },
+        { status: 404 }
+      );
+    }
+
+    const strategy = db.strategies.find((s) => s.id === inquiry.strategyId);
+    const trader = db.users.find((u) => u.id === strategy?.traderId);
+    const inquirer = db.users.find((u) => u.id === inquiry.userId);
+
+    const response = {
+      inquiryId: inquiry.id,
+      inquiryTitle: inquiry.title,
+      inquiryContent: inquiry.content,
+      inquiryRegistrationDate: inquiry.createdAt,
+      inquiryStatus: inquiry.isAnswered ? 'closed' : 'unclosed',
+      inquirerNickname: inquirer?.nickname,
+      answerTitle: inquiry.answer ? `RE: ${inquiry.title}` : null,
+      answerContent: inquiry.answer?.content,
+      answerRegistrationDate: inquiry.answer?.answeredAt,
+      strategyId: strategy?.id,
+      strategyName: strategy?.name,
+      traderNickname: trader?.nickname,
+      traderProfileImagePath: trader?.profileImage,
+      methodIconPath: strategy?.methodIconPath,
+      cycle: strategy?.cycle,
+      stockList: strategy?.stockList,
+    };
+
+    return HttpResponse.json({
+      code: 200,
+      message: '요청 성공',
+      data: response,
+    });
+  }),
+
+  // 질문자 문의 수정 화면 조회
+  http.get('*/v1/member/qna/:qnaId/modify', ({ params }) => {
+    const qnaId = parseInt(params.qnaId as string, 10);
+    const inquiry = db.inquiries.find((i) => i.id === qnaId);
+
+    if (!inquiry) {
+      return HttpResponse.json(
+        { code: 404, message: '문의를 찾을 수 없습니다.' },
+        { status: 404 }
+      );
+    }
+
+    return HttpResponse.json({
+      code: 200,
+      message: '요청 성공',
+      data: {
+        inquiryTitle: inquiry.title,
+        inquiryContent: inquiry.content,
+      },
+    });
+  }),
+
+  // 질문자 문의 수정
+  http.put('*/v1/member/qna/:qnaId', async ({ params, request }) => {
+    const qnaId = parseInt(params.qnaId as string, 10);
+    const { inquiryTitle, inquiryContent } = (await request.json()) as {
+      inquiryTitle: string;
+      inquiryContent: string;
+    };
+    const inquiry = db.inquiries.find((i) => i.id === qnaId);
+
+    if (!inquiry) {
+      return HttpResponse.json(
+        { code: 404, message: '문의를 찾을 수 없습니다.' },
+        { status: 404 }
+      );
+    }
+
+    inquiry.title = inquiryTitle;
+    inquiry.content = inquiryContent;
+
+    return HttpResponse.json({
+      code: 200,
+      message: '문의가 수정되었습니다.',
       data: null,
     });
   }),

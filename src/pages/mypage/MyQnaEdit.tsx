@@ -40,6 +40,15 @@ const MyQnaEdit = () => {
 
   const inquiryData = inquiryResponse?.data || {};
 
+  useEffect(() => {
+    if (inquiryData.inquiryTitle) {
+      setTitleValue(inquiryData.inquiryTitle);
+    }
+    if (inquiryData.inquiryContent) {
+      setContentValue(inquiryData.inquiryContent);
+    }
+  }, [inquiryData]);
+
   if (isError) {
     openModal('get-inquiry-error');
   }
@@ -108,7 +117,7 @@ const MyQnaEdit = () => {
             <>
               <div css={questionNameStyle}>
                 <TextInput
-                  value={titleValue || inquiryData.inquiryTitle}
+                  value={titleValue}
                   status={status}
                   placeholder='제목을 입력해주세요.'
                   fullWidth
@@ -117,7 +126,7 @@ const MyQnaEdit = () => {
               </div>
               <div css={questionStyle}>
                 <TextArea
-                  value={contentValue || inquiryData.inquiryContent}
+                  value={contentValue}
                   placeholder='내용을 입력해주세요.'
                   fullWidth
                   handleChange={handleTextChange}
