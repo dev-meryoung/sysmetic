@@ -25,8 +25,7 @@ const SignIn = () => {
 
   const emailRegEx =
     /^[A-Za-z0-9]([-_.]?[A-Za-z0-9])*@[A-Za-z0-9]([-_.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$/i;
-  const passwordRegEx =
-    /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,20}$/;
+  const passwordRegEx = /^(?=.*[a-z])(?=.*[0-9]).{6,20}$/;
 
   const handlePasswordVisibility = () => setShowPassword((prev) => !prev);
 
@@ -136,7 +135,7 @@ const SignIn = () => {
           </div>
           {passwordError && (
             <span css={messageStyle}>
-              6~20자의 영대/소문자, 숫자, 특수문자로 구성되어야 합니다.
+              6~20자의 영문 소문자, 숫자를 필수로 포함하여 입력해주세요
             </span>
           )}
         </div>
