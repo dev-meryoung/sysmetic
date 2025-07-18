@@ -16,7 +16,7 @@ export interface User {
   email: string;
   name: string;
   nickname: string;
-  roleCode: 'USER' | 'TRADER' | 'MANAGER' | 'ADMIN';
+  roleCode: 'USER' | 'TRADER' | 'USER_MANAGER' | 'TRADER_MANAGER' | 'ADMIN';
   profileImage: string;
   phoneNumber: string;
   birth: string;
@@ -115,34 +115,8 @@ const strategies: Strategy[] = [];
 const notices: Notice[] = [];
 const comments: Comment[] = [];
 const inquiries: Inquiry[] = [];
-const folders: Folder[] = [
-  { id: 1, userId: 1, name: '기본 폴더' },
-  { id: 2, userId: 1, name: '가치주 전략' },
-  { id: 3, userId: 2, name: '퀀트 포트폴리오' },
-];
-const interestStrategies: InterestStrategy[] = [
-  {
-    id: 1,
-    userId: 1,
-    folderId: 1,
-    strategyId: 101,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 2,
-    userId: 1,
-    folderId: 1,
-    strategyId: 103,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 3,
-    userId: 1,
-    folderId: 2,
-    strategyId: 102,
-    createdAt: new Date().toISOString(),
-  },
-];
+const folders: Folder[] = [];
+const interestStrategies: InterestStrategy[] = [];
 
 // --- 기본 데이터 ---
 // "매매방식" 데이터
@@ -627,6 +601,65 @@ for (let i = 1; i <= 20; i++) {
           ).toString(),
         }
       : null,
+  });
+}
+
+// 모든 사용자에게 '기본 폴더'가 있는지 확인하고 없으면 생성
+let folderIdCounter =
+  folders.length > 0 ? Math.max(...folders.map((f) => f.id)) + 1 : 1;
+users.forEach((user) => {
+  const hasDefaultFolder = folders.some(
+    (folder) => folder.userId === user.id && folder.name === '기본 폴더'
+  );
+  if (!hasDefaultFolder) {
+    folders.push({
+      id: folderIdCounter++,
+      userId: user.id,
+      name: '기본 폴더',
+    });
+  }
+});
+
+// 일반 투자자에게 관심 전략 2~3개씩 추가
+const normalUsers = users.filter((u) => u.roleCode === 'USER');
+const approvedStrategies = strategies.filter(
+  (s) => s.isApproved === 'APPROVED'
+);
+let interestIdCounter = 1;
+
+if (approvedStrategies.length > 0) {
+  normalUsers.forEach((user) => {
+    const defaultFolder = folders.find(
+      (f) => f.userId === user.id && f.name === '기본 폴더'
+    );
+    if (defaultFolder) {
+      const numStrategiesToAdd = getRandomInt(2, 3);
+      const availableStrategies = [...approvedStrategies];
+
+      for (let i = 0; i < numStrategiesToAdd; i++) {
+        if (availableStrategies.length === 0) break;
+
+        const strategyIndex = getRandomInt(0, availableStrategies.length - 1);
+        const selectedStrategy = availableStrategies.splice(
+          strategyIndex,
+          1
+        )[0];
+
+        const isAlreadyAdded = interestStrategies.some(
+          (is) => is.userId === user.id && is.strategyId === selectedStrategy.id
+        );
+
+        if (!isAlreadyAdded) {
+          interestStrategies.push({
+            id: interestIdCounter++,
+            userId: user.id,
+            folderId: defaultFolder.id,
+            strategyId: selectedStrategy.id,
+            createdAt: new Date().toISOString(),
+          });
+        }
+      }
+    }
   });
 }
 

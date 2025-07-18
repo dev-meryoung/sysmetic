@@ -1,5 +1,6 @@
 import { HttpResponse, http } from 'msw';
 import { db } from '../data/database';
+import { getUserIdFromRequest } from '../utils';
 
 const authHandlers = [
   // 로그인 API
@@ -18,6 +19,7 @@ const authHandlers = [
       );
     }
 
+    // 토큰으로 사용자 ID를 직접 사용
     return HttpResponse.json(
       {
         code: 200,
@@ -26,7 +28,7 @@ const authHandlers = [
       },
       {
         headers: {
-          Authorization: `Bearer sample_access_token_for_user_${user.id}`,
+          Authorization: `Bearer ${user.id}`,
         },
       }
     );
@@ -34,8 +36,7 @@ const authHandlers = [
 
   // Token 유효성 검증 및 회원 정보 조회 API
   http.get('/v1/auth', ({ request }) => {
-    const authHeader = request.headers.get('Authorization');
-    const userId = parseInt(authHeader?.split('_').pop() || '1', 10);
+    const userId = getUserIdFromRequest(request); // 일관된 유틸리티 함수 사용
     const user = db.users.find((u) => u.id === userId);
 
     if (!user) {
@@ -192,14 +193,21 @@ const authHandlers = [
     };
     db.users.push(newUser);
 
+    // 새 사용자를 위한 기본 폴더 생성
+    const folderIdCounter =
+      db.folders.length > 0 ? Math.max(...db.folders.map((f) => f.id)) + 1 : 1;
+    db.folders.push({
+      id: folderIdCounter,
+      userId: newUser.id,
+      name: '기본 폴더',
+    });
+
     return HttpResponse.json({
       code: 200,
       message: '회원가입이 완료되었습니다.',
       data: null,
     });
   }),
-
-  // (이하 다른 핸들러들은 기존 코드 유지)
 ];
 
 export { authHandlers };

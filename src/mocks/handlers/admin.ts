@@ -83,8 +83,8 @@ const adminHandlers = [
     let filteredUsers = db.users;
     if (role !== 'ALL') {
       if (role === 'MANAGER') {
-        filteredUsers = filteredUsers.filter(
-          (u) => u.roleCode === 'ADMIN' || u.roleCode === 'MANAGER'
+        filteredUsers = filteredUsers.filter((u) =>
+          ['ADMIN', 'USER_MANAGER', 'TRADER_MANAGER'].includes(u.roleCode)
         );
       } else {
         filteredUsers = filteredUsers.filter((u) => u.roleCode === role);
@@ -148,7 +148,21 @@ const adminHandlers = [
     };
     db.users.forEach((user) => {
       if (memberId.includes(user.id)) {
-        user.roleCode = hasManagerRights ? 'ADMIN' : 'USER';
+        if (hasManagerRights) {
+          // 관리자 임명
+          if (user.roleCode === 'USER') {
+            user.roleCode = 'USER_MANAGER';
+          } else if (user.roleCode === 'TRADER') {
+            user.roleCode = 'TRADER_MANAGER';
+          }
+        } else {
+          // 관리자 해임
+          if (user.roleCode === 'USER_MANAGER') {
+            user.roleCode = 'USER';
+          } else if (user.roleCode === 'TRADER_MANAGER') {
+            user.roleCode = 'TRADER';
+          }
+        }
       }
     });
     return HttpResponse.json({
